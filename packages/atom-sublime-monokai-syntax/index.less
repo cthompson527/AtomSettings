@@ -1,0 +1,180 @@
+@import "./styles/base.less";
+
+:host,
+atom-text-editor {
+    .search-results {
+        .marker .region {
+            background-color: transparent;
+            border: 1px solid @syntax-result-marker-color;
+        }
+
+        .marker.current-result .region {
+            border: 1px solid @syntax-result-marker-color-selected;
+        }
+    }
+
+    .gfm {
+        .markup {
+            &.heading {
+                color: @green;
+                font-weight: bold;
+            }
+
+            &.underline {
+                color: @yellow;
+                text-decoration: underline;
+            }
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        .italic {
+            font-style: italic;
+        }
+
+        .raw {
+            color: @blue;
+        }
+
+        .variable.list {
+            color: @pink;
+            font-weight: bold;
+        }
+
+        .link {
+            color: @light-gray;
+
+            .entity {
+                color: @purple;
+            }
+        }
+    }
+}
+
+.entity {
+    &.name {
+        &.class {
+            text-decoration: none;
+            color: @green;
+        }
+
+        &.function {
+            color: @function-declaration-color;
+
+            .method-call & {
+                // selects the parent which className is method-call
+                color: @function-call-color;
+            }
+        }
+
+        &.instance {
+            color: @blue;
+        }
+
+        &.tag {
+            color: @pink;
+        }
+    }
+
+    &.other {
+        &.attribute-name {
+            color: @green;
+        }
+
+        &.inherited-class {
+            font-style: italic;
+            text-decoration: none;
+            color: @green;
+        }
+
+        &.class.jade {
+            // Jade syntax
+            color: @purple;
+        }
+    }
+}
+
+.punctuation {
+    &.definition.parameters,
+    &.section.embedded,
+    &.section.scope,
+    &.separator,
+    &.terminator.expression {
+        color: @syntax-text-color;
+    }
+}
+
+.invalid {
+    color: @ghost-white;
+    background-color: @pink;
+
+    &.deprecated {
+        background-color: @purple;
+    }
+
+    &.illegal {
+        background-color: @red;
+        color: @syntax-background-color;
+    }
+}
+
+.support {
+    &.constant,
+    &.function {
+        color: @function-call-color;
+    }
+
+    &.class,
+    &.type {
+        font-style: italic;
+        color: @blue;
+    }
+}
+
+.variable {
+    color: @syntax-text-color; // white
+    // 'self' Python
+    &.language.python,
+    // 'this' Javascript
+    &.language.js {
+        color: @pink;
+        font-style: italic;
+    }
+}
+
+.meta {
+    &.tag {
+        color: @syntax-text-color;
+    }
+
+    &.delimiter.period {
+        color: @pink
+    }
+
+    &.function-call:not(.js) {
+        // atom puts the ( and ) punctuations inside the function-call block for JS
+        color: @function-call-color;
+    }
+
+    &.function .variable {
+        font-style: italic;
+        color: @orange;
+    }
+}
+// Prevent underlines from making their way into whitespace elements
+
+.leading-whitespace,
+.trailing-whitespace {
+    display: inline-block;
+}
+// specific language highlight
+
+.php {
+    // PHP syntax highlighting
+    .punctuation.section.embedded {
+        font-weight: bold;
+        font-style: italic;
+    }
+}

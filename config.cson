@@ -1,0 +1,29 @@
+"*":
+  core:
+    customFileTypes:
+      "source.ini": [
+        ".buckconfig"
+        ".hgrc"
+        ".flowconfig"
+      ]
+      "source.json": [
+        ".arcconfig"
+        "BUCK.autodeps"
+      ]
+      "source.python": [
+        "BUCK"
+      ]
+    disabledPackages: [
+      "tree-view"
+    ]
+    telemetryConsent: "no"
+    themes: [
+      "atom-dark-ui"
+      "atom-sublime-monokai-syntax"
+    ]
+  editor:
+    scrollPastEnd: true
+  "exception-reporting":
+    userId: "11324a01-1729-3dfa-03cb-3447e18d86f7"
+  welcome:
+    showOnStartup: false

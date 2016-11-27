@@ -1,0 +1,14 @@
+# pack-refs with: peeled fully-peeled 
+adb71a3d9ce6307be5039cc92709f21b31896892 refs/heads/greenkeeper-eslint-plugin-react-4.0.0
+f85f775f6e79dce64f635708ae8e364808b2aa5d refs/heads/master
+f85f775f6e79dce64f635708ae8e364808b2aa5d refs/tags/2.0
+f39c2204c3ae7cde1e9e97f8f33894ec201d7020 refs/tags/v1.0.0
+^a4c9bc28e64907454fc17ff399e0f462665ecd8d
+1b52c1bda5bdc919b2efad7feb05471b94aa11e8 refs/tags/v1.0.1
+^2e39a047f877d6174db3d8c7de0ce86c983b7fcf
+16fb7ffbfd37a9e03277717ca3255d744e6ef7fc refs/tags/v1.1.0
+^7e23a518729e35a3a6a1a76ba779a3ba81775615
+4ed548147e25215200dcedaf0568e4fe9bcf6b4d refs/tags/v1.1.1
+^e3ce2b04595540d3e74c934f6f9bae6ac9810ab9
+2e8b499d09e3b969710860ba4b146f652aefd3a3 refs/tags/v1.2.0
+^7aff691f0f0aba14aaca5d7102468d7992eff0c9
