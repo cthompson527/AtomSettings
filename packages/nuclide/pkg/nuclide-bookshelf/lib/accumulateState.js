@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.accumulateState = accumulateState;
 
 var _constants;
@@ -30,6 +18,16 @@ function _load_immutable() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getEmptyRepositoryState() {
   return {
@@ -61,7 +59,6 @@ function accumulateState(state, action) {
 }
 
 function accumulateAddProjectRepository(state, action) {
-
   const repositoryPath = action.payload.repository.getWorkingDirectory();
   const newRepositoryState = state.repositoryPathToState.get(repositoryPath) || getEmptyRepositoryState();
   return Object.assign({}, state, {
@@ -70,7 +67,6 @@ function accumulateAddProjectRepository(state, action) {
 }
 
 function accumulateRemoveProjectRepository(state, action) {
-
   const repositoryPath = action.payload.repository.getWorkingDirectory();
   return Object.assign({}, state, {
     repositoryPathToState: state.repositoryPathToState.delete(repositoryPath)
@@ -115,13 +111,10 @@ function accumulateRepositoryStateUpdateBookmarks(repositoryState_, action) {
   let repositoryState = repositoryState_;
 
   repositoryState = repositoryState || getEmptyRepositoryState();
-  var _action$payload = action.payload;
-  const bookmarkNames = _action$payload.bookmarkNames,
-        activeShortHead = _action$payload.activeShortHead;
-  var _repositoryState = repositoryState;
-  let shortHeadsToFileList = _repositoryState.shortHeadsToFileList;
-  // Invalidate removed bookmarks data.
+  const { bookmarkNames, activeShortHead } = action.payload;
 
+  let { shortHeadsToFileList } = repositoryState;
+  // Invalidate removed bookmarks data.
   for (const shortHead of repositoryState.shortHeadsToFileList.keys()) {
     if (!bookmarkNames.has(shortHead)) {
       shortHeadsToFileList = shortHeadsToFileList.delete(shortHead);
@@ -129,21 +122,15 @@ function accumulateRepositoryStateUpdateBookmarks(repositoryState_, action) {
   }
 
   return Object.assign({}, repositoryState, {
-    activeShortHead: activeShortHead,
-    shortHeadsToFileList: shortHeadsToFileList
+    activeShortHead,
+    shortHeadsToFileList
   });
 }
 
 function accumulateUpdatePaneItemState(state, action) {
-  const repositoryPathToEditors = action.payload.repositoryPathToEditors;
-
+  const { repositoryPathToEditors } = action.payload;
   return Object.assign({}, state, {
-    repositoryPathToState: (_immutable || _load_immutable()).default.Map(Array.from(state.repositoryPathToState.entries()).map((_ref) => {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      let repositoryPath = _ref2[0],
-          repositoryState = _ref2[1];
-
+    repositoryPathToState: (_immutable || _load_immutable()).default.Map(Array.from(state.repositoryPathToState.entries()).map(([repositoryPath, repositoryState]) => {
       const fileList = (repositoryPathToEditors.get(repositoryPath) || []).map(textEditor => textEditor.getPath() || '');
       return [repositoryPath, accumulateRepositoryStateUpdatePaneItemState(repositoryState, fileList)];
     }))

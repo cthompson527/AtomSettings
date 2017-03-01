@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -38,6 +29,16 @@ function _load_Activation() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let activation = null;
 
 function activate(state) {
@@ -60,7 +61,7 @@ function deactivate() {
 function createDebuggerProvider() {
   return {
     name: 'react-native',
-    getLaunchAttachProvider: function (connection) {
+    getLaunchAttachProvider(connection) {
       if ((_nuclideUri || _load_nuclideUri()).default.isLocal(connection)) {
         return new (_ReactNativeLaunchAttachProvider || _load_ReactNativeLaunchAttachProvider()).ReactNativeLaunchAttachProvider('React Native', connection);
       }

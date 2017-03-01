@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -40,7 +30,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * An autocompletion provider that uses the compile commands in a built Swift
  * package's debug.yaml or release.yaml.
  */
-let SwiftPMAutocompletionProvider = class SwiftPMAutocompletionProvider {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class SwiftPMAutocompletionProvider {
 
   constructor(store) {
     this._store = store;
@@ -57,10 +57,7 @@ let SwiftPMAutocompletionProvider = class SwiftPMAutocompletionProvider {
         compilerArgs = commands.get(filePath);
       }
 
-      const bufferPosition = request.bufferPosition,
-            editor = request.editor,
-            prefix = request.prefix;
-
+      const { bufferPosition, editor, prefix } = request;
       const offset = editor.getBuffer().characterIndexForPosition(bufferPosition) - prefix.length;
       const result = yield (0, (_SourceKitten || _load_SourceKitten()).asyncExecuteSourceKitten)('complete', ['--text', request.editor.getText(), '--offset', String(offset), '--', compilerArgs ? compilerArgs : '']);
 
@@ -73,6 +70,5 @@ let SwiftPMAutocompletionProvider = class SwiftPMAutocompletionProvider {
       }).map((_Complete || _load_Complete()).default);
     })();
   }
-};
+}
 exports.default = SwiftPMAutocompletionProvider;
-module.exports = exports['default'];

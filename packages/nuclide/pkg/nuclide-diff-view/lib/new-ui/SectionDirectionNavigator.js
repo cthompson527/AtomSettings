@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _Button;
 
@@ -24,28 +14,26 @@ var _atom = require('atom');
 
 var _reactForAtom = require('react-for-atom');
 
-let SectionDirectionNavigator = class SectionDirectionNavigator extends _reactForAtom.React.Component {
+class SectionDirectionNavigator extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._onClickNavigateDown = this._onClickNavigateDown.bind(this);
     this._onClickNavigateUp = this._onClickNavigateUp.bind(this);
 
-    const commandTarget = this.props.commandTarget;
-
+    const { commandTarget } = this.props;
     this._subscriptions = new _atom.CompositeDisposable(atom.commands.add(commandTarget, 'nuclide-diff-view:next-diff-section', this._onClickNavigateDown), atom.commands.add(commandTarget, 'nuclide-diff-view:previous-diff-section', this._onClickNavigateUp));
   }
 
   render() {
-    const filePath = this.props.filePath;
-
+    const { filePath } = this.props;
     const hasActiveFile = filePath != null && filePath.length > 0;
     const hasDiffsUp = this._getPreviousNavigationSection() != null;
     const hasDiffsDown = this._getNextNavigationSection() != null;
 
     return _reactForAtom.React.createElement(
       'span',
-      null,
+      { className: 'nuclide-diff-view-direction' },
       _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
         disabled: !hasActiveFile || !hasDiffsDown,
         icon: 'arrow-down',
@@ -79,10 +67,7 @@ let SectionDirectionNavigator = class SectionDirectionNavigator extends _reactFo
   }
 
   _getPreviousNavigationSection() {
-    var _props = this.props;
-    const navigationSections = _props.navigationSections,
-          selectedNavigationSectionIndex = _props.selectedNavigationSectionIndex;
-
+    const { navigationSections, selectedNavigationSectionIndex } = this.props;
     const previousSectionIndex = selectedNavigationSectionIndex - 1;
     if (previousSectionIndex < 0) {
       return null;
@@ -91,16 +76,20 @@ let SectionDirectionNavigator = class SectionDirectionNavigator extends _reactFo
   }
 
   _getNextNavigationSection() {
-    var _props2 = this.props;
-    const navigationSections = _props2.navigationSections,
-          selectedNavigationSectionIndex = _props2.selectedNavigationSectionIndex;
-
+    const { navigationSections, selectedNavigationSectionIndex } = this.props;
     const nextSectionIndex = selectedNavigationSectionIndex + 1;
     if (nextSectionIndex >= navigationSections.length) {
       return null;
     }
     return navigationSections[nextSectionIndex];
   }
-};
-exports.default = SectionDirectionNavigator;
-module.exports = exports['default'];
+}
+exports.default = SectionDirectionNavigator; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              * 
+                                              */

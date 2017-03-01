@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,15 +12,17 @@ function _load_singleton() {
   return _singleton = _interopRequireDefault(require('../../commons-node/singleton'));
 }
 
-var _string;
-
-function _load_string() {
-  return _string = require('../../commons-node/string');
-}
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const PREPARE_STACK_TRACE_HOOKED_KEY = '_nuclide_error_stack_trace_hooked';
+const PREPARE_STACK_TRACE_HOOKED_KEY = '_nuclide_error_stack_trace_hooked'; /**
+                                                                             * Copyright (c) 2015-present, Facebook, Inc.
+                                                                             * All rights reserved.
+                                                                             *
+                                                                             * This source code is licensed under the license found in the LICENSE file in
+                                                                             * the root directory of this source tree.
+                                                                             *
+                                                                             * 
+                                                                             */
 
 let hookedPrepareStackTrace;
 
@@ -53,13 +46,12 @@ function addPrepareStackTraceHook() {
     // calls the hook.
     // $FlowIssue
     Object.defineProperty(Error, 'prepareStackTrace', {
-      get: function () {
+      get() {
         return hookedPrepareStackTrace;
       },
-      set: function (newValue) {
+      set(newValue) {
         hookedPrepareStackTrace = createHookedPrepareStackTrace(newValue || defaultPrepareStackTrace);
       },
-
       enumerable: false,
       configurable: true
     });
@@ -105,7 +97,7 @@ function structuredStackTraceHook(error, frames) {
       fileName: frame.getFileName(),
       lineNumber: frame.getLineNumber(),
       columnNumber: frame.getColumnNumber(),
-      evalOrigin: evalOrigin,
+      evalOrigin,
       isTopLevel: frame.isToplevel(),
       isEval: frame.isEval(),
       isNative: frame.isNative(),
@@ -115,16 +107,19 @@ function structuredStackTraceHook(error, frames) {
 }
 
 function defaultPrepareStackTrace(error, frames) {
-  let formattedStackTrace = error.message ? `${ error.name }: ${ error.message }` : `${ error.name }`;
+  let formattedStackTrace = error.message ? `${error.name}: ${error.message}` : `${error.name}`;
   frames.forEach(frame => {
-    formattedStackTrace += `\n    at ${ (0, (_string || _load_string()).maybeToString)(frame.toString()) }`;
+    // Do not use `maybeToString` here since lazily loading it (inline-imports) may
+    // result in a circular load of `babel-core` via `nuclide-node-transpiler`.
+    // https://github.com/babel/babel/blob/c2b3ea7/packages/babel-template/src/index.js#L21
+    formattedStackTrace += `\n    at ${String(frame.toString())}`;
   });
   return formattedStackTrace;
 }
 
 const __test__ = exports.__test__ = {
-  createHookedPrepareStackTrace: createHookedPrepareStackTrace,
-  resetPrepareStackTraceHooked: function () {
+  createHookedPrepareStackTrace,
+  resetPrepareStackTraceHooked() {
     (_singleton || _load_singleton()).default.clear(PREPARE_STACK_TRACE_HOOKED_KEY);
   }
 };

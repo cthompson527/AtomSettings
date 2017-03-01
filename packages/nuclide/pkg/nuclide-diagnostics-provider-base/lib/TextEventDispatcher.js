@@ -1,20 +1,17 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.__TEST__ = exports.default = undefined;
+exports.__TEST__ = undefined;
 
 var _atom = require('atom');
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
 
 var _debounce;
 
@@ -25,6 +22,16 @@ function _load_debounce() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // A reload changes the text in the buffer, so it should trigger a refresh.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const FILE_CHANGE_EVENTS = ['did-change', 'did-reload', 'did-open'];
 
 // A reload basically indicates that an external program saved the file, so
@@ -36,7 +43,7 @@ const FILE_SAVE_EVENTS = ['did-save', 'did-reload', 'did-open'];
  * we need to dispatch to all callbacks registered for a given (grammar, event)
  * pair.
  */
-let TextCallbackContainer = class TextCallbackContainer {
+class TextCallbackContainer {
   // grammar -> event -> callback
   // invariant: no empty maps or sets (they should be removed instead)
   constructor() {
@@ -137,7 +144,7 @@ let TextCallbackContainer = class TextCallbackContainer {
       }
     }
   }
-};
+}
 
 /**
  * Meant to make it simple and easy for a DiagnosticProvider to subscribe to
@@ -156,8 +163,7 @@ let TextCallbackContainer = class TextCallbackContainer {
  * from Atom's text events.
  *
  */
-
-let TextEventDispatcher = class TextEventDispatcher {
+class TextEventDispatcher {
 
   constructor() {
     this._callbackContainer = new TextCallbackContainer();
@@ -217,7 +223,7 @@ let TextEventDispatcher = class TextEventDispatcher {
       }
     }));
 
-    this._getEditorListenerDisposable().add(atom.workspace.observeTextEditors(editor => {
+    this._getEditorListenerDisposable().add((0, (_textEditor || _load_textEditor()).observeTextEditors)(editor => {
       const buffer = editor.getBuffer();
       const makeDispatch = event => {
         return () => {
@@ -273,8 +279,9 @@ let TextEventDispatcher = class TextEventDispatcher {
 
     return disposable;
   }
-};
+}
+
 exports.default = TextEventDispatcher;
 const __TEST__ = exports.__TEST__ = {
-  TextCallbackContainer: TextCallbackContainer
+  TextCallbackContainer
 };

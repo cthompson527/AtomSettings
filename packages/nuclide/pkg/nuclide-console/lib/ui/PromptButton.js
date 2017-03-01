@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -20,13 +10,21 @@ var _electron = _interopRequireDefault(require('electron'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const remote = _electron.default.remote;
+const { remote } = _electron.default; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
 }
 
-let PromptButton = class PromptButton extends _reactForAtom.React.Component {
+class PromptButton extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -60,7 +58,5 @@ let PromptButton = class PromptButton extends _reactForAtom.React.Component {
     });
     menu.popup(currentWindow, event.clientX, event.clientY);
   }
-
-};
+}
 exports.default = PromptButton;
-module.exports = exports['default'];

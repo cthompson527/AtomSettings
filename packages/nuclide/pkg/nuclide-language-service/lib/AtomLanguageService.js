@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -90,12 +81,26 @@ function _load_DiagnosticsProvider() {
   return _DiagnosticsProvider = require('./DiagnosticsProvider');
 }
 
+var _nuclideLogging;
+
+function _load_nuclideLogging() {
+  return _nuclideLogging = require('../../nuclide-logging');
+}
+
+var _nuclideBusySignal;
+
+function _load_nuclideBusySignal() {
+  return _nuclideBusySignal = require('../../nuclide-busy-signal');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageService {
+class AtomLanguageService {
 
-  constructor(languageServiceFactory, config) {
+  constructor(languageServiceFactory, config, onDidInsertSuggestion, logger = (0, (_nuclideLogging || _load_nuclideLogging()).getCategoryLogger)('nuclide-language-service')) {
     this._config = config;
+    this._onDidInsertSuggestion = onDidInsertSuggestion;
+    this._logger = logger;
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     const lazy = true;
     this._connectionToLanguageService = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(languageServiceFactory, lazy);
@@ -107,14 +112,17 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
   }
 
   activate() {
-    const highlightsConfig = this._config.highlights;
-    if (highlightsConfig != null) {
-      this._subscriptions.add((_CodeHighlightProvider || _load_CodeHighlightProvider()).CodeHighlightProvider.register(this._config.name, this._selector(), highlightsConfig, this._connectionToLanguageService));
+    const busySignalProvider = new (_nuclideBusySignal || _load_nuclideBusySignal()).DedupedBusySignalProviderBase();
+    this._subscriptions.add(atom.packages.serviceHub.provide('nuclide-busy-signal', '0.1.0', busySignalProvider));
+
+    const highlightConfig = this._config.highlight;
+    if (highlightConfig != null) {
+      this._subscriptions.add((_CodeHighlightProvider || _load_CodeHighlightProvider()).CodeHighlightProvider.register(this._config.name, this._selector(), highlightConfig, this._connectionToLanguageService));
     }
 
-    const outlinesConfig = this._config.outlines;
-    if (outlinesConfig != null) {
-      this._subscriptions.add((_OutlineViewProvider || _load_OutlineViewProvider()).OutlineViewProvider.register(this._config.name, this._selector(), outlinesConfig, this._connectionToLanguageService));
+    const outlineConfig = this._config.outline;
+    if (outlineConfig != null) {
+      this._subscriptions.add((_OutlineViewProvider || _load_OutlineViewProvider()).OutlineViewProvider.register(this._config.name, this._selector(), outlineConfig, this._connectionToLanguageService));
     }
 
     const coverageConfig = this._config.coverage;
@@ -134,7 +142,7 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
 
     const codeFormatConfig = this._config.codeFormat;
     if (codeFormatConfig != null) {
-      this._subscriptions.add((_CodeFormatProvider || _load_CodeFormatProvider()).CodeFormatProvider.register(this._config.name, this._selector(), codeFormatConfig, this._connectionToLanguageService));
+      this._subscriptions.add((_CodeFormatProvider || _load_CodeFormatProvider()).CodeFormatProvider.register(this._config.name, this._selector(), codeFormatConfig, this._connectionToLanguageService, busySignalProvider));
     }
 
     const findReferencesConfig = this._config.findReferences;
@@ -149,12 +157,12 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
 
     const autocompleteConfig = this._config.autocomplete;
     if (autocompleteConfig != null) {
-      this._subscriptions.add((_AutocompleteProvider || _load_AutocompleteProvider()).AutocompleteProvider.register(this._config.name, this._config.grammars, autocompleteConfig, this._connectionToLanguageService));
+      this._subscriptions.add((_AutocompleteProvider || _load_AutocompleteProvider()).AutocompleteProvider.register(this._config.name, this._config.grammars, autocompleteConfig, this._onDidInsertSuggestion, this._connectionToLanguageService));
     }
 
     const diagnosticsConfig = this._config.diagnostics;
     if (diagnosticsConfig != null) {
-      this._subscriptions.add((0, (_DiagnosticsProvider || _load_DiagnosticsProvider()).registerDiagnostics)(this._config.name, this._config.grammars, diagnosticsConfig, this._connectionToLanguageService));
+      this._subscriptions.add((0, (_DiagnosticsProvider || _load_DiagnosticsProvider()).registerDiagnostics)(this._config.name, this._config.grammars, diagnosticsConfig, this._logger, this._connectionToLanguageService, busySignalProvider));
     }
   }
 
@@ -162,8 +170,7 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const result = _this._connectionToLanguageService.getForUri(fileUri);
-      return result == null ? null : yield result;
+      return _this._connectionToLanguageService.getForUri(fileUri);
     })();
   }
 
@@ -175,7 +182,7 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
       if (languageService == null) {
         return false;
       }
-      return yield (yield languageService).isFileInProject(fileUri);
+      return (yield languageService).isFileInProject(fileUri);
     })();
   }
 
@@ -188,4 +195,15 @@ let AtomLanguageService = exports.AtomLanguageService = class AtomLanguageServic
   dispose() {
     this._subscriptions.dispose();
   }
-};
+}
+exports.AtomLanguageService = AtomLanguageService;
+// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */

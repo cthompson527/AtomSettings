@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,14 +19,22 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 // All remotable objects have some set of named functions,
 // and they also have a dispose method.
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 // Handles lifetimes of marshalling wrappers remote objects.
 //
 // Object passed by reference over RPC are assigned an ID.
 // Positive IDs represent objects which live on the server,
 // negative IDs represent objects which live on the client.
-let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
+class ObjectRegistry {
   // null means the proxy has been disposed.
 
   // These members handle local objects which have been marshalled remotely.
@@ -179,7 +178,7 @@ let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
     const registration = {
       interface: interfaceName,
       remoteId: objectId,
-      object: object
+      object
     };
 
     this._registrationsById.set(objectId, registration);
@@ -206,7 +205,7 @@ let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
 
     return (0, _asyncToGenerator.default)(function* () {
       const ids = Array.from(_this2._registrationsById.keys());
-      logger.info(`Disposing ${ ids.length } registrations`);
+      logger.info(`Disposing ${ids.length} registrations`);
 
       yield Promise.all(ids.map((() => {
         var _ref = (0, _asyncToGenerator.default)(function* (id) {
@@ -223,10 +222,9 @@ let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
       })()));
 
       const subscriptions = Array.from(_this2._subscriptions.keys());
-      logger.info(`Disposing ${ subscriptions.length } subscriptions`);
+      logger.info(`Disposing ${subscriptions.length} subscriptions`);
       for (const id of subscriptions) {
         try {
-
           _this2.disposeSubscription(id);
         } catch (e) {
           logger.error('Error disposing subscription', e);
@@ -247,7 +245,7 @@ let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
       const objectId = _this3._idsByProxy.get(proxy);
       if (objectId != null) {
         _this3._idsByProxy.set(proxy, null);
-        return yield objectId;
+        return objectId;
       } else {
         return null;
       }
@@ -285,4 +283,5 @@ let ObjectRegistry = exports.ObjectRegistry = class ObjectRegistry {
   _isLocalId(id) {
     return id * this._delta > 0;
   }
-};
+}
+exports.ObjectRegistry = ObjectRegistry;

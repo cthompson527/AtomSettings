@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.ActionTypes = undefined;
+exports.ActionTypes = undefined;
 
 var _Dispatcher;
 
@@ -21,6 +12,16 @@ function _load_Dispatcher() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const ActionTypes = exports.ActionTypes = Object.freeze({
   COLLAPSE_NODE: 'COLLAPSE_NODE',
@@ -63,6 +64,8 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   MOVE_SELECTION_TO_BOTTOM: 'MOVE_SELECTION_TO_BOTTOM',
   ENSURE_CHILD_NODE: 'ENSURE_CHILD_NODE',
   CLEAR_FILTER: 'CLEAR_FILTER',
+  ADD_EXTRA_PROJECT_SELECTION_CONTENT: 'ADD_EXTRA_PROJECT_SELECTION_CONTENT',
+  REMOVE_EXTRA_PROJECT_SELECTION_CONTENT: 'REMOVE_EXTRA_PROJECT_SELECTION_CONTENT',
   SET_OPEN_FILES_EXPANDED: 'SET_OPEN_FILES_EXPANDED',
   SET_UNCOMMITTED_CHANGES_EXPANDED: 'SET_UNCOMMITTED_CHANGES_EXPANDED',
   INVALIDATE_REMOVED_FOLDER: 'INVALIDATE_REMOVED_FOLDER'
@@ -73,12 +76,12 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
 
 let instance;
 
-let FileTreeDispatcher = class FileTreeDispatcher extends (_Dispatcher || _load_Dispatcher()).default {
+class FileTreeDispatcher extends (_Dispatcher || _load_Dispatcher()).default {
   static getInstance() {
     if (!instance) {
       instance = new FileTreeDispatcher();
     }
     return instance;
   }
-};
+}
 exports.default = FileTreeDispatcher;

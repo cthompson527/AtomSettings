@@ -1,13 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _electron = _interopRequireDefault(require('electron'));
 
@@ -43,7 +40,17 @@ function _load_WebInspector() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ipcRenderer = _electron.default.ipcRenderer;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const { ipcRenderer } = _electron.default;
 
 if (!(ipcRenderer != null)) {
   throw new Error('Invariant violation: "ipcRenderer != null"');
@@ -51,9 +58,8 @@ if (!(ipcRenderer != null)) {
 
 const NUCLIDE_DEBUGGER_CONSOLE_OBJECT_GROUP = 'console';
 const DebuggerSettingsChangedEvent = 'debugger-settings-updated';
-const PARSABLE_EXTENSIONS = ['.php', '.hh', '.c', '.cpp', '.h', '.hpp', '.js', '.m', '.mm'];
 
-let NuclideBridge = class NuclideBridge {
+class NuclideBridge {
 
   constructor() {
     this._allBreakpoints = [];
@@ -124,16 +130,16 @@ let NuclideBridge = class NuclideBridge {
        * @param {?Array.<!WebInspector.RemoteObjectProperty>} internalProperties
        * @this {WebInspector.ObjectPropertiesSection}
        */
-      function callback(properties, internalProperties) {
+      function callback(scopeName, properties, internalProperties) {
         if (!properties) {
           return;
         }
         this.updateProperties(properties, internalProperties);
-        const neededProperties = getIpcExpansionResult(properties);
-        ipcRenderer.sendToHost('notification', 'LocalsUpdate', neededProperties);
       }
       // $FlowFixMe.
-      (_WebInspector || _load_WebInspector()).default.RemoteObject.loadFromObject(this.object, Boolean(this.ignoreHasOwnProperty), callback.bind(this));
+      (_WebInspector || _load_WebInspector()).default.RemoteObject.loadFromObject(this.object, Boolean(this.ignoreHasOwnProperty),
+      // We use the scope object's `description` field as the scope's section header in the UI.
+      callback.bind(this));
     };
   }
 
@@ -141,23 +147,23 @@ let NuclideBridge = class NuclideBridge {
     ipcRenderer.sendToHost('notification', 'ready');
   }
 
-  _handleIpcCommand(event, command) {
+  _handleIpcCommand(event, command, ...args) {
     switch (command) {
       case 'UpdateSettings':
-        this._handleSettingsUpdated(arguments.length <= 2 ? undefined : arguments[2]);
+        this._handleSettingsUpdated(args[0]);
         break;
       case 'SyncBreakpoints':
-        this._allBreakpoints = arguments.length <= 2 ? undefined : arguments[2];
+        this._allBreakpoints = args[0];
         this._syncBreakpoints();
         break;
       case 'AddBreakpoint':
-        this._addBreakpoint(arguments.length <= 2 ? undefined : arguments[2]);
+        this._addBreakpoint(args[0]);
         break;
       case 'UpdateBreakpoint':
-        this._updateBreakpoint(arguments.length <= 2 ? undefined : arguments[2]);
+        this._updateBreakpoint(args[0]);
         break;
       case 'DeleteBreakpoint':
-        this._deleteBreakpoint(arguments.length <= 2 ? undefined : arguments[2]);
+        this._deleteBreakpoint(args[0]);
         break;
       case 'Continue':
         this._continue();
@@ -171,32 +177,35 @@ let NuclideBridge = class NuclideBridge {
       case 'StepOut':
         this._stepOut();
         break;
+      case 'RunToLocation':
+        this._runToLocation(args[0], args[1]);
+        break;
       case 'evaluateOnSelectedCallFrame':
-        this._evaluateOnSelectedCallFrame(arguments.length <= 2 ? undefined : arguments[2], arguments.length <= 3 ? undefined : arguments[3], arguments.length <= 4 ? undefined : arguments[4]);
+        this._evaluateOnSelectedCallFrame(args[0], args[1], args[2]);
         break;
       case 'runtimeEvaluate':
-        this._runtimeEvaluate(arguments.length <= 2 ? undefined : arguments[2], arguments.length <= 3 ? undefined : arguments[3]);
+        this._runtimeEvaluate(args[0], args[1]);
         break;
       case 'getProperties':
-        this._getProperties(arguments.length <= 2 ? undefined : arguments[2], arguments.length <= 3 ? undefined : arguments[3]);
+        this._getProperties(args[0], args[1]);
         break;
       case 'triggerDebuggerAction':
-        this._triggerDebuggerAction(arguments.length <= 2 ? undefined : arguments[2]);
+        this._triggerDebuggerAction(args[0]);
         break;
       case 'setPauseOnException':
-        this._setPauseOnException(arguments.length <= 2 ? undefined : arguments[2]);
+        this._setPauseOnException(args[0]);
         break;
       case 'setPauseOnCaughtException':
-        this._setPauseOnCaughtException(arguments.length <= 2 ? undefined : arguments[2]);
+        this._setPauseOnCaughtException(args[0]);
         break;
       case 'setSingleThreadStepping':
-        this._setSingleThreadStepping(arguments.length <= 2 ? undefined : arguments[2]);
+        this._setSingleThreadStepping(args[0]);
         break;
       case 'selectThread':
-        this.selectThread(arguments.length <= 2 ? undefined : arguments[2]);
+        this.selectThread(args[0]);
         break;
       case 'setSelectedCallFrameIndex':
-        this._handleSetSelectedCallFrameIndex(arguments.length <= 2 ? undefined : arguments[2]);
+        this._handleSetSelectedCallFrameIndex(args[0]);
     }
   }
 
@@ -224,6 +233,7 @@ let NuclideBridge = class NuclideBridge {
       sourceURL: uiLocation.uiSourceCode.uri(),
       lineNumber: uiLocation.lineNumber
     });
+    this._updateScopes(frame);
   }
 
   _handleOpenSourceLocation(event) {
@@ -237,7 +247,7 @@ let NuclideBridge = class NuclideBridge {
 
   sendOpenSourceLocation(sourceURL, line) {
     ipcRenderer.sendToHost('notification', 'OpenSourceLocation', {
-      sourceURL: sourceURL,
+      sourceURL,
       lineNumber: line
     });
   }
@@ -258,7 +268,37 @@ let NuclideBridge = class NuclideBridge {
     if (target != null) {
       const selectedFrame = target.debuggerModel.callFrames[callframeIndex];
       target.debuggerModel.setSelectedCallFrame(selectedFrame);
+      this._updateScopes(selectedFrame);
     }
+  }
+
+  _updateScopes(frame) {
+    return (0, _asyncToGenerator.default)(function* () {
+      const scopes = frame.scopeChain();
+      // We need to wait for the backend to send us the scope data, and only want to continue when
+      // we have each scope.
+      const scopeSections = yield Promise.all(scopes.map(function (scope) {
+        const scopeObj = scope.object();
+        return new Promise(function (resolve) {
+          return scopeObj.getOwnProperties(function (scopeVariables) {
+            return resolve({ name: scopeObj.description, scopeVariables });
+          });
+        });
+      }));
+      ipcRenderer.sendToHost('notification', 'ScopesUpdate', scopeSections.map(function (scope) {
+        const { name, scopeVariables } = scope;
+        return {
+          name,
+          scopeVariables: scopeVariables.map(function (scopeVariable) {
+            const { name: variableName, value: scopeValue } = scopeVariable;
+            return {
+              name: variableName,
+              value: getIpcEvaluationResult(false /* wasThrown */, scopeValue)
+            };
+          })
+        };
+      }));
+    })();
   }
 
   _sendCallstack() {
@@ -309,10 +349,10 @@ let NuclideBridge = class NuclideBridge {
     (error, properties, internalProperties) => {
       const result = getIpcExpansionResult(properties);
       ipcRenderer.sendToHost('notification', 'GetPropertiesResponse', {
-        result: result,
-        error: error,
-        objectId: objectId,
-        id: id
+        result,
+        error,
+        objectId,
+        id
       });
     });
   }
@@ -329,10 +369,10 @@ let NuclideBridge = class NuclideBridge {
     (remoteObject, wasThrown, error) => {
       const result = getIpcEvaluationResult(wasThrown, remoteObject);
       ipcRenderer.sendToHost('notification', 'ExpressionEvaluationResponse', {
-        result: result,
+        result,
         error: wasThrown ? error : null,
-        expression: expression,
-        id: id
+        expression,
+        id
       });
     });
   }
@@ -354,10 +394,10 @@ let NuclideBridge = class NuclideBridge {
     (remoteObject, wasThrown, error) => {
       const result = getIpcEvaluationResult(wasThrown, remoteObject);
       ipcRenderer.sendToHost('notification', 'ExpressionEvaluationResponse', {
-        result: result,
+        result,
         error: wasThrown ? error : null,
-        expression: expression,
-        id: id
+        expression,
+        id
       });
     });
   }
@@ -394,16 +434,17 @@ let NuclideBridge = class NuclideBridge {
   _handleDebuggerPaused(event) {
     (0, (_AnalyticsHelper || _load_AnalyticsHelper()).endTimerTracking)();
     ++this._debuggerPausedCount;
+
     if (this._debuggerPausedCount === 1) {
-      ipcRenderer.sendToHost('notification', 'LoaderBreakpointHit', {});
       this._handleLoaderBreakpoint();
     } else {
       ipcRenderer.sendToHost('notification', 'NonLoaderDebuggerPaused', {
         stopThreadId: event.data.stopThreadId,
         threadSwitchNotification: this._generateThreadSwitchNotification(event.data.threadSwitchMessage, event.data.location)
       });
+      // Only send callstack for non-loader breakpoint pause.
+      this._sendCallstack();
     }
-    this._sendCallstack();
   }
 
   _generateThreadSwitchNotification(message, location) {
@@ -412,7 +453,7 @@ let NuclideBridge = class NuclideBridge {
       return {
         sourceURL: uiLocation.uiSourceCode.uri(),
         lineNumber: uiLocation.lineNumber,
-        message: message
+        message
       };
     } else {
       return null;
@@ -466,10 +507,7 @@ let NuclideBridge = class NuclideBridge {
   }
 
   _getIPCBreakpointFromEvent(event) {
-    var _event$data = event.data;
-    const breakpoint = _event$data.breakpoint,
-          uiLocation = _event$data.uiLocation;
-
+    const { breakpoint, uiLocation } = event.data;
     return {
       sourceURL: uiLocation.uiSourceCode.uri(),
       lineNumber: uiLocation.lineNumber,
@@ -489,27 +527,17 @@ let NuclideBridge = class NuclideBridge {
     });
   }
 
-  _hasParsableExtension(sourceUrl) {
-    return PARSABLE_EXTENSIONS.some(extension => (_nuclideUri || _load_nuclideUri()).default.extname(sourceUrl) === extension);
-  }
-
-  _isFileWithNoExtension(sourceUrl) {
-    return !(_nuclideUri || _load_nuclideUri()).default.endsWithSeparator(sourceUrl) && (_nuclideUri || _load_nuclideUri()).default.extname(sourceUrl) === '';
-  }
-
   _parseBreakpointSourceIfNeeded(breakpoint) {
     const sourceUrl = breakpoint.sourceURL;
-    if (this._hasParsableExtension(sourceUrl) || this._isFileWithNoExtension(sourceUrl)) {
-      const source = (_WebInspector || _load_WebInspector()).default.workspace.uiSourceCodeForOriginURL(sourceUrl);
-      if (source != null) {
-        return;
-      }
-      const target = (_WebInspector || _load_WebInspector()).default.targetManager.mainTarget();
-      if (target == null) {
-        return;
-      }
-      target.debuggerModel._parsedScriptSource(sourceUrl, sourceUrl);
+    const source = (_WebInspector || _load_WebInspector()).default.workspace.uiSourceCodeForOriginURL(sourceUrl);
+    if (source != null) {
+      return;
     }
+    const target = (_WebInspector || _load_WebInspector()).default.targetManager.mainTarget();
+    if (target == null) {
+      return;
+    }
+    target.debuggerModel._parsedScriptSource(sourceUrl, sourceUrl);
   }
 
   // Synchronizes nuclide BreakpointStore and BreakpointManager
@@ -535,10 +563,7 @@ let NuclideBridge = class NuclideBridge {
 
   _addBreakpoint(breakpoint) {
     this._parseBreakpointSourceIfNeeded(breakpoint);
-    const sourceURL = breakpoint.sourceURL,
-          lineNumber = breakpoint.lineNumber,
-          condition = breakpoint.condition;
-
+    const { sourceURL, lineNumber, condition } = breakpoint;
     const source = (_WebInspector || _load_WebInspector()).default.workspace.uiSourceCodeForOriginURL(sourceURL);
     if (source == null) {
       return false;
@@ -550,11 +575,7 @@ let NuclideBridge = class NuclideBridge {
   }
 
   _updateBreakpoint(breakpoint) {
-    const sourceURL = breakpoint.sourceURL,
-          lineNumber = breakpoint.lineNumber,
-          condition = breakpoint.condition,
-          enabled = breakpoint.enabled;
-
+    const { sourceURL, lineNumber, condition, enabled } = breakpoint;
     const source = (_WebInspector || _load_WebInspector()).default.workspace.uiSourceCodeForOriginURL(sourceURL);
     if (source == null) {
       return false;
@@ -623,6 +644,16 @@ let NuclideBridge = class NuclideBridge {
     }
   }
 
+  _runToLocation(path, line) {
+    const target = (_WebInspector || _load_WebInspector()).default.targetManager.mainTarget();
+    if (target) {
+      (0, (_AnalyticsHelper || _load_AnalyticsHelper()).beginTimerTracking)('nuclide-debugger-atom:runToLocation');
+      const url = (_nuclideUri || _load_nuclideUri()).default.nuclideUriToUri(path);
+      const location = target.debuggerModel.createRawLocationByURL(url, line, 0);
+      location.continueToLocation();
+    }
+  }
+
   _handleUISourceCodeAdded(event) {
     const source = event.data;
     this._unresolvedBreakpoints.get(source.uri()).forEach(line => {
@@ -640,7 +671,7 @@ let NuclideBridge = class NuclideBridge {
   getUnresolvedBreakpointsList() {
     const result = [];
     this._unresolvedBreakpoints.forEach((line, url) => {
-      result.push({ url: url, line: line });
+      result.push({ url, line });
     });
     result.sort((a, b) => {
       if (a.url < b.url) {
@@ -655,14 +686,19 @@ let NuclideBridge = class NuclideBridge {
   }
 
   _handleThreadsUpdated(event) {
+    // Debugger.ThreadsUpdate happens before Debugger.paused
+    // so the first Debugger.ThreadsUpdate has this._debuggerPausedCount
+    // of zero.
+    if (this._debuggerPausedCount < 1) {
+      return;
+    }
     ipcRenderer.sendToHost('notification', 'ThreadsUpdate', event.data);
   }
 
   _handleThreadUpdated(event) {
     ipcRenderer.sendToHost('notification', 'ThreadUpdate', event.data);
   }
-};
-
+}
 
 function getIpcEvaluationResult(wasThrown, remoteObject) {
   if (wasThrown || remoteObject == null) {
@@ -681,30 +717,19 @@ function getIpcExpansionResult(properties) {
   if (properties == null) {
     return null;
   }
-  return properties.filter((_ref) => {
-    let name = _ref.name,
-        value = _ref.value;
-    return value != null;
-  }).map((_ref2) => {
-    let name = _ref2.name,
-        value = _ref2.value;
-    const type = value.type,
-          subtype = value.subtype,
-          objectId = value.objectId,
-          innerValue = value.value,
-          description = value.description;
-
+  return properties.filter(({ name, value }) => value != null).map(({ name, value }) => {
+    const { type, subtype, objectId, value: innerValue, description } = value;
     return {
-      name: name,
+      name,
       value: {
-        type: type,
-        subtype: subtype,
-        objectId: objectId,
+        type,
+        subtype,
+        objectId,
         value: innerValue,
-        description: description
+        description
       }
     };
   });
 }
 
-module.exports = new NuclideBridge();
+exports.default = new NuclideBridge();

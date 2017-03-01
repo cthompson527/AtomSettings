@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _classnames;
 
@@ -48,7 +38,17 @@ function _load_TextRenderer() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let RecordView = class RecordView extends _reactForAtom.React.Component {
+const URL_REGEX = /(https?:\/\/[\S]+)/i; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */
+
+class RecordView extends _reactForAtom.React.Component {
 
   _renderContent(record) {
     if (record.kind === 'request') {
@@ -72,7 +72,7 @@ let RecordView = class RecordView extends _reactForAtom.React.Component {
       return _reactForAtom.React.createElement(
         'pre',
         null,
-        text
+        parseText(text)
       );
     }
   }
@@ -90,24 +90,24 @@ let RecordView = class RecordView extends _reactForAtom.React.Component {
       evaluationResult: record.data,
       fetchChildren: getProperties,
       simpleValueComponent: simpleValueComponent,
-      shouldCacheChildren: true
+      shouldCacheChildren: true,
+      expansionStateId: this
     });
   }
 
   render() {
-    const record = this.props.record;
-
-    const classNames = (0, (_classnames || _load_classnames()).default)('nuclide-console-record', `level-${ record.level || 'log' }`, {
+    const { record } = this.props;
+    const classNames = (0, (_classnames || _load_classnames()).default)('nuclide-console-record', `level-${record.level || 'log'}`, {
       request: record.kind === 'request',
       response: record.kind === 'response'
     });
 
     const iconName = getIconName(record);
-    const icon = iconName ? _reactForAtom.React.createElement('span', { className: `icon icon-${ iconName }` }) : null;
+    const icon = iconName ? _reactForAtom.React.createElement('span', { className: `icon icon-${iconName}` }) : null;
     const sourceLabel = this.props.showSourceLabel ? _reactForAtom.React.createElement(
       'span',
       {
-        className: `nuclide-console-record-source-label ${ getHighlightClassName(record.level) }` },
+        className: `nuclide-console-record-source-label ${getHighlightClassName(record.level)}` },
       record.sourceId
     ) : null;
 
@@ -123,11 +123,9 @@ let RecordView = class RecordView extends _reactForAtom.React.Component {
       sourceLabel
     );
   }
+}
 
-};
 exports.default = RecordView;
-
-
 function getComponent(type) {
   switch (type) {
     case 'text':
@@ -174,4 +172,15 @@ function getIconName(record) {
       return 'stop';
   }
 }
-module.exports = exports['default'];
+
+function parseText(text) {
+  return text.split(URL_REGEX).map((chunk, i) => {
+    // Since we're splitting on the URL regex, every other piece will be a URL.
+    const isURL = i % 2 !== 0;
+    return isURL ? _reactForAtom.React.createElement(
+      'a',
+      { key: `d${i}`, href: chunk, target: '_blank' },
+      chunk
+    ) : chunk;
+  });
+}

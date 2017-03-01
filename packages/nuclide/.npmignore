@@ -4,10 +4,13 @@
 /.flowconfig
 /CONTRIBUTING.md
 /ISSUE_TEMPLATE.md
+/circle.yml
 /docs
+/flow-libs
 /flow-typed
 /pkg/sample-*
 /resources/benchmarker
+/resources/nuclicons
 /scripts
 spec
 

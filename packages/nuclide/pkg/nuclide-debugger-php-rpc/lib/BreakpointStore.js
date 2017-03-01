@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.BreakpointStore = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _utils;
 
@@ -32,6 +21,16 @@ function _load_DbgpSocket() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const PAUSE_ALL_EXCEPTION_NAME = '*';
 const EXCEPTION_PAUSE_STATE_ALL = 'all';
 
@@ -44,7 +43,7 @@ const EXCEPTION_PAUSE_STATE_ALL = 'all';
 // Care is taken to ensure that operations are atomic in the face of async turns.
 // Specifically, removing a breakpoint removes it from all connection's maps
 // before returning.
-let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
+class BreakpointStore {
   // Client visible breakpoint map from
   // chrome breakpoint id to Breakpoint object.
   constructor() {
@@ -61,19 +60,15 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const breakpointInfo = { filename: filename, lineNumber: lineNumber, conditionExpression: conditionExpression };
+      const breakpointInfo = { filename, lineNumber, conditionExpression };
       _this._breakpoints.set(chromeId, {
-        chromeId: chromeId,
-        breakpointInfo: breakpointInfo,
+        chromeId,
+        breakpointInfo,
         resolved: false
       });
       const breakpointPromises = Array.from(_this._connections.entries()).map((() => {
         var _ref = (0, _asyncToGenerator.default)(function* (entry) {
-          var _entry = _slicedToArray(entry, 2);
-
-          const connection = _entry[0],
-                map = _entry[1];
-
+          const [connection, map] = entry;
           const xdebugBreakpointId = yield connection.setFileLineBreakpoint(breakpointInfo);
           map.set(chromeId, xdebugBreakpointId);
         });
@@ -93,11 +88,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
 
     return (0, _asyncToGenerator.default)(function* () {
       for (const entry of _this2._connections) {
-        var _entry2 = _slicedToArray(entry, 2);
-
-        const connection = _entry2[0],
-              map = _entry2[1];
-
+        const [connection, map] = entry;
         const xdebugBreakpointId = map.get(chromeId);
 
         if (!(xdebugBreakpointId != null)) {
@@ -105,7 +96,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
         }
 
         const promise = connection.getBreakpoint(xdebugBreakpointId);
-        const xdebugBreakpoint = yield promise; // eslint-disable-line babel/no-await-in-loop
+        const xdebugBreakpoint = yield promise; // eslint-disable-line no-await-in-loop
         _this2.updateBreakpoint(chromeId, xdebugBreakpoint);
         // Breakpoint status should be the same for all connections
         // so only need to fetch from the first connection.
@@ -125,12 +116,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
       throw new Error('Invariant violation: "map"');
     }
 
-    for (const _ref2 of map) {
-      var _ref3 = _slicedToArray(_ref2, 2);
-
-      const key = _ref3[0];
-      const value = _ref3[1];
-
+    for (const [key, value] of map) {
       if (value === xdebugBreakpoint.id) {
         return key;
       }
@@ -145,8 +131,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
       throw new Error('Invariant violation: "breakpoint != null"');
     }
 
-    const breakpointInfo = breakpoint.breakpointInfo;
-
+    const { breakpointInfo } = breakpoint;
     breakpointInfo.lineNumber = xdebugBreakpoint.lineno || breakpointInfo.lineNumber;
     breakpointInfo.filename = xdebugBreakpoint.filename || breakpointInfo.filename;
     if (xdebugBreakpoint.resolved != null) {
@@ -161,7 +146,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
 
     return (0, _asyncToGenerator.default)(function* () {
       _this3._breakpoints.delete(breakpointId);
-      return yield _this3._removeBreakpointFromConnections(breakpointId);
+      return _this3._removeBreakpointFromConnections(breakpointId);
     })();
   }
 
@@ -176,23 +161,19 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
     return (0, _asyncToGenerator.default)(function* () {
       if (state !== EXCEPTION_PAUSE_STATE_ALL) {
         // Try to remove any existing exception breakpoint.
-        return yield _this4._removePauseAllExceptionBreakpointIfNeeded();
+        return _this4._removePauseAllExceptionBreakpointIfNeeded();
       }
       _this4._pauseAllExceptionBreakpointId = chromeId;
 
       const breakpointPromises = Array.from(_this4._connections.entries()).map((() => {
-        var _ref4 = (0, _asyncToGenerator.default)(function* (entry) {
-          var _entry3 = _slicedToArray(entry, 2);
-
-          const connection = _entry3[0],
-                map = _entry3[1];
-
+        var _ref2 = (0, _asyncToGenerator.default)(function* (entry) {
+          const [connection, map] = entry;
           const xdebugBreakpointId = yield connection.setExceptionBreakpoint(PAUSE_ALL_EXCEPTION_NAME);
           map.set(chromeId, xdebugBreakpointId);
         });
 
         return function (_x2) {
-          return _ref4.apply(this, arguments);
+          return _ref2.apply(this, arguments);
         };
       })());
       yield Promise.all(breakpointPromises);
@@ -206,7 +187,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
       const breakpointId = _this5._pauseAllExceptionBreakpointId;
       if (breakpointId) {
         _this5._pauseAllExceptionBreakpointId = null;
-        return yield _this5._removeBreakpointFromConnections(breakpointId);
+        return _this5._removeBreakpointFromConnections(breakpointId);
       } else {
         // This can happen if users switch between 'none' and 'uncaught' states.
         (_utils || _load_utils()).default.log('No exception breakpoint to remove.');
@@ -217,11 +198,7 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
 
   _removeBreakpointFromConnections(breakpointId) {
     return Promise.all(Array.from(this._connections.entries()).map(entry => {
-      var _entry4 = _slicedToArray(entry, 2);
-
-      const connection = _entry4[0],
-            map = _entry4[1];
-
+      const [connection, map] = entry;
       if (map.has(breakpointId)) {
         const connectionIdPromise = map.get(breakpointId);
 
@@ -246,16 +223,14 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
     return (0, _asyncToGenerator.default)(function* () {
       const map = new Map();
       const breakpointPromises = Array.from(_this6._breakpoints.values()).map((() => {
-        var _ref6 = (0, _asyncToGenerator.default)(function* (breakpoint) {
-          const chromeId = breakpoint.chromeId,
-                breakpointInfo = breakpoint.breakpointInfo;
-
+        var _ref4 = (0, _asyncToGenerator.default)(function* (breakpoint) {
+          const { chromeId, breakpointInfo } = breakpoint;
           const xdebugBreakpointId = yield connection.setFileLineBreakpoint(breakpointInfo);
           map.set(chromeId, xdebugBreakpointId);
         });
 
         return function (_x3) {
-          return _ref6.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       })());
       yield Promise.all(breakpointPromises);
@@ -271,10 +246,10 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
       _this6._connections.set(connection, map);
       connection.onStatus(function (status) {
         switch (status) {
-          case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STOPPING:
-          case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STOPPED:
-          case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.ERROR:
-          case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.END:
+          case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Stopping:
+          case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Stopped:
+          case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Error:
+          case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.End:
             _this6._removeConnection(connection);
         }
       });
@@ -286,4 +261,5 @@ let BreakpointStore = exports.BreakpointStore = class BreakpointStore {
       this._connections.delete(connection);
     }
   }
-};
+}
+exports.BreakpointStore = BreakpointStore;

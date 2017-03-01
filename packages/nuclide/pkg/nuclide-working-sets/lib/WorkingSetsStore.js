@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -48,11 +39,21 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NEW_WORKING_SET_EVENT = 'new-working-set';
 const NEW_DEFINITIONS_EVENT = 'new-definitions';
 const SAVE_DEFINITIONS_EVENT = 'save-definitions';
 
-let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
+class WorkingSetsStore {
 
   constructor() {
     this._emitter = new _atom.Emitter();
@@ -93,20 +94,12 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
   }
 
   updateDefinitions(definitions) {
-    var _sortOutApplicability = this._sortOutApplicability(definitions);
-
-    const applicable = _sortOutApplicability.applicable,
-          notApplicable = _sortOutApplicability.notApplicable;
-
+    const { applicable, notApplicable } = this._sortOutApplicability(definitions);
     this._setDefinitions(applicable, notApplicable, definitions);
   }
 
   updateApplicability() {
-    var _sortOutApplicability2 = this._sortOutApplicability(this._definitions);
-
-    const applicable = _sortOutApplicability2.applicable,
-          notApplicable = _sortOutApplicability2.notApplicable;
-
+    const { applicable, notApplicable } = this._sortOutApplicability(this._definitions);
     this._setDefinitions(applicable, notApplicable, this._definitions);
   }
 
@@ -127,7 +120,7 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
   }
 
   deleteWorkingSet(name) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-delete', { name: name });
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-delete', { name });
 
     const definitions = this._definitions.filter(d => d.name !== name);
     this._saveDefinitions(definitions);
@@ -145,7 +138,7 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
       if (activeApplicable.length > 0) {
         this._lastSelected = activeApplicable.map(d => d.name);
       }
-      this._emitter.emit(NEW_DEFINITIONS_EVENT, { applicable: applicable, notApplicable: notApplicable });
+      this._emitter.emit(NEW_DEFINITIONS_EVENT, { applicable, notApplicable });
 
       this._updateCurrentWorkingSet(activeApplicable);
     }
@@ -173,21 +166,21 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
 
     let newDefinitions;
     if (nameIndex < 0) {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-create', { name: name, uris: workingSet.getUris().join(',') });
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-create', { name, uris: workingSet.getUris().join(',') });
 
-      newDefinitions = definitions.concat({ name: name, uris: workingSet.getUris(), active: false });
+      newDefinitions = definitions.concat({ name, uris: workingSet.getUris(), active: false });
     } else {
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-update', { oldName: name, name: newName, uris: workingSet.getUris().join(',') });
 
       const active = definitions[nameIndex].active;
-      newDefinitions = [].concat(definitions.slice(0, nameIndex), { name: newName, uris: workingSet.getUris(), active: active }, definitions.slice(nameIndex + 1));
+      newDefinitions = [].concat(definitions.slice(0, nameIndex), { name: newName, uris: workingSet.getUris(), active }, definitions.slice(nameIndex + 1));
     }
 
     this._saveDefinitions(newDefinitions);
   }
 
   _activateDefinition(name, active) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-activate', { name: name, active: active.toString() });
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('working-sets-activate', { name, active: active.toString() });
 
     const definitions = this.getDefinitions();
     const newDefinitions = definitions.map(d => {
@@ -242,7 +235,7 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
       }
     });
 
-    return { applicable: applicable, notApplicable: notApplicable };
+    return { applicable, notApplicable };
   }
 
   _isApplicable(definition) {
@@ -269,4 +262,5 @@ let WorkingSetsStore = exports.WorkingSetsStore = class WorkingSetsStore {
 
     return dirs.some(dir => workingSet.containsDir(dir.getPath()));
   }
-};
+}
+exports.WorkingSetsStore = WorkingSetsStore;

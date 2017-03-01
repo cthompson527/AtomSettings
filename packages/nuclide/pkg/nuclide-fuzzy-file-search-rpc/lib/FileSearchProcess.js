@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17,24 +8,24 @@ exports.disposeSearchForDirectory = exports.fileSearchForDirectory = undefined;
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let newFileSearch = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (directoryUri, ignoredNames) {
-    const exists = yield (_fsPromise || _load_fsPromise()).default.exists(directoryUri);
+  var _ref = (0, _asyncToGenerator.default)(function* (directory, ignoredNames) {
+    const exists = yield (_fsPromise || _load_fsPromise()).default.exists(directory);
     if (!exists) {
-      throw new Error('Could not find directory to search : ' + directoryUri);
+      throw new Error('Could not find directory to search : ' + directory);
     }
 
-    const stat = yield (_fsPromise || _load_fsPromise()).default.stat(directoryUri);
+    const stat = yield (_fsPromise || _load_fsPromise()).default.stat(directory);
     if (!stat.isDirectory()) {
-      throw new Error('Provided path is not a directory : ' + directoryUri);
+      throw new Error('Provided path is not a directory : ' + directory);
     }
 
     const task = new (_nuclideTask || _load_nuclideTask()).default();
     yield task.invokeRemoteMethod({
       file: require.resolve('./FileSearch'),
       method: 'initFileSearchForDirectory',
-      args: [directoryUri, ignoredNames]
+      args: [directory, ignoredNames]
     });
-    return new FileSearchProcess(task, directoryUri, ignoredNames);
+    return new FileSearchProcess(task, directory, ignoredNames);
   });
 
   return function newFileSearch(_x, _x2) {
@@ -43,8 +34,8 @@ let newFileSearch = (() => {
 })();
 
 let fileSearchForDirectory = exports.fileSearchForDirectory = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (directoryUri, ignoredNames) {
-    const cached = fileSearchForDirectoryUri[directoryUri];
+  var _ref2 = (0, _asyncToGenerator.default)(function* (directory, ignoredNames) {
+    const cached = processForDirectory[directory];
     if (cached != null) {
       const fileSearch = yield cached;
       if ((0, (_collection || _load_collection()).arrayEqual)(fileSearch.getIgnoredNames(), ignoredNames)) {
@@ -54,12 +45,12 @@ let fileSearchForDirectory = exports.fileSearchForDirectory = (() => {
       fileSearch.dispose();
     }
 
-    const promise = newFileSearch(directoryUri, ignoredNames).catch(function (error) {
+    const promise = newFileSearch(directory, ignoredNames).catch(function (error) {
       // Remove errored processes from the cache so we can try again.
-      delete fileSearchForDirectoryUri[directoryUri];
+      delete processForDirectory[directory];
       throw error;
     });
-    fileSearchForDirectoryUri[directoryUri] = promise;
+    processForDirectory[directory] = promise;
     return promise;
   });
 
@@ -69,8 +60,8 @@ let fileSearchForDirectory = exports.fileSearchForDirectory = (() => {
 })();
 
 let disposeSearchForDirectory = exports.disposeSearchForDirectory = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (directoryUri) {
-    const cached = fileSearchForDirectoryUri[directoryUri];
+  var _ref3 = (0, _asyncToGenerator.default)(function* (directory) {
+    const cached = processForDirectory[directory];
     if (cached != null) {
       const search = yield cached;
       search.dispose();
@@ -116,15 +107,26 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
  * This is an object that lives in the main process that delegates calls to the
  * FileSearch in the forked process.
  */
-let FileSearchProcess = class FileSearchProcess {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-  constructor(task, directoryUri, ignoredNames) {
+class FileSearchProcess {
+
+  constructor(task, directory, ignoredNames) {
     this._task = task;
-    this._task.onError(buffer => {
+    task.onError(buffer => {
       logger.error('File search process crashed with message:', buffer.toString());
       this.dispose();
     });
-    this._directoryUri = directoryUri;
+    task.onExit(() => this.dispose());
+    this._directory = directory;
     this._ignoredNames = ignoredNames;
   }
 
@@ -139,7 +141,7 @@ let FileSearchProcess = class FileSearchProcess {
       return task.invokeRemoteMethod({
         file: require.resolve('./FileSearch'),
         method: 'doSearch',
-        args: [_this._directoryUri, query]
+        args: [_this._directory, query]
       });
     })();
   }
@@ -150,16 +152,15 @@ let FileSearchProcess = class FileSearchProcess {
 
   dispose() {
     if (this._task != null) {
-      delete fileSearchForDirectoryUri[this._directoryUri];
+      delete processForDirectory[this._directory];
       this._task.dispose();
       this._task = null;
     }
   }
-};
+}
 
-
-const fileSearchForDirectoryUri = {};
+const processForDirectory = {};
 
 function getExistingSearchDirectories() {
-  return Object.keys(fileSearchForDirectoryUri);
+  return Object.keys(processForDirectory);
 }

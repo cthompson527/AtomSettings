@@ -1,23 +1,16 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-var _atom = require('atom');
-
-var _nullthrows;
-
-function _load_nullthrows() {
-  return _nullthrows = _interopRequireDefault(require('nullthrows'));
-}
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _reactForAtom = require('react-for-atom');
+
+var _shallowequal;
+
+function _load_shallowequal() {
+  return _shallowequal = _interopRequireDefault(require('shallowequal'));
+}
 
 var _BuckToolbarSettings;
 
@@ -31,16 +24,16 @@ function _load_BuckToolbarTargetSelector() {
   return _BuckToolbarTargetSelector = _interopRequireDefault(require('./ui/BuckToolbarTargetSelector'));
 }
 
+var _string;
+
+function _load_string() {
+  return _string = require('../../commons-node/string');
+}
+
 var _Button;
 
 function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
-}
-
-var _Checkbox;
-
-function _load_Checkbox() {
-  return _Checkbox = require('../../nuclide-ui/Checkbox');
 }
 
 var _Dropdown;
@@ -63,72 +56,56 @@ function _load_addTooltip() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let BuckToolbar = class BuckToolbar extends _reactForAtom.React.Component {
+class BuckToolbar extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
-    this._handleSimulatorChange = this._handleSimulatorChange.bind(this);
-    this._handleReactNativeServerModeChanged = this._handleReactNativeServerModeChanged.bind(this);
-
-    this._buckToolbarActions = this.props.actions;
-    this._buckToolbarStore = this.props.store;
-
-    this._disposables = new _atom.CompositeDisposable();
-
-    // Re-render whenever the data in the store changes.
-    this._disposables.add(this._buckToolbarStore.subscribe(() => {
-      this.forceUpdate();
-    }));
-
+    this._handleDeploymentTargetChange = this._handleDeploymentTargetChange.bind(this);
     this.state = { settingsVisible: false };
   }
 
-  componentWillMount() {
-    // Schedule the update to avoid the Flux "dispatching during a dispatch" error.
-    this._fetchDevicesTimeoutId = setTimeout(() => {
-      this._buckToolbarActions.fetchDevices();
-    }, 0);
-    this._disposables.add(new _atom.Disposable(() => {
-      clearTimeout(this._fetchDevicesTimeoutId);
-    }));
-  }
-
-  componentWillUnmount() {
-    this._disposables.dispose();
-  }
-
   render() {
-    const buckToolbarStore = this._buckToolbarStore;
-    const isAppleBundle = buckToolbarStore.getRuleType() === 'apple_bundle';
-    const devices = buckToolbarStore.getDevices();
-    const isLoading = buckToolbarStore.isLoadingRule() || isAppleBundle && devices.length < 1;
+    const {
+      buildRuleType,
+      buildTarget,
+      buckRoot,
+      isLoadingRule,
+      isLoadingPlatforms,
+      platformGroups,
+      projectRoot,
+      selectedDeploymentTarget,
+      taskSettings
+    } = this.props.appState;
+
     let status;
-    if (isLoading) {
+    if (isLoadingRule || isLoadingPlatforms) {
+      const title = isLoadingRule ? 'Loading target build rule...' : 'Loading available platforms...';
       status = _reactForAtom.React.createElement(
         'div',
-        { ref: (0, (_addTooltip || _load_addTooltip()).default)({ title: 'Waiting on rule info...', delay: 0 }) },
+        { ref: (0, (_addTooltip || _load_addTooltip()).default)({ title, delay: 0 }) },
         _reactForAtom.React.createElement((_LoadingSpinner || _load_LoadingSpinner()).LoadingSpinner, {
-          className: 'inline-block',
+          className: 'inline-block buck-spinner',
           size: 'EXTRA_SMALL'
         })
       );
-    } else if (buckToolbarStore.getBuildTarget() && buckToolbarStore.getRuleType() == null) {
+    } else if (buildTarget && buildRuleType == null) {
       let title;
-      const buckRoot = buckToolbarStore.getCurrentBuckRoot();
-      const projectRoot = buckToolbarStore.getCurrentProjectRoot();
       if (buckRoot == null) {
         if (projectRoot != null) {
-          title = `No Buck project found in the Current Working Root:<br />${ projectRoot }`;
+          title = `No Buck project found in the Current Working Root:<br />${projectRoot}`;
         } else {
           title = 'No Current Working Root.';
         }
       } else {
-        title = `Rule "${ buckToolbarStore.getBuildTarget() }" could not be found in ${ buckRoot }.<br />` + `Check your Current Working Root: ${ (0, (_nullthrows || _load_nullthrows()).default)(projectRoot) }`;
+        title = `Rule "${buildTarget}" could not be found in ${buckRoot}.<br />` + `Check your Current Working Root: ${(0, (_string || _load_string()).maybeToString)(projectRoot)}`;
       }
+
+      title += '<br />Click icon to retry';
 
       status = _reactForAtom.React.createElement('span', {
         className: 'icon icon-alert',
-        ref: (0, (_addTooltip || _load_addTooltip()).default)({ title: title, delay: 0 })
+        ref: (0, (_addTooltip || _load_addTooltip()).default)({ title, delay: 0 }),
+        onClick: () => this.props.setBuildTarget(buildTarget)
       });
     }
 
@@ -139,70 +116,45 @@ let BuckToolbar = class BuckToolbar extends _reactForAtom.React.Component {
         { key: 'status', className: 'nuclide-buck-status inline-block text-center' },
         status
       ));
-    } else {
-      const deviceId = buckToolbarStore.getSimulator();
-      if (isAppleBundle && !isLoading && deviceId != null && devices.length > 0) {
-        const options = devices.map(device => ({
-          label: `${ device.name } (${ device.os })`,
-          value: device.udid
-        }));
+    } else if (platformGroups.length) {
+      const options = this._optionsFromPlatformGroups(platformGroups);
 
-        widgets.push(_reactForAtom.React.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
-          key: 'simulator-dropdown',
-          className: 'inline-block',
-          value: deviceId,
-          options: options,
-          onChange: this._handleSimulatorChange,
-          size: 'sm',
-          title: 'Choose a device'
-        }));
-      }
-      if (buckToolbarStore.canBeReactNativeApp()) {
-        widgets.push(_reactForAtom.React.createElement(
-          'div',
-          { key: 'react-native-checkbox', className: 'inline-block' },
-          _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
-            className: 'nuclide-buck-react-native-packager-checkbox',
-            checked: buckToolbarStore.isReactNativeServerMode(),
-            onChange: this._handleReactNativeServerModeChanged,
-            label: 'Start React Native Packager'
-          })
-        ));
-      }
+      widgets.push(_reactForAtom.React.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
+        key: 'simulator-dropdown',
+        className: 'inline-block',
+        value: selectedDeploymentTarget,
+        options: options,
+        onChange: this._handleDeploymentTargetChange,
+        size: 'sm',
+        title: 'Choose a device',
+        selectionComparator: (_shallowequal || _load_shallowequal()).default
+      }));
     }
-
-    const activeTaskType = this.props.activeTaskType;
 
     return _reactForAtom.React.createElement(
       'div',
       { className: 'nuclide-buck-toolbar' },
       _reactForAtom.React.createElement((_BuckToolbarTargetSelector || _load_BuckToolbarTargetSelector()).default, {
-        store: this.props.store,
-        actions: this.props.actions
+        appState: this.props.appState,
+        setBuildTarget: this.props.setBuildTarget
       }),
       _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
         className: 'nuclide-buck-settings icon icon-gear',
         size: (_Button || _load_Button()).ButtonSizes.SMALL,
-        disabled: activeTaskType == null || this.props.store.getCurrentBuckRoot() == null,
         onClick: () => this._showSettings()
       }),
       widgets,
-      this.state.settingsVisible && activeTaskType != null ? _reactForAtom.React.createElement((_BuckToolbarSettings || _load_BuckToolbarSettings()).default, {
-        currentBuckRoot: this.props.store.getCurrentBuckRoot(),
-        settings: this.props.store.getTaskSettings()[activeTaskType] || {},
-        buildType: activeTaskType,
+      this.state.settingsVisible ? _reactForAtom.React.createElement((_BuckToolbarSettings || _load_BuckToolbarSettings()).default, {
+        currentBuckRoot: buckRoot,
+        settings: taskSettings,
         onDismiss: () => this._hideSettings(),
-        onSave: settings => this._saveSettings(activeTaskType, settings)
+        onSave: settings => this._saveSettings(settings)
       }) : null
     );
   }
 
-  _handleSimulatorChange(deviceId) {
-    this._buckToolbarActions.updateSimulator(deviceId);
-  }
-
-  _handleReactNativeServerModeChanged(checked) {
-    this._buckToolbarActions.updateReactNativeServerMode(checked);
+  _handleDeploymentTargetChange(deploymentTarget) {
+    this.props.setDeploymentTarget(deploymentTarget);
   }
 
   _showSettings() {
@@ -213,12 +165,102 @@ let BuckToolbar = class BuckToolbar extends _reactForAtom.React.Component {
     this.setState({ settingsVisible: false });
   }
 
-  _saveSettings(taskType, settings) {
-    this._buckToolbarActions.updateTaskSettings(taskType, settings);
+  _saveSettings(settings) {
+    this.props.setTaskSettings(settings);
     this._hideSettings();
   }
 
-};
+  _optionsFromPlatformGroups(platformGroups) {
+    return platformGroups.reduce((options, platformGroup) => {
+      let dropdownGroup = null;
+      if (platformGroup.platforms.length === 1) {
+        dropdownGroup = this._turnDevicesIntoSelectableOptions(platformGroup.platforms[0]);
+      } else {
+        dropdownGroup = this._putDevicesIntoSubmenus(platformGroup);
+      }
 
+      options.push(dropdownGroup.header);
+      return options.concat(dropdownGroup.selectableOptions);
+    }, []);
+  }
 
-module.exports = BuckToolbar;
+  _turnDevicesIntoSelectableOptions(platform) {
+    const header = {
+      label: platform.name,
+      value: platform.name,
+      disabled: true
+    };
+
+    if (!(platform.deviceGroups.length === 1)) {
+      throw new Error('Invariant violation: "platform.deviceGroups.length === 1"');
+    }
+
+    const selectableOptions = platform.deviceGroups[0].devices.map(device => {
+      return {
+        label: `  ${device.name}`,
+        selectedLabel: device.name,
+        value: { platform, device }
+      };
+    });
+    return { header, selectableOptions };
+  }
+
+  _putDevicesIntoSubmenus(platformGroup) {
+    const header = {
+      label: platformGroup.name,
+      value: platformGroup.name,
+      disabled: true
+    };
+
+    const selectableOptions = [];
+
+    for (const platform of platformGroup.platforms) {
+      if (platform.deviceGroups.length) {
+        const submenu = [];
+
+        for (const deviceGroup of platform.deviceGroups) {
+          if (deviceGroup.name) {
+            submenu.push({
+              label: deviceGroup.name,
+              value: deviceGroup.name,
+              disabled: true
+            });
+          }
+
+          for (const device of deviceGroup.devices) {
+            submenu.push({
+              label: `  ${device.name}`,
+              selectedLabel: `${platform.name}: ${device.name}`,
+              value: { platform, device }
+            });
+          }
+
+          submenu.push({ type: 'separator' });
+        }
+
+        selectableOptions.push({
+          type: 'submenu',
+          label: `  ${platform.name}`,
+          submenu
+        });
+      } else {
+        selectableOptions.push({
+          label: `  ${platform.name}`,
+          selectedLabel: platform.name,
+          value: { platform, device: null }
+        });
+      }
+    }
+
+    return { header, selectableOptions };
+  }
+}
+exports.default = BuckToolbar; /**
+                                * Copyright (c) 2015-present, Facebook, Inc.
+                                * All rights reserved.
+                                *
+                                * This source code is licensed under the license found in the LICENSE file in
+                                * the root directory of this source tree.
+                                *
+                                * 
+                                */

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -20,7 +11,17 @@ function _load_track() {
   return _track = require('./track');
 }
 
-const HISTOGRAM_TRACKER_KEY = 'performance-histogram';let Bucket = class Bucket {
+const HISTOGRAM_TRACKER_KEY = 'performance-histogram'; /**
+                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                        * All rights reserved.
+                                                        *
+                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                        * the root directory of this source tree.
+                                                        *
+                                                        * 
+                                                        */
+
+class Bucket {
 
   constructor() {
     this._count = 0;
@@ -44,12 +45,11 @@ const HISTOGRAM_TRACKER_KEY = 'performance-histogram';let Bucket = class Bucket 
     this._count = 0;
     this._sum = 0;
   }
-};
-let HistogramTracker = exports.HistogramTracker = class HistogramTracker {
+}
 
-  constructor(eventName, maxValue, numBuckets) {
-    let intervalSeconds = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 60;
+class HistogramTracker {
 
+  constructor(eventName, maxValue, numBuckets, intervalSeconds = 60) {
     this._eventName = eventName;
     this._maxValue = maxValue;
     this._bucketSize = maxValue / numBuckets;
@@ -93,4 +93,5 @@ let HistogramTracker = exports.HistogramTracker = class HistogramTracker {
       this._buckets[i].clear();
     }
   }
-};
+}
+exports.HistogramTracker = HistogramTracker;

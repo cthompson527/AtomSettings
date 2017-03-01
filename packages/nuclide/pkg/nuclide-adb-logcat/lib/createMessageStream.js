@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.default = createMessageStream;
 
 var _featureConfig;
@@ -45,8 +33,17 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function createMessageStream(line$) {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+function createMessageStream(line$) {
   // Separate the lines into groups, beginning with metadata lines.
   const messages = _rxjsBundlesRxMinJs.Observable.create(observer => {
     let buffer = [];
@@ -126,21 +123,9 @@ function filter(messages) {
     }
   });
 
-  return messages.withLatestFrom(patterns).filter((_ref) => {
-    var _ref2 = _slicedToArray(_ref, 2);
-
-    let message = _ref2[0],
-        pattern = _ref2[1];
-
+  return messages.withLatestFrom(patterns).filter(([message, pattern]) => {
     // Add an empty tag to untagged messages so they cfeaturean be matched by `.*` etc.
     const tags = message.tags == null ? [''] : message.tags;
     return tags.some(tag => pattern.test(tag));
-  }).map((_ref3) => {
-    var _ref4 = _slicedToArray(_ref3, 2);
-
-    let message = _ref4[0],
-        pattern = _ref4[1];
-    return message;
-  });
+  }).map(([message, pattern]) => message);
 }
-module.exports = exports['default'];

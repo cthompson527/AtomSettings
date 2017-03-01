@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,7 +14,7 @@ function _load_FindReferencesView() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let FindReferencesElement = class FindReferencesElement extends HTMLElement {
+class FindReferencesElement extends HTMLElement {
 
   initialize(model) {
     this._model = model;
@@ -41,8 +32,18 @@ let FindReferencesElement = class FindReferencesElement extends HTMLElement {
   detachedCallback() {
     _reactForAtom.ReactDOM.unmountComponentAtNode(this);
   }
-};
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+/* global HTMLElement */
+
 exports.default = document.registerElement('nuclide-find-references-view', {
   prototype: FindReferencesElement.prototype
 });
-module.exports = exports['default'];

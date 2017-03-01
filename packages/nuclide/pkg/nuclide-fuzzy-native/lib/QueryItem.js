@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.__test__ = undefined;
+exports.__test__ = undefined;
 
 var _nuclideUri;
 
@@ -28,6 +19,16 @@ const NON_UPPERCASE_CHARS_REGEXP = /[^a-z0-9]/g;
  * no common subsequence.
  * A lower number means `needle` is more relevant to `haystack`.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function scoreCommonSubsequence(needle, haystack_) {
   let haystack = haystack_;
   haystack = haystack.toLowerCase();
@@ -102,13 +103,13 @@ function importantCharactersForString(str) {
 }
 
 const __test__ = exports.__test__ = {
-  checkIfMatchesCamelCaseLetters: checkIfMatchesCamelCaseLetters,
-  isLetterImportant: isLetterImportant,
-  importantCharactersForString: importantCharactersForString,
-  scoreCommonSubsequence: scoreCommonSubsequence
+  checkIfMatchesCamelCaseLetters,
+  isLetterImportant,
+  importantCharactersForString,
+  scoreCommonSubsequence
 };
 
-let QueryItem = class QueryItem {
+class QueryItem {
 
   constructor(filepath) {
     this._filepath = filepath;
@@ -141,13 +142,13 @@ let QueryItem = class QueryItem {
    */
   score(query) {
     const score = this._getScoreFor(query);
-    return score == null ? null : { score: score, value: this._filepath, matchIndexes: [] };
+    return score == null ? null : { score, value: this._filepath, matchIndexes: [] };
   }
 
   _getScoreFor(query) {
-    // Purely defensive, as query is guaranteed to be non-empty.
+    // Everything's an equally decent match for the empty string.
     if (query.length === 0) {
-      return null;
+      return 0;
     }
     // Check if this a "possible result".
     // TODO consider building a directory-level index from important_character -> QueryItem,
@@ -184,6 +185,5 @@ let QueryItem = class QueryItem {
     }
     return null;
   }
-
-};
+}
 exports.default = QueryItem;

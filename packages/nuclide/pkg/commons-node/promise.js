@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -66,15 +57,13 @@ let triggerAfterWait = exports.triggerAfterWait = (() => {
  * If no valid response is found, an exception is thrown.
  */
 let retryLimit = exports.retryLimit = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (retryFunction, validationFunction, maximumTries) {
-    let retryIntervalMs = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-
+  var _ref2 = (0, _asyncToGenerator.default)(function* (retryFunction, validationFunction, maximumTries, retryIntervalMs = 0) {
     let result = null;
     let tries = 0;
     let lastError = null;
     while (tries === 0 || tries < maximumTries) {
       try {
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         result = yield retryFunction();
         lastError = null;
         if (validationFunction(result)) {
@@ -86,7 +75,7 @@ let retryLimit = exports.retryLimit = (() => {
       }
 
       if (++tries < maximumTries && retryIntervalMs !== 0) {
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         yield sleep(retryIntervalMs);
       }
     }
@@ -99,7 +88,7 @@ let retryLimit = exports.retryLimit = (() => {
     }
   });
 
-  return function retryLimit(_x6, _x7, _x8) {
+  return function retryLimit(_x5, _x6, _x7) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -157,14 +146,14 @@ let asyncFilter = exports.asyncFilter = (() => {
         }
       });
 
-      return function (_x13) {
+      return function (_x12) {
         return _ref6.apply(this, arguments);
       };
     })());
     return filteredList;
   });
 
-  return function asyncFilter(_x10, _x11, _x12) {
+  return function asyncFilter(_x9, _x10, _x11) {
     return _ref5.apply(this, arguments);
   };
 })();
@@ -181,14 +170,14 @@ let asyncObjFilter = exports.asyncObjFilter = (() => {
         }
       });
 
-      return function (_x17) {
+      return function (_x16) {
         return _ref8.apply(this, arguments);
       };
     })());
     return filteredObj;
   });
 
-  return function asyncObjFilter(_x14, _x15, _x16) {
+  return function asyncObjFilter(_x13, _x14, _x15) {
     return _ref7.apply(this, arguments);
   };
 })();
@@ -230,14 +219,14 @@ let asyncSome = exports.asyncSome = (() => {
         }
       });
 
-      return function (_x21) {
+      return function (_x20) {
         return _ref10.apply(this, arguments);
       };
     })());
     return resolved;
   });
 
-  return function asyncSome(_x18, _x19, _x20) {
+  return function asyncSome(_x17, _x18, _x19) {
     return _ref9.apply(this, arguments);
   };
 })();
@@ -284,7 +273,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * receive a 'success' status. If promise1 later resolved, the first callsite
  * would receive an 'outdated' status.
  */
-let RequestSerializer = exports.RequestSerializer = class RequestSerializer {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class RequestSerializer {
 
   constructor() {
     this._lastDispatchedOp = 0;
@@ -307,7 +306,7 @@ let RequestSerializer = exports.RequestSerializer = class RequestSerializer {
         _this._lastFinishedOp = thisOp;
         return {
           status: 'success',
-          result: result
+          result
         };
       } else {
         return {
@@ -330,7 +329,7 @@ let RequestSerializer = exports.RequestSerializer = class RequestSerializer {
       while (lastPromise !== _this2._latestPromise) {
         lastPromise = _this2._latestPromise;
         // Wait for the current last know promise to resolve, or a next run have started.
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         result = yield new Promise(function (resolve, reject) {
           _this2._waitResolve = resolve;
           _this2._latestPromise.then(resolve);
@@ -343,13 +342,13 @@ let RequestSerializer = exports.RequestSerializer = class RequestSerializer {
   isRunInProgress() {
     return this._lastDispatchedOp > this._lastFinishedOp;
   }
-};
+}
 
-/*
- * Returns a promise that will resolve after `milliSeconds` milli seconds.
- * this can be used to pause execution asynchronously.
- * e.g. await sleep(1000), pauses the async flow execution for 1 second.
- */
+exports.RequestSerializer = RequestSerializer; /*
+                                                * Returns a promise that will resolve after `milliSeconds` milli seconds.
+                                                * this can be used to pause execution asynchronously.
+                                                * e.g. await sleep(1000), pauses the async flow execution for 1 second.
+                                                */
 
 function sleep(milliSeconds) {
   return new Promise(resolve => {
@@ -365,7 +364,7 @@ function nextTick() {
   return new Promise((resolve, reject) => {
     let timeout = setTimeout(() => {
       timeout = null;
-      reject(new Error(`Promise timed out after ${ String(milliseconds) } ms`));
+      reject(new Error(`Promise timed out after ${String(milliseconds)} ms`));
     }, milliseconds);
     promise.then(value => {
       if (timeout != null) {
@@ -417,7 +416,7 @@ function nextTick() {
  * IMPORTANT: This should almost never be used!! Instead, use the Promise constructor. See
  *  <https://github.com/petkaantonov/bluebird/wiki/Promise-anti-patterns#the-deferred-anti-pattern>
  */
-let Deferred = exports.Deferred = class Deferred {
+class Deferred {
 
   constructor() {
     this.promise = new Promise((resolve, reject) => {
@@ -425,26 +424,26 @@ let Deferred = exports.Deferred = class Deferred {
       this.reject = reject;
     });
   }
-};
+}
 
-/**
- * Returns a value derived asynchronously from an element in the items array.
- * The test function is applied sequentially to each element in items until
- * one returns a Promise that resolves to a non-null value. When this happens,
- * the Promise returned by this method will resolve to that non-null value. If
- * no such Promise is produced, then the Promise returned by this function
- * will resolve to null.
- *
- * @param items Array of elements that will be passed to test, one at a time.
- * @param test Will be called with each item and must return either:
- *     (1) A "thenable" (i.e, a Promise or promise-like object) that resolves
- *         to a derived value (that will be returned) or null.
- *     (2) null.
- *     In both cases where null is returned, test will be applied to the next
- *     item in the array.
- * @param thisArg Receiver that will be used when test is called.
- * @return Promise that resolves to an asynchronously derived value or null.
- */
+exports.Deferred = Deferred; /**
+                              * Returns a value derived asynchronously from an element in the items array.
+                              * The test function is applied sequentially to each element in items until
+                              * one returns a Promise that resolves to a non-null value. When this happens,
+                              * the Promise returned by this method will resolve to that non-null value. If
+                              * no such Promise is produced, then the Promise returned by this function
+                              * will resolve to null.
+                              *
+                              * @param items Array of elements that will be passed to test, one at a time.
+                              * @param test Will be called with each item and must return either:
+                              *     (1) A "thenable" (i.e, a Promise or promise-like object) that resolves
+                              *         to a derived value (that will be returned) or null.
+                              *     (2) null.
+                              *     In both cases where null is returned, test will be applied to the next
+                              *     item in the array.
+                              * @param thisArg Receiver that will be used when test is called.
+                              * @return Promise that resolves to an asynchronously derived value or null.
+                              */
 
 function asyncFind(items_, test, thisArg) {
   let items = items_;
@@ -470,7 +469,7 @@ function asyncFind(items_, test, thisArg) {
         }
       });
 
-      return function next(_x9) {
+      return function next(_x8) {
         return _ref3.apply(this, arguments);
       };
     })();
@@ -480,11 +479,7 @@ function asyncFind(items_, test, thisArg) {
 }
 
 function denodeify(f) {
-  return function () {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
+  return function (...args) {
     return new Promise((resolve, reject) => {
       function callback(error, result) {
         if (error) {

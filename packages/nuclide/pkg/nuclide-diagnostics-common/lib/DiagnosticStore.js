@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _nuclideTextedit;
 
@@ -37,7 +32,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DiagnosticStore = class DiagnosticStore {
+class DiagnosticStore {
   // A map from each file that has messages from any diagnostic provider
   // to the set of diagnostic providers that have messages for it.
   constructor() {
@@ -201,7 +196,7 @@ let DiagnosticStore = class DiagnosticStore {
 
   getFileMessageUpdates(filePath) {
     const fileMessages = this._getFileMessages(filePath);
-    const initialObservable = _rxjsBundlesRxMinJs.Observable.of({ filePath: filePath, messages: fileMessages });
+    const initialObservable = _rxjsBundlesRxMinJs.Observable.of({ filePath, messages: fileMessages });
     return _rxjsBundlesRxMinJs.Observable.concat(initialObservable, this._fileChanges.filter(change => change.filePath === filePath));
   }
 
@@ -316,11 +311,7 @@ let DiagnosticStore = class DiagnosticStore {
   }
 
   // Precondition: all messages have the given filePath
-  _applyFixes(filePath) {
-    for (var _len = arguments.length, messages = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      messages[_key - 1] = arguments[_key];
-    }
-
+  _applyFixes(filePath, ...messages) {
     const messagesWithFixes = messages.filter(msg => msg.fix != null);
     const fixes = [];
     for (const message of messagesWithFixes) {
@@ -371,7 +362,7 @@ let DiagnosticStore = class DiagnosticStore {
 
   _emitFileMessages(filePath) {
     this._fileChanges.next({
-      filePath: filePath,
+      filePath,
       messages: this._getFileMessages(filePath)
     });
   }
@@ -383,11 +374,18 @@ let DiagnosticStore = class DiagnosticStore {
   _emitAllMessages() {
     this._allChanges.next(this._getAllMessages());
   }
-};
+}
 
+exports.default = DiagnosticStore; /**
+                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                    * All rights reserved.
+                                    *
+                                    * This source code is licensed under the license found in the LICENSE file in
+                                    * the root directory of this source tree.
+                                    *
+                                    * 
+                                    */
 
 function notifyFixFailed() {
   atom.notifications.addWarning('Failed to apply fix. Try saving to get fresh results and then try again.');
 }
-
-module.exports = DiagnosticStore;

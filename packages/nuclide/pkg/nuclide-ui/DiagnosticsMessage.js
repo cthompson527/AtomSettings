@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -48,6 +39,16 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function plainTextForItem(item) {
   let mainComponent = undefined;
   if (item.html != null) {
@@ -66,7 +67,7 @@ function plainTextForItem(item) {
   if (item.filePath == null) {
     pathComponent = '';
   } else {
-    const lineComponent = item.range != null ? `:${ item.range.start.row + 1 }` : '';
+    const lineComponent = item.range != null ? `:${item.range.start.row + 1}` : '';
     pathComponent = ': ' + (_nuclideUri || _load_nuclideUri()).default.getPath(item.filePath) + lineComponent;
   }
   return mainComponent + pathComponent;
@@ -78,9 +79,10 @@ function plainTextForDiagnostic(message) {
 }
 
 function diagnosticHeader(props) {
-  const message = props.message,
-        fixer = props.fixer;
-
+  const {
+    message,
+    fixer
+  } = props;
   const providerClassName = message.type === 'Error' ? 'highlight-error' : 'highlight-warning';
   const copy = () => {
     const text = plainTextForDiagnostic(message);
@@ -121,9 +123,10 @@ function diagnosticHeader(props) {
 }
 
 function traceElements(props) {
-  const message = props.message,
-        goToLocation = props.goToLocation;
-
+  const {
+    message,
+    goToLocation
+  } = props;
   return message.trace ? message.trace.map((traceItem, i) => _reactForAtom.React.createElement((_DiagnosticsTraceItem || _load_DiagnosticsTraceItem()).DiagnosticsTraceItem, {
     key: i,
     trace: traceItem,

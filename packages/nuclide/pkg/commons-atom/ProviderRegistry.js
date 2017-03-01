@@ -1,18 +1,9 @@
-'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-let ProviderRegistry = class ProviderRegistry {
+class ProviderRegistry {
 
   constructor() {
     this._providers = new Set();
@@ -44,6 +35,13 @@ let ProviderRegistry = class ProviderRegistry {
     }
     return bestProvider;
   }
-};
-exports.default = ProviderRegistry;
-module.exports = exports['default'];
+}
+exports.default = ProviderRegistry; /**
+                                     * Copyright (c) 2015-present, Facebook, Inc.
+                                     * All rights reserved.
+                                     *
+                                     * This source code is licensed under the license found in the LICENSE file in
+                                     * the root directory of this source tree.
+                                     *
+                                     * 
+                                     */

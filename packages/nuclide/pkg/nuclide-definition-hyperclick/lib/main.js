@@ -1,16 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-// This package provides Hyperclick results for any language which provides a
-// DefinitionProvider.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,7 +15,7 @@ let getSuggestion = (() => {
     if (result == null) {
       return null;
     }
-    const definitions = result.definitions;
+    const { definitions } = result;
 
     if (!(definitions.length > 0)) {
       throw new Error('Invariant violation: "definitions.length > 0"');
@@ -45,7 +33,7 @@ let getSuggestion = (() => {
       }
 
       const filePath = definition.projectRoot == null ? definition.path : (_nuclideUri || _load_nuclideUri()).default.relative(definition.projectRoot, definition.path);
-      return `${ definition.name } (${ filePath })`;
+      return `${definition.name} (${filePath})`;
     }
 
     if (definitions.length === 1) {
@@ -92,7 +80,20 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let currentService = null;function consumeDefinitionService(service) {
+let currentService = null; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            */
+
+// This package provides Hyperclick results for any language which provides a
+// DefinitionProvider.
+
+function consumeDefinitionService(service) {
   if (!(currentService == null)) {
     throw new Error('Invariant violation: "currentService == null"');
   }
@@ -111,7 +112,7 @@ function getHyperclickProvider() {
   return {
     priority: 20,
     providerName: 'nuclide-definition-hyperclick',
-    getSuggestion: getSuggestion
+    getSuggestion
   };
 }
 

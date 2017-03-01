@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,9 +45,18 @@ function _load_utils2() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logInfo = (_utils || _load_utils()).default.logInfo;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+const { logInfo } = (_utils || _load_utils()).default;
+class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
   constructor(targetUri) {
     super('hhvm', targetUri);
   }
@@ -83,21 +83,16 @@ let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo exte
 
       const rpcService = _this2._getRpcService();
       const sessionConfig = (0, (_utils2 || _load_utils2()).getSessionConfig)((_nuclideUri || _load_nuclideUri()).default.getPath(_this2.getTargetUri()), false);
-      logInfo(`Connection session config: ${ JSON.stringify(sessionConfig) }`);
+      logInfo(`Connection session config: ${JSON.stringify(sessionConfig)}`);
       const result = yield rpcService.debug(sessionConfig);
-      logInfo(`Launch process result: ${ result }`);
+      logInfo(`Launch process result: ${result}`);
 
       return new (_PhpDebuggerInstance || _load_PhpDebuggerInstance()).PhpDebuggerInstance(_this2, rpcService);
     })();
   }
 
   _getRpcService() {
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('PhpDebuggerService', this.getTargetUri());
-
-    if (!service) {
-      throw new Error('Invariant violation: "service"');
-    }
-
+    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPhpDebuggerServiceByNuclideUri)(this.getTargetUri());
     return new service.PhpDebuggerService();
   }
 
@@ -120,10 +115,10 @@ let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo exte
       onClick: () => atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-http-request-sender:toggle-http-request-edit-dialog')
     }];
     try {
-      // $FlowFB
       return customControlButtons.concat(require('./fb/services').customControlButtons);
     } catch (_) {
       return customControlButtons;
     }
   }
-};
+}
+exports.AttachProcessInfo = AttachProcessInfo;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,14 +17,22 @@ var _os = _interopRequireDefault(require('os'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getChildProcessesTree() {
   if (_os.default.platform() !== 'darwin') {
     return _rxjsBundlesRxMinJs.Observable.of(null);
   }
 
-  return (0, (_process || _load_process()).runCommand)('ps', ['axo', 'ppid,pid,pcpu,command']).map(parsePSOutput).map(ps => buildTree(ps, process.pid));
+  return (0, (_process || _load_process()).runCommand)('ps', ['axo', 'ppid,pid,pcpu,command'], { dontLogInNuclide: true }).map(parsePSOutput).map(ps => buildTree(ps, process.pid));
 }
 
 function getActiveHandles() {
@@ -48,14 +47,7 @@ function parsePSOutput(output) {
   const ioBytesStats = {};
   const lines = output.split('\n');
   lines.forEach(line => {
-    var _line$trim$split = line.trim().split(/ +/),
-        _line$trim$split2 = _toArray(_line$trim$split);
-
-    const ppid = _line$trim$split2[0],
-          pid = _line$trim$split2[1],
-          cpu = _line$trim$split2[2],
-          spawnargs = _line$trim$split2.slice(3);
-
+    const [ppid, pid, cpu, ...spawnargs] = line.trim().split(/ +/);
     if (spawnargs.join(' ') === 'ps axo ppid,pid,pcpu,command') {
       return;
     }
@@ -74,16 +66,15 @@ function parsePSOutput(output) {
       };
     }
   });
-  return { cpids: cpids, cpus: cpus, commands: commands, ioBytesStats: ioBytesStats };
+  return { cpids, cpus, commands, ioBytesStats };
 }
 
 function buildTree(ps, pid) {
   return {
-    pid: pid,
+    pid,
     command: ps.commands[pid],
     cpuPercentage: ps.cpus[pid],
     children: (ps.cpids[pid] || []).map(cpid => buildTree(ps, cpid)),
     ioBytesStats: ps.ioBytesStats[pid]
   };
 }
-module.exports = exports['default'];

@@ -1,5 +1,447 @@
 # Nuclide Changelog
 
+## v0.208.0
+
+### Highlights
+
+* The session key is now correctly stored in the keyring on Linux, only requiring one authentication per session.
+* Improve Flow client-side autocomplete filtering heuristic to filter fast in more scenarios.
+
+### Hack
+
+* Filter out errors with empty paths, which crash the RPC connection.
+
+### Debugger
+
+* Show `(no variables)` in the Scopes window for frames with no local variables.
+* Changed debug type for `PHP` to `PHP / Hack` in the debugger launch window.
+
+### Misc
+
+* Fixed bug whereby tools would sometimes not fill entire panel until resized.
+* Fixed `nuclideUri.uriToNuclideUri` which used to return malformed file paths on Windows.
+* Fixed Quick Open remembering undo history across invocations.
+* Fixed switching between header and source.
+* Nuclide server start-up performance improvements due to the V8 compile cache.
+* Fixed bug where buck targets with `...` wouldn't build.
+* Fixed `Package already activated` error.
+* `atom://` URL handler is updated to work for Atom 1.15+.
+
+
+## v0.207.0
+
+### Highlights
+
+* Lots of Workspace View improvements! This greatly improves UX when (re)-arranging the pane layout, e.g. via drag-and-drop.
+
+### Debugger
+
+* The threads window is now sortable.
+
+### Languages
+
+* Hack Grammar: Fix variable capture in lambdas.
+* Hack: Fix errors disappearing after restarting the Hack server.
+* Flow: Highlight typehints according to the exact range returned from Flow.
+
+### Misc bug fixes & improvements
+
+* Fixed a bug that caused Nuclide to overwrite the symlink itself instead of the target file when editing a remote file that is a symlink.
+* Prevent spawning multiple cursors whenever it conflicts with hyperclick.
+* Fixed the styling of links in the console.
+
+
+## v0.206.0
+
+### Highlights
+
+* Minimally required version of Atom is now 1.14.0
+
+### Debugger
+
+* Fixed a bug that caused the debug session not to end if the debugger proxy is killed
+* Fixed a bug causing exception breakpoint messages to be formatted incorrectly
+
+### PHP
+
+* Faster autocomplete thanks to new caching
+
+### Misc
+
+* Support device groups in platform/device selection dropdown
+* Fixed Diagnostics "Try it" button on Home screen
+* Support skipping local lint and unit tests
+
+
+## v0.205.0
+
+Hotfix for internal changes.
+
+
+## v0.204.0
+
+### Mobile JS
+
+* Improved disposal logic for the experimental debugger, resulting in fewer crashes.
+
+### Hack
+
+* With this week's HHVM release, asynchronous callstacks in the debugger will no longer be missing frames.
+
+### Improvements and Fixes
+
+* Improved Atom responsiveness when using flow by offloading more work to the nuclide-server.
+* Fixed issue with remote connection that would cause Atom to not be able to serialize state.
+* Improved task runner toolbar UI.
+
+
+## v0.203.0
+
+Hotfix for internal changes.
+
+
+## v0.202.0
+
+### Highlights
+
+* GraphQL Integration. Autocomplete, syntax errors, go to definition, outline and context views integrations... All you need for `.graphql` files!
+
+### HACK
+
+* Syntax highlighting fixed for methods that start with magic method names (eg `__getBlah()`).
+
+### Logcat
+
+* Fixed parsing for some versions of adb that included extra CRs (Thanks @fcFn!).
+* Added "unknown:React" to default tag whitelist.
+
+### Reason
+
+* Fixed slow syntax highlighting (Thanks @freebroccolo!).
+
+### Source Control
+
+* Fixed double context menu bug in source control sidebar.
+* Fix Diff View changed sections gutter highlighting.
+
+### Debugger
+
+* Watches in the debugger now have the 'x' on the left.
+* Clicking the selected frame in the debugger callstack window navigates to the expected file.
+
+### Misc
+
+* File permissions are preserved when using search and replace on remote files.
+* Bugfix for Xdebug on PHP 5.3 (Thanks @jesseschalken!)
+* Windows - fixed panel being stuck occasionally in an endless resize.
+* When opening a file from the CLI, prefer windows which already have the directory open.
+* Flow autocomplete will no longer work with Flow v0.19 and below.
+
+
+## v0.201.0
+
+### Highlights
+
+* URLs in console messages are now clickable. Thanks @nmn!
+* Sections in the debugger panel are now resizable.
+
+### General
+
+* Hyperclick now creates a navigation stack entry before performing an action. Thanks Sandor!
+* Fixed a bug that prevented “opening all“ bugs from the diagnostics table when there were more than 20. Thanks Sandor!
+* We now only show the most relevant datatip for a given location, rather than all applicable ones. Thanks Sandor!
+* A warning will show up if several of the remote profiles connect to same server by different names. Thanks Kody!
+* Removed confusing “split” context menu items from file tree.
+
+### Debugger
+
+* Make JavaScript debugger names more clear. (iOS Webkit Debug Proxy → Mobile JS, JavaScript -> NodeJS)
+* Detaching the Node debugger no longer crashes the Node process.
+* Node and Native debugger process selection lists refresh as soon as the dialog is opened.
+* Bugfixes for attaching the Node debugger to a Node process.
+
+## v0.200.0
+
+Hotfix for internal changes.
+
+
+## v0.199.0
+
+Hotfix for quick-open providers selection for multiple projects case.
+
+
+## v0.198.0
+
+### Highlights
+
+* Project-level replace now works remotely.
+
+### General
+
+* Fix bug causing server crash when using different hostnames for the same server.
+* Atom 1.13 is now the minimal required version of Atom.
+
+### Source Control
+
+*  Improved Commit Workflow:
+  * Warn against publishing public commits.
+  * Improved console logging for arcanist errors.
+  * Toggle console, showing the error in case of failed commits.
+  * Publish only after successful commit/amend.
+
+### Flow
+
+* Remove experimental structured type hints option from Flow.
+* Enabled definition preview in Context View.
+
+
+## v0.197.0
+
+Hotfix for 0.196.0 with backwards-compatible Atom 1.13.x shadow DOM fixes.
+
+## v0.196.0
+
+### Bug Fixes
+
+* Flow's autocomplete prefix matching is now more exact.
+* `flow-bin` is now correctly located on Windows.
+* When Nuclide kills a process, all of that process' children are gone too - this fixes an issue with the RN packager lingering around after being stopped.
+
+### UI
+
+* Datatips that expand beyond the bottom of the screen are now correctly displayed.
+* Descriptions from the diagnostics table can now be copied.
+* Long gutter popups (like from Diagnostics) are now narrower so they're easier to read.
+
+### Quick Open
+
+* `nuclide-quick-open`'s Atom service API got a major facelift.
+* Many internal improvements. It's faster, smoother and less jittery. More features coming to it soon.
+
+## v0.195.0
+
+### Highlights
+
+* Upgrade to Atom 1.12.7
+* Add tooltip with key bindings for navigation stack
+
+### Bug Fixes
+
+* Fix native debugger callstack printing
+* task runner fixes
+* Improve C++ debugger start debugging failure error message
+
+## v0.194.0
+
+* OCaml Hyperclick provider now only triggers on success.
+* Hotfix for internal changes.
+
+## v0.193.0
+
+### Highlights
+
+* Improve Flow autocomplete performance by caching and filtering previous results more often.
+
+### General
+
+* Recreate closed workspace view items in previous location.
+*  `~`  is now expanded to the user's home dir by default in user provided config paths.
+* Task runner failure notifications are now automatically hidden when you start running another task.
+* Task runner visibility is now serialized based on current working root.
+
+### Source Control
+
+* Add option to create bookmark on commit.
+
+### Fixes
+
+* Fix bug causing Mercurial operations to sometimes never terminate.
+* Fix dragging tabs between panels.
+* Fix Diff View sometimes missing original file.
+* Clang: fix blank outline views for some C++ files.
+* Fix remote atom when folks have overridden their `TMPDIR`.
+* Fixed several File Tree regressions including
+    * Re-introduce `⌘K` `⌘B` alias for toggling.
+    * Fix `⌃0` / focus toggling.
+    * Ability to move files using drag-and-drop.
+
+## v0.192.0
+
+Hotfix various hanging processes and Diff View operations.
+
+## v0.191.0
+
+Hotfix Diff View gutter highlighting for Atom <= 1.12.x.
+
+## v0.190.0
+
+Hotfix for internal changes.
+
+## v0.189.0
+
+### Highlights
+
+* React Native: Experimental JavaScriptCore JS debugger support for Android.
+* Vastly improved Mercurial blame UI.
+* Flow types are now pretty-printed into multiple lines.
+* Debugger, file tree, and source control panels are now normal, draggable Atom tabs.
+
+### General
+
+* `atom://nuclide/open-arc` URLs can now remember and re-open your previous paths.
+* Brought back the remote connection status-bar indicator.
+* Fixed opening remote directories via the remote Atom CLI.
+* Fixed diagnostics table resizing bug.
+* Datatips no longer appear after leaving the editor.
+
+### Debugger
+
+* Breakpoints are no longer restricted to certain file extensions.
+* HHVM: fixed debugger crashes related to evaluations coming back in an unexpected order.
+* HHVM: Debugger now displays a warning if hphpd is attached.
+* C++: Fixed toggle uncaught exception crash.
+* iOS: Fixed app debugging via the Buck toolbar.
+
+### Source Control
+
+* Diff View icon has been changed from the branch icon to a "diff" icon.
+
+### React Native
+
+* Improved adb logcat error messages.
+
+## v0.188.0
+
+Hotfix release for Source Control sidebar styling and goToLocation errors.
+
+## v0.187.0
+
+### Highlights
+
+* Debugger "Locals" window is now a "Scopes" window, and can show non-local variables in scope, such as global variables.
+* Fixed an issue that would cause the "Hack Diagnostics" spinner to spin forever and also cause Atom to hog the CPU.
+
+### General
+
+* When opening a file with `cmd+t`, prefer to focus an existing editor in a different pane rather than re-opening the file.
+* Fixed a bug causing occasional Hg / Buck errors at Atom startup.
+
+### Debugger
+
+* Fix C++ debugging attach "missing envPythonPath" regression.
+* "Run to location" debug command for C++ debugging.
+* Remove C++ start debugging flickering because of loader breakpoint.
+* Fixed caching of nested value expansion state during stepping.
+
+### React Native
+
+* React Native redboxes will automatically open files using the current Atom window when the packager is run from Nuclide.
+
+### Source Control
+
+* Add confirmation prompt for **Revert** and **Delete** context menu options.
+* Added publish options and an input for publish update message in commit/amend mode.
+* Added verbatim mode to enable updating summary and title on Phabricator to match the data entered in the diff view.
+* Removed amend button in diff view form.
+
+### Buck
+
+* Allow building with the `path/to/target/...` target syntax.
+* `buck test` test failures are treated as diagnostics, and appear inline in the test's source code's buffer.
+
+## v0.186.0
+
+### Hotfix
+
+* Fix case-sensitivity issue that manifested on Linux and Windows.
+* Fix issue where datatips would close when they are clicked on.
+
+## v0.185.0
+
+### Highlights
+
+* When you right click on the file tree, it now highlights the row you clicked on!
+
+### General
+
+* Make remote "Search in Directory" behaviour more consistent.
+* Performance improvements for remote "Search in Directory".
+* Make remote "Search in Directory” work with multiple projects.
+* Fix Task Runner alphabetical ordering.
+* Buck toolbar no longer includes a “React Native Server” checkbox for iOS/Android targets.
+* New icon for active project root in the file tree.
+* File Tree no longer “jumps” when editing a Working Set.
+
+### File tree
+
+* The `[+]` icon for the working set no longer jumps around when scrolling.
+* Do not show (default) bubble next to the root.
+
+### Debugger
+
+* Watch expressions are working again.
+* Debugger highlights the current stack frame in the call stack.
+* Fix issue with launching scripts with arguments under the PHP debugger.
+
+### Diagnostics
+
+* The yellow and red `~~~~` underlines no longer extends to the end of the line.
+
+### Datatip
+
+* Once interacted with (clicking, selecting text or scrolling horizontally), the datatip closes less aggressively when you mouse out of it.
+* When switching tabs or applications, it should no longer trigger a datatip without moving the mouse.
+
+### Diff view
+
+* The amend button is no longer enabled when the top commit isn't yours.
+* Clicking on the diff gutter no longer creates a breakpoint.
+
+### OCaml/Reason
+
+* Fix bug in formatting `rei` and `mli` files.
+
+### Task Runner Toolbar
+
+* Task selection dropdown  and action button have been separated.
+* UI no longer jumps when the active project root changes or is set for the first time.
+
+## v0.184.0
+
+* Fixes regression in backspace/enter events not working in input fields of the debugger.
+* Workaround for unprepared Atom environment during package activation.
+
+## v0.183.0
+
+* Fix inadvertent infinite loop in work deferral queue.
+
+## v0.182.0
+
+### Highlights
+
+* You can now open files with [atom://nuclide/open-arc?project=<project_id>&path=<path>](http:) URLs.
+
+### General
+
+* Arc Lint processes can no longer stack - saving a file while a lint is running will kill the old lint process.
+* Nuclide settings filter now matches on Section and Package names.
+* Arc lint timeout is now configurable in Nuclide Settings.
+
+### Health
+
+* Add list of calls to external processes and their duration.
+* You can now use cmd-c to copy the content.
+
+### Source Control
+
+* No longer display some random stranger commit and now clicking on a commit shows its own changes.
+* Lots of small tweaks to make the UI stop jumping around all the time.
+
+### Debugger
+
+* Add support for selecting text and copy/paste.
+* PHP debugger can be started if active file is not remote.
+
 ## v0.181.0
 
 Hotfix for gutter breakpoint click-listener regression.

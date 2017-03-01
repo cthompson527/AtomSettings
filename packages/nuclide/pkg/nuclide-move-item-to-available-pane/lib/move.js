@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,9 +14,21 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function moveUp() {
   doSplit('up', (pane, params) => pane.splitUp(params));
-}function moveDown() {
+}
+
+function moveDown() {
   doSplit('down', (pane, params) => pane.splitDown(params));
 }
 
@@ -97,6 +100,15 @@ function findTargetPane(activePane, operation) {
     candidatePanes.sort((pane1, pane2) => {
       const rect1 = paneToRect.get(pane1);
       const rect2 = paneToRect.get(pane2);
+
+      if (!(rect1 != null)) {
+        throw new Error('Invariant violation: "rect1 != null"');
+      }
+
+      if (!(rect2 != null)) {
+        throw new Error('Invariant violation: "rect2 != null"');
+      }
+
       const comp = primaryComparator(rect1) - primaryComparator(rect2);
       if (comp !== 0) {
         return comp;
@@ -121,5 +133,5 @@ function createPredicate(operation, activeRect) {
     case 'right':
       return rect => rect.left > activeRect.left;
   }
-  throw Error(`Unknown operation: ${ operation }`);
+  throw Error(`Unknown operation: ${operation}`);
 }

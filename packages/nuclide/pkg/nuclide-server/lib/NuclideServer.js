@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -79,13 +74,23 @@ function _load_nuclideMarshalersCommon() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const connect = require('connect');
 const http = require('http');
 const https = require('https');
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
-let NuclideServer = class NuclideServer {
+class NuclideServer {
 
   constructor(options, services) {
     if (!(NuclideServer._theServer == null)) {
@@ -94,12 +99,13 @@ let NuclideServer = class NuclideServer {
 
     NuclideServer._theServer = this;
 
-    const serverKey = options.serverKey,
-          serverCertificate = options.serverCertificate,
-          port = options.port,
-          certificateAuthorityCertificate = options.certificateAuthorityCertificate,
-          trackEventLoop = options.trackEventLoop;
-
+    const {
+      serverKey,
+      serverCertificate,
+      port,
+      certificateAuthorityCertificate,
+      trackEventLoop
+    } = options;
 
     this._version = (0, (_nuclideVersion || _load_nuclideVersion()).getVersion)().toString();
     this._app = connect();
@@ -195,7 +201,7 @@ let NuclideServer = class NuclideServer {
   }
 
   static closeConnection(client) {
-    logger.info(`Closing client: #${ client.getTransport().id }`);
+    logger.info(`Closing client: #${client.getTransport().id}`);
     if (NuclideServer._theServer != null) {
       NuclideServer._theServer._closeConnection(client);
     }
@@ -305,7 +311,5 @@ let NuclideServer = class NuclideServer {
     this._webSocketServer.close();
     this._webServer.close();
   }
-};
-
-
-module.exports = NuclideServer;
+}
+exports.default = NuclideServer;

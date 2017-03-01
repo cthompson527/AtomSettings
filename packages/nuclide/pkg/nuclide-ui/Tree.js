@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,18 +15,27 @@ function _load_classnames() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
+                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                              */
 
-const TreeItem = exports.TreeItem = props => {
-  const className = props.className,
-        selected = props.selected,
-        children = props.children,
+const TreeItem = props => {
+  const {
+    className,
+    selected,
+    children
+  } = props,
         remainingProps = _objectWithoutProperties(props, ['className', 'selected', 'children']);
-
   return _reactForAtom.React.createElement(
     'li',
     Object.assign({ className: (0, (_classnames || _load_classnames()).default)(className, {
-        selected: selected
+        selected
       }, 'list-item')
     }, remainingProps),
     selected && typeof children === 'string'
@@ -48,19 +48,21 @@ const TreeItem = exports.TreeItem = props => {
   );
 };
 
-const NestedTreeItem = exports.NestedTreeItem = props => {
-  const className = props.className,
-        selected = props.selected,
-        collapsed = props.collapsed,
-        title = props.title,
-        children = props.children,
+exports.TreeItem = TreeItem;
+const NestedTreeItem = props => {
+  const {
+    className,
+    selected,
+    collapsed,
+    title,
+    children
+  } = props,
         remainingProps = _objectWithoutProperties(props, ['className', 'selected', 'collapsed', 'title', 'children']);
-
   return _reactForAtom.React.createElement(
     'li',
     Object.assign({ className: (0, (_classnames || _load_classnames()).default)(className, {
-        selected: selected,
-        collapsed: collapsed
+        selected,
+        collapsed
       }, 'list-nested-item')
     }, remainingProps),
     _reactForAtom.React.createElement(
@@ -76,6 +78,7 @@ const NestedTreeItem = exports.NestedTreeItem = props => {
   );
 };
 
+exports.NestedTreeItem = NestedTreeItem;
 const TreeList = exports.TreeList = props => _reactForAtom.React.createElement(
   'ul',
   { className: (0, (_classnames || _load_classnames()).default)(props.className, {

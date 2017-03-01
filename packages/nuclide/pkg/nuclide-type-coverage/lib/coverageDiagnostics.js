@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -52,6 +43,16 @@ function diagnosticProviderForResultStream(results, isEnabledStream) {
  * This is reasonable because we only query providers when there is a path available for the current
  * text editor.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function diagnosticsForResult(result) {
   if (result.kind !== 'result') {
     return null;
@@ -77,13 +78,13 @@ function diagnosticsForResult(result) {
 }
 
 function uncoveredRangeToDiagnostic(region, path, providerName) {
-  const text = region.message != null ? region.message : `Not covered by ${ providerName }`;
+  const text = region.message != null ? region.message : `Not covered by ${providerName}`;
   return {
     scope: 'file',
     providerName: 'Type Coverage',
     type: 'Warning',
     filePath: path,
     range: region.range,
-    text: text
+    text
   };
 }

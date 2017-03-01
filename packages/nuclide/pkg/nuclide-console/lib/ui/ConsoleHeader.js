@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _classnames;
 
@@ -72,7 +62,7 @@ function _load_Button() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ConsoleHeader = class ConsoleHeader extends _reactForAtom.React.Component {
+class ConsoleHeader extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -133,8 +123,7 @@ let ConsoleHeader = class ConsoleHeader extends _reactForAtom.React.Component {
   }
 
   _renderOption(optionProps) {
-    const option = optionProps.option;
-
+    const { option } = optionProps;
     const source = this.props.sources.find(s => s.id === option.value);
 
     if (!(source != null)) {
@@ -215,10 +204,17 @@ let ConsoleHeader = class ConsoleHeader extends _reactForAtom.React.Component {
       )
     );
   }
+}
 
-};
-exports.default = ConsoleHeader;
-
+exports.default = ConsoleHeader; /**
+                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                  * All rights reserved.
+                                  *
+                                  * This source code is licensed under the license found in the LICENSE file in
+                                  * the root directory of this source tree.
+                                  *
+                                  * 
+                                  */
 
 function sortAlpha(a, b) {
   const aLower = a.toLowerCase();
@@ -232,9 +228,8 @@ function sortAlpha(a, b) {
 }
 
 function MultiSelectLabel(props) {
-  const selectedOptions = props.selectedOptions;
-
-  const label = selectedOptions.length === 1 ? selectedOptions[0].label : `${ selectedOptions.length } Sources`;
+  const { selectedOptions } = props;
+  const label = selectedOptions.length === 1 ? selectedOptions[0].label : `${selectedOptions.length} Sources`;
   return _reactForAtom.React.createElement(
     'span',
     null,
@@ -242,4 +237,3 @@ function MultiSelectLabel(props) {
     label
   );
 }
-module.exports = exports['default'];

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17,7 +8,17 @@ Object.defineProperty(exports, "__esModule", {
 /**
  * A class that gives us an idempotent API for rendering panels, creating them lazily.
  */
-let PanelRenderer = class PanelRenderer {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class PanelRenderer {
 
   constructor(options) {
     this._createItem = options.createItem;
@@ -30,7 +31,7 @@ let PanelRenderer = class PanelRenderer {
       if (this._panel == null) {
         const item = this._item == null ? this._item = this._createItem() : this._item;
         this._panel = addPanel(this._location, {
-          item: item,
+          item,
           priority: this._priority == null ? undefined : this._priority
         });
       } else {
@@ -49,11 +50,9 @@ let PanelRenderer = class PanelRenderer {
       this._panel.destroy();
     }
   }
+}
 
-};
 exports.default = PanelRenderer;
-
-
 function addPanel(location, options) {
   switch (location) {
     case 'top':
@@ -65,7 +64,6 @@ function addPanel(location, options) {
     case 'left':
       return atom.workspace.addLeftPanel(options);
     default:
-      throw new Error(`Invalid location: ${ location }`);
+      throw new Error(`Invalid location: ${location}`);
   }
 }
-module.exports = exports['default'];

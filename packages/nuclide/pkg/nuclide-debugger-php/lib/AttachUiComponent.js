@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -60,7 +51,17 @@ function _load_consumeFirstProvider() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class AttachUiComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -139,10 +140,7 @@ let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent exte
 
   _handleAttachButtonClick() {
     // Start a debug session with the user-supplied information.
-    var _nuclideUri$parseRemo = (_nuclideUri || _load_nuclideUri()).default.parseRemoteUri(this.props.targetUri);
-
-    const hostname = _nuclideUri$parseRemo.hostname;
-
+    const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parseRemoteUri(this.props.targetUri);
     const selectedPath = this.state.pathMenuItems[this.state.selectedPathIndex].label;
     const processInfo = new (_AttachProcessInfo || _load_AttachProcessInfo()).AttachProcessInfo((_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, selectedPath));
     (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote').then(debuggerService => debuggerService.startDebugging(processInfo));
@@ -157,4 +155,5 @@ let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent exte
   _handleCancelButtonClick() {
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:toggle-launch-attach');
   }
-};
+}
+exports.AttachUiComponent = AttachUiComponent;

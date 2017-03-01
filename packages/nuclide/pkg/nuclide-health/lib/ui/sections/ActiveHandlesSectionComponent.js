@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -24,7 +14,7 @@ function _load_HandlesTableComponent() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ActiveHandlesSectionComponent = class ActiveHandlesSectionComponent extends _reactForAtom.React.Component {
+class ActiveHandlesSectionComponent extends _reactForAtom.React.Component {
 
   render() {
     if (!this.props.activeHandlesByType || Object.keys(this.props.activeHandlesByType).length === 0) {
@@ -67,6 +57,13 @@ let ActiveHandlesSectionComponent = class ActiveHandlesSectionComponent extends 
       })
     );
   }
-};
-exports.default = ActiveHandlesSectionComponent;
-module.exports = exports['default'];
+}
+exports.default = ActiveHandlesSectionComponent; /**
+                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                  * All rights reserved.
+                                                  *
+                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                  * the root directory of this source tree.
+                                                  *
+                                                  * 
+                                                  */

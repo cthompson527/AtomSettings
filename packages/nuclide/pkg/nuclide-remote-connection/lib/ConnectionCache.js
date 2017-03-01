@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,14 +34,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // A cache of values by ServerConnection.
 // Will lazily create the values when requested for each connection.
 // Note that an entry is added for local with connection == null.
-let ConnectionCache = exports.ConnectionCache = class ConnectionCache extends (_cache || _load_cache()).Cache {
+class ConnectionCache extends (_cache || _load_cache()).Cache {
 
   // If lazy is true, then entries will only be created when get() is called.
   // Otherwise, entries will be created as soon as ServerConnection's are
   // established.
-  constructor(factory) {
-    let lazy = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+  constructor(factory, lazy = false) {
     super(factory, valuePromise => valuePromise.then(value => value.dispose()));
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._subscriptions.add((_ServerConnection || _load_ServerConnection()).ServerConnection.onDidCloseServerConnection(connection => {
@@ -89,11 +78,20 @@ let ConnectionCache = exports.ConnectionCache = class ConnectionCache extends (_
     super.dispose();
     this._subscriptions.dispose();
   }
-};
+}
 
-// Returns null if there's no valid connection for the given filePath
+exports.ConnectionCache = ConnectionCache; // Returns null if there's no valid connection for the given filePath
 // Returns {connection: null} for a valid local filePath.
 // Returns {connection: non-null} for a valid remote filePath.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function connectionOfUri(filePath) {
   if (filePath == null) {
@@ -107,5 +105,5 @@ function connectionOfUri(filePath) {
     return null;
   }
 
-  return { connection: connection };
+  return { connection };
 }

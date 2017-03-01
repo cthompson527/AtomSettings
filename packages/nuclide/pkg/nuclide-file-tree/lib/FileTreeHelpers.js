@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _atom = require('atom');
 
@@ -29,7 +24,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function dirPathToKey(path) {
   return (_nuclideUri || _load_nuclideUri()).default.ensureTrailingSeparator((_nuclideUri || _load_nuclideUri()).default.trimTrailingSeparator(path));
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function isDirKey(key) {
   return (_nuclideUri || _load_nuclideUri()).default.endsWithSeparator(key);
@@ -53,7 +56,7 @@ function fetchChildren(nodeKey) {
 
   return new Promise((resolve, reject) => {
     if (directory == null) {
-      reject(`Directory "${ nodeKey }" not found or is inaccessible.`);
+      reject(new Error(`Directory "${nodeKey}" not found or is inaccessible.`));
       return;
     }
 
@@ -158,20 +161,20 @@ function updatePathInOpenedEditors(oldPath, newPath) {
   });
 }
 
-module.exports = {
-  dirPathToKey: dirPathToKey,
-  isDirKey: isDirKey,
-  keyToName: keyToName,
-  keyToPath: keyToPath,
-  getParentKey: getParentKey,
-  fetchChildren: fetchChildren,
-  getDirectoryByKey: getDirectoryByKey,
-  getEntryByKey: getEntryByKey,
-  getFileByKey: getFileByKey,
-  getDisplayTitle: getDisplayTitle,
-  isValidDirectory: isValidDirectory,
-  isLocalEntry: isLocalEntry,
-  isContextClick: isContextClick,
-  buildHashKey: buildHashKey,
-  updatePathInOpenedEditors: updatePathInOpenedEditors
+exports.default = {
+  dirPathToKey,
+  isDirKey,
+  keyToName,
+  keyToPath,
+  getParentKey,
+  fetchChildren,
+  getDirectoryByKey,
+  getEntryByKey,
+  getFileByKey,
+  getDisplayTitle,
+  isValidDirectory,
+  isLocalEntry,
+  isContextClick,
+  buildHashKey,
+  updatePathInOpenedEditors
 };

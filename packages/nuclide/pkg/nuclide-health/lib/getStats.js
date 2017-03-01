@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17,6 +8,16 @@ exports.default = getStats;
 var _os = _interopRequireDefault(require('os'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getStats() {
   const stats = process.memoryUsage(); // RSS, heap and usage.
@@ -28,7 +29,7 @@ function getStats() {
     cpuPercentage: _os.default.loadavg()[0], // 1 minute CPU average.
     activeHandles: activeHandles.length,
     activeRequests: getActiveRequests().length,
-    activeHandlesByType: activeHandlesByType
+    activeHandlesByType
   });
 }
 
@@ -80,4 +81,3 @@ function getActiveRequests() {
   // $FlowFixMe: Private method.
   return process._getActiveRequests();
 }
-module.exports = exports['default'];

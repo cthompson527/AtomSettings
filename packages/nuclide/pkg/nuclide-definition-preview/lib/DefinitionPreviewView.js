@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,16 +27,22 @@ function _load_goToLocation() {
   return _goToLocation = require('../../commons-atom/go-to-location');
 }
 
-var _textEditor;
+var _textBuffer;
 
-function _load_textEditor() {
-  return _textEditor = require('../../commons-atom/text-editor');
+function _load_textBuffer() {
+  return _textBuffer = require('../../commons-atom/text-buffer');
 }
 
 var _AtomTextEditor;
 
 function _load_AtomTextEditor() {
   return _AtomTextEditor = require('../../nuclide-ui/AtomTextEditor');
+}
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
 }
 
 var _nuclideAnalytics;
@@ -64,14 +61,24 @@ var _atom = require('atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const MINIMUM_EDITOR_HEIGHT = 10;
 const EDITOR_HEIGHT_DELTA = 10;
 
-let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPreviewView extends _reactForAtom.React.Component {
+class DefinitionPreviewView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
-    const buffer = props.definition != null ? (0, (_textEditor || _load_textEditor()).bufferForUri)(props.definition.path) : new _atom.TextBuffer();
+    const buffer = props.definition != null ? (0, (_textBuffer || _load_textBuffer()).bufferForUri)(props.definition.path) : new _atom.TextBuffer();
     const heightSetting = (_featureConfig || _load_featureConfig()).default.get('nuclide-definition-preview.editorHeight');
     let height = 50;
     if (heightSetting != null) {
@@ -81,7 +88,7 @@ let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPrev
       height = MINIMUM_EDITOR_HEIGHT;
     }
     this.state = {
-      buffer: buffer,
+      buffer,
       oldBuffer: null,
       editorHeight: height
     };
@@ -99,13 +106,13 @@ let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPrev
       // the correct path if the new definition prop has a different path than the
       // currently loaded buffer.
       if (definition.path !== this.state.buffer.getPath()) {
-        this.setState({ buffer: (0, (_textEditor || _load_textEditor()).bufferForUri)(definition.path), oldBuffer: this.state.buffer });
+        this.setState({ buffer: (0, (_textBuffer || _load_textBuffer()).bufferForUri)(definition.path), oldBuffer: this.state.buffer });
       }
     } else {
       // A null definition has no associated file path, so make a new TextBuffer()
       // that doesn't have an associated file path.
       const oldBuffer = this.state.buffer;
-      this.setState({ buffer: new _atom.TextBuffer(), oldBuffer: oldBuffer });
+      this.setState({ buffer: new _atom.TextBuffer(), oldBuffer });
     }
   }
 
@@ -170,10 +177,7 @@ let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPrev
   }
 
   render() {
-    var _props = this.props;
-    const ContextViewMessage = _props.ContextViewMessage,
-          definition = _props.definition;
-
+    const { ContextViewMessage, definition } = this.props;
     const atMinHeight = this.state.editorHeight - EDITOR_HEIGHT_DELTA < MINIMUM_EDITOR_HEIGHT;
     // Show either a "No definition" message or the definition in an editors
     return definition == null ? _reactForAtom.React.createElement(ContextViewMessage, { message: ContextViewMessage.NO_DEFINITION }) : _reactForAtom.React.createElement(
@@ -182,13 +186,15 @@ let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPrev
       _reactForAtom.React.createElement(
         'div',
         { className: 'nuclide-definition-preview-editor',
-          style: { height: `${ this.state.editorHeight }em` } },
+          style: { height: `${this.state.editorHeight}em` } },
         _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
           ref: 'editor',
           gutterHidden: true,
           lineNumberGutterVisible: false,
-          path: definition.path,
-          readOnly: true,
+          path: definition.path
+          // Should be readonly, but can't because we can only make buffers readonly,
+          // We can't do readonly on editor granularity.
+          , readOnly: false,
           textBuffer: this.state.buffer,
           syncTextContents: false
         }),
@@ -233,7 +239,9 @@ let DefinitionPreviewView = exports.DefinitionPreviewView = class DefinitionPrev
   _scrollToRow(row) {
     this.getEditor().scrollToBufferPosition([row, 0], { center: true });
   }
-};
+}
+
+exports.DefinitionPreviewView = DefinitionPreviewView;
 
 
 const ButtonContainer = props => {

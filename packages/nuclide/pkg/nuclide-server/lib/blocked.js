@@ -1,12 +1,17 @@
-'use strict';
-'use babel';
+"use strict";
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = blocked;
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
 
 /**
@@ -17,11 +22,7 @@
  * @return the interval handler.
  * To cancel, call clearInterval on the returned interval handler.
  */
-
-function blocked(fn) {
-  let intervalMs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 100;
-  let thresholdMs = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 50;
-
+function blocked(fn, intervalMs = 100, thresholdMs = 50) {
   let start = Date.now();
 
   return setInterval(() => {
@@ -33,5 +34,3 @@ function blocked(fn) {
     start = Date.now();
   }, intervalMs);
 }
-
-module.exports = blocked;

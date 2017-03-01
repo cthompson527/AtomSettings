@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _classnames;
 
@@ -36,7 +26,7 @@ function _load_constants() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let UncommittedChangesTimelineNode = class UncommittedChangesTimelineNode extends _reactForAtom.React.Component {
+class UncommittedChangesTimelineNode extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -45,25 +35,31 @@ let UncommittedChangesTimelineNode = class UncommittedChangesTimelineNode extend
   }
 
   render() {
-    const dirtyFileCount = this.props.dirtyFileCount;
-
+    const { dirtyFileCount, selectedIndex, revisionsCount } = this.props;
     const hasChanges = dirtyFileCount > 0;
-    const bubbleClassName = (0, (_classnames || _load_classnames()).default)('revision-bubble revision-bubble--uncommitted', {
-      'revision-bubble--no-changes': !hasChanges
-    });
     let filesMessage;
     if (hasChanges) {
-      filesMessage = `${ dirtyFileCount } Uncommitted Change${ dirtyFileCount > 1 ? 's' : '' }`;
+      filesMessage = `${dirtyFileCount} Uncommitted Change${dirtyFileCount > 1 ? 's' : ''}`;
     } else {
       filesMessage = 'No Uncommitted Changes';
     }
+
+    const revisionClassName = (0, (_classnames || _load_classnames()).default)('revision selected-revision-start', {
+      'selected-revision-inrange': selectedIndex !== 0,
+      'selected-revision-last': revisionsCount === 1
+    });
+
     return _reactForAtom.React.createElement(
       'div',
-      { className: 'revision selected-revision-inrange selected-revision-start' },
-      _reactForAtom.React.createElement('div', { className: bubbleClassName }),
+      {
+        className: revisionClassName,
+        onClick: () => {
+          this.props.onSelectionChange();
+        } },
+      _reactForAtom.React.createElement('div', { className: 'revision-bubble revision-bubble--uncommitted' }),
       _reactForAtom.React.createElement(
         'div',
-        { className: 'revision-label revision-label--uncommitted' },
+        { className: 'revision-label' },
         _reactForAtom.React.createElement(
           'span',
           { className: 'revision-title text-monospace' },
@@ -83,6 +79,7 @@ let UncommittedChangesTimelineNode = class UncommittedChangesTimelineNode extend
           {
             className: 'nuclide-diff-rev-side-button',
             size: (_Button || _load_Button()).ButtonSizes.SMALL,
+            disabled: revisionsCount === 1,
             onClick: this._handleClickAmend },
           'Amend'
         )
@@ -90,19 +87,26 @@ let UncommittedChangesTimelineNode = class UncommittedChangesTimelineNode extend
     );
   }
 
-  _handleClickCommit() {
-    const diffModel = this.props.diffModel;
-
+  _handleClickCommit(event) {
+    const { diffModel } = this.props;
     diffModel.setCommitMode((_constants || _load_constants()).CommitMode.COMMIT);
     diffModel.setViewMode((_constants || _load_constants()).DiffMode.COMMIT_MODE);
+    event.stopPropagation();
   }
 
-  _handleClickAmend() {
-    const diffModel = this.props.diffModel;
-
+  _handleClickAmend(event) {
+    const { diffModel } = this.props;
     diffModel.setCommitMode((_constants || _load_constants()).CommitMode.AMEND);
     diffModel.setViewMode((_constants || _load_constants()).DiffMode.COMMIT_MODE);
+    event.stopPropagation();
   }
-};
-exports.default = UncommittedChangesTimelineNode;
-module.exports = exports['default'];
+}
+exports.default = UncommittedChangesTimelineNode; /**
+                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                   * All rights reserved.
+                                                   *
+                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                   * the root directory of this source tree.
+                                                   *
+                                                   * 
+                                                   */

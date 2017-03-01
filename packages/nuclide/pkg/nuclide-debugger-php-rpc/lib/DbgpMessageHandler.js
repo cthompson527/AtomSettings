@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -35,7 +26,17 @@ function _load_xml2js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHandler = exports.DbgpMessageHandler = class DbgpMessageHandler {
+const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key'; /**
+                                                               * Copyright (c) 2015-present, Facebook, Inc.
+                                                               * All rights reserved.
+                                                               *
+                                                               * This source code is licensed under the license found in the LICENSE file in
+                                                               * the root directory of this source tree.
+                                                               *
+                                                               * 
+                                                               */
+
+class DbgpMessageHandler {
 
   constructor() {}
 
@@ -60,7 +61,7 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
      * 2: length<NULL>xml-part1.
      * >=3: Other scenarios.
      */
-    (_utils || _load_utils()).default.log(`Total components: ${ components.length }`);
+    (_utils || _load_utils()).default.log(`Total components: ${components.length}`);
 
     // Merge head component with prevIncompletedMessage if needed.
     const results = [];
@@ -77,7 +78,7 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
 
     // Verify that we can't get another message without completing previous one.
     if (prevIncompletedMessage && components.length !== 0) {
-      (_utils || _load_utils()).default.logErrorAndThrow('Error: got extra messages without completing previous message. ' + `Previous message was: ${ JSON.stringify(prevIncompletedMessage) }. ` + `Remaining components: ${ JSON.stringify(components) }`);
+      (_utils || _load_utils()).default.logErrorAndThrow('Error: got extra messages without completing previous message. ' + `Previous message was: ${JSON.stringify(prevIncompletedMessage)}. ` + `Remaining components: ${JSON.stringify(components)}`);
     }
 
     const isIncompleteResponse = components.length % 2 === 0;
@@ -86,7 +87,7 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
     if (!isIncompleteResponse) {
       const lastComponent = components.pop();
       if (lastComponent.length !== 0) {
-        (_utils || _load_utils()).default.logErrorAndThrow('The complete response should terminate with' + ` zero character while got: ${ lastComponent } `);
+        (_utils || _load_utils()).default.logErrorAndThrow('The complete response should terminate with' + ` zero character while got: ${lastComponent} `);
       }
     }
 
@@ -100,7 +101,7 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
 
       const content = components.pop();
       const length = Number(components.pop());
-      const lastMessage = { length: length, content: content };
+      const lastMessage = { length, content };
       if (!this._isIncompletedMessage(lastMessage)) {
         (_utils || _load_utils()).default.logErrorAndThrow('The last message should be a fragment of a full message: ' + JSON.stringify(lastMessage));
       }
@@ -119,7 +120,7 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
         content: components.shift()
       };
       if (!this._isCompletedMessage(message)) {
-        (_utils || _load_utils()).default.logErrorAndThrow(`Got message length(${ message.content.length }) ` + `not equal to expected(${ message.length }). ` + `Message was: ${ JSON.stringify(message) }`);
+        (_utils || _load_utils()).default.logErrorAndThrow(`Got message length(${message.content.length}) ` + `not equal to expected(${message.length}). ` + `Message was: ${JSON.stringify(message)}`);
       }
       results.push(this._parseXml(message));
     }
@@ -174,7 +175,9 @@ const GLOBAL_HHVM_DEBUGGER_KEY = '_global_hhvm_debugger_key';let DbgpMessageHand
   clearIncompletedMessage() {
     this._prevIncompletedMessage = null;
   }
-};
+}
+
+exports.DbgpMessageHandler = DbgpMessageHandler;
 function getDbgpMessageHandlerInstance() {
   return (_singleton || _load_singleton()).default.get(GLOBAL_HHVM_DEBUGGER_KEY, () => {
     return new DbgpMessageHandler();

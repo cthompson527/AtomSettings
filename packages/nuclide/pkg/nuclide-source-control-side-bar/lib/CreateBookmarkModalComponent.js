@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
@@ -30,6 +20,18 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
+var _Button;
+
+function _load_Button() {
+  return _Button = require('../../nuclide-ui/Button');
+}
+
+var _ButtonGroup;
+
+function _load_ButtonGroup() {
+  return _ButtonGroup = require('../../nuclide-ui/ButtonGroup');
+}
+
 var _constants;
 
 function _load_constants() {
@@ -38,7 +40,7 @@ function _load_constants() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let CreateBookmarkModal = class CreateBookmarkModal extends _reactForAtom.React.Component {
+class CreateBookmarkModal extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -88,17 +90,17 @@ let CreateBookmarkModal = class CreateBookmarkModal extends _reactForAtom.React.
         'div',
         { className: 'text-right' },
         _reactForAtom.React.createElement(
-          'div',
-          { className: 'btn-group btn-group-sm' },
+          (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
+          { size: (_ButtonGroup || _load_ButtonGroup()).ButtonGroupSizes.SMALL },
           _reactForAtom.React.createElement(
-            'button',
-            { className: 'btn', onClick: this.props.onCancel },
+            (_Button || _load_Button()).Button,
+            { onClick: this.props.onCancel },
             'Cancel'
           ),
           _reactForAtom.React.createElement(
-            'button',
+            (_Button || _load_Button()).Button,
             {
-              className: 'btn btn-primary',
+              buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY,
               onClick: this._handleCreateClick },
             'Create'
           )
@@ -106,6 +108,13 @@ let CreateBookmarkModal = class CreateBookmarkModal extends _reactForAtom.React.
       )
     );
   }
-};
-exports.default = CreateBookmarkModal;
-module.exports = exports['default'];
+}
+exports.default = CreateBookmarkModal; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        */

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -22,7 +12,7 @@ function _load_Button() {
   return _Button = require('../../../../nuclide-ui/Button');
 }
 
-let BasicStatsSectionComponent = class BasicStatsSectionComponent extends _reactForAtom.React.Component {
+class BasicStatsSectionComponent extends _reactForAtom.React.Component {
 
   updateToolbarJewel(value) {
     this.props.updateToolbarJewel(value);
@@ -31,22 +21,22 @@ let BasicStatsSectionComponent = class BasicStatsSectionComponent extends _react
   render() {
     const stats = [{
       name: 'CPU',
-      value: `${ this.props.cpuPercentage.toFixed(0) }%`
+      value: `${this.props.cpuPercentage.toFixed(0)}%`
     }, {
       name: 'Heap',
-      value: `${ this.props.heapPercentage.toFixed(1) }%`
+      value: `${this.props.heapPercentage.toFixed(1)}%`
     }, {
       name: 'Memory',
-      value: `${ Math.floor(this.props.memory / 1024 / 1024) }MB`
+      value: `${Math.floor(this.props.memory / 1024 / 1024)}MB`
     }, {
       name: 'Handles',
-      value: `${ this.props.activeHandles }`
+      value: `${this.props.activeHandles}`
     }, {
       name: 'Child processes',
-      value: `${ this.props.activeHandlesByType.childprocess.length }`
+      value: `${this.props.activeHandlesByType.childprocess.length}`
     }, {
       name: 'Event loop',
-      value: `${ this.props.activeRequests }`
+      value: `${this.props.activeRequests}`
     }];
 
     const updateToolbarJewel = this.updateToolbarJewel;
@@ -117,6 +107,13 @@ let BasicStatsSectionComponent = class BasicStatsSectionComponent extends _react
       )
     );
   }
-};
-exports.default = BasicStatsSectionComponent;
-module.exports = exports['default'];
+}
+exports.default = BasicStatsSectionComponent; /**
+                                               * Copyright (c) 2015-present, Facebook, Inc.
+                                               * All rights reserved.
+                                               *
+                                               * This source code is licensed under the license found in the LICENSE file in
+                                               * the root directory of this source tree.
+                                               *
+                                               * 
+                                               */

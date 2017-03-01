@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _eventKit;
 
@@ -22,7 +17,7 @@ function _load_eventKit() {
  *   Notably, this value should be undefined if subscriptionRoot is the same as
  *   subscriptionPath.
  */
-let WatchmanSubscription = class WatchmanSubscription extends (_eventKit || _load_eventKit()).Emitter {
+class WatchmanSubscription extends (_eventKit || _load_eventKit()).Emitter {
   constructor(subscriptionRoot, pathFromSubscriptionRootToSubscriptionPath, subscriptionPath, subscriptionName, subscriptionCount, subscriptionOptions) {
     super();
     this.root = subscriptionRoot;
@@ -32,6 +27,13 @@ let WatchmanSubscription = class WatchmanSubscription extends (_eventKit || _loa
     this.subscriptionCount = subscriptionCount;
     this.options = subscriptionOptions;
   }
-};
-
-module.exports = WatchmanSubscription;
+}
+exports.default = WatchmanSubscription; /**
+                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                         * All rights reserved.
+                                         *
+                                         * This source code is licensed under the license found in the LICENSE file in
+                                         * the root directory of this source tree.
+                                         *
+                                         * 
+                                         */

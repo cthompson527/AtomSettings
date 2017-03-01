@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,17 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
-let Commands = exports.Commands = class Commands {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Commands {
 
   constructor(dispatch, getState) {
     this._dispatch = dispatch;
@@ -46,7 +47,7 @@ let Commands = exports.Commands = class Commands {
   addProjectRepository(repository) {
     this._dispatch({
       payload: {
-        repository: repository
+        repository
       },
       type: (_constants || _load_constants()).ActionType.ADD_PROJECT_REPOSITORY
     });
@@ -65,11 +66,11 @@ let Commands = exports.Commands = class Commands {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('bookshelf-restore-files');
     this._dispatch({
       payload: {
-        repository: repository,
+        repository,
         shortHead: newShortHead
       },
       type: (_constants || _load_constants()).ActionType.RESTORE_PANE_ITEM_STATE
     });
   }
-
-};
+}
+exports.Commands = Commands;

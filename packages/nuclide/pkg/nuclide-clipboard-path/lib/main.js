@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,7 +45,15 @@ function copyAbsolutePath() {
     }
     copyToClipboard('Copied absolute path', (_nuclideUri || _load_nuclideUri()).default.getPath(uri));
   });
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function copyProjectRelativePath() {
   trackOperation('copyProjectRelativePath', () => {
@@ -74,7 +73,6 @@ function copyProjectRelativePath() {
 
 function copyRepositoryRelativePath() {
   trackOperation('copyRepositoryRelativePath', (0, _asyncToGenerator.default)(function* () {
-
     const uri = getCurrentNuclideUri();
     if (!uri) {
       return;
@@ -118,7 +116,7 @@ function getArcanistRelativePath(path) {
 
 function copyToClipboard(messagePrefix, value) {
   atom.clipboard.write(value);
-  notify(`${ messagePrefix }: \`\`\`${ value }\`\`\``);
+  notify(`${messagePrefix}: \`\`\`${value}\`\`\``);
 }
 
 function getCurrentNuclideUri() {
@@ -138,14 +136,14 @@ function getCurrentNuclideUri() {
 }
 
 function trackOperation(eventName, operation) {
-  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('nuclide-clipboard-path:' + eventName, operation);
+  (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clipboard-path:' + eventName, operation);
 }
 
 function notify(message) {
   atom.notifications.addInfo(message);
 }
 
-let Activation = class Activation {
+class Activation {
 
   constructor(state) {
     this._subscriptions = new _atom.CompositeDisposable();
@@ -157,8 +155,7 @@ let Activation = class Activation {
   dispose() {
     this._subscriptions.dispose();
   }
-};
-
+}
 
 let activation = null;
 

@@ -1,22 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _desc, _value, _class;
 
 exports.outlineFromClangOutline = outlineFromClangOutline;
 
@@ -52,36 +40,17 @@ function _load_libclang() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
 // Display friendly names for all class-like types.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const CLASS_KIND_NAMES = {
   [(_nuclideClangRpc || _load_nuclideClangRpc()).ClangCursorTypes.STRUCT_DECL]: 'struct',
   [(_nuclideClangRpc || _load_nuclideClangRpc()).ClangCursorTypes.UNION_DECL]: 'union',
@@ -119,9 +88,7 @@ function tokenizeCursor(cursor) {
     return [(0, (_tokenizedText || _load_tokenizedText()).keyword)(CLASS_KIND_NAMES[cursor.cursor_kind] || 'class'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).className)(cursor.name)];
   }
   if (cursor.params != null) {
-    const params = cursor.params,
-          tparams = cursor.tparams;
-
+    const { params, tparams } = cursor;
     const paramTokens = [];
     params.forEach(fparam => {
       if (paramTokens.length > 0) {
@@ -160,9 +127,9 @@ function outlineFromClangOutline(outline) {
   });
 }
 
-let OutlineViewHelpers = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom:outline-view'), (_class = class OutlineViewHelpers {
+class OutlineViewHelpers {
   static getOutline(editor) {
-    return (0, _asyncToGenerator.default)(function* () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom:outline-view', (0, _asyncToGenerator.default)(function* () {
       // HACK: Since outline view and diagnostics both trigger on save, favor diagnostics.
       yield (0, (_promise || _load_promise()).sleep)(0);
       const clangOutline = yield (0, (_libclang || _load_libclang()).getOutline)(editor);
@@ -172,7 +139,7 @@ let OutlineViewHelpers = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytic
       return {
         outlineTrees: outlineFromClangOutline(clangOutline)
       };
-    })();
+    }));
   }
-}, (_applyDecoratedDescriptor(_class, 'getOutline', [_dec], Object.getOwnPropertyDescriptor(_class, 'getOutline'), _class)), _class));
+}
 exports.default = OutlineViewHelpers;

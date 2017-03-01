@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -29,9 +20,19 @@ function _load_DiagnosticsMessage() {
   return _DiagnosticsMessage = require('../../nuclide-ui/DiagnosticsMessage');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NOOP = () => {};
 
-let DiagnosticsDatatipComponent = exports.DiagnosticsDatatipComponent = class DiagnosticsDatatipComponent extends _reactForAtom.React.Component {
+class DiagnosticsDatatipComponent extends _reactForAtom.React.Component {
 
   render() {
     // Remove the `fix` property to prevent the fix button from showing up (for now).
@@ -46,7 +47,9 @@ let DiagnosticsDatatipComponent = exports.DiagnosticsDatatipComponent = class Di
       })
     );
   }
-};
+}
+
+exports.DiagnosticsDatatipComponent = DiagnosticsDatatipComponent;
 function makeDiagnosticsDatatipComponent(message) {
   return () => _reactForAtom.React.createElement(DiagnosticsDatatipComponent, { message: message });
 }

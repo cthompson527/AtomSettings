@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,9 +7,13 @@ exports.NuxManager = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _atom = require('atom');
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
 
 var _collection;
 
@@ -71,13 +66,23 @@ function _load_NuxView() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Limits the number of NUXes displayed every session
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NUX_PER_SESSION_LIMIT = 3;
 const NEW_TOUR_EVENT = 'nuxTourNew';
 const READY_TOUR_EVENT = 'nuxTourReady';
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
-let NuxManager = exports.NuxManager = class NuxManager {
+class NuxManager {
   // Maps a NUX's unique ID to its corresponding NuxTour
   // Registered NUXes that are waiting to be triggered
   constructor(nuxStore, syncCompletedNux) {
@@ -136,9 +141,9 @@ let NuxManager = exports.NuxManager = class NuxManager {
       try {
         return new (_NuxView || _load_NuxView()).NuxView(nuxTourModel.id, model.selector, model.selectorFunction, model.position, model.content, model.completionPredicate, index, arr.length);
       } catch (err) {
-        const error = `NuxView #${ index } for "${ nuxTourModel.id }" failed to instantiate.`;
-        logger.error(`ERROR: ${ error }`);
-        this._track(nuxTourModel.id, nuxTourModel.name, `NuxView #${ index + 1 } failed to instantiate.`, err.toString());
+        const error = `NuxView #${index} for "${nuxTourModel.id}" failed to instantiate.`;
+        logger.error(`ERROR: ${error}`);
+        this._track(nuxTourModel.id, nuxTourModel.name, `NuxView #${index + 1} failed to instantiate.`, err.toString());
         return null;
       }
     }));
@@ -146,8 +151,8 @@ let NuxManager = exports.NuxManager = class NuxManager {
     const nuxTour = new (_NuxTour || _load_NuxTour()).NuxTour(nuxTourModel.id, nuxTourModel.name, nuxViews, nuxTourModel.trigger, nuxTourModel.gatekeeperID);
 
     this._emitter.emit(NEW_TOUR_EVENT, {
-      nuxTour: nuxTour,
-      nuxTourModel: nuxTourModel
+      nuxTour,
+      nuxTourModel
     });
   }
 
@@ -164,9 +169,10 @@ let NuxManager = exports.NuxManager = class NuxManager {
 
   // Handles NUX registry
   _handleNewTour(value) {
-    const nuxTour = value.nuxTour,
-          nuxTourModel = value.nuxTourModel;
-
+    const {
+      nuxTour,
+      nuxTourModel
+    } = value;
 
     nuxTour.setNuxCompleteCallback(this._handleNuxCompleted.bind(this, nuxTourModel));
 
@@ -197,18 +203,13 @@ let NuxManager = exports.NuxManager = class NuxManager {
       // The `paneItem` is not guaranteed to be an instance of `TextEditor` from
       // Atom's API, but usually is.  We return if the type is not `TextEditor`
       // since `NuxTour.isReady` expects a `TextEditor` as its argument.
-      if (!atom.workspace.isTextEditor(paneItem)) {
+      if (!(0, (_textEditor || _load_textEditor()).isValidTextEditor)(paneItem)) {
         return;
       }
       // Flow doesn't understand the refinement done above.
       const textEditor = paneItem;
 
-      for (const _ref of _this._pendingNuxes.entries()) {
-        var _ref2 = _slicedToArray(_ref, 2);
-
-        const id = _ref2[0];
-        const nux = _ref2[1];
-
+      for (const [id, nux] of _this._pendingNuxes.entries()) {
         if (nux.getTriggerType() !== 'editor' || !nux.isReady(textEditor)) {
           continue;
         }
@@ -220,7 +221,7 @@ let NuxManager = exports.NuxManager = class NuxManager {
         try {
           // Disable the linter suggestion to use `Promise.all` as we want to trigger NUXes
           // as soon as each promise resolves rather than waiting for them all to.
-          // eslint-disable-next-line babel/no-await-in-loop
+          // eslint-disable-next-line no-await-in-loop
           if (yield _this._canTriggerNux(gkID)) {
             _this._emitter.emit(READY_TOUR_EVENT, nux);
           }
@@ -295,14 +296,13 @@ let NuxManager = exports.NuxManager = class NuxManager {
     this._disposables.dispose();
   }
 
-  _track(tourId, tourName, message) {
-    let error = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
-
+  _track(tourId, tourName, message, error = null) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nux-manager-action', {
-      tourId: tourId,
-      tourName: tourName,
-      message: `${ message }`,
+      tourId,
+      tourName,
+      message: `${message}`,
       error: (0, (_string || _load_string()).maybeToString)(error)
     });
   }
-};
+}
+exports.NuxManager = NuxManager;

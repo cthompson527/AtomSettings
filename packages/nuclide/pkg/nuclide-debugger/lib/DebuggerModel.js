@@ -1,13 +1,9 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.WORKSPACE_VIEW_URI = undefined;
 
 var _DebuggerProviderStore;
 
@@ -51,10 +47,10 @@ function _load_CallstackStore() {
   return _CallstackStore = _interopRequireDefault(require('./CallstackStore'));
 }
 
-var _LocalsStore;
+var _ScopesStore;
 
-function _load_LocalsStore() {
-  return _LocalsStore = _interopRequireDefault(require('./LocalsStore'));
+function _load_ScopesStore() {
+  return _ScopesStore = _interopRequireDefault(require('./ScopesStore'));
 }
 
 var _ThreadStore;
@@ -95,21 +91,30 @@ function _load_DebuggerPauseController() {
   return _DebuggerPauseController = require('./DebuggerPauseController');
 }
 
+var _events = _interopRequireDefault(require('events'));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var _require = require('events');
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-const EventEmitter = _require.EventEmitter;
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/debugger';
 
 /**
  * Atom ViewProvider compatible model object.
  */
-
-let DebuggerModel = class DebuggerModel {
+class DebuggerModel {
 
   constructor(state) {
     this._dispatcher = new (_DebuggerDispatcher || _load_DebuggerDispatcher()).default();
-    this._emitter = new EventEmitter();
+    this._emitter = new _events.default();
     this._store = new (_DebuggerStore || _load_DebuggerStore()).DebuggerStore(this._dispatcher, this);
     this._actions = new (_DebuggerActions || _load_DebuggerActions()).default(this._dispatcher, this._store);
     this._breakpointStore = new (_BreakpointStore || _load_BreakpointStore()).default(this._dispatcher, state ? state.breakpoints : null);
@@ -120,11 +125,16 @@ let DebuggerModel = class DebuggerModel {
     this._watchExpressionListStore = new (_WatchExpressionListStore || _load_WatchExpressionListStore()).WatchExpressionListStore(this._watchExpressionStore, this._dispatcher);
     this._debuggerActionStore = new (_DebuggerActionsStore || _load_DebuggerActionsStore()).default(this._dispatcher, this._bridge);
     this._callstackStore = new (_CallstackStore || _load_CallstackStore()).default(this._dispatcher);
-    this._localsStore = new (_LocalsStore || _load_LocalsStore()).default(this._dispatcher);
+    this._scopesStore = new (_ScopesStore || _load_ScopesStore()).default(this._dispatcher);
     this._threadStore = new (_ThreadStore || _load_ThreadStore()).default(this._dispatcher);
     this._debuggerPauseController = new (_DebuggerPauseController || _load_DebuggerPauseController()).DebuggerPauseController(this._store);
 
-    this._disposables = new _atom.CompositeDisposable(this._store, this._actions, this._breakpointStore, this._breakpointManager, this._bridge, this._debuggerProviderStore, this._watchExpressionStore, this._debuggerActionStore, this._callstackStore, this._localsStore, this._threadStore, this._debuggerPauseController);
+    this._disposables = new _atom.CompositeDisposable(this._store, this._actions, this._breakpointStore, this._breakpointManager, this._bridge, this._debuggerProviderStore, this._watchExpressionStore, this._debuggerActionStore, this._callstackStore, this._scopesStore, this._threadStore, this._debuggerPauseController);
+  }
+
+  destroy() {
+    // Stop debugging when the view's destroyed.
+    this.getActions().stopDebugging();
   }
 
   dispose() {
@@ -163,8 +173,8 @@ let DebuggerModel = class DebuggerModel {
     return this._callstackStore;
   }
 
-  getLocalsStore() {
-    return this._localsStore;
+  getScopesStore() {
+    return this._scopesStore;
   }
 
   getThreadStore() {
@@ -174,7 +184,21 @@ let DebuggerModel = class DebuggerModel {
   getBridge() {
     return this._bridge;
   }
-};
 
+  getTitle() {
+    return 'Debugger';
+  }
 
-module.exports = DebuggerModel;
+  getDefaultLocation() {
+    return 'right-panel';
+  }
+
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getPreferredInitialWidth() {
+    return 500;
+  }
+}
+exports.default = DebuggerModel;

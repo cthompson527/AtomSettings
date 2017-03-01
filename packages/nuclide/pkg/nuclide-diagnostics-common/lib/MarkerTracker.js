@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,14 +7,19 @@ exports.MarkerTracker = undefined;
 
 var _atom = require('atom');
 
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
+
 var _collection;
 
 function _load_collection() {
   return _collection = require('../../commons-node/collection');
 }
 
-let MarkerTracker = exports.MarkerTracker = class MarkerTracker {
-
+class MarkerTracker {
   /**
    * Stores all current FileDiagnosticMessages, indexed by file. Includes those for files that are
    * not open.
@@ -34,7 +30,7 @@ let MarkerTracker = exports.MarkerTracker = class MarkerTracker {
     this._subscriptions = new _atom.CompositeDisposable();
     this._disposed = false;
 
-    this._subscriptions.add(atom.workspace.observeTextEditors(editor => {
+    this._subscriptions.add((0, (_textEditor || _load_textEditor()).observeTextEditors)(editor => {
       const path = editor.getPath();
       if (path == null) {
         return;
@@ -149,4 +145,13 @@ let MarkerTracker = exports.MarkerTracker = class MarkerTracker {
       throw new Error('MarkerTracker has been disposed');
     }
   }
-};
+}
+exports.MarkerTracker = MarkerTracker; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        */

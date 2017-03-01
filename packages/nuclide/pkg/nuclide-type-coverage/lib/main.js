@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,7 +12,7 @@ let resultFunction = (() => {
     if (path == null) {
       return null;
     }
-    return yield provider.getCoverage(path);
+    return provider.getCoverage(path);
   });
 
   return function resultFunction(_x, _x2) {
@@ -73,7 +64,17 @@ function _load_coverageDiagnostics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const STATUS_BAR_PRIORITY = 1000;let Activation = class Activation {
+const STATUS_BAR_PRIORITY = 1000; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   */
+
+class Activation {
 
   constructor(state) {
     this._toggleEvents = new _rxjsBundlesRxMinJs.Subject();
@@ -96,7 +97,7 @@ const STATUS_BAR_PRIORITY = 1000;let Activation = class Activation {
     item.className = 'inline-block';
 
     const statusBarTile = statusBar.addLeftTile({
-      item: item,
+      item,
       priority: STATUS_BAR_PRIORITY
     });
 
@@ -121,8 +122,7 @@ const STATUS_BAR_PRIORITY = 1000;let Activation = class Activation {
   dispose() {
     this._disposables.dispose();
   }
-};
-
+}
 
 let activation = null;
 

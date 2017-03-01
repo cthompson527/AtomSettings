@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,6 +6,16 @@ Object.defineProperty(exports, "__esModule", {
 exports.refmt = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 let refmt = exports.refmt = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (content, flags) {
@@ -25,7 +26,7 @@ let refmt = exports.refmt = (() => {
       // logic. This also implies .nucliderc isn't considered, if there's any
       // extra override; to simulate the same behavior, do this in your bashrc:
       // if [ "$TERM" = "nuclide"]; then someOverrideLogic if
-      env: (0, (_process || _load_process()).getOriginalEnvironment)(),
+      env: yield (0, (_process || _load_process()).getOriginalEnvironment)(),
       stdin: content
     };
     const result = yield (0, (_process || _load_process()).asyncExecute)(refmtPath, flags, options);

@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/**
- * Originally from https://github.com/facebook/flux/blob/55480fb/src/Dispatcher.js
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -107,7 +94,21 @@ const _prefix = 'ID_';
  * registered callbacks in order: `CountryStore`, `CityStore`, then
  * `FlightPriceStore`.
  */
-let Dispatcher = class Dispatcher {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/**
+ * Originally from https://github.com/facebook/flux/blob/55480fb/src/Dispatcher.js
+ */
+
+class Dispatcher {
 
   constructor() {
     this._callbacks = {};
@@ -237,6 +238,5 @@ let Dispatcher = class Dispatcher {
     delete this._pendingPayload;
     this._isDispatching = false;
   }
-};
+}
 exports.default = Dispatcher;
-module.exports = exports['default'];

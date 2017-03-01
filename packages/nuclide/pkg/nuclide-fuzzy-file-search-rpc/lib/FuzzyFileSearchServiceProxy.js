@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 26
+          line: 25
         },
         kind: "named",
         name: "NuclideUri"
@@ -23,7 +23,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 27
+          line: 26
         },
         kind: "string"
       }
@@ -33,14 +33,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 28
+          line: 27
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
-            line: 28
+            line: 27
           },
           kind: "string"
         }
@@ -52,14 +52,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 29
+          line: 28
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
-            line: 29
+            line: 28
           },
           kind: "named",
           name: "FileSearchResult"
@@ -75,7 +75,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 35
+          line: 34
         },
         kind: "string"
       }
@@ -85,14 +85,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 36
+          line: 35
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
-            line: 36
+            line: 35
           },
           kind: "string"
         }
@@ -104,14 +104,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 37
+          line: 36
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
-            line: 37
+            line: 36
           },
           kind: "named",
           name: "FileSearchResult"
@@ -127,7 +127,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 56
+          line: 55
         },
         kind: "named",
         name: "NuclideUri"
@@ -139,7 +139,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 57
+          line: 56
         },
         kind: "boolean"
       });
@@ -153,7 +153,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 64
+          line: 63
         },
         kind: "named",
         name: "NuclideUri"
@@ -165,7 +165,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 64
+          line: 63
         },
         kind: "void"
       });
@@ -181,366 +181,380 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["queryFuzzyFile", {
-    kind: "function",
-    name: "queryFuzzyFile",
-    location: {
-      type: "source",
-      fileName: "FuzzyFileSearchService.js",
-      line: 25
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    type: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    queryFuzzyFile: {
+      kind: "function",
+      name: "queryFuzzyFile",
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 25
+        line: 24
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootDirectory",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 26
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "queryString",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 27
-          },
-          kind: "string"
-        }
-      }, {
-        name: "ignoredNames",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "FuzzyFileSearchService.js",
+          line: 24
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootDirectory",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 25
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "queryString",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 26
+            },
+            kind: "string"
+          }
+        }, {
+          name: "ignoredNames",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 27
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "FuzzyFileSearchService.js",
+                line: 27
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
             line: 28
           },
-          kind: "array",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "FuzzyFileSearchService.js",
               line: 28
             },
-            kind: "string"
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "FuzzyFileSearchService.js",
+                line: 28
+              },
+              kind: "named",
+              name: "FileSearchResult"
+            }
           }
         }
-      }],
-      returnType: {
+      }
+    },
+    queryAllExistingFuzzyFile: {
+      kind: "function",
+      name: "queryAllExistingFuzzyFile",
+      location: {
+        type: "source",
+        fileName: "FuzzyFileSearchService.js",
+        line: 33
+      },
+      type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 29
+          line: 33
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 29
-          },
-          kind: "array",
+        kind: "function",
+        argumentTypes: [{
+          name: "queryString",
           type: {
             location: {
               type: "source",
               fileName: "FuzzyFileSearchService.js",
-              line: 29
+              line: 34
             },
-            kind: "named",
-            name: "FileSearchResult"
+            kind: "string"
           }
-        }
-      }
-    }
-  }], ["queryAllExistingFuzzyFile", {
-    kind: "function",
-    name: "queryAllExistingFuzzyFile",
-    location: {
-      type: "source",
-      fileName: "FuzzyFileSearchService.js",
-      line: 34
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "FuzzyFileSearchService.js",
-        line: 34
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "queryString",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 35
-          },
-          kind: "string"
-        }
-      }, {
-        name: "ignoredNames",
-        type: {
+        }, {
+          name: "ignoredNames",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 35
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "FuzzyFileSearchService.js",
+                line: 35
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
             line: 36
           },
-          kind: "array",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "FuzzyFileSearchService.js",
               line: 36
             },
-            kind: "string"
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "FuzzyFileSearchService.js",
+                line: 36
+              },
+              kind: "named",
+              name: "FileSearchResult"
+            }
           }
         }
-      }],
-      returnType: {
+      }
+    },
+    isFuzzySearchAvailableFor: {
+      kind: "function",
+      name: "isFuzzySearchAvailableFor",
+      location: {
+        type: "source",
+        fileName: "FuzzyFileSearchService.js",
+        line: 54
+      },
+      type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 37
+          line: 54
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 37
-          },
-          kind: "array",
+        kind: "function",
+        argumentTypes: [{
+          name: "rootDirectory",
           type: {
             location: {
               type: "source",
               fileName: "FuzzyFileSearchService.js",
-              line: 37
+              line: 55
             },
             kind: "named",
-            name: "FileSearchResult"
+            name: "NuclideUri"
           }
-        }
-      }
-    }
-  }], ["isFuzzySearchAvailableFor", {
-    kind: "function",
-    name: "isFuzzySearchAvailableFor",
-    location: {
-      type: "source",
-      fileName: "FuzzyFileSearchService.js",
-      line: 55
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "FuzzyFileSearchService.js",
-        line: 55
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootDirectory",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
             line: 56
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "FuzzyFileSearchService.js",
-          line: 57
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 57
-          },
-          kind: "boolean"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 56
+            },
+            kind: "boolean"
+          }
         }
       }
-    }
-  }], ["disposeFuzzySearch", {
-    kind: "function",
-    name: "disposeFuzzySearch",
-    location: {
-      type: "source",
-      fileName: "FuzzyFileSearchService.js",
-      line: 64
     },
-    type: {
+    disposeFuzzySearch: {
+      kind: "function",
+      name: "disposeFuzzySearch",
       location: {
         type: "source",
         fileName: "FuzzyFileSearchService.js",
-        line: 64
+        line: 63
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootDirectory",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FuzzyFileSearchService.js",
-            line: 64
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "FuzzyFileSearchService.js",
-          line: 64
+          line: 63
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "rootDirectory",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 63
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FuzzyFileSearchService.js",
-            line: 64
+            line: 63
           },
-          kind: "void"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FuzzyFileSearchService.js",
+              line: 63
+            },
+            kind: "void"
+          }
         }
       }
-    }
-  }], ["FileSearchResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 13
     },
-    name: "FileSearchResult",
-    definition: {
+    FileSearchResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 13
       },
-      kind: "object",
-      fields: [{
+      name: "FileSearchResult",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 14
+          line: 13
         },
-        name: "path",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 14
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 15
-        },
-        name: "score",
-        type: {
+          name: "path",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 14
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 15
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 16
-        },
-        name: "matchIndexes",
-        type: {
+          name: "score",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 15
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 16
           },
-          kind: "array",
+          name: "matchIndexes",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 16
             },
-            kind: "number"
-          }
-        },
-        optional: false
-      }]
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 16
+              },
+              kind: "number"
+            }
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -35,6 +26,16 @@ function _load_yargs() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function main(args) {
   const argv = (_yargs || _load_yargs()).default.usage('Python command-line debugger in JavaScript.\nUsage: $0 <file-to-run.py> <arg1> <arg2>').help('help').alias('h', 'help').demand(1, 'Must specify a Python file').parse(args);
@@ -87,34 +88,30 @@ function interact(observable, commander) {
           commander.step();
           break;
         default:
-          console.error(`Unrecognized command: ${ answer }`);
+          console.error(`Unrecognized command: ${answer}`);
           ask();
       }
     });
   }
 
   observable.subscribe({
-    next: function (message) {
+    next(message) {
       if (message.event === 'start') {
         // Give the user a chance to set breakpoints before starting the program.
         console.log('Program started. Type \'c\' to continue or \'s\' to start stepping.');
         ask();
       } else if (message.event === 'stop') {
-        const file = message.file,
-              line = message.line;
-
-        console.log(`Stopped at: ${ file }:${ line }`);
+        const { file, line } = message;
+        console.log(`Stopped at: ${file}:${line}`);
         ask();
       }
     },
-    error: function (error) {
+    error(error) {
       console.error('ERROR:', error);
     },
-    complete: function () {
+    complete() {
       rl.close();
     }
   });
 }
 /* eslint-enable no-console */
-
-module.exports = exports['default'];

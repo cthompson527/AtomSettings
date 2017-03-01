@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
@@ -24,7 +14,7 @@ function _load_UnescapedUnicodeDatatip() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let UnicodeDatatipManager = class UnicodeDatatipManager {
+class UnicodeDatatipManager {
 
   constructor() {
     this._disposables = new _atom.CompositeDisposable();
@@ -51,6 +41,13 @@ let UnicodeDatatipManager = class UnicodeDatatipManager {
     this._disposables.add(disposable);
     return disposable;
   }
-};
-exports.default = UnicodeDatatipManager;
-module.exports = exports['default'];
+}
+exports.default = UnicodeDatatipManager; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */

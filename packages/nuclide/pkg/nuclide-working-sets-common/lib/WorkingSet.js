@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40,6 +31,16 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 /**
@@ -58,20 +59,14 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 *   to know that it must include its parent directories.
 *   This kind of test is performed by the .containsDir() method.
 */
-let WorkingSet = exports.WorkingSet = class WorkingSet {
+class WorkingSet {
 
-  static union() {
-    for (var _len = arguments.length, sets = Array(_len), _key = 0; _key < _len; _key++) {
-      sets[_key] = arguments[_key];
-    }
-
+  static union(...sets) {
     const combinedUris = [].concat(...sets.map(s => s._uris));
     return new WorkingSet(combinedUris);
   }
 
-  constructor() {
-    let uris = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-
+  constructor(uris = []) {
     try {
       this._uris = (0, (_uri || _load_uri()).dedupeUris)(uris.filter(uri => !(_nuclideUri || _load_nuclideUri()).default.isBrokenDeserializedUri(uri)));
       this._root = this._buildDirTree(this._uris);
@@ -132,11 +127,7 @@ let WorkingSet = exports.WorkingSet = class WorkingSet {
     return this._uris;
   }
 
-  append() {
-    for (var _len2 = arguments.length, uris = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-      uris[_key2] = arguments[_key2];
-    }
-
+  append(...uris) {
     return new WorkingSet(this._uris.concat(uris));
   }
 
@@ -212,9 +203,9 @@ let WorkingSet = exports.WorkingSet = class WorkingSet {
 
     return !mustHaveLeaf;
   }
-};
+}
 
-
+exports.WorkingSet = WorkingSet;
 function newInnerNode() {
   return { kind: 'inner', children: new Map() };
 }

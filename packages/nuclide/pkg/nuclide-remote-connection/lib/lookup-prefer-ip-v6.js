@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,7 +16,7 @@ exports.default = (() => {
       return yield lookup(host, 6);
     } catch (e) {
       if (e.code === 'ENOTFOUND') {
-        return yield lookup(host, 4);
+        return lookup(host, 4);
       }
       throw e;
     }
@@ -36,7 +27,15 @@ exports.default = (() => {
   }
 
   return lookupPreferIpv6;
-})();
+})(); /**
+       * Copyright (c) 2015-present, Facebook, Inc.
+       * All rights reserved.
+       *
+       * This source code is licensed under the license found in the LICENSE file in
+       * the root directory of this source tree.
+       *
+       * 
+       */
 
 function lookup(host, family) {
   return new Promise((resolve, reject) => {
@@ -46,9 +45,8 @@ function lookup(host, family) {
       } else if (address != null) {
         resolve(address);
       } else {
-        reject('One of error or address must be set.');
+        reject(new Error('One of error or address must be set.'));
       }
     });
   });
 }
-module.exports = exports['default'];

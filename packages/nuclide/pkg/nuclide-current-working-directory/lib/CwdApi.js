@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,7 +34,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-let CwdApi = exports.CwdApi = class CwdApi {
+class CwdApi {
 
   constructor(initialCwdPath) {
     this._cwdPath$ = new _rxjsBundlesRxMinJs.BehaviorSubject(initialCwdPath);
@@ -57,7 +48,7 @@ let CwdApi = exports.CwdApi = class CwdApi {
 
   setCwd(path) {
     if (getDirectory(path) == null) {
-      throw new Error(`Path does not belong to a project root: ${ path }`);
+      throw new Error(`Path does not belong to a project root: ${path}`);
     }
     this._cwdPath$.next(path);
   }
@@ -86,9 +77,17 @@ let CwdApi = exports.CwdApi = class CwdApi {
   getCwd() {
     return getDirectory(this._cwdPath$.getValue()) || getDirectory(this._getDefaultCwdPath());
   }
+}
 
-};
-
+exports.CwdApi = CwdApi; /**
+                          * Copyright (c) 2015-present, Facebook, Inc.
+                          * All rights reserved.
+                          *
+                          * This source code is licensed under the license found in the LICENSE file in
+                          * the root directory of this source tree.
+                          *
+                          * 
+                          */
 
 function getDirectory(path) {
   if (path == null) {

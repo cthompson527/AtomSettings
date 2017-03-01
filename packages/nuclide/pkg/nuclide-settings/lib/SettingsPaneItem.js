@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.WORKSPACE_VIEW_URI = undefined;
 
 var _atom = require('atom');
 
@@ -50,7 +41,17 @@ function _load_settingsUtils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAtom.React.Component {
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/settings'; /**
+                                                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                    * All rights reserved.
+                                                                                    *
+                                                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                                                    * the root directory of this source tree.
+                                                                                    *
+                                                                                    * 
+                                                                                    */
+
+class NuclideSettingsPaneItem extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -99,14 +100,14 @@ let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAto
     // ```
     nuclidePackages.forEach(pkg => {
       const pkgName = pkg.name;
-      const nuclide = pkg.metadata.nuclide;
-
+      const { nuclide } = pkg.metadata;
 
       if (nuclide.config && nuclide.configMetadata) {
-        const pathComponents = nuclide.configMetadata.pathComponents;
-
+        const { pathComponents } = nuclide.configMetadata;
         const categoryName = pathComponents[0];
-        const packageTitle = pathComponents[1];
+        const packageTitle = pathComponents[1] || pkgName;
+        const categoryMatches = this.state == null || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, categoryName);
+        const packageMatches = this.state == null || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, packageTitle);
 
         // Group packages according to their category.
         let packages = configData[categoryName];
@@ -122,17 +123,17 @@ let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAto
           const schema = (_featureConfig || _load_featureConfig()).default.getSchema(keyPath);
           const title = getTitle(schema, settingName);
           const description = getDescription(schema);
-          if (this.state == null || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, title) || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, description)) {
+          if (this.state == null || categoryMatches || packageMatches || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, title) || (0, (_settingsUtils || _load_settingsUtils()).matchesFilter)(this.state.filter, description)) {
             settings[settingName] = {
               name: settingName,
-              description: description,
-              keyPath: keyPath,
+              description,
+              keyPath,
               onChange: value => {
                 this._handleComponentChange(keyPath, value);
               },
               order: getOrder(schema),
-              schema: schema,
-              title: title,
+              schema,
+              title,
               value: (_featureConfig || _load_featureConfig()).default.get(keyPath)
             };
           }
@@ -145,8 +146,8 @@ let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAto
 
         if (Object.keys(settings).length !== 0) {
           packages[pkgName] = {
-            title: packageTitle || pkgName,
-            settings: settings
+            title: packageTitle,
+            settings
           };
         }
       }
@@ -217,7 +218,7 @@ let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAto
   _onFilterTextChanged(filterText) {
     const filter = filterText != null ? filterText.trim() : '';
     this.setState({
-      filter: filter
+      filter
     });
   }
 
@@ -229,14 +230,21 @@ let NuclideSettingsPaneItem = class NuclideSettingsPaneItem extends _reactForAto
     return 'tools';
   }
 
+  getDefaultLocation() {
+    return 'pane';
+  }
+
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
   // Prevent the tab getting split.
   copy() {
     return false;
   }
-};
+}
+
 exports.default = NuclideSettingsPaneItem;
-
-
 function getOrder(schema) {
   return typeof schema.order === 'number' ? schema.order : 0;
 }
@@ -252,4 +260,3 @@ function getTitle(schema, settingName) {
 function getDescription(schema) {
   return schema.description || '';
 }
-module.exports = exports['default'];

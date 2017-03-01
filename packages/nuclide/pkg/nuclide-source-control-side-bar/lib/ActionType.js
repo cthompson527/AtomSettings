@@ -1,17 +1,17 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 const CREATE_BOOKMARK = exports.CREATE_BOOKMARK = 'create-bookmark';
 const DELETE_BOOKMARK = exports.DELETE_BOOKMARK = 'delete-bookmark';
@@ -24,3 +24,4 @@ const SET_PROJECT_DIRECTORIES = exports.SET_PROJECT_DIRECTORIES = 'set-project-d
 const SET_REPOSITORY_BOOKMARKS = exports.SET_REPOSITORY_BOOKMARKS = 'set-repository-bookmarks';
 const UNSET_BOOKMARK_IS_LOADING = exports.UNSET_BOOKMARK_IS_LOADING = 'unset-bookmark-is-loading';
 const UPDATE_TO_BOOKMARK = exports.UPDATE_TO_BOOKMARK = 'update-to-bookmark';
+const UPDATE_UNCOMMITTED_CHANGES = exports.UPDATE_UNCOMMITTED_CHANGES = 'update-uncommitted-changes';

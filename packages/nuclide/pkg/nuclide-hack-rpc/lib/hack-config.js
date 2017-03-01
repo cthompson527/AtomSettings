@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.getHackExecOptions = exports.HACK_FILE_EXTENSIONS = exports.logger = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 // Returns the empty string on failure
 let findHackCommand = (() => {
@@ -32,14 +21,9 @@ let findHackCommand = (() => {
 
 let getHackExecOptions = exports.getHackExecOptions = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (localFile) {
-    var _ref3 = yield Promise.all([hackCommand, findHackConfigDir(localFile)]),
-        _ref4 = _slicedToArray(_ref3, 2);
-
-    const currentHackCommand = _ref4[0],
-          hackRoot = _ref4[1];
-
+    const [currentHackCommand, hackRoot] = yield Promise.all([hackCommand, findHackConfigDir(localFile)]);
     if (hackRoot && currentHackCommand) {
-      return { hackRoot: hackRoot, hackCommand: currentHackCommand };
+      return { hackRoot, hackCommand: currentHackCommand };
     } else {
       return null;
     }
@@ -74,7 +58,16 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const HACK_LOGGER_CATEGORY = 'nuclide-hack';
+const HACK_LOGGER_CATEGORY = 'nuclide-hack'; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              * 
+                                              */
+
 const logger = exports.logger = (0, (_nuclideLogging || _load_nuclideLogging()).getCategoryLogger)(HACK_LOGGER_CATEGORY);
 
 const HACK_CONFIG_FILE_NAME = '.hhconfig';
@@ -105,7 +98,7 @@ function findHackConfigDir(localFile) {
   if (newHackCommand === '') {
     hackCommand = DEFAULT_HACK_COMMAND;
   } else {
-    logger.logTrace(`Using custom hh_client: ${ newHackCommand }`);
+    logger.log(`Using custom hh_client: ${newHackCommand}`);
     hackCommand = Promise.resolve(newHackCommand);
   }
 }

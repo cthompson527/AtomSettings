@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 47
+          line: 46
         },
         kind: "named",
         name: "NuclideUri"
@@ -24,7 +24,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 47
+          line: 46
         },
         kind: "named",
         name: "WatchResult"
@@ -39,7 +39,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 51
+          line: 50
         },
         kind: "named",
         name: "NuclideUri"
@@ -51,7 +51,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 51
+          line: 50
         },
         kind: "named",
         name: "WatchResult"
@@ -66,7 +66,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 93
+          line: 92
         },
         kind: "named",
         name: "NuclideUri"
@@ -78,7 +78,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 94
+          line: 93
         },
         kind: "string"
       });
@@ -94,237 +94,250 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["WatchResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "FileWatcherService.js",
-      line: 24
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    name: "WatchResult",
-    definition: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    WatchResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 24
+        line: 23
       },
-      kind: "object",
-      fields: [{
+      name: "WatchResult",
+      definition: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 25
+          line: 23
         },
-        name: "path",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "FileWatcherService.js",
+            line: 24
+          },
+          name: "path",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 24
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "FileWatcherService.js",
             line: 25
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "FileWatcherService.js",
-          line: 26
-        },
-        name: "type",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FileWatcherService.js",
-            line: 26
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 25
+            },
+            kind: "string"
           },
-          kind: "string"
-        },
-        optional: false
-      }]
-    }
-  }], ["watchFile", {
-    kind: "function",
-    name: "watchFile",
-    location: {
-      type: "source",
-      fileName: "FileWatcherService.js",
-      line: 47
+          optional: false
+        }]
+      }
     },
-    type: {
+    watchFile: {
+      kind: "function",
+      name: "watchFile",
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 47
+        line: 46
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "filePath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FileWatcherService.js",
-            line: 47
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 47
+          line: 46
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 46
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FileWatcherService.js",
-            line: 47
+            line: 46
           },
-          kind: "named",
-          name: "WatchResult"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 46
+            },
+            kind: "named",
+            name: "WatchResult"
+          }
         }
       }
-    }
-  }], ["watchDirectory", {
-    kind: "function",
-    name: "watchDirectory",
-    location: {
-      type: "source",
-      fileName: "FileWatcherService.js",
-      line: 51
     },
-    type: {
+    watchDirectory: {
+      kind: "function",
+      name: "watchDirectory",
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 51
+        line: 50
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "directoryPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FileWatcherService.js",
-            line: 51
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "FileWatcherService.js",
-          line: 51
+          line: 50
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "directoryPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 50
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FileWatcherService.js",
-            line: 51
+            line: 50
           },
-          kind: "named",
-          name: "WatchResult"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 50
+            },
+            kind: "named",
+            name: "WatchResult"
+          }
         }
       }
-    }
-  }], ["watchDirectoryRecursive", {
-    kind: "function",
-    name: "watchDirectoryRecursive",
-    location: {
-      type: "source",
-      fileName: "FileWatcherService.js",
-      line: 92
     },
-    type: {
+    watchDirectoryRecursive: {
+      kind: "function",
+      name: "watchDirectoryRecursive",
       location: {
         type: "source",
         fileName: "FileWatcherService.js",
-        line: 92
+        line: 91
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "directoryPath",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "FileWatcherService.js",
+          line: 91
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "directoryPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 92
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "FileWatcherService.js",
             line: 93
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "FileWatcherService.js",
-          line: 94
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "FileWatcherService.js",
-            line: 94
-          },
-          kind: "string"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "FileWatcherService.js",
+              line: 93
+            },
+            kind: "string"
+          }
         }
       }
     }
-  }]])
+  }
 });

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -50,7 +40,19 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const NO_ACTIVE_PROJECT_ERROR = 'No active Buck project. Check your Current Working Root.';let BuckToolbarTargetSelector = class BuckToolbarTargetSelector extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const NO_ACTIVE_PROJECT_ERROR = 'No active Buck project. Check your Current Working Root.';
+
+class BuckToolbarTargetSelector extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -64,7 +66,7 @@ const NO_ACTIVE_PROJECT_ERROR = 'No active Buck project. Check your Current Work
 
 
   _requestOptions(inputText) {
-    const buckRoot = this.props.store.getCurrentBuckRoot();
+    const { buckRoot } = this.props.appState;
     if (buckRoot == null) {
       return _rxjsBundlesRxMinJs.Observable.throw(Error(NO_ACTIVE_PROJECT_ERROR));
     }
@@ -97,7 +99,7 @@ const NO_ACTIVE_PROJECT_ERROR = 'No active Buck project. Check your Current Work
     this._cachedOwners = buckService == null ? Promise.resolve([]) : buckService.getOwners(buckRoot, path).then(
     // Strip off the optional leading "//" to match typical user input.
     owners => owners.map(owner => owner.startsWith('//') ? owner.substring(2) : owner)).catch(err => {
-      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error getting Buck owners for ${ path }`, err);
+      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error getting Buck owners for ${path}`, err);
       return [];
     });
     this._cachedOwnersPath = path;
@@ -106,27 +108,28 @@ const NO_ACTIVE_PROJECT_ERROR = 'No active Buck project. Check your Current Work
 
   _handleBuildTargetChange(value) {
     const trimmed = value.trim();
-    if (this.props.store.getBuildTarget() === trimmed) {
+    if (this.props.appState.buildTarget === trimmed) {
       return;
     }
-    this.props.actions.updateBuildTarget(trimmed);
+    this.props.setBuildTarget(trimmed);
   }
 
   render() {
-    return _reactForAtom.React.createElement((_Combobox || _load_Combobox()).Combobox, {
+    return _reactForAtom.React.createElement((_Combobox || _load_Combobox()).Combobox
+    // Hack to forcibly refresh the combobox when the target changes.
+    // TODO(#11581583): Remove this when Combobox is fully controllable.
+    , { key: this.props.appState.buildTarget,
       className: 'inline-block nuclide-buck-target-combobox',
       formatRequestOptionsErrorMessage: err => err.message,
       requestOptions: this._requestOptions,
       size: 'sm',
       loadingMessage: 'Updating target names...',
-      initialTextInput: this.props.store.getBuildTarget(),
+      initialTextInput: this.props.appState.buildTarget,
       onSelect: this._handleBuildTargetChange,
       onBlur: this._handleBuildTargetChange,
       placeholderText: 'Buck build target',
       width: null
     });
   }
-
-};
+}
 exports.default = BuckToolbarTargetSelector;
-module.exports = exports['default'];

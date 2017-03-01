@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,6 +9,12 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+var _connectToPackager;
+
+function _load_connectToPackager() {
+  return _connectToPackager = require('./connectToPackager');
 }
 
 var _connectToIwdp;
@@ -38,6 +35,8 @@ function _load_logger() {
   return _logger = require('./logger');
 }
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
 var _main;
 
 function _load_main() {
@@ -46,11 +45,20 @@ function _load_main() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (_logger || _load_logger()).logger.log;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+const { log, logError } = (_logger || _load_logger()).logger;
 let lastServiceObjectDispose = null;
 
-let IwdpDebuggerService = exports.IwdpDebuggerService = class IwdpDebuggerService {
+class IwdpDebuggerService {
 
   constructor() {
     if (lastServiceObjectDispose != null) {
@@ -66,10 +74,21 @@ let IwdpDebuggerService = exports.IwdpDebuggerService = class IwdpDebuggerServic
     return this._clientCallback.getServerMessageObservable().publish();
   }
 
-  attach() {
-    this._disposables.add((0, (_connectToIwdp || _load_connectToIwdp()).connectToIwdp)().subscribe(deviceInfo => {
-      log(`Got device info: ${ JSON.stringify(deviceInfo) }`);
+  getAtomNotificationObservable() {
+    return this._clientCallback.getAtomNotificationObservable().publish();
+  }
+
+  attach(targetEnvironment) {
+    const connection = connectToTarget(targetEnvironment);
+    this._disposables.add(connection.subscribe(deviceInfo => {
+      log(`Got device info: ${JSON.stringify(deviceInfo)}`);
       this._connectionMultiplexer.add(deviceInfo);
+    }, err => {
+      logError(`The debug proxy was killed!  Error: ${err}`);
+      this._clientCallback.sendAtomNotification('warning', 'The session has ended because the debug proxy was killed!');
+      // We need to wait for the event loop to run before disposing, otherwise our atom
+      // notification never makes it through the service framework.
+      process.nextTick(() => this.dispose());
     }));
     return Promise.resolve('IWDP Connected');
   }
@@ -80,7 +99,19 @@ let IwdpDebuggerService = exports.IwdpDebuggerService = class IwdpDebuggerServic
   }
 
   dispose() {
-    this._disposables.dispose();
+    if (this._disposables != null) {
+      this._disposables.dispose();
+    }
     return Promise.resolve();
   }
-};
+}
+
+exports.IwdpDebuggerService = IwdpDebuggerService;
+function connectToTarget(targetEnvironment) {
+  if (targetEnvironment === 'iOS') {
+    return (0, (_connectToIwdp || _load_connectToIwdp()).connectToIwdp)();
+  } else if (targetEnvironment === 'Android') {
+    return (0, (_connectToPackager || _load_connectToPackager()).connectToPackager)();
+  }
+  throw new Error(`Unrecognized environment: ${targetEnvironment}`);
+}

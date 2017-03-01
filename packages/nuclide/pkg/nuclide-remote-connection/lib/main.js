@@ -1,18 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.getlocalService = exports.getServiceByNuclideUri = exports.getServiceByConnection = exports.getService = exports.decorateSshConnectionDelegateWithTracking = exports.NuclideTextBuffer = exports.SshHandshake = exports.ConnectionCache = exports.ServerConnection = exports.RemoteFile = exports.RemoteDirectory = exports.RemoteConnection = undefined;
+exports.getAdbServiceByNuclideUri = getAdbServiceByNuclideUri;
 exports.getArcanistServiceByNuclideUri = getArcanistServiceByNuclideUri;
 exports.getBuckServiceByNuclideUri = getBuckServiceByNuclideUri;
 exports.getClangServiceByNuclideUri = getClangServiceByNuclideUri;
@@ -25,13 +17,14 @@ exports.getGrepServiceByNuclideUri = getGrepServiceByNuclideUri;
 exports.getHackLanguageForUri = getHackLanguageForUri;
 exports.getHgServiceByNuclideUri = getHgServiceByNuclideUri;
 exports.getInfoServiceByNuclideUri = getInfoServiceByNuclideUri;
+exports.getIwdpDebuggerServiceByNuclideUri = getIwdpDebuggerServiceByNuclideUri;
 exports.getMerlinServiceByNuclideUri = getMerlinServiceByNuclideUri;
-exports.getReasonServiceByNuclideUri = getReasonServiceByNuclideUri;
 exports.getNativeDebuggerServiceByNuclideUri = getNativeDebuggerServiceByNuclideUri;
 exports.getNodeDebuggerServiceByNuclideUri = getNodeDebuggerServiceByNuclideUri;
 exports.getOpenFilesServiceByNuclideUri = getOpenFilesServiceByNuclideUri;
 exports.getPhpDebuggerServiceByNuclideUri = getPhpDebuggerServiceByNuclideUri;
 exports.getPythonServiceByNuclideUri = getPythonServiceByNuclideUri;
+exports.getReasonServiceByNuclideUri = getReasonServiceByNuclideUri;
 exports.getRemoteCommandServiceByNuclideUri = getRemoteCommandServiceByNuclideUri;
 exports.getSourceControlServiceByNuclideUri = getSourceControlServiceByNuclideUri;
 
@@ -102,7 +95,20 @@ exports.decorateSshConnectionDelegateWithTracking = (_SshHandshake || _load_SshH
 exports.getService = (_serviceManager || _load_serviceManager()).getService;
 exports.getServiceByConnection = (_serviceManager || _load_serviceManager()).getServiceByConnection;
 exports.getServiceByNuclideUri = (_serviceManager || _load_serviceManager()).getServiceByNuclideUri;
-exports.getlocalService = (_serviceManager || _load_serviceManager()).getlocalService;
+exports.getlocalService = (_serviceManager || _load_serviceManager()).getlocalService; /**
+                                                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                        * All rights reserved.
+                                                                                        *
+                                                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                                                        * the root directory of this source tree.
+                                                                                        *
+                                                                                        * 
+                                                                                        */
+
+function getAdbServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('AdbService', uri));
+}
+
 function getArcanistServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('ArcanistService', uri));
 }
@@ -151,12 +157,12 @@ function getInfoServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('InfoService', uri));
 }
 
-function getMerlinServiceByNuclideUri(uri) {
-  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('MerlinService', uri));
+function getIwdpDebuggerServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('IwdpDebuggerService', uri));
 }
 
-function getReasonServiceByNuclideUri(uri) {
-  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('ReasonService', uri));
+function getMerlinServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('MerlinService', uri));
 }
 
 function getNativeDebuggerServiceByNuclideUri(uri) {
@@ -177,6 +183,10 @@ function getPhpDebuggerServiceByNuclideUri(uri) {
 
 function getPythonServiceByNuclideUri(uri) {
   return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('PythonService', uri));
+}
+
+function getReasonServiceByNuclideUri(uri) {
+  return (0, (_nullthrows || _load_nullthrows()).default)((0, (_serviceManager || _load_serviceManager()).getServiceByNuclideUri)('ReasonService', uri));
 }
 
 function getRemoteCommandServiceByNuclideUri(uri) {

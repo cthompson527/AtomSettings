@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,6 +27,16 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function createProcessStream() {
   const processEvents = (0, (_process || _load_process()).observeProcess)(spawnAdbLogcat).share();
   const stdoutEvents = processEvents.filter(event => event.kind === 'stdout')
@@ -58,18 +59,21 @@ function createProcessStream() {
         // badly. If we get a non-error message, then the last error we saw wasn't the one
         // that killed the process, so throw it away. Why is this not on stderr? I don't know.
         return {
-          event: event,
-          lastError: parseError(event.data)
+          event,
+          lastError: parseError(event.data) || acc.lastError
         };
       case 'stderr':
-        return Object.assign({}, acc, { event: event });
+        return Object.assign({}, acc, {
+          lastError: event.data || acc.lastError,
+          event
+        });
       default:
         // This should never happen.
-        throw new Error(`Invalid event kind: ${ event.kind }`);
+        throw new Error(`Invalid event kind: ${event.kind}`);
     }
   }, { event: null, lastError: null }).map(acc => acc.event))
   // Only get the text from stdout.
-  .filter(event => event.kind === 'stdout').map(event => event.data && event.data.replace(/\r?\n$/, ''));
+  .filter(event => event.kind === 'stdout').map(event => event.data && event.data.replace(/\r*\n$/, ''));
 }
 
 function spawnAdbLogcat() {

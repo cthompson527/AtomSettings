@@ -1,24 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.WorkingSetNameAndSaveComponent = undefined;
-
-var _classnames;
-
-function _load_classnames() {
-  return _classnames = _interopRequireDefault(require('classnames'));
-}
 
 var _reactForAtom = require('react-for-atom');
 
@@ -34,9 +19,7 @@ function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-let WorkingSetNameAndSaveComponent = exports.WorkingSetNameAndSaveComponent = class WorkingSetNameAndSaveComponent extends _reactForAtom.React.Component {
+class WorkingSetNameAndSaveComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -79,18 +62,12 @@ let WorkingSetNameAndSaveComponent = exports.WorkingSetNameAndSaveComponent = cl
           onCancel: this.props.onCancel
         })
       ),
-      _reactForAtom.React.createElement(
-        (_Button || _load_Button()).Button,
-        {
-          buttonType: (_Button || _load_Button()).ButtonTypes.SUCCESS,
-          className: (0, (_classnames || _load_classnames()).default)({
-            'inline-block-tight': true,
-            'disabled': this.state.name === '',
-            'nuclide-file-tree-toolbar-icon': true
-          }),
-          onClick: this._saveWorkingSet },
-        _reactForAtom.React.createElement('span', { className: 'icon icon-check nuclide-file-tree-toolbar-icon' })
-      ),
+      _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
+        buttonType: (_Button || _load_Button()).ButtonTypes.SUCCESS,
+        disabled: this.state.name === '',
+        icon: 'check',
+        onClick: this._saveWorkingSet
+      }),
       setNameText
     );
   }
@@ -111,4 +88,13 @@ let WorkingSetNameAndSaveComponent = exports.WorkingSetNameAndSaveComponent = cl
       this.props.onSave(this.state.name);
     }
   }
-};
+}
+exports.WorkingSetNameAndSaveComponent = WorkingSetNameAndSaveComponent; /**
+                                                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                                                          * All rights reserved.
+                                                                          *
+                                                                          * This source code is licensed under the license found in the LICENSE file in
+                                                                          * the root directory of this source tree.
+                                                                          *
+                                                                          * 
+                                                                          */

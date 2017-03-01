@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _UniversalDisposable;
 
@@ -44,7 +34,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ArcBuildSystem = class ArcBuildSystem {
+class ArcBuildSystem {
 
   constructor() {
     this.id = 'arcanist';
@@ -54,9 +44,17 @@ let ArcBuildSystem = class ArcBuildSystem {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._outputMessages);
   }
 
-  setCwdApi(cwdApi) {
-    this._cwdApi = cwdApi;
-    this._model.setCwdApi(cwdApi);
+  setProjectRoot(projectRoot, callback) {
+    const path = projectRoot ? projectRoot.getPath() : null;
+    this._model.setProjectPath(path);
+
+    const storeReady = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._model.onChange.bind(this._model)).map(() => this._model).startWith(this._model).filter(model => model.isArcSupported() !== null && model.getActiveProjectPath() === path);
+
+    const enabledObservable = storeReady.map(model => model.isArcSupported() === true).distinctUntilChanged();
+
+    const tasksObservable = storeReady.map(model => model.getTaskList());
+
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(_rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks)));
   }
 
   _getModel() {
@@ -68,13 +66,6 @@ let ArcBuildSystem = class ArcBuildSystem {
       ArcToolbarModel = require('./ArcToolbarModel').ArcToolbarModel;
     }
     return new ArcToolbarModel(this._outputMessages);
-  }
-
-  observeTaskList(cb) {
-    if (this._tasks == null) {
-      this._tasks = _rxjsBundlesRxMinJs.Observable.concat(_rxjsBundlesRxMinJs.Observable.of(this._model.getTaskList()), (0, (_event || _load_event()).observableFromSubscribeFunction)(this._model.onChange.bind(this._model)).map(() => this._model.getTaskList()));
-    }
-    return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._tasks.subscribe({ next: cb }));
   }
 
   getExtraUi() {
@@ -94,7 +85,7 @@ let ArcBuildSystem = class ArcBuildSystem {
 
   runTask(taskType) {
     if (!this._model.getTaskList().some(task => task.type === taskType)) {
-      throw new Error(`There's no hhvm task named "${ taskType }"`);
+      throw new Error(`There's no hhvm task named "${taskType}"`);
     }
 
     const taskFunction = getTaskRunFunction(this._model, taskType);
@@ -104,16 +95,24 @@ let ArcBuildSystem = class ArcBuildSystem {
   dispose() {
     this._disposables.dispose();
   }
-};
-exports.default = ArcBuildSystem;
+}
 
+exports.default = ArcBuildSystem; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   */
 
 function getTaskRunFunction(model, taskType) {
   switch (taskType) {
     case 'build':
       return () => model.arcBuild();
     default:
-      throw new Error(`Invalid task type: ${ taskType }`);
+      throw new Error(`Invalid task type: ${taskType}`);
   }
 }
 
@@ -122,4 +121,3 @@ const ArcIcon = () => _reactForAtom.React.createElement(
   null,
   'arc'
 );
-module.exports = exports['default'];

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
@@ -30,7 +20,7 @@ function _load_DebuggerDispatcher() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let CallstackStore = class CallstackStore {
+class CallstackStore {
 
   constructor(dispatcher) {
     const dispatcherToken = dispatcher.register(this._handlePayload.bind(this));
@@ -38,6 +28,7 @@ let CallstackStore = class CallstackStore {
       dispatcher.unregister(dispatcherToken);
     }));
     this._callstack = null;
+    this._selectedCallFrameIndex = 0;
     this._selectedCallFrameMarker = null;
     this._emitter = new _atom.Emitter();
   }
@@ -48,6 +39,7 @@ let CallstackStore = class CallstackStore {
         this._handleClearInterface();
         break;
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_SELECTED_CALLFRAME_LINE:
+        // TODO: update _selectedCallFrameIndex.
         this._setSelectedCallFrameLine(payload.data.options);
         break;
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.OPEN_SOURCE_LOCATION:
@@ -56,13 +48,22 @@ let CallstackStore = class CallstackStore {
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_CALLSTACK:
         this._updateCallstack(payload.data.callstack);
         break;
+      case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_SELECTED_CALLFRAME_INDEX:
+        this._updateSelectedCallFrameIndex(payload.data.index);
+        break;
       default:
         return;
     }
   }
 
   _updateCallstack(callstack) {
+    this._selectedCallFrameIndex = 0;
     this._callstack = callstack;
+    this._emitter.emit('change');
+  }
+
+  _updateSelectedCallFrameIndex(index) {
+    this._selectedCallFrameIndex = index;
     this._emitter.emit('change');
   }
 
@@ -70,6 +71,9 @@ let CallstackStore = class CallstackStore {
     const path = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(sourceURL);
     if (path != null && atom.workspace != null) {
       // only handle real files for now.
+      // This should be goToLocation instead but since the searchAllPanes option is correctly
+      // provided it's not urgent.
+      // eslint-disable-next-line nuclide-internal/atom-apis
       atom.workspace.open(path, { searchAllPanes: true }).then(editor => {
         this._nagivateToLocation(editor, lineNumber);
       });
@@ -82,6 +86,7 @@ let CallstackStore = class CallstackStore {
   }
 
   _handleClearInterface() {
+    this._selectedCallFrameIndex = 0;
     this._setSelectedCallFrameLine(null);
     this._updateCallstack([]);
   }
@@ -89,10 +94,12 @@ let CallstackStore = class CallstackStore {
   _setSelectedCallFrameLine(options) {
     if (options) {
       const path = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(options.sourceURL);
-      const lineNumber = options.lineNumber;
-
+      const { lineNumber } = options;
       if (path != null && atom.workspace != null) {
         // only handle real files for now
+        // This should be goToLocation instead but since the searchAllPanes option is correctly
+        // provided it's not urgent.
+        // eslint-disable-next-line nuclide-internal/atom-apis
         atom.workspace.open(path, { searchAllPanes: true }).then(editor => {
           this._clearSelectedCallFrameMarker();
           this._highlightCallFrameLine(editor, lineNumber);
@@ -128,10 +135,21 @@ let CallstackStore = class CallstackStore {
     return this._callstack;
   }
 
+  getSelectedCallFrameIndex() {
+    return this._selectedCallFrameIndex;
+  }
+
   dispose() {
     this._clearSelectedCallFrameMarker();
     this._disposables.dispose();
   }
-};
-exports.default = CallstackStore;
-module.exports = exports['default'];
+}
+exports.default = CallstackStore; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   */

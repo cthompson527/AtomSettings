@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _AtomInput;
 
@@ -45,6 +40,16 @@ function _load_ButtonGroup() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const PROFILE_NAME_LABEL = 'Profile Name';
 const DEFAULT_SERVER_COMMAND_PLACEHOLDER = '(DEFAULT)';
 
@@ -53,7 +58,7 @@ const emptyFunction = () => {};
 /**
  * A form that is used to create a new connection profile.
  */
-let CreateConnectionProfileForm = class CreateConnectionProfileForm extends _reactForAtom.React.Component {
+class CreateConnectionProfileForm extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -106,11 +111,12 @@ let CreateConnectionProfileForm = class CreateConnectionProfileForm extends _rea
         initialUsername: initialFields.username,
         initialServer: initialFields.server,
         initialCwd: initialFields.cwd,
-        initialRemoteServerCommand: DEFAULT_SERVER_COMMAND_PLACEHOLDER,
+        initialRemoteServerCommand: initialFields.remoteServerCommand || DEFAULT_SERVER_COMMAND_PLACEHOLDER,
         initialSshPort: initialFields.sshPort,
         initialPathToPrivateKey: initialFields.pathToPrivateKey,
         initialAuthMethod: initialFields.authMethod,
         initialDisplayTitle: initialFields.displayTitle,
+        profileHosts: this.props.profileHosts,
         onCancel: emptyFunction,
         onConfirm: this._clickSave,
         onDidChange: emptyFunction,
@@ -167,7 +173,5 @@ let CreateConnectionProfileForm = class CreateConnectionProfileForm extends _rea
   _clickCancel() {
     this.props.onCancel();
   }
-};
-
-
-module.exports = CreateConnectionProfileForm;
+}
+exports.default = CreateConnectionProfileForm;

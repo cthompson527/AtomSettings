@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -37,7 +28,7 @@ function _load_utils() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Handles all 'Runtime.*' Chrome dev tools messages
-let RuntimeHandler = exports.RuntimeHandler = class RuntimeHandler extends (_Handler || _load_Handler()).default {
+class RuntimeHandler extends (_Handler || _load_Handler()).default {
 
   constructor(clientCallback, connectionMultiplexer) {
     super('Runtime', clientCallback);
@@ -94,9 +85,7 @@ let RuntimeHandler = exports.RuntimeHandler = class RuntimeHandler extends (_Han
       // params also has properties:
       //    ownProperties
       //    generatePreview
-      const objectId = params.objectId,
-            accessorPropertiesOnly = params.accessorPropertiesOnly;
-
+      const { objectId, accessorPropertiesOnly } = params;
       let result;
       if (!accessorPropertiesOnly) {
         result = yield _this2._connectionMultiplexer.getProperties(objectId);
@@ -104,7 +93,7 @@ let RuntimeHandler = exports.RuntimeHandler = class RuntimeHandler extends (_Han
         // TODO: Handle remaining params
         result = [];
       }
-      _this2.replyToCommand(id, { result: result });
+      _this2.replyToCommand(id, { result });
     })();
   }
 
@@ -116,4 +105,13 @@ let RuntimeHandler = exports.RuntimeHandler = class RuntimeHandler extends (_Han
       _this3.replyToCommand(id, result);
     })();
   }
-};
+}
+exports.RuntimeHandler = RuntimeHandler; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */

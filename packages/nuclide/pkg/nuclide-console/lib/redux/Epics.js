@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,14 +34,23 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 /**
  * Register a record provider for every executor.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function registerExecutorEpic(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).REGISTER_EXECUTOR).map(action => {
     if (!(action.type === (_Actions || _load_Actions()).REGISTER_EXECUTOR)) {
       throw new Error('Invariant violation: "action.type === Actions.REGISTER_EXECUTOR"');
     }
 
-    const executor = action.payload.executor;
-
+    const { executor } = action.payload;
     return (_Actions || _load_Actions()).registerRecordProvider({
       id: executor.id,
       records: executor.output.map(message => Object.assign({}, message, {
@@ -70,8 +70,7 @@ function executeEpic(actions, store) {
       throw new Error('Invariant violation: "action.type === Actions.EXECUTE"');
     }
 
-    const code = action.payload.code;
-
+    const { code } = action.payload;
     const currentExecutorId = (0, (_getCurrentExecutorId || _load_getCurrentExecutorId()).default)(store.getState());
 
     if (!currentExecutorId) {
@@ -108,12 +107,11 @@ function registerRecordProviderEpic(actions, store) {
       throw new Error('Invariant violation: "action.type === Actions.REGISTER_RECORD_PROVIDER"');
     }
 
-    const recordProvider = action.payload.recordProvider;
+    const { recordProvider } = action.payload;
 
     // Transform the messages into actions and merge them into the action stream.
     // TODO: Add enabling/disabling of registered source and only subscribe when enabled. That
     //       way, we won't trigger cold observer side-effects when we don't need the results.
-
     const messageActions = recordProvider.records.map((_Actions || _load_Actions()).recordReceived);
 
     // TODO: Can this be delayed until sometime after registration?

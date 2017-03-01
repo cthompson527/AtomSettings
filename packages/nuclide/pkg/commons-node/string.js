@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.stringifyError = stringifyError;
 exports.maybeToString = maybeToString;
 exports.relativeDate = relativeDate;
@@ -22,6 +10,10 @@ exports.countOccurrences = countOccurrences;
 exports.shellParse = shellParse;
 exports.removeCommonPrefix = removeCommonPrefix;
 exports.removeCommonSuffix = removeCommonSuffix;
+exports.shorten = shorten;
+exports.splitOnce = splitOnce;
+exports.indent = indent;
+exports.pluralize = pluralize;
 
 var _shellQuote;
 
@@ -29,8 +21,18 @@ function _load_shellQuote() {
   return _shellQuote = require('shell-quote');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function stringifyError(error) {
-  return `name: ${ error.name }, message: ${ error.message }, stack: ${ error.stack }.`;
+  return `name: ${error.name}, message: ${error.message}, stack: ${error.stack}.`;
 }
 
 // As of Flow v0.28, Flow does not alllow implicit string coercion of null or undefined. Use this to
@@ -54,9 +56,11 @@ const WEEK = 7 * DAY;
 const YEAR = DAY * 365;
 const MONTH = YEAR / 12;
 
-const formats = [[0.7 * MINUTE, 'just now'], [1.5 * MINUTE, 'a minute ago'], [60 * MINUTE, 'minutes ago', MINUTE], [1.5 * HOUR, 'an hour ago'], [DAY, 'hours ago', HOUR], [2 * DAY, 'yesterday'], [7 * DAY, 'days ago', DAY], [1.5 * WEEK, 'a week ago'], [MONTH, 'weeks ago', WEEK], [1.5 * MONTH, 'a month ago'], [YEAR, 'months ago', MONTH], [1.5 * YEAR, 'a year ago'], [Number.MAX_VALUE, 'years ago', YEAR]];
+const shortFormats = [[0.7 * MINUTE, 'now'], [1.5 * MINUTE, '1m'], [60 * MINUTE, 'm', MINUTE], [1.5 * HOUR, '1h'], [DAY, 'h', HOUR], [2 * DAY, '1d'], [7 * DAY, 'd', DAY], [1.5 * WEEK, '1w'], [MONTH, 'w', WEEK], [1.5 * MONTH, '1mo'], [YEAR, 'mo', MONTH], [1.5 * YEAR, '1y'], [Number.MAX_VALUE, 'y', YEAR]];
 
-function relativeDate(input_, reference_) {
+const longFormats = [[0.7 * MINUTE, 'just now'], [1.5 * MINUTE, 'a minute ago'], [60 * MINUTE, 'minutes ago', MINUTE], [1.5 * HOUR, 'an hour ago'], [DAY, 'hours ago', HOUR], [2 * DAY, 'yesterday'], [7 * DAY, 'days ago', DAY], [1.5 * WEEK, 'a week ago'], [MONTH, 'weeks ago', WEEK], [1.5 * MONTH, 'a month ago'], [YEAR, 'months ago', MONTH], [1.5 * YEAR, 'a year ago'], [Number.MAX_VALUE, 'years ago', YEAR]];
+
+function relativeDate(input_, reference_, useShortVariant = false) {
   let input = input_;
   let reference = reference_;
   if (input instanceof Date) {
@@ -70,17 +74,11 @@ function relativeDate(input_, reference_) {
   }
 
   const delta = reference - input;
-
-  for (const _ref of formats) {
-    var _ref2 = _slicedToArray(_ref, 3);
-
-    const limit = _ref2[0];
-    const relativeFormat = _ref2[1];
-    const remainder = _ref2[2];
-
+  const formats = useShortVariant ? shortFormats : longFormats;
+  for (const [limit, relativeFormat, remainder] of formats) {
     if (delta < limit) {
       if (typeof remainder === 'number') {
-        return Math.round(delta / remainder) + ' ' + relativeFormat;
+        return Math.round(delta / remainder) + (useShortVariant ? '' : ' ') + relativeFormat;
       } else {
         return relativeFormat;
       }
@@ -117,7 +115,7 @@ function shellParse(str, env) {
   const result = (0, (_shellQuote || _load_shellQuote()).parse)(str, env);
   for (let i = 0; i < result.length; i++) {
     if (typeof result[i] !== 'string') {
-      throw new Error(`Unexpected operator "${ result[i].op }" provided to shellParse`);
+      throw new Error(`Unexpected operator "${result[i].op}" provided to shellParse`);
     }
   }
   return result;
@@ -137,4 +135,27 @@ function removeCommonSuffix(a, b) {
     i++;
   }
   return [a.substring(0, a.length - i), b.substring(0, b.length - i)];
+}
+
+function shorten(str, maxLength, suffix) {
+  return str.length < maxLength ? str : str.slice(0, maxLength) + (suffix || '');
+}
+
+/**
+ * Like String.split, but only splits once.
+ */
+function splitOnce(str, separator) {
+  const index = str.indexOf(separator);
+  return index === -1 ? [str, null] : [str.slice(0, index), str.slice(index + separator.length)];
+}
+
+/**
+ * Indents each line by the specified number of characters.
+ */
+function indent(str, level = 2, char = ' ') {
+  return str.replace(/^([^\n])/gm, char.repeat(level) + '$1');
+}
+
+function pluralize(noun, count) {
+  return count === 1 ? noun : noun + 's';
 }

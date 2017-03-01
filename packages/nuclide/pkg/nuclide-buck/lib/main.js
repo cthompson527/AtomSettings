@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -20,6 +11,7 @@ exports.provideObservableDiagnosticUpdates = provideObservableDiagnosticUpdates;
 exports.serialize = serialize;
 exports.getHyperclickProvider = getHyperclickProvider;
 exports.provideBuckBuilder = provideBuckBuilder;
+exports.providePlatformService = providePlatformService;
 
 var _registerGrammar;
 
@@ -41,9 +33,24 @@ function _load_BuckBuildSystem() {
   return _BuckBuildSystem = require('./BuckBuildSystem');
 }
 
+var _PlatformService;
+
+function _load_PlatformService() {
+  return _PlatformService = require('./PlatformService');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let disposables = null;
+let disposables = null; /**
+                         * Copyright (c) 2015-present, Facebook, Inc.
+                         * All rights reserved.
+                         *
+                         * This source code is licensed under the license found in the LICENSE file in
+                         * the root directory of this source tree.
+                         *
+                         * 
+                         */
+
 let buildSystem = null;
 let initialState = null;
 
@@ -58,9 +65,9 @@ function activate(rawState) {
   }), new _atom.Disposable(() => {
     initialState = null;
   }));
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.python', 'BUCK');
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', 'BUCK.autodeps');
-  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', '.buckconfig');
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.python', ['BUCK']);
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.json', ['BUCK.autodeps']);
+  (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.buckconfig']);
 }
 
 function deactivate() {
@@ -117,7 +124,7 @@ function getHyperclickProvider() {
   return {
     priority: 200,
     providerName: 'nuclide-buck',
-    getSuggestion: function (editor, position) {
+    getSuggestion(editor, position) {
       return (0, (_HyperclickProvider || _load_HyperclickProvider()).getSuggestion)(editor, position);
     }
   };
@@ -127,4 +134,8 @@ function provideBuckBuilder() {
   return {
     build: options => getBuildSystem().buildArtifact(options)
   };
+}
+
+function providePlatformService() {
+  return getBuildSystem().getPlatformService();
 }

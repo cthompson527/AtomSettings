@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _atom = require('atom');
 
@@ -31,7 +26,17 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
  * This closes square brackets for Objective-C message calls.
  * Clients must call `disable()` once they're done with an instance.
  */
-let ObjectiveCBracketBalancer = class ObjectiveCBracketBalancer {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ObjectiveCBracketBalancer {
 
   enable() {
     // The feature is already enabled.
@@ -57,10 +62,8 @@ let ObjectiveCBracketBalancer = class ObjectiveCBracketBalancer {
 
   _enableInTextEditor(textEditor) {
     const insertTextSubscription = textEditor.onDidInsertText(event => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('objc:balance-bracket', () => {
-        const range = event.range,
-              text = event.text;
-
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('objc:balance-bracket', () => {
+        const { range, text } = event;
         if (text === ']') {
           const buffer = textEditor.getBuffer();
           const leftBracketInsertPosition = ObjectiveCBracketBalancer.getOpenBracketInsertPosition(buffer, range.start);
@@ -151,7 +154,5 @@ let ObjectiveCBracketBalancer = class ObjectiveCBracketBalancer {
       return null;
     }
   }
-};
-
-
-module.exports = ObjectiveCBracketBalancer;
+}
+exports.default = ObjectiveCBracketBalancer;

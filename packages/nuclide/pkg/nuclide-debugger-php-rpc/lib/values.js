@@ -1,13 +1,9 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.convertValue = convertValue;
 
 var _utils;
 
@@ -54,13 +50,21 @@ function convertValue(contextId, dbgpProperty) {
       // TODO: Remaining property types - closure, hashmap, ...
       return convertUnknownValue(dbgpProperty);
   }
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function convertStringValue(dbgpProperty) {
   let value;
   if (dbgpProperty.hasOwnProperty('_')) {
     // $FlowFixMe(peterhal)
-    value = dbgpProperty.$.encoding === 'base64' ? (0, (_helpers || _load_helpers()).base64Decode)(dbgpProperty._) : `TODO: Non-base64 encoded string: ${ JSON.stringify(dbgpProperty) }`;
+    value = dbgpProperty.$.encoding === 'base64' ? (0, (_helpers || _load_helpers()).base64Decode)(dbgpProperty._) : `TODO: Non-base64 encoded string: ${JSON.stringify(dbgpProperty)}`;
   } else {
     // zero length strings have no dbgpProperty._ property
     value = '';
@@ -68,23 +72,23 @@ function convertStringValue(dbgpProperty) {
 
   return {
     type: 'string',
-    value: value
+    value
   };
 }
 
 function convertIntValue(dbgpProperty) {
-  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded int: ${ JSON.stringify(dbgpProperty) }` : dbgpProperty._;
+  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded int: ${JSON.stringify(dbgpProperty)}` : dbgpProperty._;
   return {
     type: 'number',
-    value: value
+    value
   };
 }
 
 function convertFloatValue(dbgpProperty) {
-  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded float: ${ JSON.stringify(dbgpProperty) }` : dbgpProperty._;
+  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded float: ${JSON.stringify(dbgpProperty)}` : dbgpProperty._;
   return {
     type: 'number',
-    value: value
+    value
   };
 }
 
@@ -93,10 +97,10 @@ function convertBoolValue(dbgpProperty) {
     throw new Error('Invariant violation: "dbgpProperty._ != null"');
   }
 
-  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded bool: ${ JSON.stringify(dbgpProperty) }` : toBool(dbgpProperty._);
+  const value = dbgpProperty.$.encoding === 'base64' ? `TODO: Base64 encoded bool: ${JSON.stringify(dbgpProperty)}` : toBool(dbgpProperty._);
   return {
     type: 'boolean',
-    value: value
+    value
   };
 }
 
@@ -118,12 +122,12 @@ function getUndefinedValue() {
 function convertArrayValue(contextId, dbgpProperty) {
   const remoteId = getAggregateRemoteObjectId(contextId, dbgpProperty);
   const numchildren = String(dbgpProperty.$.numchildren != null ? dbgpProperty.$.numchildren : 0);
-  let description = `Array[${ numchildren }]`;
+  let description = `Array[${numchildren}]`;
   if (dbgpProperty.$.recursive != null) {
     description = '* Recursive *';
   }
   return {
-    description: description,
+    description,
     type: 'object',
     objectId: remoteId
   };
@@ -136,7 +140,7 @@ function convertObjectValue(contextId, dbgpProperty) {
     description = '* Recursive *';
   }
   return {
-    description: description,
+    description,
     type: 'object',
     objectId: remoteId
   };
@@ -151,10 +155,10 @@ function getAggregateRemoteObjectId(contextId, dbgpProperty) {
   if (pagesize !== 0) {
     pageCount = Math.trunc((numchildren + pagesize - 1) / pagesize) || 0;
   }
-  (_utils || _load_utils()).default.log(`numchildren: ${ numchildren } pagesize: ${ pagesize } pageCount ${ pageCount }`);
+  (_utils || _load_utils()).default.log(`numchildren: ${numchildren} pagesize: ${pagesize} pageCount ${pageCount}`);
   if (pageCount > 1) {
     const elementRange = {
-      pagesize: pagesize,
+      pagesize,
       startIndex: 0,
       count: numchildren
     };
@@ -190,5 +194,3 @@ function toBool(value) {
       return 'Unexpected bool value: ' + value;
   }
 }
-
-module.exports = { convertValue: convertValue };

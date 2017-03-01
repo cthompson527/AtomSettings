@@ -1,15 +1,14 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _dedent;
+
+function _load_dedent() {
+  return _dedent = _interopRequireDefault(require('dedent'));
+}
 
 var _atom = require('atom');
 
@@ -25,7 +24,18 @@ function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
-const BREAKPOINT_NEED_UI_UPDATE = 'BREAKPOINT_NEED_UI_UPDATE';
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const BREAKPOINT_NEED_UI_UPDATE = 'BREAKPOINT_NEED_UI_UPDATE'; /**
+                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                * All rights reserved.
+                                                                *
+                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                * the root directory of this source tree.
+                                                                *
+                                                                * 
+                                                                */
+
 const BREAKPOINT_USER_CHANGED = 'breakpoint_user_changed';
 
 const ADDBREAKPOINT_ACTION = 'AddBreakpoint';
@@ -37,7 +47,7 @@ const DELETEBREAKPOINT_ACTION = 'DeleteBreakpoint';
  * Mutations to this object fires off high level events to listeners such as UI
  * controllers, giving them a chance to update.
  */
-let BreakpointStore = class BreakpointStore {
+class BreakpointStore {
 
   constructor(dispatcher, initialBreakpoints) {
     const dispatcherToken = dispatcher.register(this._handlePayload.bind(this));
@@ -87,20 +97,15 @@ let BreakpointStore = class BreakpointStore {
     }
   }
 
-  _addBreakpoint(path, line) {
-    let condition = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-    let resolved = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-    let userAction = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-    let enabled = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
-
+  _addBreakpoint(path, line, condition = '', resolved = false, userAction = true, enabled = true) {
     this._breakpointIdSeed++;
     const breakpoint = {
       id: this._breakpointIdSeed,
-      path: path,
-      line: line,
-      condition: condition,
-      enabled: enabled,
-      resolved: resolved
+      path,
+      line,
+      condition,
+      enabled,
+      resolved
     };
     this._idToBreakpointMap.set(breakpoint.id, breakpoint);
     if (!this._breakpoints.has(path)) {
@@ -117,7 +122,7 @@ let BreakpointStore = class BreakpointStore {
     if (userAction) {
       this._emitter.emit(BREAKPOINT_USER_CHANGED, {
         action: ADDBREAKPOINT_ACTION,
-        breakpoint: breakpoint
+        breakpoint
       });
     }
   }
@@ -144,7 +149,7 @@ let BreakpointStore = class BreakpointStore {
     this._emitter.emit(BREAKPOINT_NEED_UI_UPDATE, breakpoint.path);
     this._emitter.emit(BREAKPOINT_USER_CHANGED, {
       action: 'UpdateBreakpoint',
-      breakpoint: breakpoint
+      breakpoint
     });
   }
 
@@ -162,13 +167,16 @@ let BreakpointStore = class BreakpointStore {
     }
   }
 
-  _deleteBreakpoint(path, line) {
-    let userAction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
-
+  _deleteBreakpoint(path, line, userAction = true) {
     const lineMap = this._breakpoints.get(path);
 
     if (!(lineMap != null)) {
-      throw new Error('Invariant violation: "lineMap != null"');
+      throw new Error((_dedent || _load_dedent()).default`
+        Expected a non-null lineMap.
+        path: ${path},
+        line: ${line},
+        userAction: ${userAction}
+      `);
     }
 
     const breakpoint = lineMap.get(line);
@@ -182,7 +190,7 @@ let BreakpointStore = class BreakpointStore {
       if (userAction) {
         this._emitter.emit(BREAKPOINT_USER_CHANGED, {
           action: DELETEBREAKPOINT_ACTION,
-          breakpoint: breakpoint
+          breakpoint
         });
       }
     }
@@ -252,11 +260,7 @@ let BreakpointStore = class BreakpointStore {
 
   getAllBreakpoints() {
     const breakpoints = [];
-    for (const _ref of this._breakpoints) {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      const lineMap = _ref2[1];
-
+    for (const [, lineMap] of this._breakpoints) {
       for (const breakpoint of lineMap.values()) {
         breakpoints.push(breakpoint);
       }
@@ -266,16 +270,11 @@ let BreakpointStore = class BreakpointStore {
 
   getSerializedBreakpoints() {
     const breakpoints = [];
-    for (const _ref3 of this._breakpoints) {
-      var _ref4 = _slicedToArray(_ref3, 2);
-
-      const path = _ref4[0];
-      const lineMap = _ref4[1];
-
+    for (const [path, lineMap] of this._breakpoints) {
       for (const line of lineMap.keys()) {
         // TODO: serialize condition and enabled states.
         breakpoints.push({
-          line: line,
+          line,
           sourceURL: path
         });
       }
@@ -285,9 +284,7 @@ let BreakpointStore = class BreakpointStore {
 
   _deserializeBreakpoints(breakpoints) {
     for (const breakpoint of breakpoints) {
-      const line = breakpoint.line,
-            sourceURL = breakpoint.sourceURL;
-
+      const { line, sourceURL } = breakpoint;
       this._addBreakpoint(sourceURL, line);
     }
   }
@@ -312,7 +309,5 @@ let BreakpointStore = class BreakpointStore {
     this._emitter.dispose();
     this._disposables.dispose();
   }
-};
-
-
-module.exports = BreakpointStore;
+}
+exports.default = BreakpointStore;

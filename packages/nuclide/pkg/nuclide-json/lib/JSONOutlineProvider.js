@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -19,6 +10,16 @@ var _parsing;
 function _load_parsing() {
   return _parsing = require('./parsing');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getOutline(text) {
   const expression = (0, (_parsing || _load_parsing()).parseJSON)(text);
@@ -38,7 +39,7 @@ function getOutline(text) {
         children: []
       };
     });
-    return { outlineTrees: outlineTrees };
+    return { outlineTrees };
   }
   return null;
 }

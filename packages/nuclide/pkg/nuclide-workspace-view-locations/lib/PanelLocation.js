@@ -1,37 +1,14 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.PanelLocation = undefined;
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 var _createPaneContainer;
 
 function _load_createPaneContainer() {
   return _createPaneContainer = _interopRequireDefault(require('../../commons-atom/create-pane-container'));
-}
-
-var _PanelRenderer;
-
-function _load_PanelRenderer() {
-  return _PanelRenderer = _interopRequireDefault(require('../../commons-atom/PanelRenderer'));
-}
-
-var _renderReactRoot;
-
-function _load_renderReactRoot() {
-  return _renderReactRoot = require('../../commons-atom/renderReactRoot');
 }
 
 var _event;
@@ -52,10 +29,22 @@ function _load_SimpleModel() {
   return _SimpleModel = require('../../commons-node/SimpleModel');
 }
 
-var _bindObservableAsProps;
+var _tabBarView;
 
-function _load_bindObservableAsProps() {
-  return _bindObservableAsProps = require('../../nuclide-ui/bindObservableAsProps');
+function _load_tabBarView() {
+  return _tabBarView = _interopRequireDefault(require('../../nuclide-ui/VendorLib/atom-tabs/lib/tab-bar-view'));
+}
+
+var _addPanel;
+
+function _load_addPanel() {
+  return _addPanel = _interopRequireDefault(require('./addPanel'));
+}
+
+var _observeAddedPaneItems;
+
+function _load_observeAddedPaneItems() {
+  return _observeAddedPaneItems = require('./observeAddedPaneItems');
 }
 
 var _observePanes;
@@ -76,10 +65,10 @@ function _load_PanelLocationIds() {
   return _PanelLocationIds = _interopRequireWildcard(require('./PanelLocationIds'));
 }
 
-var _Panel;
+var _PanelComponent;
 
-function _load_Panel() {
-  return _Panel = require('./ui/Panel');
+function _load_PanelComponent() {
+  return _PanelComponent = require('./ui/PanelComponent');
 }
 
 var _nullthrows;
@@ -99,26 +88,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Manages views for an Atom panel.
  */
-let PanelLocation = exports.PanelLocation = class PanelLocation extends (_SimpleModel || _load_SimpleModel()).SimpleModel {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-  constructor(locationId) {
-    let serializedState = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+class PanelLocation extends (_SimpleModel || _load_SimpleModel()).SimpleModel {
 
+  constructor(locationId, serializedState = {}) {
     super();
     this._handlePanelResize = this._handlePanelResize.bind(this);
     const serializedData = serializedState.data || {};
     this._paneContainer = deserializePaneContainer(serializedData.paneContainer);
     this._position = (0, (_nullthrows || _load_nullthrows()).default)(locationsToPosition.get(locationId));
-    this._panelRenderer = new (_PanelRenderer || _load_PanelRenderer()).default({
-      priority: 101, // Use a value higher than the default (100).
-      location: this._position,
-      createItem: this._createItem.bind(this)
-    });
     this._panes = new _rxjsBundlesRxMinJs.BehaviorSubject(new Set());
     this._size = serializedData.size || null;
     this.state = {
       showDropAreas: false,
-      visible: serializedData.visible === true
+      // `visible` check is for legacy compat (<= v0.206)
+      active: serializedData.active === true || serializedData.visible === true
     };
   }
 
@@ -139,69 +132,26 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
       return _rxjsBundlesRxMinJs.Observable.merge(...itemChanges);
     }).share();
 
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._panelRenderer, (0, (_observePanes || _load_observePanes()).observePanes)(paneContainer).subscribe(this._panes), (0, (_syncPaneItemVisibility || _load_syncPaneItemVisibility()).syncPaneItemVisibility)(this._panes,
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_observePanes || _load_observePanes()).observePanes)(paneContainer).subscribe(this._panes), (0, (_syncPaneItemVisibility || _load_syncPaneItemVisibility()).syncPaneItemVisibility)(this._panes,
     // $FlowFixMe: Teach Flow about Symbol.observable
-    _rxjsBundlesRxMinJs.Observable.from(this).map(state => state.visible).distinctUntilChanged()),
+    _rxjsBundlesRxMinJs.Observable.from(this).map(state => state.active).distinctUntilChanged()),
 
     // Add a tab bar to any panes created in the container.
-    // TODO: Account for the disabling of the atom-tabs package. We assume that it will be
-    //   activated, but that isn't necessarily true. Continuing to use the atom-tabs logic while
-    //   avoiding that assumption will likely mean a change to atom-tabs that makes it more
-    //   generic.
     paneContainer.observePanes(pane => {
-      const tabBarView = document.createElement('ul', 'atom-tabs');
-      tabBarView.classList.add('nuclide-workspace-views-panel-location-tabs');
-
-      const initializeTabBar = () => {
-        if (!(typeof tabBarView.initialize === 'function')) {
-          throw new Error('Invariant violation: "typeof tabBarView.initialize === \'function\'"');
-        }
-
-        tabBarView.initialize(pane);
-        const paneElement = atom.views.getView(pane);
-        paneElement.insertBefore(tabBarView, paneElement.firstChild);
-
-        const hideButtonWrapper = document.createElement('div');
-        hideButtonWrapper.className = 'nuclide-workspace-views-panel-location-tabs-hide-button-wrapper';
-        const hideButton = document.createElement('div');
-        hideButton.className = 'nuclide-workspace-views-panel-location-tabs-hide-button';
-        hideButton.onclick = () => {
-          this.setState({ visible: false });
-        };
-        hideButtonWrapper.appendChild(hideButton);
-        tabBarView.appendChild(hideButtonWrapper);
-      };
-
-      // It's possible that the tabs package may not have activated yet (and therefore that the
-      // atom-tabs element won't have been upgraded). If that's the case, wait for it to do so and
-      // then initialize the tab bar.
-      if (typeof tabBarView.initialize === 'function') {
-        initializeTabBar();
-      } else {
-        const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.packages.onDidActivatePackage(pkg => {
-          if (typeof tabBarView.initialize === 'function') {
-            initializeTabBar();
-            disposables.dispose();
-          }
-        }), pane.onDidDestroy(() => {
-          disposables.dispose();
-        }));
-      }
+      const tabBarView = new (_tabBarView || _load_tabBarView()).default(pane);
+      const paneElement = atom.views.getView(pane);
+      paneElement.insertBefore(tabBarView.element, paneElement.firstChild);
+      tabBarView.element.classList.add('nuclide-workspace-views-panel-location-tabs');
     }),
 
-    // If you add an item to a panel (e.g. by drag & drop), make the panel visible.
-    paneItemChanges.startWith(null).map(() => this._paneContainer.getPaneItems().length).pairwise().subscribe((_ref) => {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      let prev = _ref2[0],
-          next = _ref2[1];
-
+    // If you add an item to a panel (e.g. by drag & drop), make the panel active.
+    paneItemChanges.startWith(null).map(() => this._paneContainer.getPaneItems().length).pairwise().subscribe(([prev, next]) => {
       // If the last item is removed, hide the panel.
       if (next === 0) {
-        this.setState({ visible: false });
+        this.setState({ active: false });
       } else if (next > prev) {
         // If there are more items now than there were before, show the panel.
-        this.setState({ visible: true });
+        this.setState({ active: true });
       }
     }),
 
@@ -212,30 +162,53 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
     // Manipulating the DOM in the dragstart handler will fire the dragend event so we defer it.
     // See https://groups.google.com/a/chromium.org/forum/?fromgroups=#!msg/chromium-bugs/YHs3orFC8Dc/ryT25b7J-NwJ
     .observeOn(_rxjsBundlesRxMinJs.Scheduler.async).subscribe(showDropAreas => {
-      this.setState({ showDropAreas: showDropAreas });
-    }),
+      this.setState({ showDropAreas });
+    }));
 
+    this._disposables.add(
     // $FlowIssue: We need to teach flow about Symbol.observable.
-    _rxjsBundlesRxMinJs.Observable.from(this).subscribe(state => {
-      this._panelRenderer.render({
-        visible: state.showDropAreas || state.visible
-      });
+    _rxjsBundlesRxMinJs.Observable.from(this).subscribeOn(_rxjsBundlesRxMinJs.Scheduler.animationFrame).subscribe(state => {
+      this._render(state);
     }));
   }
 
-  _createItem() {
-    // Create an item to display in the panel. Atom will associate this item with a view via the
-    // view registry (and its `getElement` method). That view will be used to display views for this
-    // panel.
-    // $FlowIssue: We need to teach flow about Symbol.observable.
-    const props = _rxjsBundlesRxMinJs.Observable.from(this).map(state => ({
+  _render(state) {
+    const shouldBeVisible = this.state.active || this.state.showDropAreas;
+    const panel = this._getPanel();
+
+    // Because we want to show something event when the panel is collapsed, we have to show it.
+    if (shouldBeVisible && !panel.isVisible()) {
+      panel.show();
+    }
+
+    const el = panel.getItem();
+    _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement((_PanelComponent || _load_PanelComponent()).PanelComponent, {
+      draggingItem: state.showDropAreas,
+      active: state.active,
       initialSize: this._size,
       paneContainer: this._paneContainer,
       position: this._position,
-      onResize: this._handlePanelResize
-    }));
-    const Component = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props, (_Panel || _load_Panel()).Panel);
-    return { getElement: () => (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_reactForAtom.React.createElement(Component, null)) };
+      onResize: this._handlePanelResize,
+      toggle: () => {
+        this.toggle();
+      }
+    }), el);
+  }
+
+  _getPanel() {
+    if (this._panel == null) {
+      const el = document.createElement('div');
+      const panel = this._panel = (0, (_addPanel || _load_addPanel()).default)(this._position, {
+        item: el,
+        priority: 101 });
+      this._disposables.add(() => {
+        _reactForAtom.ReactDOM.unmountComponentAtNode(el);
+      }, () => {
+        panel.destroy();
+      });
+      this._panel = panel;
+    }
+    return this._panel;
   }
 
   _handlePanelResize(size) {
@@ -244,7 +217,7 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
   }
 
   itemIsVisible(item) {
-    if (!this.state.visible) {
+    if (!this.state.active) {
       return false;
     }
     for (const pane of this._panes.getValue()) {
@@ -278,19 +251,28 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
     return items;
   }
 
-  showItem(item) {
+  activate() {
+    this.setState({ active: true });
+  }
+
+  addItem(item) {
     let pane = this._paneContainer.paneForItem(item);
     if (pane == null) {
       pane = this._paneContainer.getActivePane();
-      pane.addItem(item);
     }
-    pane.activate();
+    pane.addItem(item);
+  }
+
+  activateItem(item) {
+    let pane = this._paneContainer.paneForItem(item);
+    if (pane == null) {
+      pane = this._paneContainer.getActivePane();
+    }
     pane.activateItem(item);
-    this.setState({ visible: true });
   }
 
   /**
-   * Hide the specified item. If the user toggles a visible item, we hide the entire pane.
+   * Hide the specified item. If the user toggles a active item, we hide the entire pane.
    */
   hideItem(item) {
     const itemIsVisible = this._paneContainer.getPanes().some(pane => pane.getActiveItem() === item);
@@ -301,15 +283,15 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
     }
 
     // Otherwise, hide the panel altogether.
-    this.setState({ visible: false });
+    this.setState({ active: false });
   }
 
   isVisible() {
-    return this.state.visible;
+    return this.state.active;
   }
 
   toggle() {
-    this.setState({ visible: !this.state.visible });
+    this.setState({ active: !this.state.active });
   }
 
   serialize() {
@@ -318,13 +300,17 @@ let PanelLocation = exports.PanelLocation = class PanelLocation extends (_Simple
       data: {
         paneContainer: this._paneContainer == null ? null : this._paneContainer.serialize(),
         size: this._size,
-        visible: this.state.visible
+        active: this.state.active
       }
     };
   }
-};
 
+  onDidAddItem(cb) {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_observeAddedPaneItems || _load_observeAddedPaneItems()).observeAddedPaneItems)(this._paneContainer).subscribe(cb));
+  }
+}
 
+exports.PanelLocation = PanelLocation;
 function deserializePaneContainer(serialized) {
   const paneContainer = (0, (_createPaneContainer || _load_createPaneContainer()).default)();
   if (serialized != null) {

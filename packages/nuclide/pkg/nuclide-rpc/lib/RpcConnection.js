@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -48,6 +39,12 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
+var _config;
+
+function _load_config() {
+  return _config = require('./config');
+}
+
 var _nuclideLogging;
 
 function _load_nuclideLogging() {
@@ -56,11 +53,21 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 const SERVICE_FRAMEWORK_RPC_TIMEOUT_MS = 60 * 1000;
 
-let Subscription = class Subscription {
+class Subscription {
 
   constructor(message, observer) {
     this._message = message;
@@ -71,7 +78,7 @@ let Subscription = class Subscription {
     try {
       this._observer.error((0, (_messages || _load_messages()).decodeError)(this._message, error));
     } catch (e) {
-      logger.error(`Caught exception in Subscription.error: ${ e.toString() }`);
+      logger.error(`Caught exception in Subscription.error: ${e.toString()}`);
     }
   }
 
@@ -79,7 +86,7 @@ let Subscription = class Subscription {
     try {
       this._observer.next(data);
     } catch (e) {
-      logger.error(`Caught exception in Subscription.next: ${ e.toString() }`);
+      logger.error(`Caught exception in Subscription.next: ${e.toString()}`);
     }
   }
 
@@ -87,11 +94,12 @@ let Subscription = class Subscription {
     try {
       this._observer.complete();
     } catch (e) {
-      logger.error(`Caught exception in Subscription.complete: ${ e.toString() }`);
+      logger.error(`Caught exception in Subscription.complete: ${e.toString()}`);
     }
   }
-};
-let Call = class Call {
+}
+
+class Call {
 
   constructor(message, timeoutMessage, resolve, reject, cleanup) {
     this._message = message;
@@ -131,11 +139,12 @@ let Call = class Call {
   _timeout() {
     if (!this._complete) {
       this.cleanup();
-      this._reject(new Error(`Timeout after ${ SERVICE_FRAMEWORK_RPC_TIMEOUT_MS } for id: ` + `${ this._message.id }, ${ this._timeoutMessage }.`));
+      this._reject(new Error(`Timeout after ${SERVICE_FRAMEWORK_RPC_TIMEOUT_MS} for id: ` + `${this._message.id}, ${this._timeoutMessage}.`));
     }
   }
-};
-let RpcConnection = exports.RpcConnection = class RpcConnection {
+}
+
+class RpcConnection {
 
   // Do not call this directly, use factory methods below.
   constructor(kind, serviceRegistry, transport) {
@@ -156,20 +165,20 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
   }
 
   // Creates a client side connection to a server on another machine.
-  static createRemote(transport, predefinedTypes, services) {
-    return new RpcConnection('client', new (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry(predefinedTypes, services), transport);
+  static createRemote(transport, predefinedTypes, services, protocol = (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL) {
+    return new RpcConnection('client', new (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry(predefinedTypes, services, protocol), transport);
   }
 
   // Creates a client side connection to a server on the same machine.
-  static createLocal(transport, predefinedTypes, services) {
-    return new RpcConnection('client', new (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry(predefinedTypes, services), transport);
+  static createLocal(transport, predefinedTypes, services, protocol = (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL) {
+    return new RpcConnection('client', new (_ServiceRegistry || _load_ServiceRegistry()).ServiceRegistry(predefinedTypes, services, protocol), transport);
   }
 
   getService(serviceName) {
     const service = this._objectRegistry.getService(serviceName);
 
     if (!(service != null)) {
-      throw new Error(`No config found for service ${ serviceName }`);
+      throw new Error(`No config found for service ${serviceName}`);
     }
 
     return service;
@@ -207,7 +216,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
    * @param args - The serialized arguments to invoke the remote function with.
    */
   callRemoteFunction(functionName, returnType, args) {
-    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallMessage)(functionName, this._generateRequestId(), args), returnType, `Calling function ${ functionName }`);
+    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallMessage)(this._getProtocol(), functionName, this._generateRequestId(), args), returnType, `Calling function ${functionName}`);
   }
 
   /**
@@ -219,7 +228,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
    * @param args - The serialized arguments to invoke the remote method with.
    */
   callRemoteMethod(objectId, methodName, returnType, args) {
-    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallObjectMessage)(methodName, objectId, this._generateRequestId(), args), returnType, `Calling remote method ${ methodName }.`);
+    return this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createCallObjectMessage)(this._getProtocol(), methodName, objectId, this._generateRequestId(), args), returnType, `Calling remote method ${methodName}.`);
   }
 
   /**
@@ -235,7 +244,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
 
     const idPromise = (0, _asyncToGenerator.default)(function* () {
       const marshalledArgs = yield _this._getTypeRegistry().marshalArguments(_this._objectRegistry, unmarshalledArgs, argTypes);
-      return _this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createNewObjectMessage)(interfaceName, _this._generateRequestId(), marshalledArgs), 'promise', `Creating instance of ${ interfaceName }`);
+      return _this._sendMessageAndListenForResult((0, (_messages || _load_messages()).createNewObjectMessage)(_this._getProtocol(), interfaceName, _this._generateRequestId(), marshalledArgs), 'promise', `Creating instance of ${interfaceName}`);
     })();
     this._objectRegistry.addProxy(thisArg, interfaceName, idPromise);
   }
@@ -256,7 +265,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
       } else if (_this2._transport.isClosed()) {
         logger.info('Dispose call on remote proxy after connection closed');
       } else {
-        return yield _this2._sendMessageAndListenForResult((0, (_messages || _load_messages()).createDisposeMessage)(_this2._generateRequestId(), objectId), 'promise', `Disposing object ${ objectId }`);
+        return _this2._sendMessageAndListenForResult((0, (_messages || _load_messages()).createDisposeMessage)(_this2._getProtocol(), _this2._generateRequestId(), objectId), 'promise', `Disposing object ${objectId}`);
       }
     })();
   }
@@ -296,7 +305,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
             };
             const sendUnsubscribe = () => {
               if (!this._transport.isClosed()) {
-                this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createUnsubscribeMessage)(id)));
+                this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createUnsubscribeMessage)(this._getProtocol(), id)));
               }
             };
             let hadSubscription = false;
@@ -333,10 +342,10 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
             return observable;
           }
         default:
-          throw new Error(`Unkown return type: ${ returnType }.`);
+          throw new Error(`Unkown return type: ${returnType}.`);
       }
     };
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(trackingIdOfMessageAndNetwork(this._objectRegistry, message), operation);
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(trackingIdOfMessageAndNetwork(this._objectRegistry, message), operation);
   }
 
   _returnPromise(id, timingTracker, candidate, type) {
@@ -356,10 +365,10 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
 
     // Send the result of the promise across the socket.
     returnVal.then(result => {
-      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createPromiseMessage)(id, result)));
+      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createPromiseMessage)(this._getProtocol(), id, result)));
       timingTracker.onSuccess();
     }, error => {
-      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createErrorResponseMessage)(id, error)));
+      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createErrorResponseMessage)(this._getProtocol(), id, error)));
       timingTracker.onError(error == null ? new Error() : error);
     });
   }
@@ -378,12 +387,12 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
 
     // Send the next, error, and completion events of the observable across the socket.
     .subscribe(data => {
-      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createNextMessage)(id, data)));
+      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createNextMessage)(this._getProtocol(), id, data)));
     }, error => {
-      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createObserveErrorMessage)(id, error)));
+      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createObserveErrorMessage)(this._getProtocol(), id, error)));
       this._objectRegistry.removeSubscription(id);
     }, completed => {
-      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createCompleteMessage)(id)));
+      this._transport.send(JSON.stringify((0, (_messages || _load_messages()).createCompleteMessage)(this._getProtocol(), id)));
       this._objectRegistry.removeSubscription(id);
     });
 
@@ -402,7 +411,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         this._returnObservable(id, value, type.type);
         break;
       default:
-        throw new Error(`Unkown return type ${ type.kind }.`);
+        throw new Error(`Unkown return type ${type.kind}.`);
     }
     return false;
   }
@@ -411,11 +420,10 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
     var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _getFunctionImplement = _this3._getFunctionImplemention(call.method);
-
-      const localImplementation = _getFunctionImplement.localImplementation,
-            type = _getFunctionImplement.type;
-
+      const {
+        localImplementation,
+        type
+      } = _this3._getFunctionImplemention(call.method);
       const marshalledArgs = yield _this3._getTypeRegistry().unmarshalArguments(_this3._objectRegistry, call.args, type.argumentTypes);
 
       return _this3._returnValue(id, timingTracker, localImplementation.apply(_this3, marshalledArgs), type.returnType);
@@ -439,10 +447,11 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         throw new Error('Invariant violation: "classDefinition != null"');
       }
 
-      const type = classDefinition.definition.instanceMethods.get(call.method);
+      const { instanceMethods } = classDefinition.definition;
+      const type = instanceMethods[call.method];
 
-      if (!(type != null)) {
-        throw new Error('Invariant violation: "type != null"');
+      if (!(instanceMethods.hasOwnProperty(call.method) && type != null)) {
+        throw new Error('Invariant violation: "instanceMethods.hasOwnProperty(call.method) && type != null"');
       }
 
       const marshalledArgs = yield _this4._getTypeRegistry().unmarshalArguments(_this4._objectRegistry, call.args, type.argumentTypes);
@@ -461,9 +470,10 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         throw new Error('Invariant violation: "classDefinition != null"');
       }
 
-      const localImplementation = classDefinition.localImplementation,
-            definition = classDefinition.definition;
-
+      const {
+        localImplementation,
+        definition
+      } = classDefinition;
       const constructorArgs = definition.constructorArgs;
 
       if (!(constructorArgs != null)) {
@@ -491,11 +501,25 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
 
   _parseMessage(value) {
     try {
-      return JSON.parse(value);
+      const result = JSON.parse(value);
+      if (result == null) {
+        return null;
+      }
+      /* TODO: Uncomment this when the Hack service updates their protocol.
+      if (result.protocol !== this._getProtocol()) {
+        logger.error(`Recieved message with unexpected protocol: '${value}'`);
+        return null;
+      }
+      */
+      return result;
     } catch (e) {
-      logger.error(`Recieved invalid JSON message: '${ value }'`);
+      logger.error(`Recieved invalid JSON message: '${value}'`);
       return null;
     }
+  }
+
+  _getProtocol() {
+    return this._serviceRegistry.getProtocol();
   }
 
   _handleMessage(value) {
@@ -503,9 +527,6 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
     if (message == null) {
       return;
     }
-
-    // TODO: advinsky uncomment after version 0.136 and below are phased out
-    // invariant(message.protocol === SERVICE_FRAMEWORK3_PROTOCOL);
 
     switch (message.type) {
       case 'response':
@@ -534,8 +555,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         {
           const call = this._calls.get(id);
           if (call != null) {
-            const result = message.result;
-
+            const { result } = message;
             call.resolve(result);
           }
           break;
@@ -544,8 +564,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         {
           const call = this._calls.get(id);
           if (call != null) {
-            const error = message.error;
-
+            const { error } = message;
             call.reject(error);
           }
           break;
@@ -554,8 +573,7 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         {
           const subscription = this._subscriptions.get(id);
           if (subscription != null) {
-            const value = message.value;
-
+            const { value } = message;
             subscription.next(value);
           }
           break;
@@ -573,15 +591,14 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
         {
           const subscription = this._subscriptions.get(id);
           if (subscription != null) {
-            const error = message.error;
-
+            const { error } = message;
             subscription.error(error);
             this._subscriptions.delete(id);
           }
           break;
         }
       default:
-        throw new Error(`Unexpected message type ${ JSON.stringify(message) }`);
+        throw new Error(`Unexpected message type ${JSON.stringify(message)}`);
     }
   }
 
@@ -620,15 +637,15 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
             _this6._objectRegistry.disposeSubscription(id);
             break;
           default:
-            throw new Error(`Unknown message type ${ message.type }`);
+            throw new Error(`Unknown message type ${message.type}`);
         }
         if (!returnedPromise) {
           timingTracker.onSuccess();
         }
       } catch (e) {
-        logger.error(`Error handling RPC ${ message.type } message`, e);
+        logger.error(`Error handling RPC ${message.type} message`, e);
         timingTracker.onError(e == null ? new Error() : e);
-        _this6._transport.send(JSON.stringify((0, (_messages || _load_messages()).createErrorResponseMessage)(id, e)));
+        _this6._transport.send(JSON.stringify((0, (_messages || _load_messages()).createErrorResponseMessage)(_this6._getProtocol(), id, e)));
       }
     })();
   }
@@ -660,25 +677,25 @@ let RpcConnection = exports.RpcConnection = class RpcConnection {
     });
     this._subscriptions.clear();
   }
-};
+}
 
-
+exports.RpcConnection = RpcConnection;
 function trackingIdOfMessage(registry, message) {
   switch (message.type) {
     case 'call':
-      return `service-framework:${ message.method }`;
+      return `service-framework:${message.method}`;
     case 'call-object':
       const callInterface = registry.getInterface(message.objectId);
-      return `service-framework:${ callInterface }.${ message.method }`;
+      return `service-framework:${callInterface}.${message.method}`;
     case 'new':
-      return `service-framework:new:${ message.interface }`;
+      return `service-framework:new:${message.interface}`;
     case 'dispose':
       const interfaceName = registry.getInterface(message.objectId);
-      return `service-framework:dispose:${ interfaceName }`;
+      return `service-framework:dispose:${interfaceName}`;
     case 'unsubscribe':
       return 'service-framework:disposeObservable';
     default:
-      throw new Error(`Unknown message type ${ message.type }`);
+      throw new Error(`Unknown message type ${message.type}`);
   }
 }
 

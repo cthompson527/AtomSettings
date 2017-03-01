@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -24,7 +14,7 @@ let getCtagsService = (() => {
     if (service == null) {
       return null;
     }
-    return yield service.getCtagsService(path);
+    return service.getCtagsService(path);
   });
 
   return function getCtagsService(_x) {
@@ -69,12 +59,21 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // ctags doesn't have a true limit API, so having too many results slows down Nuclide.
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const MIN_QUERY_LENGTH = 2;
 const RESULTS_LIMIT = 10;
 const DEFAULT_ICON = 'icon-squirrel';
 
-let QuickOpenHelpers = class QuickOpenHelpers {
-
+class QuickOpenHelpers {
   static isEligibleForDirectory(directory) {
     return (0, _asyncToGenerator.default)(function* () {
       const svc = yield getCtagsService(directory);
@@ -101,7 +100,7 @@ let QuickOpenHelpers = class QuickOpenHelpers {
       { title: kind },
       _reactForAtom.React.createElement(
         'span',
-        { className: `file icon ${ icon }` },
+        { className: `file icon ${icon}` },
         _reactForAtom.React.createElement(
           'code',
           null,
@@ -118,7 +117,7 @@ let QuickOpenHelpers = class QuickOpenHelpers {
 
   static executeQuery(query, directory) {
     return (0, _asyncToGenerator.default)(function* () {
-      if (directory == null || query.length < MIN_QUERY_LENGTH) {
+      if (query.length < MIN_QUERY_LENGTH) {
         return [];
       }
 
@@ -150,8 +149,8 @@ let QuickOpenHelpers = class QuickOpenHelpers {
             const line = yield (0, (_utils || _load_utils()).getLineNumberForTag)(tag);
             return Object.assign({}, tag, {
               path: tag.file,
-              dir: dir,
-              line: line
+              dir,
+              line
             });
           });
 
@@ -164,7 +163,5 @@ let QuickOpenHelpers = class QuickOpenHelpers {
       }
     })();
   }
-
-};
+}
 exports.default = QuickOpenHelpers;
-module.exports = exports['default'];

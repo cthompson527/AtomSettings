@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,11 +21,10 @@ function _load_refactorActions() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-let PickRefactorComponent = exports.PickRefactorComponent = class PickRefactorComponent extends _reactForAtom.React.Component {
+class PickRefactorComponent extends _reactForAtom.React.Component {
 
   render() {
-    const availableRefactorings = this.props.pickPhase.availableRefactorings;
-
+    const { availableRefactorings } = this.props.pickPhase;
     if (availableRefactorings.length === 0) {
       return _reactForAtom.React.createElement(
         'div',
@@ -74,7 +64,16 @@ let PickRefactorComponent = exports.PickRefactorComponent = class PickRefactorCo
           'Rename'
         );
       default:
-        throw new Error(`Unknown refactoring kind ${ refactoring.kind }`);
+        throw new Error(`Unknown refactoring kind ${refactoring.kind}`);
     }
   }
-};
+}
+exports.PickRefactorComponent = PickRefactorComponent; /**
+                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                        * All rights reserved.
+                                                        *
+                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                        * the root directory of this source tree.
+                                                        *
+                                                        * 
+                                                        */

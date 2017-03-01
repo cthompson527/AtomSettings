@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,11 +9,19 @@ Object.defineProperty(exports, "__esModule", {
 // the WOp to the local string.
 function idLess(idLeft, idRight) {
   return idLeft.site < idRight.site || idLeft.site === idRight.site && idLeft.h < idRight.h;
-}let WString = exports.WString = class WString {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
-  constructor(siteId) {
-    let length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+class WString {
 
+  constructor(siteId, length = 0) {
     this._siteId = siteId;
     this._localId = 1;
     this._string = [WString.start, WString.end];
@@ -36,7 +35,7 @@ function idLess(idLeft, idRight) {
         },
         visible: true,
         startDegree: 1,
-        length: length
+        length
       }, length);
     }
   }
@@ -176,9 +175,7 @@ function idLess(idLeft, idRight) {
     this.mergeRuns();
   }
 
-  pos(c) {
-    let visibleOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+  pos(c, visibleOnly = false) {
     let currentOffset = 0;
 
     for (let i = 0; i < this._string.length; i++) {
@@ -204,9 +201,7 @@ function idLess(idLeft, idRight) {
     };
   }
 
-  ith(pos) {
-    let visibleOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
+  ith(pos, visibleOnly = true) {
     let i;
     let offset = pos;
 
@@ -245,7 +240,7 @@ function idLess(idLeft, idRight) {
     const nextChar = this.ith(pos + 1);
 
     if (prevChar == null || nextChar == null) {
-      throw new Error(`Position ${ pos } invalid within wstring`);
+      throw new Error(`Position ${pos} invalid within wstring`);
     }
 
     const c = {
@@ -261,7 +256,7 @@ function idLess(idLeft, idRight) {
 
     this.integrateIns(c, prevChar, nextChar);
 
-    return { type: 'INS', char: Object.assign({}, c), prev: prevChar, next: nextChar, text: text };
+    return { type: 'INS', char: Object.assign({}, c), prev: prevChar, next: nextChar, text };
   }
 
   // Main wooto algorithm. see: "Wooki: a P2P Wiki-based Collaborative Writing Tool"
@@ -297,7 +292,7 @@ function idLess(idLeft, idRight) {
         h: char.id.h
       },
       startDegree: char.degree,
-      visible: visible,
+      visible,
       length: 1
     };
   }
@@ -328,9 +323,7 @@ function idLess(idLeft, idRight) {
     return runs;
   }
 
-  genDelete(pos) {
-    let count = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
-
+  genDelete(pos, count = 1) {
     const chars = [];
     for (let i = 0; i < count; i++) {
       chars.push(this.ith(pos + 1));
@@ -356,7 +349,7 @@ function idLess(idLeft, idRight) {
           count += 1;
         } else {
           if (pos > 0) {
-            ranges.push({ pos: pos, count: count });
+            ranges.push({ pos, count });
           }
           count = 1;
           pos = newPos;
@@ -364,7 +357,7 @@ function idLess(idLeft, idRight) {
       }
     }
     if (pos > 0) {
-      ranges.push({ pos: pos, count: count });
+      ranges.push({ pos, count });
     }
 
     return ranges;
@@ -453,7 +446,7 @@ function idLess(idLeft, idRight) {
         throw new Error('Invariant violation: "op.text"');
       }
 
-      return { addition: { pos: pos, text: op.text } };
+      return { addition: { pos, text: op.text } };
     } else {
       // DEL
       if (op.runs == null) {
@@ -470,9 +463,9 @@ function idLess(idLeft, idRight) {
       return { removals: ranges };
     }
   }
-};
+}
 
-
+exports.WString = WString;
 WString.start = {
   startId: { site: -1, h: 0 },
   visible: true,

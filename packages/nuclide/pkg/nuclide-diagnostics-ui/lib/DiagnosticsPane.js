@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _classnames;
 
@@ -72,7 +62,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // text is always used for sorting.
 // Precedence for rendering is: element, html, text.
-const MAX_RESULTS_COUNT = 1000;
+const MAX_RESULTS_COUNT = 1000; /**
+                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                 * All rights reserved.
+                                 *
+                                 * This source code is licensed under the license found in the LICENSE file in
+                                 * the root directory of this source tree.
+                                 *
+                                 * 
+                                 */
 
 const EmptyComponent = () => _reactForAtom.React.createElement(
   'div',
@@ -149,7 +147,7 @@ function goToDiagnosticLocation(rowData) {
   (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri, line, column);
 }
 
-let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Component {
+class DiagnosticsPane extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -163,8 +161,8 @@ let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Componen
 
   _handleSort(sortedColumn, sortDescending) {
     this.setState({
-      sortedColumn: sortedColumn,
-      sortDescending: sortDescending
+      sortedColumn,
+      sortDescending
     });
   }
 
@@ -173,8 +171,7 @@ let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Componen
   }
 
   _getColumns() {
-    const showFileName = this.props.showFileName;
-
+    const { showFileName } = this.props;
     const filePathColumnWidth = 0.2;
     const filePathColumn = showFileName ? [{
       key: 'filePath',
@@ -203,13 +200,11 @@ let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Componen
   }
 
   render() {
-    var _props = this.props;
-    const diagnostics = _props.diagnostics,
-          showTraces = _props.showTraces;
-    var _state = this.state;
-    const sortedColumn = _state.sortedColumn,
-          sortDescending = _state.sortDescending;
-
+    const { diagnostics, showTraces } = this.props;
+    const {
+      sortedColumn,
+      sortDescending
+    } = this.state;
     const diagnosticRows = diagnostics.map(diagnostic => {
       const messageContent = getMessageContent(showTraces, diagnostic);
       return {
@@ -219,7 +214,7 @@ let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Componen
           filePath: (0, (_paneUtils || _load_paneUtils()).getProjectRelativePathOfDiagnostic)(diagnostic),
           range: diagnostic.range ? diagnostic.range.start.row + 1 : 0,
           description: messageContent,
-          diagnostic: diagnostic
+          diagnostic
         }
       };
     });
@@ -258,6 +253,5 @@ let DiagnosticsPane = class DiagnosticsPane extends _reactForAtom.React.Componen
       maxResultsMessage
     );
   }
-};
+}
 exports.default = DiagnosticsPane;
-module.exports = exports['default'];

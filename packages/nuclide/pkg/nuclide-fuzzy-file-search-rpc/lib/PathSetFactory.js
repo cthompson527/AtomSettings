@@ -1,21 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.__test__ = undefined;
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.getPaths = getPaths;
 
 var _child_process = _interopRequireDefault(require('child_process'));
@@ -24,6 +12,12 @@ var _split;
 
 function _load_split() {
   return _split = _interopRequireDefault(require('split'));
+}
+
+var _nuclideWatchmanHelpers;
+
+function _load_nuclideWatchmanHelpers() {
+  return _nuclideWatchmanHelpers = require('../../nuclide-watchman-helpers');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -61,7 +55,15 @@ function getFilesFromCommand(command, args, localDirectory, transform) {
       }
     });
   });
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function getTrackedHgFiles(localDirectory) {
   return getFilesFromCommand('hg', ['locate', '--fullpath', '--include', '.'], localDirectory, filePath => filePath.slice(localDirectory.length + 1));
@@ -93,11 +95,7 @@ function getFilesFromHg(localDirectory) {
   return Promise.all([getTrackedHgFiles(localDirectory),
   // It's not a dealbreaker if untracked files fail to show up.
   getUntrackedHgFiles(localDirectory).catch(() => [])]).then(returnedFiles => {
-    var _returnedFiles = _slicedToArray(returnedFiles, 2);
-
-    const trackedFiles = _returnedFiles[0],
-          untrackedFiles = _returnedFiles[1];
-
+    const [trackedFiles, untrackedFiles] = returnedFiles;
     return trackedFiles.concat(untrackedFiles);
   });
 }
@@ -124,11 +122,7 @@ function getUntrackedGitFiles(localDirectory) {
  */
 function getFilesFromGit(localDirectory) {
   return Promise.all([getTrackedGitFiles(localDirectory), getUntrackedGitFiles(localDirectory)]).then(returnedFiles => {
-    var _returnedFiles2 = _slicedToArray(returnedFiles, 2);
-
-    const trackedFiles = _returnedFiles2[0],
-          untrackedFiles = _returnedFiles2[1];
-
+    const [trackedFiles, untrackedFiles] = returnedFiles;
     return trackedFiles.concat(untrackedFiles);
   });
 }
@@ -139,17 +133,29 @@ function getAllFiles(localDirectory) {
   filePath => filePath.substring(2));
 }
 
+function getAllFilesFromWatchman( // eslint-disable-line no-unused-vars
+localDirectory) {
+  const client = new (_nuclideWatchmanHelpers || _load_nuclideWatchmanHelpers()).WatchmanClient();
+  try {
+    return client.listFiles(localDirectory);
+  } finally {
+    client.dispose();
+  }
+}
+
 function getPaths(localDirectory) {
   // Attempts to get a list of files relative to `localDirectory`, hopefully from
   // a fast source control index.
   // TODO (williamsc) once ``{HG|Git}Repository` is working in nuclide-server,
   // use those instead to determine VCS.
-  return getFilesFromHg(localDirectory).catch(() => getFilesFromGit(localDirectory)).catch(() => getAllFiles(localDirectory)).catch(() => {
-    throw new Error(`Failed to populate FileSearch for ${ localDirectory }`);
+  return getFilesFromHg(localDirectory).catch(() => getFilesFromGit(localDirectory))
+  // .catch(() => getAllFilesFromWatchman(localDirectory))
+  .catch(() => getAllFiles(localDirectory)).catch(() => {
+    throw new Error(`Failed to populate FileSearch for ${localDirectory}`);
   });
 }
 
 const __test__ = exports.__test__ = {
-  getFilesFromGit: getFilesFromGit,
-  getFilesFromHg: getFilesFromHg
+  getFilesFromGit,
+  getFilesFromHg
 };

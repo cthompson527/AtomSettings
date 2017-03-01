@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -74,6 +65,16 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 const PING_SEND_INTERVAL = 5000;
@@ -100,7 +101,7 @@ const MAX_RECONNECT_TIME_MS = 5000;
 //   - message(message: Object): on receipt fo JSON message
 //   - heartbeat: On receipt of successful heartbeat
 //   - heartbeat.error({code, originalCode, message}): On failure of heartbeat
-let NuclideSocket = exports.NuclideSocket = class NuclideSocket {
+class NuclideSocket {
 
   constructor(serverUri, options) {
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
@@ -121,13 +122,9 @@ let NuclideSocket = exports.NuclideSocket = class NuclideSocket {
       }
     });
 
-    var _url$parse = _url.default.parse(serverUri);
-
-    const protocol = _url$parse.protocol,
-          host = _url$parse.host;
+    const { protocol, host } = _url.default.parse(serverUri);
     // TODO verify that `host` is non-null rather than using maybeToString
-
-    this._websocketUri = `ws${ protocol === 'https:' ? 's' : '' }://${ (0, (_string || _load_string()).maybeToString)(host) }`;
+    this._websocketUri = `ws${protocol === 'https:' ? 's' : ''}://${(0, (_string || _load_string()).maybeToString)(host)}`;
 
     this._heartbeat = new (_XhrConnectionHeartbeat || _load_XhrConnectionHeartbeat()).XhrConnectionHeartbeat(serverUri, options);
     this._heartbeat.onConnectionRestored(() => {
@@ -172,7 +169,7 @@ let NuclideSocket = exports.NuclideSocket = class NuclideSocket {
     // in uncaught exceptions. This is due to EventEmitter treating 'error'
     // events specially.
     const onSocketError = error => {
-      logger.error(`WebSocket Error while connecting... ${ error.message }`);
+      logger.error(`WebSocket Error while connecting... ${error.message}`);
       if (this.isDisconnected()) {
         logger.info('WebSocket reconnecting after error.');
         this._scheduleReconnect();
@@ -311,10 +308,7 @@ let NuclideSocket = exports.NuclideSocket = class NuclideSocket {
   }
 
   getServerPort() {
-    var _url$parse2 = _url.default.parse(this.getServerUri());
-
-    const port = _url$parse2.port;
-
+    const { port } = _url.default.parse(this.getServerUri());
     if (port == null) {
       return null;
     }
@@ -367,7 +361,9 @@ let NuclideSocket = exports.NuclideSocket = class NuclideSocket {
   onDisconnect(callback) {
     return this._emitter.on('disconnect', callback);
   }
-};
+}
+
+exports.NuclideSocket = NuclideSocket;
 
 
 function sendOneMessage(socket, message) {

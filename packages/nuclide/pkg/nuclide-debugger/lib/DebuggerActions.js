@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -55,13 +50,17 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-var _string;
-
-function _load_string() {
-  return _string = require('../../commons-node/string');
-}
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -78,7 +77,7 @@ const GK_DEBUGGER_REQUEST_SENDER = 'nuclide_debugger_request_sender';
 /**
  * Flux style action creator for actions that affect the debugger.
  */
-let DebuggerActions = class DebuggerActions {
+class DebuggerActions {
 
   constructor(dispatcher, store) {
     this._disposables = new _atom.CompositeDisposable();
@@ -105,6 +104,10 @@ let DebuggerActions = class DebuggerActions {
         _this._registerConsole();
         const supportThreadsWindow = processInfo.supportThreads() && (yield (0, (_passesGK || _load_passesGK()).default)(GK_DEBUGGER_THREADS_WINDOW)) && (yield _this._allowThreadsForPhp(processInfo));
         _this._store.getSettings().set('SupportThreadsWindow', supportThreadsWindow);
+        if (supportThreadsWindow) {
+          const customColumns = processInfo.getThreadColumns();
+          _this._store.getSettings().set('CustomThreadColumns', customColumns);
+        }
         const singleThreadStepping = processInfo.supportSingleThreadStepping();
         if (singleThreadStepping) {
           _this._store.getSettings().set('SingleThreadStepping', singleThreadStepping);
@@ -123,7 +126,7 @@ let DebuggerActions = class DebuggerActions {
       } catch (err) {
         (0, (_AnalyticsHelper || _load_AnalyticsHelper()).failTimerTracking)(err);
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(AnalyticsEvents.DEBUGGER_START_FAIL, {});
-        const errorMessage = `Failed to start debugger process: ${ (0, (_string || _load_string()).stringifyError)(err) }`;
+        const errorMessage = `Failed to start debugger process: ${err}`;
         _this.setError(errorMessage);
         atom.notifications.addError(errorMessage);
         _this.stopDebugging();
@@ -134,7 +137,7 @@ let DebuggerActions = class DebuggerActions {
   _allowThreadsForPhp(processInfo) {
     return (0, _asyncToGenerator.default)(function* () {
       if (processInfo.getServiceName() === 'hhvm') {
-        return yield (0, (_passesGK || _load_passesGK()).default)(GK_DEBUGGER_REQUEST_WINDOW);
+        return (0, (_passesGK || _load_passesGK()).default)(GK_DEBUGGER_REQUEST_WINDOW);
       }
       return true;
     })();
@@ -209,15 +212,16 @@ let DebuggerActions = class DebuggerActions {
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_PROCESS_SOCKET,
       data: null
     });
+
+    this.clearInterface();
+
     this.setDebuggerMode((_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED);
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(AnalyticsEvents.DEBUGGER_STOP);
     (0, (_AnalyticsHelper || _load_AnalyticsHelper()).endTimerTracking)();
 
-    if (!(this._store.getDebuggerInstance() === null)) {
-      throw new Error('Invariant violation: "this._store.getDebuggerInstance() === null"');
+    if (!(this._store.getDebuggerInstance() == null)) {
+      throw new Error('Invariant violation: "this._store.getDebuggerInstance() == null"');
     }
-
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:hide');
   }
 
   _registerConsole() {
@@ -294,24 +298,10 @@ let DebuggerActions = class DebuggerActions {
   }
 
   /**
-   * Utility for debugging.
-   *
-   * This can be used to set an existing socket, bypassing normal UI flow to
-   * improve iteration speed for development.
-   */
-  forceProcessSocket(socketAddr) {
-    this._dispatcher.dispatch({
-      actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_PROCESS_SOCKET,
-      data: socketAddr
-    });
-  }
-
-  /**
    * Utility for getting refreshed connections.
    * TODO: refresh connections when new directories are removed/added in file-tree.
    */
   updateConnections() {
-
     const connections = this._getRemoteConnections();
     // Always have one single local connection.
     connections.push('local');
@@ -329,10 +319,7 @@ let DebuggerActions = class DebuggerActions {
     return atom.project.getPaths().filter(path => {
       return (_nuclideUri || _load_nuclideUri()).default.isRemote(path);
     }).map(remotePath => {
-      var _nuclideUri$parseRemo = (_nuclideUri || _load_nuclideUri()).default.parseRemoteUri(remotePath);
-
-      const hostname = _nuclideUri$parseRemo.hostname;
-
+      const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parseRemoteUri(remotePath);
       return (_nuclideUri || _load_nuclideUri()).default.createRemoteUri(hostname, '/');
     }).filter((path, index, inputArray) => {
       return inputArray.indexOf(path) === index;
@@ -343,7 +330,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.ADD_WATCH_EXPRESSION,
       data: {
-        expression: expression
+        expression
       }
     });
   }
@@ -352,7 +339,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.REMOVE_WATCH_EXPRESSION,
       data: {
-        index: index
+        index
       }
     });
   }
@@ -361,8 +348,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_WATCH_EXPRESSION,
       data: {
-        newExpression: newExpression,
-        index: index
+        newExpression,
+        index
       }
     });
   }
@@ -371,8 +358,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.OPEN_SOURCE_LOCATION,
       data: {
-        sourceURL: sourceURL,
-        lineNumber: lineNumber
+        sourceURL,
+        lineNumber
       }
     });
   }
@@ -384,7 +371,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TRIGGER_DEBUGGER_ACTION,
       data: {
-        actionId: actionId
+        actionId
       }
     });
   }
@@ -393,7 +380,16 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_CALLSTACK,
       data: {
-        callstack: callstack
+        callstack
+      }
+    });
+  }
+
+  setSelectedCallFrameIndex(index) {
+    this._dispatcher.dispatch({
+      actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_SELECTED_CALLFRAME_INDEX,
+      data: {
+        index
       }
     });
   }
@@ -402,7 +398,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.SET_SELECTED_CALLFRAME_LINE,
       data: {
-        options: options
+        options
       }
     });
   }
@@ -418,8 +414,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.ADD_BREAKPOINT,
       data: {
-        path: path,
-        line: line
+        path,
+        line
       }
     });
   }
@@ -428,8 +424,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_BREAKPOINT_ENABLED,
       data: {
-        breakpointId: breakpointId,
-        enabled: enabled
+        breakpointId,
+        enabled
       }
     });
   }
@@ -438,8 +434,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_BREAKPOINT_CONDITION,
       data: {
-        breakpointId: breakpointId,
-        condition: condition
+        breakpointId,
+        condition
       }
     });
   }
@@ -448,8 +444,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.DELETE_BREAKPOINT,
       data: {
-        path: path,
-        line: line
+        path,
+        line
       }
     });
   }
@@ -465,8 +461,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.TOGGLE_BREAKPOINT,
       data: {
-        path: path,
-        line: line
+        path,
+        line
       }
     });
   }
@@ -475,8 +471,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.DELETE_BREAKPOINT_IPC,
       data: {
-        path: path,
-        line: line
+        path,
+        line
       }
     });
   }
@@ -485,10 +481,10 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.BIND_BREAKPOINT_IPC,
       data: {
-        path: path,
-        line: line,
-        condition: condition,
-        enabled: enabled
+        path,
+        line,
+        condition,
+        enabled
       }
     });
   }
@@ -514,12 +510,10 @@ let DebuggerActions = class DebuggerActions {
     });
   }
 
-  updateLocals(locals) {
+  updateScopes(scopeSections) {
     this._dispatcher.dispatch({
-      actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_LOCALS,
-      data: {
-        locals: locals
-      }
+      actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_SCOPES,
+      data: scopeSections
     });
   }
 
@@ -532,7 +526,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_THREADS,
       data: {
-        threadData: threadData
+        threadData
       }
     });
   }
@@ -541,7 +535,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_THREAD,
       data: {
-        thread: thread
+        thread
       }
     });
   }
@@ -550,7 +544,7 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.UPDATE_STOP_THREAD,
       data: {
-        id: id
+        id
       }
     });
   }
@@ -559,19 +553,23 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.NOTIFY_THREAD_SWITCH,
       data: {
-        sourceURL: sourceURL,
-        lineNumber: lineNumber,
-        message: message
+        sourceURL,
+        lineNumber,
+        message
       }
     });
+  }
+
+  openDevTools() {
+    this._dispatcher.dispatch({ actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.OPEN_DEV_TOOLS });
   }
 
   receiveExpressionEvaluationResponse(id, response) {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.RECEIVED_EXPRESSION_EVALUATION_RESPONSE,
       data: {
-        id: id,
-        response: response
+        id,
+        response
       }
     });
   }
@@ -580,8 +578,8 @@ let DebuggerActions = class DebuggerActions {
     this._dispatcher.dispatch({
       actionType: (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.RECEIVED_GET_PROPERTIES_RESPONSE,
       data: {
-        id: id,
-        response: response
+        id,
+        response
       }
     });
   }
@@ -590,7 +588,5 @@ let DebuggerActions = class DebuggerActions {
     // Open the console window if it's not already opened.
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-console:toggle', { visible: true });
   }
-};
-
-
-module.exports = DebuggerActions;
+}
+exports.default = DebuggerActions;

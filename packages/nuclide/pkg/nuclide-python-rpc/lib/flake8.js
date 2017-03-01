@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.parseFlake8Output = parseFlake8Output;
 
 
@@ -36,7 +24,15 @@ const ERROR_CODES = new Set([
 'E129', // visually indented line with same indent as next logical line
 'E133', // closing bracket is missing indentation
 'E901', // SyntaxError or IndentationError
-'E902']);
+'E902']); /**
+           * Copyright (c) 2015-present, Facebook, Inc.
+           * All rights reserved.
+           *
+           * This source code is licensed under the license found in the LICENSE file in
+           * the root directory of this source tree.
+           *
+           * 
+           */
 
 function classifyCode(code) {
   return ERROR_CODES.has(code) ? 'Error' : 'Warning';
@@ -51,21 +47,14 @@ function parseFlake8Output(src, output) {
     if (match == null) {
       break;
     }
-
-    var _match = _slicedToArray(match, 5);
-
-    const line = _match[1],
-          column = _match[2],
-          code = _match[3],
-          message = _match[4];
-
+    const [, line, column, code, message] = match;
     results.push({
       file: src,
       line: parseInt(line, 10) - 1 || 0,
       column: parseInt(column, 10) || 0,
-      code: code,
+      code,
       type: classifyCode(code),
-      message: message
+      message
     });
   }
 

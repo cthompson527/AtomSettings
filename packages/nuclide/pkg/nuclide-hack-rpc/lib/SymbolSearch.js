@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,11 +14,7 @@ let executeQuery = exports.executeQuery = (() => {
       return [];
     }
 
-    var _parseQueryString = parseQueryString(queryString_);
-
-    const queryString = _parseQueryString.queryString,
-          searchPostfix = _parseQueryString.searchPostfix;
-
+    const { queryString, searchPostfix } = parseQueryString(queryString_);
     if (queryString === '') {
       return [];
     }
@@ -77,7 +64,17 @@ function _load_HackHelpers() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const pendingSearchPromises = new Map();function parseQueryString(queryString_) {
+const pendingSearchPromises = new Map(); /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */
+
+function parseQueryString(queryString_) {
   let queryString;
   let searchPostfix;
   switch (queryString_[0]) {
@@ -99,8 +96,8 @@ const pendingSearchPromises = new Map();function parseQueryString(queryString_) 
       break;
   }
   return {
-    searchPostfix: searchPostfix,
-    queryString: queryString
+    searchPostfix,
+    queryString
   };
 }
 

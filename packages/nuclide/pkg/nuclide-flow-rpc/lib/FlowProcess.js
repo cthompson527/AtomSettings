@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -58,6 +49,16 @@ function _load_FlowConstants() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 // Names modeled after https://github.com/facebook/flow/blob/master/src/common/flowExitStatus.ml
@@ -77,7 +78,7 @@ const SERVER_READY_TIMEOUT_MS = 10 * 1000;
 
 const EXEC_FLOW_RETRIES = 5;
 
-let FlowProcess = exports.FlowProcess = class FlowProcess {
+class FlowProcess {
   // The path to the directory where the .flowconfig is -- i.e. the root of the Flow project.
 
   // If we had to start a Flow server, store the process here so we can kill it when we shut down.
@@ -87,7 +88,7 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
     this._root = root;
 
     this._serverStatus.subscribe(status => {
-      logger.info(`[${ status }]: Flow server in ${ this._root }`);
+      logger.info(`[${status}]: Flow server in ${this._root}`);
     });
 
     this._serverStatus.filter(x => x === (_FlowConstants || _load_FlowConstants()).ServerStatus.NOT_RUNNING).subscribe(() => {
@@ -135,27 +136,23 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
   /**
    * Returns null if Flow cannot be found.
    */
-  execFlow(args, options) {
-    var _arguments = arguments,
-        _this = this;
+  execFlow(args, options, waitForServer = false, suppressErrors = false) {
+    var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let waitForServer = _arguments.length > 2 && _arguments[2] !== undefined ? _arguments[2] : false;
-      let suppressErrors = _arguments.length > 3 && _arguments[3] !== undefined ? _arguments[3] : false;
-
       const maxRetries = waitForServer ? EXEC_FLOW_RETRIES : 0;
       if (_this._serverStatus.getValue() === (_FlowConstants || _load_FlowConstants()).ServerStatus.FAILED) {
         return null;
       }
       for (let i = 0;; i++) {
         try {
-          // eslint-disable-next-line babel/no-await-in-loop
+          // eslint-disable-next-line no-await-in-loop
           const result = yield _this._rawExecFlow(args, options);
           return result;
         } catch (e) {
           const couldRetry = [(_FlowConstants || _load_FlowConstants()).ServerStatus.NOT_RUNNING, (_FlowConstants || _load_FlowConstants()).ServerStatus.INIT, (_FlowConstants || _load_FlowConstants()).ServerStatus.BUSY].indexOf(_this._serverStatus.getValue()) !== -1;
           if (i < maxRetries && couldRetry) {
-            // eslint-disable-next-line babel/no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop
             yield _this._serverIsReady();
             // Then try again.
           } else {
@@ -163,7 +160,7 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
             // don't want to log because it just means the server is busy and we don't want to wait.
             if (!couldRetry && !suppressErrors) {
               // not sure what happened, but we'll let the caller deal with it
-              logger.error(`Flow failed: flow ${ args.join(' ') }. Error: ${ JSON.stringify(e) }`);
+              logger.error(`Flow failed: flow ${args.join(' ')}. Error: ${JSON.stringify(e)}`);
             }
             throw e;
           }
@@ -182,7 +179,7 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
       if (flowExecInfo == null) {
         // This should not happen in normal use. If Flow is not installed we should have caught it by
         // now.
-        logger.error(`Could not find Flow to start server in ${ _this2._root }`);
+        logger.error(`Could not find Flow to start server in ${_this2._root}`);
         _this2._setServerStatus((_FlowConstants || _load_FlowConstants()).ServerStatus.NOT_INSTALLED);
         return;
       }
@@ -190,11 +187,11 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
       // will not resolve the promise until the process exits, which in this
       // case is never. We need to use spawn directly to get access to the
       // ChildProcess object.
-      // eslint-disable-next-line babel/no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop
       const serverProcess = yield (0, (_nice || _load_nice()).niceSafeSpawn)(flowExecInfo.pathToFlow, ['server', '--from', 'nuclide', '--max-workers', _this2._getMaxWorkers().toString(), _this2._root], flowExecInfo.execOptions);
       const logIt = function (data) {
         const pid = serverProcess.pid;
-        logger.debug(`flow server (${ pid }): ${ data }`);
+        logger.debug(`flow server (${pid}): ${data}`);
       };
       serverProcess.stdout.on('data', logIt);
       serverProcess.stderr.on('data', logIt);
@@ -216,13 +213,10 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
   }
 
   /** Execute Flow with the given arguments */
-  _rawExecFlow(args_) {
-    var _arguments2 = arguments,
-        _this3 = this;
+  _rawExecFlow(args_, options = {}) {
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let options = _arguments2.length > 1 && _arguments2[1] !== undefined ? _arguments2[1] : {};
-
       let args = args_;
       args = [...args, '--retry-if-init', 'false', '--retries', '0', '--no-auto-start'];
       try {
@@ -271,7 +265,7 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
           // server. So, don't update.
           return;
         default:
-          logger.error(`Unknown return code from Flow: ${ String(result.exitCode) }`);
+          logger.error(`Unknown return code from Flow: ${String(result.exitCode)}`);
           status = (_FlowConstants || _load_FlowConstants()).ServerStatus.UNKNOWN;
       }
     }
@@ -291,13 +285,10 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
   }
 
   /** Ping the server until it leaves the current state */
-  _pingServer() {
-    var _arguments3 = arguments,
-        _this4 = this;
+  _pingServer(tries = 5) {
+    var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let tries = _arguments3.length > 0 && _arguments3[0] !== undefined ? _arguments3[0] : 5;
-
       const fromState = _this4._serverStatus.getValue();
       let stateChanged = false;
       _this4._serverStatus.filter(function (newState) {
@@ -306,12 +297,12 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
         stateChanged = true;
       });
       for (let i = 0; !stateChanged && i < tries; i++) {
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         yield _this4._rawExecFlow(['status']).catch(function () {
           return null;
         });
         // Wait 1 second
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         yield _rxjsBundlesRxMinJs.Observable.of(null).delay(1000).toPromise();
       }
     })();
@@ -342,11 +333,8 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
    * any given root. If you need this property, create an instance with the appropriate root and use
    * execFlow.
    */
-  static execFlowClient(args_, root, execInfoContainer) {
-    var _arguments4 = arguments;
+  static execFlowClient(args_, root, execInfoContainer, options_ = {}) {
     return (0, _asyncToGenerator.default)(function* () {
-      let options_ = _arguments4.length > 3 && _arguments4[3] !== undefined ? _arguments4[3] : {};
-
       let args = args_;
       let options = options_;
       args = [...args, '--from', 'nuclide'];
@@ -363,4 +351,5 @@ let FlowProcess = exports.FlowProcess = class FlowProcess {
       return ret;
     })();
   }
-};
+}
+exports.FlowProcess = FlowProcess;

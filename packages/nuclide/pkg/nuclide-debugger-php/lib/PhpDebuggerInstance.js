@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,12 +17,6 @@ function _load_ObservableManager() {
   return _ObservableManager = require('./ObservableManager');
 }
 
-var _ChromeMessageRemoting;
-
-function _load_ChromeMessageRemoting() {
-  return _ChromeMessageRemoting = require('./ChromeMessageRemoting');
-}
-
 var _nuclideUri;
 
 function _load_nuclideUri() {
@@ -46,12 +31,21 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let PhpDebuggerInstance = exports.PhpDebuggerInstance = class PhpDebuggerInstance extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstance {
+class PhpDebuggerInstance extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstance {
   constructor(processInfo, rpcService) {
     const subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(new (_ObservableManager || _load_ObservableManager()).ObservableManager(rpcService.getNotificationObservable().refCount(), rpcService.getOutputWindowObservable().refCount().map(message => {
-      const serverMessage = (0, (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageFromServer)((_nuclideUri || _load_nuclideUri()).default.getHostname(processInfo.getTargetUri()), message);
+      const serverMessage = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).translateMessageFromServer)((_nuclideUri || _load_nuclideUri()).default.getHostname(processInfo.getTargetUri()), message);
       return JSON.parse(serverMessage);
     })));
     super(processInfo, rpcService, subscriptions);
   }
-};
+}
+exports.PhpDebuggerInstance = PhpDebuggerInstance; /**
+                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                    * All rights reserved.
+                                                    *
+                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                    * the root directory of this source tree.
+                                                    *
+                                                    * 
+                                                    */

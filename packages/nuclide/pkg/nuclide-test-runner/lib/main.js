@@ -1,31 +1,22 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.activate = activate;
 exports.deactivate = deactivate;
-exports.serialize = serialize;
 exports.consumeTestRunner = consumeTestRunner;
 exports.addItemsToFileTreeContextMenu = addItemsToFileTreeContextMenu;
 exports.consumeToolBar = consumeToolBar;
-exports.getDistractionFreeModeProvider = getDistractionFreeModeProvider;
+exports.deserializeTestRunnerPanelState = deserializeTestRunnerPanelState;
+exports.consumeWorkspaceViewsService = consumeWorkspaceViewsService;
 
 var _atom = require('atom');
 
 var _TestRunnerController;
 
 function _load_TestRunnerController() {
-  return _TestRunnerController = _interopRequireDefault(require('./TestRunnerController'));
+  return _TestRunnerController = require('./TestRunnerController');
 }
 
 var _nuclideLogging;
@@ -34,7 +25,15 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -47,44 +46,46 @@ const FILE_TREE_CONTEXT_MENU_PRIORITY = 200;
  *     > limitString('foobar', 4)
  *     'fo…ar'
  */
-function limitString(str) {
-  let length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 20;
-
+function limitString(str, length = 20) {
   const strLength = str.length;
-  return strLength > length ? `${ str.substring(0, length / 2) }…${ str.substring(str.length - length / 2) }` : str;
+  return strLength > length ? `${str.substring(0, length / 2)}…${str.substring(str.length - length / 2)}` : str;
 }
 
-let Activation = class Activation {
+class Activation {
 
-  constructor(state) {
-    this._initialState = state;
+  constructor() {
     this._testRunners = new Set();
     this._disposables = new _atom.CompositeDisposable();
     this._disposables.add(atom.commands.add('atom-workspace', 'nuclide-test-runner:toggle-panel', () => {
-      this._getController().togglePanel();
+      this.getController().togglePanel();
     }));
     this._disposables.add(atom.commands.add('atom-workspace', 'nuclide-test-runner:run-tests', () => {
-      this._getController().runTests();
+      this.getController().runTests();
     }));
     // Listen for run events on files in the file tree
     this._disposables.add(atom.commands.add('.tree-view .entry.file.list-item', 'nuclide-test-runner:run-tests', event => {
       const target = event.currentTarget.querySelector('.name');
-      this._getController().runTests(target.dataset.path);
+
+      if (!(target != null)) {
+        throw new Error('Invariant violation: "target != null"');
+      }
+
+      this.getController().runTests(target.dataset.path);
       // Ensure ancestors of this element don't attempt to run tests as well.
       event.stopPropagation();
     }));
     // Listen for run events on directories in the file tree
     this._disposables.add(atom.commands.add('.tree-view .entry.directory.list-nested-item', 'nuclide-test-runner:run-tests', event => {
       const target = event.currentTarget.querySelector('.name');
-      this._getController().runTests(target.dataset.path);
+
+      if (!(target != null)) {
+        throw new Error('Invariant violation: "target != null"');
+      }
+
+      this.getController().runTests(target.dataset.path);
       // Ensure ancestors of this element don't attempt to run tests as well.
       event.stopPropagation();
     }));
-
-    // The panel should be visible because of the last serialized state, initialize it immediately.
-    if (state != null && state.panelVisible) {
-      this._getController();
-    }
   }
 
   addItemsToFileTreeContextMenu(contextMenu) {
@@ -121,7 +122,7 @@ let Activation = class Activation {
 
   addTestRunner(testRunner) {
     if (this._testRunners.has(testRunner)) {
-      logger.info(`Attempted to add test runner "${ testRunner.label }" that was already added`);
+      logger.info(`Attempted to add test runner "${testRunner.label}" that was already added`);
       return;
     }
 
@@ -132,7 +133,7 @@ let Activation = class Activation {
     // TODO(rossallen): The control should be inverted here. The controller should listen for
     // changes rather than be told about them.
     if (this._controller != null) {
-      this._getController().didUpdateTestRunners();
+      this.getController().didUpdateTestRunners();
     }
 
     return new _atom.Disposable(() => {
@@ -140,7 +141,7 @@ let Activation = class Activation {
       // Tell the controller to re-render only if it exists so test runner services won't force
       // construction if the panel is still invisible.
       if (this._controller != null) {
-        this._getController().didUpdateTestRunners();
+        this.getController().didUpdateTestRunners();
       }
     });
   }
@@ -160,24 +161,8 @@ let Activation = class Activation {
     return disposable;
   }
 
-  getDistractionFreeModeProvider() {
-    return {
-      name: 'nuclide-test-runner',
-      isVisible: () => {
-        return this._controller != null && this._controller.isVisible();
-      },
-      toggle: () => {
-        this._getController().togglePanel();
-      }
-    };
-  }
-
   dispose() {
     this._disposables.dispose();
-  }
-
-  serialize() {
-    return this._getController().serialize();
   }
 
   _createRunTestsContextMenuItem(isForFile, contextMenu) {
@@ -200,21 +185,25 @@ let Activation = class Activation {
     return {
       // Intentionally **not** an arrow function because Atom sets the context when calling this and
       // allows dynamically setting values by assigning to `this`.
-      created: function (event) {
+      created(event) {
         let target = event.target;
         if (target.dataset.name === undefined) {
           // If the event did not happen on the `name` span, search for it in the descendants.
           target = target.querySelector('.name');
         }
+
+        if (!(target != null)) {
+          throw new Error('Invariant violation: "target != null"');
+        }
+
         if (target.dataset.name === undefined) {
           // If no necessary `.name` descendant is found, don't display a context menu.
           return;
         }
         const name = target.dataset.name;
         this.command = 'nuclide-test-runner:run-tests';
-        this.label = `${ label } '${ limitString(name) }'`;
+        this.label = `${label} '${limitString(name)}'`;
       },
-
       shouldDisplay: event => {
         // Don't show a testing option if there are no test runners.
         if (this._testRunners.size === 0) {
@@ -237,23 +226,31 @@ let Activation = class Activation {
     };
   }
 
-  _getController() {
+  getController() {
     let controller = this._controller;
     if (controller == null) {
-      controller = new (_TestRunnerController || _load_TestRunnerController()).default(this._initialState, this._testRunners);
+      controller = new (_TestRunnerController || _load_TestRunnerController()).TestRunnerController(this._testRunners);
       this._controller = controller;
     }
     return controller;
   }
 
-};
-
+  consumeWorkspaceViewsService(api) {
+    this._disposables.add(api.addOpener(uri => {
+      if (uri === (_TestRunnerController || _load_TestRunnerController()).WORKSPACE_VIEW_URI) {
+        return this.getController();
+      }
+    }), new _atom.Disposable(() => api.destroyWhere(item => item instanceof (_TestRunnerController || _load_TestRunnerController()).TestRunnerController)), atom.commands.add('atom-workspace', 'nuclide-test-runner:toggle-panel', event => {
+      api.toggle((_TestRunnerController || _load_TestRunnerController()).WORKSPACE_VIEW_URI, event.detail);
+    }));
+  }
+}
 
 let activation;
 
-function activate(state) {
+function activate() {
   if (!activation) {
-    activation = new Activation(state);
+    activation = new Activation();
   }
 }
 
@@ -262,10 +259,6 @@ function deactivate() {
     activation.dispose();
     activation = null;
   }
-}
-
-function serialize() {
-  return activation ? activation.serialize() : {};
 }
 
 function consumeTestRunner(testRunner) {
@@ -290,10 +283,21 @@ function consumeToolBar(getToolBar) {
   return activation.addToolBar(getToolBar);
 }
 
-function getDistractionFreeModeProvider() {
-  if (!(activation != null)) {
-    throw new Error('Invariant violation: "activation != null"');
+function deserializeTestRunnerPanelState() {
+  // Workaround until the bug where deserialize is ran before activation
+  activate();
+
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
   }
 
-  return activation.getDistractionFreeModeProvider();
+  return activation.getController();
+}
+
+function consumeWorkspaceViewsService(api) {
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
+  }
+
+  return activation.consumeWorkspaceViewsService(api);
 }

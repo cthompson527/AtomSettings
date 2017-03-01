@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,16 +17,16 @@ function _load_viewableFromReactElement() {
   return _viewableFromReactElement = require('../../../commons-atom/viewableFromReactElement');
 }
 
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../../commons-node/observable');
+}
+
 var _Actions;
 
 function _load_Actions() {
   return _Actions = _interopRequireWildcard(require('../redux/Actions'));
-}
-
-var _Selectors;
-
-function _load_Selectors() {
-  return _Selectors = require('../redux/Selectors');
 }
 
 var _Toolbar;
@@ -44,15 +35,15 @@ function _load_Toolbar() {
   return _Toolbar = require('./Toolbar');
 }
 
-var _lodash;
-
-function _load_lodash() {
-  return _lodash = _interopRequireDefault(require('lodash.memoize'));
-}
-
 var _reactForAtom = require('react-for-atom');
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _shallowequal;
+
+function _load_shallowequal() {
+  return _shallowequal = _interopRequireDefault(require('shallowequal'));
+}
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -60,57 +51,69 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function createPanelItem(store) {
   const staticProps = {
-    runTask: taskId => {
-      store.dispatch((_Actions || _load_Actions()).runTask(taskId));
+    runTask: taskMeta => {
+      store.dispatch((_Actions || _load_Actions()).runTask(taskMeta));
     },
-    selectTask: taskId => {
-      store.dispatch((_Actions || _load_Actions()).selectTask(taskId));
+    selectTaskRunner: taskRunner => {
+      store.dispatch((_Actions || _load_Actions()).selectTaskRunner(taskRunner, true));
     },
-    stopTask: () => {
+    stopRunningTask: () => {
       store.dispatch((_Actions || _load_Actions()).stopTask());
-    },
-    getActiveTaskRunnerIcon: () => {
-      const activeTaskRunner = (0, (_Selectors || _load_Selectors()).getActiveTaskRunner)(store.getState());
-      return activeTaskRunner && activeTaskRunner.getIcon();
     }
   };
 
-  // Delay the inital render. This way we (probably) won't wind up rendering the wrong task
-  // runner before the correct one is registered.
-  const props = _rxjsBundlesRxMinJs.Observable.interval(300).first()
   // $FlowFixMe: We need to teach Flow about Symbol.observable
-  .switchMap(() => _rxjsBundlesRxMinJs.Observable.from(store)).map(state => {
-    const activeTaskRunner = (0, (_Selectors || _load_Selectors()).getActiveTaskRunner)(state);
-    return Object.assign({}, staticProps, {
-      taskRunnerInfo: Array.from(state.taskRunners.values()),
-      getExtraUi: getExtraUiFactory(activeTaskRunner),
-      progress: state.runningTaskInfo && state.runningTaskInfo.progress,
-      activeTaskId: (0, (_Selectors || _load_Selectors()).getActiveTaskId)(state),
-      taskIsRunning: state.runningTaskInfo != null,
-      taskLists: state.taskLists
-    });
-  });
+  const states = _rxjsBundlesRxMinJs.Observable.from(store).distinctUntilChanged();
+
+  // We don't want to refresh the UI with a "pending" state while we wait for the initial tasks to
+  // become ready; that would cause too many updates in quick succession. So we make the parts of
+  // the state related to the selected task "sticky." Other parts of the state, however, we always
+  // need to update immediately (e.g. progress).
+  const stickyProps = states.filter(state => state.taskRunnersReady && !state.isUpdatingTaskRunners).startWith(store.getState()).map(state => ({
+    taskRunners: state.taskRunners,
+    statesForTaskRunners: state.statesForTaskRunners,
+    activeTaskRunner: state.activeTaskRunner,
+    iconComponent: state.activeTaskRunner ? state.activeTaskRunner.getIcon() : null,
+    extraUiComponent: getExtraUiComponent(state.activeTaskRunner)
+  })).distinctUntilChanged((_shallowequal || _load_shallowequal()).default);
+
+  const alwaysUpToDateProps = states.map(state => Object.assign({}, staticProps, {
+    toolbarDisabled: !state.taskRunnersReady || state.isUpdatingTaskRunners,
+    progress: state.runningTask ? state.runningTask.progress : null,
+    taskIsRunning: state.runningTask != null,
+    runningTaskIsCancelable: state.runningTask ? state.runningTask.metadata.cancelable !== false : undefined
+  }));
+
+  const props = (0, (_observable || _load_observable()).throttle)(_rxjsBundlesRxMinJs.Observable.combineLatest(stickyProps, alwaysUpToDateProps, (a, b) => Object.assign({}, a, b)), () => (_observable || _load_observable()).nextAnimationFrame);
+
   const StatefulToolbar = (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(props, (_Toolbar || _load_Toolbar()).Toolbar);
   return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement(StatefulToolbar, null));
 }
 
+// Since `getExtraUi` may create a React class dynamically, the classes are cached
 /**
- * Since `getExtraUi` may create a React class dynamically, we want to ensure that we only ever call
- * it once. To do that, we memoize the function and cache the result.
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
  */
-const extraUiFactories = new WeakMap();
-function getExtraUiFactory(taskRunner) {
-  let getExtraUi = extraUiFactories.get(taskRunner);
-  if (getExtraUi != null) {
-    return getExtraUi;
-  }
-  if (taskRunner == null) {
+
+const extraUiComponentCache = new WeakMap();
+function getExtraUiComponent(taskRunner) {
+  if (!taskRunner) {
     return null;
   }
-  if (taskRunner.getExtraUi == null) {
+  let extraUi = extraUiComponentCache.get(taskRunner);
+  if (extraUi != null) {
+    return extraUi;
+  }
+  if (!taskRunner.getExtraUi) {
     return null;
   }
-  getExtraUi = (0, (_lodash || _load_lodash()).default)(taskRunner.getExtraUi.bind(taskRunner));
-  extraUiFactories.set(taskRunner, getExtraUi);
-  return getExtraUi;
+  extraUi = taskRunner.getExtraUi();
+  extraUiComponentCache.set(taskRunner, extraUi);
+  return extraUi;
 }

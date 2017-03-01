@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.__test__ = exports.default = undefined;
+exports.__test__ = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -26,6 +17,16 @@ function _load_process() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DEFAULT_JOIN_TIMEOUT = 5000;
 let SCRIBE_CAT_COMMAND = 'scribe_cat';
 
@@ -35,7 +36,7 @@ let SCRIBE_CAT_COMMAND = 'scribe_cat';
  * call `scribeProcess.write($object)` to save an JSON schemaed Object into scribe category.
  * It will also recover from `scribe_cat` failure automatically.
  */
-let ScribeProcess = class ScribeProcess {
+class ScribeProcess {
 
   constructor(scribeCategory) {
     this._scribeCategory = scribeCategory;
@@ -48,10 +49,7 @@ let ScribeProcess = class ScribeProcess {
    */
   static isScribeCatOnPath() {
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref = yield (0, (_process || _load_process()).asyncExecute)('which', [SCRIBE_CAT_COMMAND]);
-
-      const exitCode = _ref.exitCode;
-
+      const { exitCode } = yield (0, (_process || _load_process()).asyncExecute)('which', [SCRIBE_CAT_COMMAND]);
       return exitCode === 0;
     })();
   }
@@ -63,7 +61,7 @@ let ScribeProcess = class ScribeProcess {
   write(message) {
     const child = this._getOrCreateChildProcess();
     return new Promise((resolve, reject) => {
-      child.stdin.write(`${ message }${ _os.default.EOL }`, resolve);
+      child.stdin.write(`${message}${_os.default.EOL}`, resolve);
     });
   }
 
@@ -77,13 +75,10 @@ let ScribeProcess = class ScribeProcess {
     return Promise.resolve();
   }
 
-  join() {
-    let timeout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_JOIN_TIMEOUT;
-
+  join(timeout = DEFAULT_JOIN_TIMEOUT) {
     if (this._childProcess != null) {
-      const stdin = this._childProcess.stdin;
+      const { stdin } = this._childProcess;
       // Make sure stdin has drained before ending it.
-
       if (!stdin.write(_os.default.EOL)) {
         stdin.once('drain', () => stdin.end());
       } else {
@@ -121,10 +116,11 @@ let ScribeProcess = class ScribeProcess {
 
     return child;
   }
-};
+}
+
 exports.default = ScribeProcess;
 const __test__ = exports.__test__ = {
-  setScribeCatCommand: function (newCommand) {
+  setScribeCatCommand(newCommand) {
     const originalCommand = SCRIBE_CAT_COMMAND;
     SCRIBE_CAT_COMMAND = newCommand;
     return originalCommand;

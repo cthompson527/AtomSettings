@@ -79,6 +79,10 @@
   border-radius: @component-border-radius;
 }
 
+.nuclide-file-tree-fixed {
+  position: relative;
+}
+
 .nuclide-file-tree-toolbar {
   margin-top: 10px;
   position: absolute;
@@ -112,18 +116,9 @@
   opacity: 0.4;
 }
 
-.nuclide-file-tree-toolbar-icon:before,
-.nuclide-file-tree-toolbar-icon {
-  margin-right: 0;
-}
 
 .nuclide-file-tree-working-set-name-missing {
   visibility: hidden;
-}
-
-.nuclide-file-tree-toolbar-icon:hover +
-.nuclide-file-tree-working-set-name-missing {
-  visibility: visible;
 }
 
 // matches the margin in .inline-block-tight
@@ -167,4 +162,8 @@
 .nuclide-file-tree-sidebar-uncommitted-changes {
   display: flex;
   max-height: 20vh;
+}
+
+.nuclide-file-tree .list-item::before {
+  vertical-align: middle;
 }

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,6 +21,16 @@ function _load_observable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const WS_URL = 'ws://localhost:8081/debugger-proxy?role=debugger&name=Nuclide';
 
 /**
@@ -41,28 +42,22 @@ function runApp(executorResults) {
 
   return websockets.switchMap(ws => _rxjsBundlesRxMinJs.Observable.merge(
   // The messages from the RN app.
-  _rxjsBundlesRxMinJs.Observable.fromEvent(ws, 'message').map(JSON.parse),
+  _rxjsBundlesRxMinJs.Observable.fromEvent(ws, 'message').map(event => JSON.parse(event.data)),
 
   // Send the executor results to the RN app.
   executorResults.do(response => {
-    const replyId = response.replyId,
-          result = response.result;
-
-    ws.send(JSON.stringify({ replyID: replyId, result: result }));
+    const { replyId, result } = response;
+    ws.send(JSON.stringify({ replyID: replyId, result }));
   }).ignoreElements())).share();
 }
 
 function connectToRnApp() {
-  // $FlowIssue: Add this to Rx defs
   const websockets = _rxjsBundlesRxMinJs.Observable.using(() => {
     const ws = new (_ws || _load_ws()).default(WS_URL);
-    return { ws: ws, unsubscribe: () => {
+    return { ws, unsubscribe: () => {
         ws.close();
       } };
-  }, (_ref) => {
-    let ws = _ref.ws;
-    return _rxjsBundlesRxMinJs.Observable.of(ws);
-  }).switchMap(ws => _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.never(),
+  }, ({ ws }) => _rxjsBundlesRxMinJs.Observable.of(ws)).switchMap(ws => _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.never(),
 
   // A stream of websockets...
   _rxjsBundlesRxMinJs.Observable.of(ws),
@@ -90,9 +85,9 @@ function connectToRnApp() {
   return (0, (_observable || _load_observable()).cacheWhileSubscribed)(websockets);
 }
 
-let PrematureCloseError = class PrematureCloseError extends Error {
+class PrematureCloseError extends Error {
   constructor() {
     super('Web socket closed prematurely');
     this.name = 'PrematureCloseError';
   }
-};
+}

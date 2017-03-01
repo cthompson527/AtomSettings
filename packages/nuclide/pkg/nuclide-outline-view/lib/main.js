@@ -1,19 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _atom = require('atom');
 
 var _ActiveEditorRegistry;
 
@@ -25,6 +10,12 @@ var _createPackage;
 
 function _load_createPackage() {
   return _createPackage = _interopRequireDefault(require('../../commons-atom/createPackage'));
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _nuclideAnalytics;
@@ -47,7 +38,16 @@ function _load_createOutlines() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const NUX_OUTLINE_VIEW_TOUR = 'nuclide_outline_view_nux';
+const NUX_OUTLINE_VIEW_TOUR = 'nuclide_outline_view_nux'; /**
+                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                           * All rights reserved.
+                                                           *
+                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                           * the root directory of this source tree.
+                                                           *
+                                                           * 
+                                                           */
+
 const NUX_OUTLINE_VIEW_ID = 4342;
 const GK_NUX_OUTLINE_VIEW = 'mp_nuclide_outline_view_nux';
 
@@ -55,7 +55,9 @@ const GK_NUX_OUTLINE_VIEW = 'mp_nuclide_outline_view_nux';
  * Includes additional information that is useful to the UI, but redundant or nonsensical for
  * providers to include in their responses.
  */
-let Activation = class Activation {
+
+
+class Activation {
 
   _createOutlineViewNuxTourModel() {
     const outlineViewToolbarIconNux = {
@@ -87,7 +89,7 @@ let Activation = class Activation {
 
     const nuxTriggerModel = {
       triggerType: 'editor',
-      triggerCallback: triggerCallback
+      triggerCallback
     };
 
     const outlineViewNuxTour = {
@@ -102,7 +104,7 @@ let Activation = class Activation {
   }
 
   constructor() {
-    this._disposables = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
     this._editorService = new (_ActiveEditorRegistry || _load_ActiveEditorRegistry()).default((provider, editor) => {
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-outline-view-getoutline');
@@ -120,19 +122,15 @@ let Activation = class Activation {
 
   consumeToolBar(getToolBar) {
     const toolBar = getToolBar('nuclide-outline-view');
-
-    var _toolBar$addButton = toolBar.addButton({
+    const { element } = toolBar.addButton({
       icon: 'list-unordered',
       callback: 'nuclide-outline-view:toggle',
       tooltip: 'Toggle Outline View',
       priority: 200
     });
-
-    const element = _toolBar$addButton.element;
     // Class added is not defined elsewhere, and is just used to mark the toolbar button
-
     element.classList.add('nuclide-outline-view-toolbar-button');
-    const disposable = new _atom.Disposable(() => {
+    const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       toolBar.removeItems();
     });
     this._disposables.add(disposable);
@@ -145,14 +143,12 @@ let Activation = class Activation {
   }
 
   consumeWorkspaceViewsService(api) {
-    this._disposables.add(api.registerFactory({
-      id: 'nuclide-outline-view',
-      name: 'Outline View',
-      iconName: 'list-unordered',
-      toggleCommand: 'nuclide-outline-view:toggle',
-      defaultLocation: 'right-panel',
-      create: () => this._createOutlineViewPanelState(),
-      isInstance: item => item instanceof (_OutlineViewPanel || _load_OutlineViewPanel()).OutlineViewPanelState
+    this._disposables.add(api.addOpener(uri => {
+      if (uri === (_OutlineViewPanel || _load_OutlineViewPanel()).WORKSPACE_VIEW_URI) {
+        return this._createOutlineViewPanelState();
+      }
+    }), () => api.destroyWhere(item => item instanceof (_OutlineViewPanel || _load_OutlineViewPanel()).OutlineViewPanelState), atom.commands.add('atom-workspace', 'nuclide-outline-view:toggle', event => {
+      api.toggle((_OutlineViewPanel || _load_OutlineViewPanel()).WORKSPACE_VIEW_URI, event.detail);
     }));
   }
 
@@ -184,7 +180,6 @@ let Activation = class Activation {
       },
       priority: 2.5 };
   }
+}
 
-};
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

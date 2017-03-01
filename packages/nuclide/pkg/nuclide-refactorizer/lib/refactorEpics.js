@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -46,10 +37,7 @@ let getRefactorings = (() => {
 
 let executeRefactoring = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (action) {
-    var _action$payload = action.payload;
-    const refactoring = _action$payload.refactoring,
-          provider = _action$payload.provider;
-
+    const { refactoring, provider } = action.payload;
     let response;
     try {
       response = yield provider.refactor(refactoring);
@@ -121,6 +109,16 @@ function _load_refactorActions() {
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getEpics(providers) {
   return [function getRefactoringsEpic(actions) {

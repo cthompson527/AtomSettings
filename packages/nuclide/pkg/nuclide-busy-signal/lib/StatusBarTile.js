@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,9 +15,21 @@ function _load_StatusBarTileComponent() {
 
 // We want to be the furthest left on the right side of the status bar so as not to leave a
 // conspicuous gap (or cause jitter) when nothing is busy.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/* global MouseEvent */
+
 const STATUS_BAR_PRIORITY = 1000;
 
-let StatusBarTile = exports.StatusBarTile = class StatusBarTile {
+class StatusBarTile {
 
   constructor() {
     this._messages = [];
@@ -59,7 +62,7 @@ let StatusBarTile = exports.StatusBarTile = class StatusBarTile {
       this._isMouseOver = false;
     });
     this._tile = statusBar.addRightTile({
-      item: item,
+      item,
       priority: STATUS_BAR_PRIORITY
     });
 
@@ -93,9 +96,10 @@ let StatusBarTile = exports.StatusBarTile = class StatusBarTile {
         });
         if (this._isMouseOver) {
           // If the mouse is currently over the element, we want to trigger the new popup to appear.
-          ['mouseover', 'mouseenter'].map(name => new window.MouseEvent(name)).forEach(event => item.dispatchEvent(event));
+          ['mouseover', 'mouseenter'].map(name => new MouseEvent(name)).forEach(event => item.dispatchEvent(event));
         }
       }
     }
   }
-};
+}
+exports.StatusBarTile = StatusBarTile;

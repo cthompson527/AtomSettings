@@ -1,18 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.RecentFilesProvider = undefined;
+exports.setRecentFilesService = setRecentFilesService;
 
 var _nuclideUri;
 
@@ -43,7 +35,15 @@ function _load_nuclideFuzzyNative() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Imported from nuclide-files-service, which is an apm package, preventing a direct import.
-let _recentFilesService = null;
+let _recentFilesService = null; /**
+                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                 * All rights reserved.
+                                 *
+                                 * This source code is licensed under the license found in the LICENSE file in
+                                 * the root directory of this source tree.
+                                 *
+                                 * 
+                                 */
 
 function getRecentFilesMatching(query) {
   if (_recentFilesService == null) {
@@ -94,34 +94,20 @@ function opacityForTimestamp(timestamp) {
 }
 
 const RecentFilesProvider = exports.RecentFilesProvider = {
-  getName: function () {
-    return 'RecentFilesProvider';
+  providerType: 'GLOBAL',
+  name: 'RecentFilesProvider',
+  debounceDelay: 0,
+  display: {
+    title: 'Recent Files',
+    prompt: 'Search recently opened filenames...',
+    action: 'nuclide-recent-files-provider:toggle-provider'
   },
-  getProviderType: function () {
-    return 'GLOBAL';
-  },
-  getDebounceDelay: function () {
-    return 0;
-  },
-  isRenderable: function () {
-    return true;
-  },
-  getAction: function () {
-    return 'nuclide-recent-files-provider:toggle-provider';
-  },
-  getPromptText: function () {
-    return 'Search recently opened files';
-  },
-  getTabTitle: function () {
-    return 'Recent Files';
-  },
-  executeQuery: function (query) {
+
+  executeQuery(query) {
     return Promise.resolve(getRecentFilesMatching(query));
   },
-  setRecentFilesService: function (service) {
-    _recentFilesService = service;
-  },
-  getComponentForItem: function (item) {
+
+  getComponentForItem(item) {
     const filename = (_nuclideUri || _load_nuclideUri()).default.basename(item.path);
     const filePath = item.path.substring(0, item.path.lastIndexOf(filename));
     const date = item.timestamp == null ? null : new Date(item.timestamp);
@@ -137,7 +123,9 @@ const RecentFilesProvider = exports.RecentFilesProvider = {
         { className: 'recent-files-provider-filepath-container' },
         _reactForAtom.React.createElement(
           'span',
-          { className: 'recent-files-provider-file-path' },
+          {
+            className: 'icon icon-file-text file recent-files-provider-file-path',
+            'data-name': filename },
           filePath
         ),
         _reactForAtom.React.createElement(
@@ -158,3 +146,7 @@ const RecentFilesProvider = exports.RecentFilesProvider = {
     );
   }
 };
+
+function setRecentFilesService(service) {
+  _recentFilesService = service;
+}

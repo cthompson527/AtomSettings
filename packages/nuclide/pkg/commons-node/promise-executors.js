@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * a sequence of async operations that need to be run in parallel and you also want
  * control the number of concurrent executions.
  */
-let PromisePool = exports.PromisePool = class PromisePool {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class PromisePool {
 
   constructor(poolSize) {
     this._fifo = new (_dequeue || _load_dequeue()).default();
@@ -50,12 +51,10 @@ let PromisePool = exports.PromisePool = class PromisePool {
    */
   submit(executor) {
     const id = this._getNextRequestId();
-    this._fifo.push({ id: id, executor: executor });
+    this._fifo.push({ id, executor });
     const promise = new Promise((resolve, reject) => {
       this._emitter.once(id, result => {
-        const isSuccess = result.isSuccess,
-              value = result.value;
-
+        const { isSuccess, value } = result;
         (isSuccess ? resolve : reject)(value);
       });
     });
@@ -72,11 +71,7 @@ let PromisePool = exports.PromisePool = class PromisePool {
       return;
     }
 
-    var _fifo$shift = this._fifo.shift();
-
-    const id = _fifo$shift.id,
-          executor = _fifo$shift.executor;
-
+    const { id, executor } = this._fifo.shift();
     this._numPromisesRunning++;
 
     executor().then(result => {
@@ -93,17 +88,17 @@ let PromisePool = exports.PromisePool = class PromisePool {
   _getNextRequestId() {
     return (this._nextRequestId++).toString(16);
   }
-};
+}
 
-/**
- * FIFO queue that executes Promise executors one at a time, in order.
- *
- * The executor function passed to the constructor of a Promise is evaluated
- * immediately. This may not always be desirable. Use a PromiseQueue if you have
- * a sequence of async operations that need to use a shared resource serially.
- */
+exports.PromisePool = PromisePool; /**
+                                    * FIFO queue that executes Promise executors one at a time, in order.
+                                    *
+                                    * The executor function passed to the constructor of a Promise is evaluated
+                                    * immediately. This may not always be desirable. Use a PromiseQueue if you have
+                                    * a sequence of async operations that need to use a shared resource serially.
+                                    */
 
-let PromiseQueue = exports.PromiseQueue = class PromiseQueue {
+class PromiseQueue {
 
   constructor() {
     this._promisePool = new PromisePool(1);
@@ -118,4 +113,5 @@ let PromiseQueue = exports.PromiseQueue = class PromiseQueue {
   submit(executor) {
     return this._promisePool.submit(executor);
   }
-};
+}
+exports.PromiseQueue = PromiseQueue;

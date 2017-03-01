@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,6 +16,12 @@ var _nuclideDiagnosticsProviderBase;
 
 function _load_nuclideDiagnosticsProviderBase() {
   return _nuclideDiagnosticsProviderBase = require('../../nuclide-diagnostics-provider-base');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
 var _promise;
@@ -51,7 +48,7 @@ function linterMessageToDiagnosticMessage(msg, providerName) {
       text: msg.text,
       html: msg.html,
       range: msg.range && _atom.Range.fromObject(msg.range),
-      trace: trace,
+      trace,
       fix: msg.fix == null ? undefined : {
         oldRange: msg.fix.range,
         oldText: msg.fix.oldText,
@@ -66,15 +63,23 @@ function linterMessageToDiagnosticMessage(msg, providerName) {
       text: msg.text,
       html: msg.html,
       range: msg.range && _atom.Range.fromObject(msg.range),
-      trace: trace
+      trace
     };
   }
 }
 
 // Exported for testing.
-function linterMessagesToDiagnosticUpdate(currentPath, msgs) {
-  let providerName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'Unnamed Linter';
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+function linterMessagesToDiagnosticUpdate(currentPath, msgs, providerName = 'Unnamed Linter') {
   const filePathToMessages = new Map();
   if (currentPath) {
     // Make sure we invalidate the messages for the current path. We may want to
@@ -99,8 +104,8 @@ function linterMessagesToDiagnosticUpdate(currentPath, msgs) {
     }
   }
   return {
-    filePathToMessages: filePathToMessages,
-    projectMessages: projectMessages
+    filePathToMessages,
+    projectMessages
   };
 }
 
@@ -115,15 +120,13 @@ function linterMessagesToDiagnosticUpdate(currentPath, msgs) {
  * optional additional field, providerName, to indicate the display name of the
  * linter.
  */
-let LinterAdapter = exports.LinterAdapter = class LinterAdapter {
+class LinterAdapter {
 
   /**
    * Keep track of the files with diagnostics for each text buffer.
    * This way we can accurately invalidate diagnostics when files are renamed.
    */
-  constructor(provider) {
-    let ProviderBase = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (_nuclideDiagnosticsProviderBase || _load_nuclideDiagnosticsProviderBase()).DiagnosticsProviderBase;
-
+  constructor(provider, ProviderBase = (_nuclideDiagnosticsProviderBase || _load_nuclideDiagnosticsProviderBase()).DiagnosticsProviderBase) {
     const utilsOptions = {
       grammarScopes: new Set(provider.grammarScopes),
       enableForAllGrammars: provider.allGrammarScopes,
@@ -143,40 +146,52 @@ let LinterAdapter = exports.LinterAdapter = class LinterAdapter {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      if (_this._enabled) {
-        const result = yield _this._requestSerializer.run(_this._provider.lint(editor));
-        if (result.status === 'success') {
-          const buffer = editor.getBuffer();
-          if (buffer.isDestroyed()) {
-            return;
-          }
+      if (!_this._enabled) {
+        return;
+      }
 
-          if (_this._provider.invalidateOnClose && !_this._onDestroyDisposables.has(buffer)) {
-            const disposable = buffer.onDidDestroy(function () {
-              _this._invalidateBuffer(buffer);
-              _this._onDestroyDisposables.delete(buffer);
-              disposable.dispose();
-            });
-            _this._onDestroyDisposables.set(buffer, disposable);
-          }
+      const maybe = _this._provider.lint(editor);
+      if (maybe == null) {
+        return;
+      }
 
-          const linterMessages = result.result;
-          const diagnosticUpdate = linterMessagesToDiagnosticUpdate(editor.getPath(), linterMessages, _this._provider.providerName || _this._provider.name);
+      const result = yield _this._requestSerializer.run(maybe);
+      if (result.status !== 'success') {
+        return;
+      }
+
+      const linterMessages = result.result;
+      if (linterMessages == null) {
+        return;
+      }
+
+      const buffer = editor.getBuffer();
+      if (buffer.isDestroyed()) {
+        return;
+      }
+
+      if (_this._provider.invalidateOnClose && !_this._onDestroyDisposables.has(buffer)) {
+        const disposable = buffer.onDidDestroy(function () {
           _this._invalidateBuffer(buffer);
-          _this._providerUtils.publishMessageUpdate(diagnosticUpdate);
-          const filePathToMessages = diagnosticUpdate.filePathToMessages;
+          _this._onDestroyDisposables.delete(buffer);
+          disposable.dispose();
+        });
+        _this._onDestroyDisposables.set(buffer, disposable);
+      }
 
-          if (filePathToMessages != null) {
-            _this._filesForBuffer.set(buffer, Array.from(filePathToMessages.keys()));
-          }
-        }
+      const diagnosticUpdate = linterMessagesToDiagnosticUpdate(editor.getPath(), linterMessages, _this._provider.providerName || _this._provider.name);
+      _this._invalidateBuffer(buffer);
+      _this._providerUtils.publishMessageUpdate(diagnosticUpdate);
+      const { filePathToMessages } = diagnosticUpdate;
+      if (filePathToMessages != null) {
+        _this._filesForBuffer.set(buffer, Array.from(filePathToMessages.keys()));
       }
     })();
   }
 
   _newUpdateSubscriber(callback) {
     const activeTextEditor = atom.workspace.getActiveTextEditor();
-    if (activeTextEditor) {
+    if (activeTextEditor && !(_nuclideUri || _load_nuclideUri()).default.isBrokenDeserializedUri(activeTextEditor.getPath())) {
       const matchesGrammar = this._provider.grammarScopes.indexOf(activeTextEditor.getGrammar().scopeName) !== -1;
       if (!this._lintInProgress() && matchesGrammar) {
         this._runLint(activeTextEditor);
@@ -213,7 +228,8 @@ let LinterAdapter = exports.LinterAdapter = class LinterAdapter {
   _invalidateBuffer(buffer) {
     const filePaths = this._filesForBuffer.get(buffer);
     if (filePaths != null) {
-      this._providerUtils.publishMessageInvalidation({ scope: 'file', filePaths: filePaths });
+      this._providerUtils.publishMessageInvalidation({ scope: 'file', filePaths });
     }
   }
-};
+}
+exports.LinterAdapter = LinterAdapter;

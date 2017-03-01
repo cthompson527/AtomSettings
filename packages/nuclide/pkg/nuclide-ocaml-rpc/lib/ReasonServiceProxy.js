@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ReasonService.js",
-          line: 17
+          line: 16
         },
         kind: "string"
       }
@@ -22,14 +22,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ReasonService.js",
-          line: 17
+          line: 16
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "ReasonService.js",
-            line: 17
+            line: 16
           },
           kind: "string"
         }
@@ -41,7 +41,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ReasonService.js",
-          line: 17
+          line: 16
         },
         kind: "named",
         name: "refmtResult"
@@ -58,215 +58,226 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["refmtResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "ReasonService.js",
-      line: 14
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    name: "refmtResult",
-    definition: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    refmtResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "ReasonService.js",
-        line: 15
+        line: 13
       },
-      kind: "union",
-      types: [{
+      name: "refmtResult",
+      definition: {
         location: {
           type: "source",
           fileName: "ReasonService.js",
-          line: 15
+          line: 14
         },
-        kind: "object",
-        fields: [{
+        kind: "union",
+        types: [{
           location: {
             type: "source",
             fileName: "ReasonService.js",
-            line: 15
+            line: 14
           },
-          name: "type",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "ReasonService.js",
-              line: 15
+              line: 14
             },
-            kind: "string-literal",
-            value: "result"
-          },
-          optional: false
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ReasonService.js",
+                line: 14
+              },
+              kind: "string-literal",
+              value: "result"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "ReasonService.js",
+              line: 14
+            },
+            name: "formattedResult",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ReasonService.js",
+                line: 14
+              },
+              kind: "string"
+            },
+            optional: false
+          }]
         }, {
           location: {
             type: "source",
             fileName: "ReasonService.js",
-            line: 15
+            line: 14
           },
-          name: "formattedResult",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "ReasonService.js",
-              line: 15
+              line: 14
             },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "ReasonService.js",
-          line: 15
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "ReasonService.js",
-            line: 15
-          },
-          name: "type",
-          type: {
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ReasonService.js",
+                line: 14
+              },
+              kind: "string-literal",
+              value: "error"
+            },
+            optional: false
+          }, {
             location: {
               type: "source",
               fileName: "ReasonService.js",
-              line: 15
+              line: 14
             },
-            kind: "string-literal",
-            value: "error"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "ReasonService.js",
-            line: 15
-          },
-          name: "error",
-          type: {
-            location: {
-              type: "source",
-              fileName: "ReasonService.js",
-              line: 15
+            name: "error",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ReasonService.js",
+                line: 14
+              },
+              kind: "string"
             },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }],
-      discriminantField: "type"
-    }
-  }], ["format", {
-    kind: "function",
-    name: "format",
-    location: {
-      type: "source",
-      fileName: "ReasonService.js",
-      line: 17
+            optional: false
+          }]
+        }],
+        discriminantField: "type"
+      }
     },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ReasonService.js",
-        line: 17
-      },
+    format: {
       kind: "function",
-      argumentTypes: [{
-        name: "content",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ReasonService.js",
-            line: 17
-          },
-          kind: "string"
-        }
-      }, {
-        name: "flags",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ReasonService.js",
-            line: 17
-          },
-          kind: "array",
+      name: "format",
+      location: {
+        type: "source",
+        fileName: "ReasonService.js",
+        line: 16
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ReasonService.js",
+          line: 16
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "content",
           type: {
             location: {
               type: "source",
               fileName: "ReasonService.js",
-              line: 17
+              line: 16
             },
             kind: "string"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ReasonService.js",
-          line: 17
-        },
-        kind: "promise",
-        type: {
+        }, {
+          name: "flags",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ReasonService.js",
+              line: 16
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ReasonService.js",
+                line: 16
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ReasonService.js",
-            line: 17
+            line: 16
           },
-          kind: "named",
-          name: "refmtResult"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ReasonService.js",
+              line: 16
+            },
+            kind: "named",
+            name: "refmtResult"
+          }
         }
       }
     }
-  }]])
+  }
 });

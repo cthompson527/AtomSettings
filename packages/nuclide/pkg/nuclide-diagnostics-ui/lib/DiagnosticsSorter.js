@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,6 +9,16 @@ exports.sortDiagnostics = sortDiagnostics;
 /*
  * Sorts the diagnostics according to given column and sort direction
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function sortDiagnostics(diagnostics, sortedColumnName, sortDescending) {
   if (sortedColumnName == null) {
     return diagnostics;
@@ -26,6 +27,7 @@ function sortDiagnostics(diagnostics, sortedColumnName, sortDescending) {
   const getter = displayDiagnostic => sortedColumnName === 'description' ? displayDiagnostic.data.description.text : displayDiagnostic.data[sortedColumnName];
   // $FlowFixMe -- this whole thing is poorly typed
   return [...diagnostics].sort((a, b) => {
+    // $FlowFixMe -- this whole thing is poorly typed
     return cmp(getter(a), getter(b), !sortDescending);
   });
 }

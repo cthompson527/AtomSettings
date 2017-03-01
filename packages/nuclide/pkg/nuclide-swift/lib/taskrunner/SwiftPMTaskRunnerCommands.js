@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -41,7 +32,17 @@ function buildCommand(chdir, configuration, Xcc, Xlinker, Xswiftc, buildPath) {
     command: _swiftPath(),
     args: commandArgs
   };
-}function testCommand(chdir, buildPath) {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+function testCommand(chdir, buildPath) {
   const commandArgs = ['test', '--chdir', chdir];
   if (buildPath.length > 0) {
     commandArgs.push('--build-path', buildPath);
@@ -55,7 +56,7 @@ function buildCommand(chdir, configuration, Xcc, Xlinker, Xswiftc, buildPath) {
 function _swiftPath() {
   const path = (_featureConfig || _load_featureConfig()).default.get('nuclide-swift.swiftToolchainPath');
   if (path) {
-    return `${ path }/usr/bin/swift`;
+    return `${path}/usr/bin/swift`;
   }
 
   if (process.platform === 'darwin') {

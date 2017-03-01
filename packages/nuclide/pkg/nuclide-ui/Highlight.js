@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,7 +15,15 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
+                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                              */
 
 const HighlightColors = exports.HighlightColors = Object.freeze({
   default: 'default',
@@ -42,12 +41,13 @@ const HighlightColorClassNames = Object.freeze({
   error: 'highlight-error'
 });
 
-const Highlight = exports.Highlight = props => {
-  const className = props.className,
-        color = props.color,
-        children = props.children,
+const Highlight = props => {
+  const {
+    className,
+    color,
+    children
+  } = props,
         remainingProps = _objectWithoutProperties(props, ['className', 'color', 'children']);
-
   const colorClassName = HighlightColorClassNames[color == null ? 'default' : color];
   const newClassName = (0, (_classnames || _load_classnames()).default)(colorClassName, className);
   return _reactForAtom.React.createElement(
@@ -56,3 +56,4 @@ const Highlight = exports.Highlight = props => {
     children
   );
 };
+exports.Highlight = Highlight;

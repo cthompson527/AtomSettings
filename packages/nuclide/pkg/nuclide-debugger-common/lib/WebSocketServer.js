@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,7 +15,17 @@ var _events = _interopRequireDefault(require('events'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let WebSocketServer = exports.WebSocketServer = class WebSocketServer {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class WebSocketServer {
 
   constructor() {
     this._webSocketServer = null;
@@ -34,7 +35,7 @@ let WebSocketServer = exports.WebSocketServer = class WebSocketServer {
   // Promise only resolves when one WebSocket client connect to it.
   start(port) {
     return new Promise((resolve, reject) => {
-      const server = new (_ws || _load_ws()).default.Server({ port: port });
+      const server = new (_ws || _load_ws()).default.Server({ port });
       this._webSocketServer = server;
       server.on('error', error => {
         reject(error);
@@ -50,4 +51,5 @@ let WebSocketServer = exports.WebSocketServer = class WebSocketServer {
       this._webSocketServer.close();
     }
   }
-};
+}
+exports.WebSocketServer = WebSocketServer;

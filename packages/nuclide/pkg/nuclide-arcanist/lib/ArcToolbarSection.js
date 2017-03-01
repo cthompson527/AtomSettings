@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -40,7 +30,17 @@ function _load_Dropdown() {
   return _Dropdown = require('../../nuclide-ui/Dropdown');
 }
 
-let ArcToolbarSection = class ArcToolbarSection extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ArcToolbarSection extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -58,7 +58,7 @@ let ArcToolbarSection = class ArcToolbarSection extends _reactForAtom.React.Comp
   }
 
   getOptions() {
-    const model = this.props.model;
+    const { model } = this.props;
 
     if (!model.isArcSupported()) {
       throw new Error('Invariant violation: "model.isArcSupported()"');
@@ -84,13 +84,12 @@ let ArcToolbarSection = class ArcToolbarSection extends _reactForAtom.React.Comp
       icon: 'sync',
       size: (_Button || _load_Button()).ButtonSizes.SMALL,
       onClick: this._reloadBuildTargets,
-      tooltip: { title: 'Reload build steps', delay: 100, placement: 'bottom' }
+      tooltip: { title: 'Reload build steps', delay: { show: 500, hide: 0 }, placement: 'bottom' }
     });
   }
 
   render() {
-    const model = this.props.model;
-
+    const { model } = this.props;
     if (!model.isArcSupported()) {
       return null;
     }
@@ -123,6 +122,5 @@ let ArcToolbarSection = class ArcToolbarSection extends _reactForAtom.React.Comp
   _arcBuild() {
     this.props.model.arcBuild();
   }
-};
+}
 exports.default = ArcToolbarSection;
-module.exports = exports['default'];

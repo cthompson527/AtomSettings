@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,14 +23,11 @@ function _load_promise() {
   return _promise = require('../../commons-node/promise');
 }
 
-let SocketTransport = exports.SocketTransport = class SocketTransport extends (_StreamTransport || _load_StreamTransport()).StreamTransport {
+class SocketTransport extends (_StreamTransport || _load_StreamTransport()).StreamTransport {
 
-  constructor(socket) {
-    let messageLogger = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : (direction, message) => {
-      return;
-    };
-
-    // $FlowIssue: Sockets are a stream$Duplex, but flow doesn't handle this.
+  constructor(socket, messageLogger = (direction, message) => {
+    return;
+  }) {
     super(socket, socket, messageLogger);
     this._socket = socket;
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
@@ -76,4 +64,13 @@ let SocketTransport = exports.SocketTransport = class SocketTransport extends (_
 
     this._emitter.dispose();
   }
-};
+}
+exports.SocketTransport = SocketTransport; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            */

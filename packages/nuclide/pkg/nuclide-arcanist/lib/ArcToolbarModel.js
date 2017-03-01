@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,30 +17,32 @@ const TASKS = exports.TASKS = [];
  * This will provide the toolbar functionality for the open-source-supported HHVM targets.
  * e.g. HHVM Debugger
  */
-let ArcToolbarModel = exports.ArcToolbarModel = class ArcToolbarModel {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ArcToolbarModel {
 
   constructor(outputMessages) {
     this._outputMessages = outputMessages;
   }
 
-  setCwdApi(cwdApi) {
-    this._cwdApi = cwdApi;
+  setProjectPath(projectPath) {
+    this._projectPath = projectPath;
   }
 
   logOutput(text, level) {
-    this._outputMessages.next({ text: text, level: level });
+    this._outputMessages.next({ text, level });
   }
 
   getActiveProjectPath() {
-    if (this._cwdApi == null) {
-      return atom.project.getPaths()[0];
-    }
-    const workingDirectory = this._cwdApi.getCwd();
-    if (workingDirectory != null) {
-      return workingDirectory.getPath();
-    } else {
-      return null;
-    }
+    return this._projectPath;
   }
 
   onChange(callback) {
@@ -101,5 +94,5 @@ let ArcToolbarModel = exports.ArcToolbarModel = class ArcToolbarModel {
   viewDeactivated() {
     throw new Error('arc build not supported');
   }
-
-};
+}
+exports.ArcToolbarModel = ArcToolbarModel;

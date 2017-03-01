@@ -1,23 +1,20 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ContextViewManager = undefined;
+exports.ContextViewManager = exports.WORKSPACE_VIEW_URI = undefined;
 
 var _featureConfig;
 
 function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
+}
+
+var _collection;
+
+function _load_collection() {
+  return _collection = require('../../commons-node/collection');
 }
 
 var _reactForAtom = require('react-for-atom');
@@ -68,8 +65,19 @@ function _load_NoProvidersView() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const EDITOR_DEBOUNCE_INTERVAL = 500;
 const POSITION_DEBOUNCE_INTERVAL = 500;
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/context-view';
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -78,29 +86,28 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
  * and manages re-rendering when a new definition is emitted from the definition
  * service.
  */
-let ContextViewManager = exports.ContextViewManager = class ContextViewManager {
-  // Whether Context View should keep displaying the current content even after the cursor moves
-  constructor(width, isVisible) {
-    this._atomPanel = null;
+class ContextViewManager {
+  // Subscriptions to all changes in registered context providers' `priority` setting.
+  //    Key: ID of the context provider
+  //    Value: Disposable for the change event subscription on its priority setting
+  constructor() {
     this._contextProviders = [];
     this._defServiceSubscription = null;
     this._settingDisposables = new Map();
     this._definitionService = null;
-    this._isVisible = isVisible;
+    this._isVisible = false;
     this._locked = false; // Should be unlocked by default
-    this._panelDOMElement = null;
-    this._width = width;
     this.currentDefinition = null;
 
     this.hide = this.hide.bind(this);
-    this._onResize = this._onResize.bind(this);
     this._setLocked = this._setLocked.bind(this);
+
+    this._panelDOMElement = document.createElement('div');
+    this._panelDOMElement.style.display = 'flex';
 
     this._render();
   }
-  // Subscriptions to all changes in registered context providers' `priority` setting.
-  //    Key: ID of the context provider
-  //    Value: Disposable for the change event subscription on its priority setting
+  // Whether Context View should keep displaying the current content even after the cursor moves
 
 
   dispose() {
@@ -158,13 +165,6 @@ let ContextViewManager = exports.ContextViewManager = class ContextViewManager {
     this._render();
   }
 
-  serialize() {
-    return {
-      width: this._width,
-      visible: this._isVisible
-    };
-  }
-
   /**
    * Sets handle to registered definition service, sets the subscriber
    * to the definition service to an Observable<Definition>, and
@@ -183,7 +183,7 @@ let ContextViewManager = exports.ContextViewManager = class ContextViewManager {
     // Only subscribe if panel showing && there's something to subscribe to && not locked
     if (this._isVisible && this._definitionService != null && !this._locked) {
       this._defServiceSubscription = (0, (_debounced || _load_debounced()).observeTextEditorsPositions)(EDITOR_DEBOUNCE_INTERVAL, POSITION_DEBOUNCE_INTERVAL).filter(editorPos => editorPos != null).map(editorPos => {
-        return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('nuclide-context-view:getDefinition', () => {
+        return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-context-view:getDefinition', () => {
           if (!(editorPos != null)) {
             throw new Error('Invariant violation: "editorPos != null"');
           }
@@ -273,72 +273,43 @@ let ContextViewManager = exports.ContextViewManager = class ContextViewManager {
   }
 
   _disposeView() {
-    if (this._panelDOMElement != null) {
-      _reactForAtom.ReactDOM.unmountComponentAtNode(this._panelDOMElement);
-      this._panelDOMElement = null;
-    }
-    if (this._atomPanel != null) {
-      this._atomPanel.destroy();
-      this._atomPanel = null;
-    }
+    _reactForAtom.ReactDOM.unmountComponentAtNode(this._panelDOMElement);
     if (this._defServiceSubscription != null) {
       this._defServiceSubscription.unsubscribe();
       this._defServiceSubscription = null;
     }
   }
 
-  _onResize(newWidth) {
-    this._width = newWidth;
-  }
-
   _renderProviders() {
     // Create collection of provider React elements to render, and
-    const providerElements = this._contextProviders.map((prov, index) => {
+    const providerElements = (0, (_collection || _load_collection()).arrayCompact)(this._contextProviders.map((prov, index) => {
       const createElementFn = prov.getElementFactory();
-      return _reactForAtom.React.createElement(
-        (_ProviderContainer || _load_ProviderContainer()).ProviderContainer,
-        { title: prov.title, key: index },
-        createElementFn({
-          ContextViewMessage: (_ContextViewMessage || _load_ContextViewMessage()).default,
-          definition: this.currentDefinition,
-          setLocked: this._setLocked
-        })
-      );
-    });
+      const element = createElementFn({
+        ContextViewMessage: (_ContextViewMessage || _load_ContextViewMessage()).default,
+        definition: this.currentDefinition,
+        setLocked: this._setLocked
+      });
+      if (element != null) {
+        return _reactForAtom.React.createElement(
+          (_ProviderContainer || _load_ProviderContainer()).ProviderContainer,
+          { title: prov.title, key: index },
+          element
+        );
+      }
+    }));
 
     // If there are no context providers to show, show a message instead
     if (providerElements.length === 0) {
       providerElements.push(_reactForAtom.React.createElement((_NoProvidersView || _load_NoProvidersView()).NoProvidersView, { key: 0 }));
     }
 
-    // Render the panel in atom workspace
-    if (!this._panelDOMElement) {
-      this._panelDOMElement = document.createElement('div');
-      this._panelDOMElement.style.display = 'flex';
-    }
-
     _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement(
       (_ContextViewPanel || _load_ContextViewPanel()).ContextViewPanel,
       {
-        initialWidth: this._width,
-        onResize: this._onResize,
         definition: this.currentDefinition,
-        locked: this._locked,
-        onHide: this.hide },
+        locked: this._locked },
       providerElements
     ), this._panelDOMElement);
-
-    if (!this._atomPanel) {
-      if (!(this._panelDOMElement != null)) {
-        throw new Error('Invariant violation: "this._panelDOMElement != null"');
-      }
-
-      this._atomPanel = atom.workspace.addRightPanel({
-        item: this._panelDOMElement,
-        visible: true,
-        priority: 200
-      });
-    }
   }
 
   _render() {
@@ -349,4 +320,42 @@ let ContextViewManager = exports.ContextViewManager = class ContextViewManager {
     }
   }
 
-};
+  getTitle() {
+    return 'Context View';
+  }
+
+  getIconName() {
+    return 'info';
+  }
+
+  getPreferredInitialWidth() {
+    return 300;
+  }
+
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getDefaultLocation() {
+    return 'right-panel';
+  }
+
+  didChangeVisibility(visible) {
+    if (visible) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+
+  getElement() {
+    return this._panelDOMElement;
+  }
+
+  serialize() {
+    return {
+      deserializer: 'nuclide.ContextViewPanelState'
+    };
+  }
+}
+exports.ContextViewManager = ContextViewManager;

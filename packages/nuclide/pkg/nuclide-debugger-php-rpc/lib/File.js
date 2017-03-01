@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -22,7 +17,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * A file in the file cache.
  */
-let File = class File {
+class File {
 
   constructor(path) {
     this._path = path;
@@ -54,7 +49,13 @@ let File = class File {
       return (yield (_fsPromise || _load_fsPromise()).default.exists(_this2._path)) && (yield (_fsPromise || _load_fsPromise()).default.lstat(_this2._path)).isFile();
     })();
   }
-};
-
-
-module.exports = File;
+}
+exports.default = File; /**
+                         * Copyright (c) 2015-present, Facebook, Inc.
+                         * All rights reserved.
+                         *
+                         * This source code is licensed under the license found in the LICENSE file in
+                         * the root directory of this source tree.
+                         *
+                         * 
+                         */

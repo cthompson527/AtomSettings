@@ -1,22 +1,11 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.__test__ = exports.default = undefined;
+exports.__test__ = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _desc, _value, _class;
 
 var _atom = require('atom');
 
@@ -46,34 +35,15 @@ function _load_libclang() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const MAX_LINE_LENGTH = 120;
 const TAB_LENGTH = 2;
@@ -152,8 +122,8 @@ function getCompletionBodyMultiLine(completion, columnOffset, indentation) {
     }
 
     args.push({
-      text: text,
-      placeholder: placeholder,
+      text,
+      placeholder,
       offset: i === 0 ? columnOffset : indentation * TAB_LENGTH
     });
   }
@@ -185,7 +155,7 @@ function _convertArgsToMultiLineSnippet(args) {
       throw Error('This is a bug! Spaces count is negative.');
     }
 
-    const line = `${ ' '.repeat(spacesCnt) }${ arg.text }:\${${ index + 1 }:${ arg.placeholder }}\n`;
+    const line = `${' '.repeat(spacesCnt)}${arg.text}:\${${index + 1}:${arg.placeholder}}\n`;
     if (index > 0 && line[colonPosition - arg.offset] !== ':') {
       throw Error('This is a bug! Colons are not aligned!');
     }
@@ -222,7 +192,7 @@ function getCompletionBodyInline(completion) {
       placeHolderCnt++;
       let spelling = chunk.spelling;
       if (chunk.isOptional) {
-        spelling = `[${ spelling }]`;
+        spelling = `[${spelling}]`;
       }
       body += '${' + placeHolderCnt + ':' + spelling + '}';
     } else {
@@ -243,15 +213,14 @@ function getCompletionPrefix(editor) {
   return editor.getTextInBufferRange(range).trim();
 }
 
-let AutocompleteHelpers = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.autocomplete'), (_class = class AutocompleteHelpers {
+class AutocompleteHelpers {
   static getAutocompleteSuggestions(request) {
-    return (0, _asyncToGenerator.default)(function* () {
-      const editor = request.editor;
-      var _request$bufferPositi = request.bufferPosition;
-      const row = _request$bufferPositi.row,
-            column = _request$bufferPositi.column,
-            activatedManually = request.activatedManually;
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.autocomplete', () => AutocompleteHelpers._getAutocompleteSuggestions(request));
+  }
 
+  static _getAutocompleteSuggestions(request) {
+    return (0, _asyncToGenerator.default)(function* () {
+      const { editor, bufferPosition: { row, column }, activatedManually } = request;
       const prefix = getCompletionPrefix(editor);
       // Only autocomplete empty strings when it's a method (a.?, a->?) or qualifier (a::?),
       // or function call (f(...)).
@@ -267,6 +236,12 @@ let AutocompleteHelpers = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalyti
       if (data == null) {
         return [];
       }
+
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('clang.autocompleteResults', {
+        path: editor.getPath(),
+        prefix: prefix.substr(0, 20), // avoid logging too much!
+        completions: data.length
+      });
 
       return data.map(function (completion) {
         let snippet;
@@ -292,21 +267,21 @@ let AutocompleteHelpers = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalyti
         const rightLabel = completion.cursor_kind ? (_nuclideClangRpc || _load_nuclideClangRpc()).ClangCursorToDeclarationTypes[completion.cursor_kind] : null;
         const type = completion.cursor_kind ? ClangCursorToAutocompletionTypes[completion.cursor_kind] : null;
         return {
-          snippet: snippet,
-          displayText: displayText,
+          snippet,
+          displayText,
           replacementPrefix: prefix,
-          type: type,
+          type,
           leftLabel: completion.result_type,
-          rightLabel: rightLabel,
+          rightLabel,
           description: completion.brief_comment || completion.result_type
         };
       });
     })();
   }
+}
 
-}, (_applyDecoratedDescriptor(_class, 'getAutocompleteSuggestions', [_dec], Object.getOwnPropertyDescriptor(_class, 'getAutocompleteSuggestions'), _class)), _class));
 exports.default = AutocompleteHelpers;
 const __test__ = exports.__test__ = {
-  getCompletionBodyMultiLine: getCompletionBodyMultiLine,
-  getCompletionBodyInline: getCompletionBodyInline
+  getCompletionBodyMultiLine,
+  getCompletionBodyInline
 };

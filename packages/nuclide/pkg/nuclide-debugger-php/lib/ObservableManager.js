@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,8 +27,18 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (_utils || _load_utils()).default.log,
-      logError = (_utils || _load_utils()).default.logError;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const { log, logError } = (_utils || _load_utils()).default;
+
 
 /**
  * The ObservableManager keeps track of the streams we use to talk to the server-side nuclide
@@ -51,7 +52,7 @@ const log = (_utils || _load_utils()).default.log,
  * The ObservableManager takes ownership of its observables, and disposes them when its dispose
  * method is called.
  */
-let ObservableManager = exports.ObservableManager = class ObservableManager {
+class ObservableManager {
 
   constructor(notifications, outputWindowMessages) {
     this._notifications = notifications;
@@ -118,4 +119,5 @@ let ObservableManager = exports.ObservableManager = class ObservableManager {
   dispose() {
     this._disposables.dispose();
   }
-};
+}
+exports.ObservableManager = ObservableManager;

@@ -1,23 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/**
- * ActiveEditorRegistry provides abstractions for creating services that operate
- * on text editor contents.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -57,6 +42,21 @@ function _load_ProviderRegistry() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/**
+ * ActiveEditorRegistry provides abstractions for creating services that operate
+ * on text editor contents.
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 const DEFAULT_CONFIG = {
@@ -67,12 +67,9 @@ function getConcreteConfig(config) {
   return Object.assign({}, DEFAULT_CONFIG, config);
 }
 
-let ActiveEditorRegistry = class ActiveEditorRegistry {
+class ActiveEditorRegistry {
 
-  constructor(resultFunction) {
-    let config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-    let eventSources = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : getDefaultEventSources();
-
+  constructor(resultFunction, config = {}, eventSources = getDefaultEventSources()) {
     this._config = getConcreteConfig(config);
     this._resultFunction = resultFunction;
     this._providerRegistry = new (_ProviderRegistry || _load_ProviderRegistry()).default();
@@ -111,7 +108,7 @@ let ActiveEditorRegistry = class ActiveEditorRegistry {
       // provider to give a result.
       _rxjsBundlesRxMinJs.Observable.of({
         kind: 'pane-change',
-        editor: editor
+        editor
       }), _rxjsBundlesRxMinJs.Observable.fromPromise(this._getResultForEditor(this._getProviderForEditor(editor), editor)), this._resultsForEditor(editor, eventSources));
     });
     return (0, (_observable || _load_observable()).cacheWhileSubscribed)(results);
@@ -134,7 +131,7 @@ let ActiveEditorRegistry = class ActiveEditorRegistry {
       }
       return _rxjsBundlesRxMinJs.Observable.concat(
       // $FlowIssue: {kind: edit | save} <=> {kind: edit} | {kind: save}
-      _rxjsBundlesRxMinJs.Observable.of({ kind: event, editor: editor }), _rxjsBundlesRxMinJs.Observable.fromPromise(this._getResultForEditor(provider, editor)));
+      _rxjsBundlesRxMinJs.Observable.of({ kind: event, editor }), _rxjsBundlesRxMinJs.Observable.fromPromise(this._getResultForEditor(provider, editor)));
     });
   }
 
@@ -156,22 +153,21 @@ let ActiveEditorRegistry = class ActiveEditorRegistry {
         return {
           kind: 'result',
           result: yield _this._resultFunction(provider, editor),
-          provider: provider,
-          editor: editor
+          provider,
+          editor
         };
       } catch (e) {
-        logger.error(`Error from provider for ${ editor.getGrammar().scopeName }`, e);
+        logger.error(`Error from provider for ${editor.getGrammar().scopeName}`, e);
         return {
-          provider: provider,
+          provider,
           kind: 'provider-error'
         };
       }
     })();
   }
-};
+}
+
 exports.default = ActiveEditorRegistry;
-
-
 function getDefaultEventSources() {
   return {
     activeEditors: (0, (_debounced || _load_debounced()).observeActiveEditorsDebounced)(),
@@ -181,4 +177,3 @@ function getDefaultEventSources() {
     }
   };
 }
-module.exports = exports['default'];

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34,6 +25,16 @@ function _load_compression() {
   return _compression = require('./compression');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 // Do not synchronously compress large payloads (risks blocking the event loop)
 const MAX_SYNC_COMPRESS_LENGTH = 100000;
@@ -45,7 +46,7 @@ const MAX_SYNC_COMPRESS_LENGTH = 100000;
 // onMessage handlers are guaranteed to not be called after onClose has been called.
 // send(data) yields false if the message failed to send, true on success.
 // onClose handlers will be called before close() returns.
-let WebSocketTransport = exports.WebSocketTransport = class WebSocketTransport {
+class WebSocketTransport {
 
   constructor(clientId, socket, options) {
     this.id = clientId;
@@ -79,10 +80,10 @@ let WebSocketTransport = exports.WebSocketTransport = class WebSocketTransport {
 
     socket.on('error', e => {
       if (this._socket != null) {
-        logger.error(`Client #${ this.id } error: ${ e.message }`);
+        logger.error(`Client #${this.id} error: ${e.message}`);
         this._emitter.emit('error', e);
       } else {
-        logger.error(`Client #${ this.id } error after close: ${ e.message }`);
+        logger.error(`Client #${this.id} error after close: ${e.message}`);
       }
     });
 
@@ -98,7 +99,7 @@ let WebSocketTransport = exports.WebSocketTransport = class WebSocketTransport {
 
   _onSocketMessage(message) {
     if (this._socket == null) {
-      logger.error('Received socket message after connection closed', new Error());
+      logger.error('Received socket message after connection closed');
       return;
     }
     this._messages.next(message);
@@ -174,4 +175,5 @@ let WebSocketTransport = exports.WebSocketTransport = class WebSocketTransport {
       this._emitter.emit('close');
     }
   }
-};
+}
+exports.WebSocketTransport = WebSocketTransport;

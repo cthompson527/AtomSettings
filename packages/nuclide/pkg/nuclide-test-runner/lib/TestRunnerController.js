@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.TestRunnerController = exports.WORKSPACE_VIEW_URI = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -66,19 +57,26 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
-let TestRunnerController = class TestRunnerController {
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/test-runner';
 
-  constructor(state_, testRunners) {
-    let state = state_;
-    if (state == null) {
-      state = {};
-    }
+class TestRunnerController {
 
-    this._state = {
-      panelVisible: state.panelVisible
-    };
+  constructor(testRunners) {
+    this._root = document.createElement('div');
+
+    this._panelVisible = false;
 
     // Bind Functions for use as callbacks;
     // TODO: Replace with property initializers when supported by Flow;
@@ -111,14 +109,7 @@ let TestRunnerController = class TestRunnerController {
 
   destroy() {
     this._stopListening();
-    if (this._root) {
-      _reactForAtom.ReactDOM.unmountComponentAtNode(this._root);
-      this._root = null;
-    }
-    if (this._panel) {
-      this._panel.destroy();
-      this._panel = null;
-    }
+    _reactForAtom.ReactDOM.unmountComponentAtNode(this._root);
   }
 
   didUpdateTestRunners() {
@@ -126,11 +117,9 @@ let TestRunnerController = class TestRunnerController {
   }
 
   hidePanel() {
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('testrunner-hide-panel');
     this.stopTests();
-    this._state.panelVisible = false;
-    if (this._panel) {
-      this._panel.hide();
-    }
+    this._panelVisible = false;
   }
 
   /**
@@ -143,7 +132,7 @@ let TestRunnerController = class TestRunnerController {
       _this._runningTest = true;
 
       // If the test runner panel is not rendered yet, ensure it is rendered before continuing.
-      if (_this._testRunnerPanel == null || !_this._state.panelVisible) {
+      if (_this._testRunnerPanel == null || !_this._panelVisible) {
         yield new Promise(function (resolve, reject) {
           _this.showPanel(resolve);
         });
@@ -157,7 +146,7 @@ let TestRunnerController = class TestRunnerController {
       // Get selected test runner when Flow knows `this._testRunnerPanel` is defined.
       const selectedTestRunner = _this._testRunnerPanel.getSelectedTestRunner();
       if (!selectedTestRunner) {
-        logger.warn(`No test runner selected. Active test runners: ${ _this._testRunners.size }`);
+        logger.warn(`No test runner selected. Active test runners: ${_this._testRunners.size}`);
         return;
       }
 
@@ -234,22 +223,14 @@ let TestRunnerController = class TestRunnerController {
     this._setExecutionState((_TestRunnerPanel || _load_TestRunnerPanel()).default.ExecutionState.STOPPED);
   }
 
-  serialize() {
-    return this._state;
-  }
-
   showPanel(didRender) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('testrunner-show-panel');
-    this._state.panelVisible = true;
+    this._panelVisible = true;
     this._renderPanel(didRender);
-    if (this._panel) {
-      this._panel.show();
-    }
   }
 
   togglePanel() {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('testrunner-hide-panel');
-    if (this._state.panelVisible) {
+    if (this._panelVisible) {
       this.hidePanel();
     } else {
       this.showPanel();
@@ -257,7 +238,7 @@ let TestRunnerController = class TestRunnerController {
   }
 
   isVisible() {
-    return this._state.panelVisible;
+    return this._panelVisible;
   }
 
   /**
@@ -270,7 +251,7 @@ let TestRunnerController = class TestRunnerController {
     // bookkeeping.
     //
     // @see {@link https://atom.io/docs/api/v1.0.4/TextBuffer#instance-append|TextBuffer::append}
-    this._buffer.append(`${ text }${ _os.default.EOL }`, { undo: 'skip' });
+    this._buffer.append(`${text}${_os.default.EOL}`, { undo: 'skip' });
   }
 
   _onDebuggerCheckboxChanged(isChecked) {
@@ -319,17 +300,17 @@ let TestRunnerController = class TestRunnerController {
             this._run.stop();
           }
           if (error.code === 'ENOENT') {
-            this._appendToBuffer(`${ (_Ansi || _load_Ansi()).default.YELLOW }Command '${ error.path }' does not exist${ (_Ansi || _load_Ansi()).default.RESET }`);
-            this._appendToBuffer(`${ (_Ansi || _load_Ansi()).default.YELLOW }Are you trying to run remotely?${ (_Ansi || _load_Ansi()).default.RESET }`);
-            this._appendToBuffer(`${ (_Ansi || _load_Ansi()).default.YELLOW }Path: ${ path }${ (_Ansi || _load_Ansi()).default.RESET }`);
+            this._appendToBuffer(`${(_Ansi || _load_Ansi()).default.YELLOW}Command '${error.path}' does not exist${(_Ansi || _load_Ansi()).default.RESET}`);
+            this._appendToBuffer(`${(_Ansi || _load_Ansi()).default.YELLOW}Are you trying to run remotely?${(_Ansi || _load_Ansi()).default.RESET}`);
+            this._appendToBuffer(`${(_Ansi || _load_Ansi()).default.YELLOW}Path: ${path}${(_Ansi || _load_Ansi()).default.RESET}`);
           }
-          this._appendToBuffer(`${ (_Ansi || _load_Ansi()).default.RED }Original Error: ${ error.message }${ (_Ansi || _load_Ansi()).default.RESET }`);
+          this._appendToBuffer(`${(_Ansi || _load_Ansi()).default.RED}Original Error: ${error.message}${(_Ansi || _load_Ansi()).default.RESET}`);
           this._setExecutionState((_TestRunnerPanel || _load_TestRunnerPanel()).default.ExecutionState.STOPPED);
-          logger.error(`Error running tests: "${ error.message }"`);
+          logger.error(`Error running tests: "${error.message}"`);
           break;
         case 'stderr':
           // Color stderr output red in the console to distinguish it as error.
-          this._appendToBuffer(`${ (_Ansi || _load_Ansi()).default.RED }${ message.data }${ (_Ansi || _load_Ansi()).default.RESET }`);
+          this._appendToBuffer(`${(_Ansi || _load_Ansi()).default.RED}${message.data}${(_Ansi || _load_Ansi()).default.RESET}`);
           break;
       }
     }).finally(() => {
@@ -347,15 +328,8 @@ let TestRunnerController = class TestRunnerController {
   _renderPanel(didRender) {
     // Initialize and render the contents of the panel only if the hosting container is visible by
     // the user's choice.
-    if (!this._state.panelVisible) {
+    if (!this._panelVisible) {
       return;
-    }
-
-    let root = this._root;
-
-    if (!root) {
-      root = document.createElement('div');
-      this._root = root;
     }
 
     let progressValue;
@@ -366,7 +340,7 @@ let TestRunnerController = class TestRunnerController {
       // track.
       progressValue = 100;
     }
-
+    this._root.style.display = 'flex';
     const component = _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement((_TestRunnerPanel || _load_TestRunnerPanel()).default, {
       attachDebuggerBeforeRunning: this._attachDebuggerBeforeRunning,
       buffer: this._buffer,
@@ -384,17 +358,13 @@ let TestRunnerController = class TestRunnerController {
       // determinate on each render.
       , testRunners: Array.from(this._testRunners),
       testSuiteModel: this._testSuiteModel
-    }), root, didRender);
+    }), this._root, didRender);
 
     if (!(component instanceof (_TestRunnerPanel || _load_TestRunnerPanel()).default)) {
       throw new Error('Invariant violation: "component instanceof TestRunnerPanel"');
     }
 
     this._testRunnerPanel = component;
-
-    if (!this._panel) {
-      this._panel = atom.workspace.addBottomPanel({ item: root, visible: this._state.panelVisible });
-    }
   }
 
   _stopListening() {
@@ -422,11 +392,43 @@ let TestRunnerController = class TestRunnerController {
         // proceed as usual.
 
 
-        logger.error(`Error when stopping test run #'${ this._run.label }: ${ e }`);
+        logger.error(`Error when stopping test run #'${this._run.label}: ${e}`);
       }
     }
   }
 
-};
-exports.default = TestRunnerController;
-module.exports = exports['default'];
+  getTitle() {
+    return 'Test Runner';
+  }
+
+  getIconName() {
+    return 'checklist';
+  }
+
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getDefaultLocation() {
+    return 'bottom-panel';
+  }
+
+  didChangeVisibility(visible) {
+    if (visible) {
+      this.showPanel();
+    } else {
+      this.hidePanel();
+    }
+  }
+
+  getElement() {
+    return this._root;
+  }
+
+  serialize() {
+    return {
+      deserializer: 'nuclide.TestRunnerPanelState'
+    };
+  }
+}
+exports.TestRunnerController = TestRunnerController;

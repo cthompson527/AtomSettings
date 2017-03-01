@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,12 +23,20 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
 
 const MARKER_PROPERTY_FOR_REMOTE_DIRECTORY = '__nuclide_remote_directory__';
 
 /* Mostly implements https://atom.io/docs/api/latest/Directory */
-let RemoteDirectory = exports.RemoteDirectory = class RemoteDirectory {
+class RemoteDirectory {
   static isRemoteDirectory(directory) {
     /* $FlowFixMe */
     return directory[MARKER_PROPERTY_FOR_REMOTE_DIRECTORY] === true;
@@ -46,34 +45,22 @@ let RemoteDirectory = exports.RemoteDirectory = class RemoteDirectory {
   /**
    * @param uri should be of the form "nuclide://example.com/path/to/directory".
    */
-  constructor(server, uri) {
-    let symlink = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-    let options = arguments[3];
-
+  constructor(server, uri, symlink = false, options) {
     Object.defineProperty(this, MARKER_PROPERTY_FOR_REMOTE_DIRECTORY, { value: true });
     this._server = server;
     this._uri = uri;
     this._emitter = new _atom.Emitter();
     this._subscriptionCount = 0;
     this._symlink = symlink;
+    const { path: directoryPath, hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
 
-    var _nuclideUri$parse = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-    const directoryPath = _nuclideUri$parse.path,
-          protocol = _nuclideUri$parse.protocol,
-          host = _nuclideUri$parse.host;
-
-    if (!protocol) {
-      throw new Error('Invariant violation: "protocol"');
-    }
-
-    if (!host) {
-      throw new Error('Invariant violation: "host"');
+    if (!(hostname != null)) {
+      throw new Error('Invariant violation: "hostname != null"');
     }
     /** In the example, this would be "nuclide://example.com". */
 
 
-    this._host = host;
+    this._host = hostname;
     /** In the example, this would be "/path/to/directory". */
     this._localPath = directoryPath;
     // A workaround before Atom 2.0: see ::getHgRepoInfo of main.js.
@@ -123,7 +110,7 @@ let RemoteDirectory = exports.RemoteDirectory = class RemoteDirectory {
       this._watchSubscription = null;
     }, () => {
       // Nothing needs to be done if the root directory watch has ended.
-      logger.debug(`watchDirectory ended: ${ this._uri }`);
+      logger.debug(`watchDirectory ended: ${this._uri}`);
       this._watchSubscription = null;
     });
   }
@@ -203,7 +190,8 @@ let RemoteDirectory = exports.RemoteDirectory = class RemoteDirectory {
   }
 
   getRealPathSync() {
-    throw new Error('Not implemented');
+    // Remote paths should already be resolved.
+    return this._uri;
   }
 
   getBaseName() {
@@ -337,4 +325,5 @@ let RemoteDirectory = exports.RemoteDirectory = class RemoteDirectory {
   _getService(serviceName) {
     return this._server.getService(serviceName);
   }
-};
+}
+exports.RemoteDirectory = RemoteDirectory;

@@ -1,46 +1,45 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.activate = activate;
-exports.createAutocompleteProvider = createAutocompleteProvider;
-exports.getHyperclickProvider = getHyperclickProvider;
-exports.provideBusySignal = provideBusySignal;
-exports.provideDiagnostics = provideDiagnostics;
-exports.provideOutlines = provideOutlines;
-exports.createTypeHintProvider = createTypeHintProvider;
-exports.createCoverageProvider = createCoverageProvider;
-exports.createEvaluationExpressionProvider = createEvaluationExpressionProvider;
-exports.deactivate = deactivate;
 
-var _atom = require('atom');
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+let connectionToFlowService = (() => {
+  var _ref = (0, _asyncToGenerator.default)(function* (connection) {
+    const flowService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByConnection)('FlowService', connection);
+    const fileNotifier = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getNotifierByConnection)(connection);
+    const languageService = yield flowService.initialize(fileNotifier);
+
+    return languageService;
+  });
+
+  return function connectionToFlowService(_x) {
+    return _ref.apply(this, arguments);
+  };
+})();
+
+let allowFlowServerRestart = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* () {
+    const services = yield Promise.all(getConnectionCache().values());
+    for (const service of services) {
+      service.allowServerRestart();
+    }
+  });
+
+  return function allowFlowServerRestart() {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
+exports.activate = activate;
+exports.deactivate = deactivate;
 
 var _featureConfig;
 
 function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
-}
-
-var _nuclideRemoteConnection;
-
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _nuclideAnalytics;
-
-function _load_nuclideAnalytics() {
-  return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
 var _registerGrammar;
@@ -49,70 +48,40 @@ function _load_registerGrammar() {
   return _registerGrammar = _interopRequireDefault(require('../../commons-atom/register-grammar'));
 }
 
-var _projects;
+var _nuclideOpenFiles;
 
-function _load_projects() {
-  return _projects = require('../../commons-atom/projects');
+function _load_nuclideOpenFiles() {
+  return _nuclideOpenFiles = require('../../nuclide-open-files');
+}
+
+var _nuclideLanguageService;
+
+function _load_nuclideLanguageService() {
+  return _nuclideLanguageService = require('../../nuclide-language-service');
+}
+
+var _nuclideFlowCommon;
+
+function _load_nuclideFlowCommon() {
+  return _nuclideFlowCommon = require('../../nuclide-flow-common');
+}
+
+var _nuclideRemoteConnection;
+
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _FlowServiceWatcher;
 
 function _load_FlowServiceWatcher() {
   return _FlowServiceWatcher = require('./FlowServiceWatcher');
-}
-
-var _FlowAutocompleteProvider;
-
-function _load_FlowAutocompleteProvider() {
-  return _FlowAutocompleteProvider = _interopRequireDefault(require('./FlowAutocompleteProvider'));
-}
-
-var _FlowHyperclickProvider;
-
-function _load_FlowHyperclickProvider() {
-  return _FlowHyperclickProvider = _interopRequireDefault(require('./FlowHyperclickProvider'));
-}
-
-var _nuclideBusySignal;
-
-function _load_nuclideBusySignal() {
-  return _nuclideBusySignal = require('../../nuclide-busy-signal');
-}
-
-var _FlowDiagnosticsProvider;
-
-function _load_FlowDiagnosticsProvider() {
-  return _FlowDiagnosticsProvider = _interopRequireDefault(require('./FlowDiagnosticsProvider'));
-}
-
-var _FlowOutlineProvider;
-
-function _load_FlowOutlineProvider() {
-  return _FlowOutlineProvider = require('./FlowOutlineProvider');
-}
-
-var _FlowTypeHintProvider;
-
-function _load_FlowTypeHintProvider() {
-  return _FlowTypeHintProvider = require('./FlowTypeHintProvider');
-}
-
-var _FlowEvaluationExpressionProvider;
-
-function _load_FlowEvaluationExpressionProvider() {
-  return _FlowEvaluationExpressionProvider = require('./FlowEvaluationExpressionProvider');
-}
-
-var _FlowServiceFactory;
-
-function _load_FlowServiceFactory() {
-  return _FlowServiceFactory = require('./FlowServiceFactory');
-}
-
-var _FlowCoverageProvider;
-
-function _load_FlowCoverageProvider() {
-  return _FlowCoverageProvider = require('./FlowCoverageProvider');
 }
 
 var _constants;
@@ -123,154 +92,109 @@ function _load_constants() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-const GRAMMARS_STRING = (_constants || _load_constants()).JS_GRAMMARS.join(', ');
-const diagnosticsOnFlySetting = 'nuclide-flow.diagnosticsOnFly';
+let disposables; /**
+                  * Copyright (c) 2015-present, Facebook, Inc.
+                  * All rights reserved.
+                  *
+                  * This source code is licensed under the license found in the LICENSE file in
+                  * the root directory of this source tree.
+                  *
+                  * 
+                  */
 
-const PACKAGE_NAME = 'nuclide-flow';
+let connectionCache = null;
 
-let busySignalProvider;
+function getConnectionCache() {
+  if (!(connectionCache != null)) {
+    throw new Error('Invariant violation: "connectionCache != null"');
+  }
 
-let flowDiagnosticsProvider;
-
-let disposables;
+  return connectionCache;
+}
 
 function activate() {
   if (!disposables) {
-    disposables = new _atom.CompositeDisposable();
+    connectionCache = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(connectionToFlowService);
 
-    const watcher = new (_FlowServiceWatcher || _load_FlowServiceWatcher()).FlowServiceWatcher();
-    disposables.add(watcher);
+    const flowLanguageService = new (_nuclideLanguageService || _load_nuclideLanguageService()).AtomLanguageService(connection => getConnectionCache().get(connection), getLanguageServiceConfig());
+    flowLanguageService.activate();
 
-    disposables.add(atom.commands.add('atom-workspace', 'nuclide-flow:restart-flow-server', allowFlowServerRestart));
+    disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(connectionCache, () => {
+      connectionCache = null;
+    }, new (_FlowServiceWatcher || _load_FlowServiceWatcher()).FlowServiceWatcher(connectionCache), atom.commands.add('atom-workspace', 'nuclide-flow:restart-flow-server', allowFlowServerRestart), flowLanguageService);
 
-    (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', '.flowconfig');
+    (0, (_registerGrammar || _load_registerGrammar()).default)('source.ini', ['.flowconfig']);
   }
-}
-
-/** Provider for autocomplete service. */
-function createAutocompleteProvider() {
-  const excludeLowerPriority = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.excludeOtherAutocomplete'));
-
-  return {
-    selector: (_constants || _load_constants()).JS_GRAMMARS.map(grammar => '.' + grammar).join(', '),
-    disableForSelector: '.source.js .comment',
-    inclusionPriority: 1,
-    // We want to get ranked higher than the snippets provider.
-    suggestionPriority: 5,
-    onDidInsertSuggestion: () => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-flow.autocomplete-chosen');
-    },
-    excludeLowerPriority: excludeLowerPriority,
-    getSuggestions: function (request) {
-      return (_FlowAutocompleteProvider || _load_FlowAutocompleteProvider()).default.getSuggestions(request);
-    }
-  };
-}
-
-function getHyperclickProvider() {
-  const flowHyperclickProvider = new (_FlowHyperclickProvider || _load_FlowHyperclickProvider()).default();
-  const getSuggestionForWord = flowHyperclickProvider.getSuggestionForWord.bind(flowHyperclickProvider);
-  return {
-    wordRegExp: (_constants || _load_constants()).JAVASCRIPT_WORD_REGEX,
-    priority: 20,
-    providerName: PACKAGE_NAME,
-    getSuggestionForWord: getSuggestionForWord
-  };
-}
-
-function provideBusySignal() {
-  if (!busySignalProvider) {
-    busySignalProvider = new (_nuclideBusySignal || _load_nuclideBusySignal()).DedupedBusySignalProviderBase();
-  }
-  return busySignalProvider;
-}
-
-function provideDiagnostics() {
-  if (!flowDiagnosticsProvider) {
-    const busyProvider = this.provideBusySignal();
-    const runOnTheFly = (_featureConfig || _load_featureConfig()).default.get(diagnosticsOnFlySetting);
-    flowDiagnosticsProvider = new (_FlowDiagnosticsProvider || _load_FlowDiagnosticsProvider()).default(runOnTheFly, busyProvider);
-
-    if (!disposables) {
-      throw new Error('Invariant violation: "disposables"');
-    }
-
-    disposables.add((0, (_projects || _load_projects()).onDidRemoveProjectPath)(projectPath => {
-      if (!flowDiagnosticsProvider) {
-        throw new Error('Invariant violation: "flowDiagnosticsProvider"');
-      }
-
-      flowDiagnosticsProvider.invalidateProjectPath(projectPath);
-    }));
-  }
-  return flowDiagnosticsProvider;
-}
-
-function provideOutlines() {
-  const provider = new (_FlowOutlineProvider || _load_FlowOutlineProvider()).FlowOutlineProvider();
-  return {
-    grammarScopes: (_constants || _load_constants()).JS_GRAMMARS,
-    priority: 1,
-    name: 'Flow',
-    getOutline: provider.getOutline.bind(provider)
-  };
-}
-
-function createTypeHintProvider() {
-  const flowTypeHintProvider = new (_FlowTypeHintProvider || _load_FlowTypeHintProvider()).FlowTypeHintProvider();
-  const typeHint = flowTypeHintProvider.typeHint.bind(flowTypeHintProvider);
-  return {
-    selector: GRAMMARS_STRING,
-    providerName: PACKAGE_NAME,
-    inclusionPriority: 1,
-    typeHint: typeHint
-  };
-}
-
-function createCoverageProvider() {
-  return {
-    displayName: 'Flow',
-    priority: 10,
-    grammarScopes: (_constants || _load_constants()).JS_GRAMMARS,
-    getCoverage: function (path) {
-      return (0, (_FlowCoverageProvider || _load_FlowCoverageProvider()).getCoverage)(path);
-    }
-  };
-}
-
-function createEvaluationExpressionProvider() {
-  const evaluationExpressionProvider = new (_FlowEvaluationExpressionProvider || _load_FlowEvaluationExpressionProvider()).FlowEvaluationExpressionProvider();
-  const getEvaluationExpression = evaluationExpressionProvider.getEvaluationExpression.bind(evaluationExpressionProvider);
-  return {
-    selector: GRAMMARS_STRING,
-    name: PACKAGE_NAME,
-    getEvaluationExpression: getEvaluationExpression
-  };
 }
 
 function deactivate() {
-  // TODO(mbolin): Find a way to unregister the autocomplete provider from
-  // ServiceHub, or set a boolean in the autocomplete provider to always return
-  const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('FlowService');
-
-  if (!service) {
-    throw new Error('Invariant violation: "service"');
-  }
-
-  service.dispose();
-  if (disposables) {
+  if (disposables != null) {
     disposables.dispose();
     disposables = null;
   }
-  if (flowDiagnosticsProvider) {
-    flowDiagnosticsProvider.dispose();
-    flowDiagnosticsProvider = null;
-  }
 }
 
-function allowFlowServerRestart() {
-  for (const service of (0, (_FlowServiceFactory || _load_FlowServiceFactory()).getCurrentServiceInstances)()) {
-    service.allowServerRestart();
-  }
+function getLanguageServiceConfig() {
+  const enableHighlight = (_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enableReferencesHighlight');
+  const excludeLowerPriority = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.excludeOtherAutocomplete'));
+  const flowResultsFirst = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.flowAutocompleteResultsFirst'));
+  const enableTypeHints = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enableTypeHints'));
+  const enablePushDiagnostics = Boolean((_featureConfig || _load_featureConfig()).default.get('nuclide-flow.enablePushDiagnostics'));
+  return {
+    name: 'Flow',
+    grammars: (_constants || _load_constants()).JS_GRAMMARS,
+    highlight: enableHighlight ? {
+      version: '0.0.0',
+      priority: 1,
+      analyticsEventName: 'flow.codehighlight'
+    } : undefined,
+    outline: {
+      version: '0.0.0',
+      priority: 1,
+      analyticsEventName: 'flow.outline'
+    },
+    coverage: {
+      version: '0.0.0',
+      priority: 10,
+      analyticsEventName: 'flow.coverage'
+    },
+    definition: {
+      version: '0.0.0',
+      priority: 20,
+      definitionEventName: 'flow.get-definition',
+      definitionByIdEventName: 'flow.get-definition-by-id'
+    },
+    autocomplete: {
+      version: '2.0.0',
+      disableForSelector: '.source.js .comment',
+      excludeLowerPriority,
+      // We want to get ranked higher than the snippets provider by default,
+      // but it's configurable
+      suggestionPriority: flowResultsFirst ? 5 : 1,
+      inclusionPriority: 1,
+      analyticsEventName: 'flow.autocomplete',
+      autocompleteCacherConfig: {
+        updateResults: (request, results) => (0, (_nuclideFlowCommon || _load_nuclideFlowCommon()).filterResultsByPrefix)(request.prefix, results),
+        shouldFilter: (_nuclideFlowCommon || _load_nuclideFlowCommon()).shouldFilter
+      },
+      onDidInsertSuggestionAnalyticsEventName: 'nuclide-flow.autocomplete-chosen'
+    },
+    diagnostics: enablePushDiagnostics ? {
+      version: '0.2.0',
+      analyticsEventName: 'flow.receive-push-diagnostics'
+    } : {
+      version: '0.1.0',
+      shouldRunOnTheFly: false,
+      analyticsEventName: 'flow.run-diagnostics'
+    },
+    typeHint: enableTypeHints ? {
+      version: '0.0.0',
+      priority: 1,
+      analyticsEventName: 'nuclide-flow.typeHint'
+    } : undefined,
+    evaluationExpression: {
+      version: '0.0.0',
+      analyticsEventName: 'flow.evaluationExpression'
+    }
+  };
 }

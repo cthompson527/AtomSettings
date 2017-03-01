@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
-
-var _dec, _desc, _value, _class;
 
 var _atom = require('atom');
 
@@ -48,34 +36,15 @@ function _load_nuclideSourceControlHelpers() {
   return _nuclideSourceControlHelpers = require('../../nuclide-source-control-helpers');
 }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -98,73 +67,64 @@ function getRepositoryDescription(directory) {
       return null;
     }
     const serverConnection = directory._server;
-    const repoPath = repositoryDescription.repoPath,
-          originURL = repositoryDescription.originURL,
-          workingDirectoryPath = repositoryDescription.workingDirectoryPath;
-
+    const { repoPath, originURL, workingDirectoryPath } = repositoryDescription;
     const workingDirectoryLocalPath = workingDirectoryPath;
     // These paths are all relative to the remote fs. We need to turn these into URIs.
     const repoUri = serverConnection.getUriOfRemotePath(repoPath);
     const workingDirectoryUri = serverConnection.getUriOfRemotePath(workingDirectoryPath);
     return {
-      originURL: originURL,
+      originURL,
       repoPath: repoUri,
       workingDirectory: serverConnection.createDirectory(workingDirectoryUri),
-      workingDirectoryLocalPath: workingDirectoryLocalPath
+      workingDirectoryLocalPath
     };
   } else {
     const repositoryDescription = (0, (_nuclideSourceControlHelpers || _load_nuclideSourceControlHelpers()).findHgRepository)(directory.getPath());
     if (repositoryDescription == null) {
       return null;
     }
-    const repoPath = repositoryDescription.repoPath,
-          originURL = repositoryDescription.originURL,
-          workingDirectoryPath = repositoryDescription.workingDirectoryPath;
-
+    const { repoPath, originURL, workingDirectoryPath } = repositoryDescription;
     return {
-      originURL: originURL,
-      repoPath: repoPath,
+      originURL,
+      repoPath,
       workingDirectory: new _atom.Directory(workingDirectoryPath),
       workingDirectoryLocalPath: workingDirectoryPath
     };
   }
 }
 
-let HgRepositoryProvider = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('hg-repository.repositoryForDirectorySync'), (_class = class HgRepositoryProvider {
+class HgRepositoryProvider {
   repositoryForDirectory(directory) {
     return Promise.resolve(this.repositoryForDirectorySync(directory));
   }
 
   repositoryForDirectorySync(directory) {
-    try {
-      const repositoryDescription = getRepositoryDescription(directory);
-      if (!repositoryDescription) {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('hg-repository.repositoryForDirectorySync', () => {
+      try {
+        const repositoryDescription = getRepositoryDescription(directory);
+        if (!repositoryDescription) {
+          return null;
+        }
+
+        const {
+          originURL,
+          repoPath,
+          workingDirectory,
+          workingDirectoryLocalPath
+        } = repositoryDescription;
+
+        const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getHgServiceByNuclideUri)(directory.getPath());
+        const hgService = new service.HgService(workingDirectoryLocalPath);
+        return new (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient(repoPath, hgService, {
+          workingDirectory,
+          projectRootDirectory: directory,
+          originURL
+        });
+      } catch (err) {
+        logger.error('Failed to create an HgRepositoryClient for ', directory.getPath(), ', error: ', err);
         return null;
       }
-
-      const originURL = repositoryDescription.originURL,
-            repoPath = repositoryDescription.repoPath,
-            workingDirectory = repositoryDescription.workingDirectory,
-            workingDirectoryLocalPath = repositoryDescription.workingDirectoryLocalPath;
-
-
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('HgService', directory.getPath());
-
-      if (!service) {
-        throw new Error('Invariant violation: "service"');
-      }
-
-      const hgService = new service.HgService(workingDirectoryLocalPath);
-      return new (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient(repoPath, hgService, {
-        workingDirectory: workingDirectory,
-        projectRootDirectory: directory,
-        originURL: originURL
-      });
-    } catch (err) {
-      logger.error('Failed to create an HgRepositoryClient for ', directory.getPath(), ', error: ', err);
-      return null;
-    }
+    });
   }
-}, (_applyDecoratedDescriptor(_class.prototype, 'repositoryForDirectorySync', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'repositoryForDirectorySync'), _class.prototype)), _class));
+}
 exports.default = HgRepositoryProvider;
-module.exports = exports['default'];

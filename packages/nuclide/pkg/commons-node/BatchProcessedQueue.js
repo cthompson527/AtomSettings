@@ -1,13 +1,4 @@
-'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,7 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 
 // A Queue which will process elements at intervals, only if the
 // queue contains any elements.
-let BatchProcessedQueue = class BatchProcessedQueue {
+class BatchProcessedQueue {
 
   constructor(batchPeriod, handler) {
     this._batchPeriod = batchPeriod;
@@ -47,6 +38,13 @@ let BatchProcessedQueue = class BatchProcessedQueue {
       this._handleBatch();
     }
   }
-};
-exports.default = BatchProcessedQueue;
-module.exports = exports['default'];
+}
+exports.default = BatchProcessedQueue; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        */

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,18 +12,15 @@ let main = (() => {
     process.on('SIGHUP', function () {});
 
     try {
-      const port = args.port;
-      let key = args.key,
-          cert = args.cert,
-          ca = args.ca;
-
+      const { port } = args;
+      let { key, cert, ca } = args;
       if (key && cert && ca) {
         key = _fs.default.readFileSync(key);
         cert = _fs.default.readFileSync(cert);
         ca = _fs.default.readFileSync(ca);
       }
       const server = new (_NuclideServer || _load_NuclideServer()).default({
-        port: port,
+        port,
         serverKey: key,
         serverCertificate: cert,
         certificateAuthorityCertificate: ca,
@@ -40,9 +28,9 @@ let main = (() => {
       }, (_servicesConfig || _load_servicesConfig()).default);
       yield server.connect();
       serverStartTimer.onSuccess();
-      logger.info(`NuclideServer started on port ${ port }.`);
-      logger.info(`Using node ${ process.version }.`);
-      logger.info(`Server ready time: ${ process.uptime() * 1000 }ms`);
+      logger.info(`NuclideServer started on port ${port}.`);
+      logger.info(`Using node ${process.version}.`);
+      logger.info(`Server ready time: ${process.uptime() * 1000}ms`);
     } catch (e) {
       // Ensure logging is configured.
       yield (0, (_nuclideLogging || _load_nuclideLogging()).initialUpdateConfig)();
@@ -94,6 +82,16 @@ function _load_yargs() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DEFAULT_PORT = 9090;
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
@@ -118,7 +116,7 @@ process.on('uncaughtException', err => {
 //
 // We include this code here in anticipation of the Node/io.js merger.
 process.on('unhandledRejection', (error, promise) => {
-  logger.error(`Unhandled promise rejection ${ promise }. Error:`, error);
+  logger.error(`Unhandled promise rejection ${promise}. Error:`, error);
 });
 
 const argv = (_yargs || _load_yargs()).default.default('port', DEFAULT_PORT).argv;

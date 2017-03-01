@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _nuclideUri;
 
@@ -40,6 +30,16 @@ function _load_nuclideMarshalersCommon() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const PYTHON_EXECUTABLE = 'python';
 const LIB_PATH = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../VendorLib');
 const PROCESS_PATH = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../python/jediserver.py');
@@ -54,19 +54,16 @@ let serviceRegistry = null;
 
 function getServiceRegistry() {
   if (serviceRegistry == null) {
-    serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry([(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], (0, (_nuclideRpc || _load_nuclideRpc()).loadServicesConfig)((_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..')));
+    serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry([(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], (0, (_nuclideRpc || _load_nuclideRpc()).loadServicesConfig)((_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..')), 'python_language_service');
   }
   return serviceRegistry;
 }
 
-let JediServer = class JediServer {
+class JediServer {
 
-  constructor(src) {
-    let pythonPath = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : PYTHON_EXECUTABLE;
-    let paths = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-
+  constructor(src, pythonPath = PYTHON_EXECUTABLE, paths = []) {
     // Generate a name for this server using the src file name, used to namespace logs
-    const name = `JediServer-${ (_nuclideUri || _load_nuclideUri()).default.basename(src) }`;
+    const name = `JediServer-${(_nuclideUri || _load_nuclideUri()).default.basename(src)}`;
     let args = [PROCESS_PATH, '-s', src];
     if (paths.length > 0) {
       args.push('-p');
@@ -93,6 +90,5 @@ let JediServer = class JediServer {
     this._isDisposed = true;
     this._process.dispose();
   }
-};
+}
 exports.default = JediServer;
-module.exports = exports['default'];

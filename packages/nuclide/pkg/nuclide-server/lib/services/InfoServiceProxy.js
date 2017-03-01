@@ -13,7 +13,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "InfoService.js",
-          line: 18
+          line: 17
         },
         kind: "string"
       });
@@ -27,7 +27,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "InfoService.js",
-          line: 25
+          line: 24
         },
         kind: "boolean"
       }
@@ -38,7 +38,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "InfoService.js",
-          line: 25
+          line: 24
         },
         kind: "void"
       });
@@ -54,129 +54,140 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["getServerVersion", {
-    kind: "function",
-    name: "getServerVersion",
-    location: {
-      type: "source",
-      fileName: "InfoService.js",
-      line: 18
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    type: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    getServerVersion: {
+      kind: "function",
+      name: "getServerVersion",
       location: {
         type: "source",
         fileName: "InfoService.js",
-        line: 18
+        line: 17
       },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "InfoService.js",
-          line: 18
+          line: 17
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
           location: {
             type: "source",
             fileName: "InfoService.js",
-            line: 18
+            line: 17
           },
-          kind: "string"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "InfoService.js",
+              line: 17
+            },
+            kind: "string"
+          }
         }
       }
-    }
-  }], ["closeConnection", {
-    kind: "function",
-    name: "closeConnection",
-    location: {
-      type: "source",
-      fileName: "InfoService.js",
-      line: 25
     },
-    type: {
+    closeConnection: {
+      kind: "function",
+      name: "closeConnection",
       location: {
         type: "source",
         fileName: "InfoService.js",
-        line: 25
+        line: 24
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "shutdownServer",
-        type: {
-          location: {
-            type: "source",
-            fileName: "InfoService.js",
-            line: 25
-          },
-          kind: "boolean"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "InfoService.js",
-          line: 25
+          line: 24
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "shutdownServer",
+          type: {
+            location: {
+              type: "source",
+              fileName: "InfoService.js",
+              line: 24
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "InfoService.js",
-            line: 25
+            line: 24
           },
-          kind: "void"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "InfoService.js",
+              line: 24
+            },
+            kind: "void"
+          }
         }
       }
     }
-  }]])
+  }
 });

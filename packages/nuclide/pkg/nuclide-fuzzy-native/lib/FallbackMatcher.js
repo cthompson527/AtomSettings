@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Fallback `Matcher` class compatible with the fuzzy-native implementation.
  * Note that the scores are different: 0 represents the best match while larger numbers are worse.
  */
-let Matcher = exports.Matcher = class Matcher {
+class Matcher {
 
   constructor(candidates) {
     this.setCandidates(candidates);
@@ -41,9 +32,7 @@ let Matcher = exports.Matcher = class Matcher {
   /**
    * Note: caseSensitive, numThreads, and recordMatchIndexes will be ignored.
    */
-  match(query) {
-    let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
+  match(query, options = {}) {
     const topScores = new (_TopScores || _load_TopScores()).default(options.maxResults || 0);
     this._queryItems.forEach(item => {
       const score = item.score(query);
@@ -70,4 +59,13 @@ let Matcher = exports.Matcher = class Matcher {
     this._queryItems = new Map();
     this.addCandidates(candidates);
   }
-};
+}
+exports.Matcher = Matcher; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            */

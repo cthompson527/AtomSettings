@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,6 +13,16 @@ var _range;
 function _load_range() {
   return _range = require('../commons-node/range');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function wordAtPosition(editor, position, wordRegex_) {
   let wordRegex = wordRegex_;
@@ -43,24 +44,14 @@ function wordAtPosition(editor, position, wordRegex_) {
  *   defaults to first non-whitespace character
  * @return atom$Range  the trimmed range
  */
-function trimRange(editor, rangeToTrim) {
-  let stopRegex = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : /\S/;
-
+function trimRange(editor, rangeToTrim, stopRegex = /\S/) {
   const buffer = editor.getBuffer();
-  let start = rangeToTrim.start,
-      end = rangeToTrim.end;
-
-  buffer.scanInRange(stopRegex, rangeToTrim, (_ref) => {
-    let range = _ref.range,
-        stop = _ref.stop;
-
+  let { start, end } = rangeToTrim;
+  buffer.scanInRange(stopRegex, rangeToTrim, ({ range, stop }) => {
     start = range.start;
     stop();
   });
-  buffer.backwardsScanInRange(stopRegex, rangeToTrim, (_ref2) => {
-    let range = _ref2.range,
-        stop = _ref2.stop;
-
+  buffer.backwardsScanInRange(stopRegex, rangeToTrim, ({ range, stop }) => {
     end = range.end;
     stop();
   });

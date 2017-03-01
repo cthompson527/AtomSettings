@@ -4,7 +4,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Integrations for the command-line tool Arcanist.",
-  "atomTestRunner": "../../lib/test-runner.js",
+  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -21,6 +21,12 @@
         "items": {
           "type": "string"
         }
+      },
+      "lintTimeout": {
+        "title": "Lint Timeout",
+        "type": "integer",
+        "description": "Arc lint timeout in milliseconds.",
+        "default": 60000
       }
     },
     "packageType": "Atom",
@@ -33,14 +39,19 @@
         "0.0.0": "consumeTaskRunnerServiceApi"
       }
     },
-    "nuclide-current-working-directory": {
-      "versions": {
-        "0.0.0": "consumeCwdApi"
-      }
-    },
     "nuclide-output": {
       "versions": {
         "0.0.0": "consumeOutputService"
+      }
+    },
+    "nuclide-deep-link.provider": {
+      "versions": {
+        "0.0.0": "consumeDeepLinkService"
+      }
+    },
+    "nuclide-remote-projects": {
+      "versions": {
+        "0.0.0": "consumeRemoteProjectsService"
       }
     }
   },

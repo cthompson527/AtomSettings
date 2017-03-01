@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -19,7 +10,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 let getFileVersionOfBuffer = exports.getFileVersionOfBuffer = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (buffer) {
     const filePath = buffer.getPath();
-    const notifier = activation.notifiers.getForUri(filePath);
+    const notifier = getActivation().notifiers.getForUri(filePath);
     if (notifier == null) {
       return null;
     }
@@ -30,7 +21,7 @@ let getFileVersionOfBuffer = exports.getFileVersionOfBuffer = (() => {
 
     return {
       notifier: yield notifier,
-      filePath: filePath,
+      filePath,
       version: buffer.changeCount
     };
   });
@@ -51,10 +42,10 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
-var _buffer;
+var _textBuffer;
 
-function _load_buffer() {
-  return _buffer = require('../../commons-atom/buffer');
+function _load_textBuffer() {
+  return _textBuffer = require('../../commons-atom/text-buffer');
 }
 
 var _NotifiersByConnection;
@@ -71,7 +62,17 @@ function _load_BufferSubscription() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = exports.Activation = class Activation {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Activation {
 
   constructor(state) {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -80,10 +81,10 @@ let Activation = exports.Activation = class Activation {
     this.notifiers = notifiers;
     this._disposables.add(notifiers);
 
-    this._disposables.add((0, (_buffer || _load_buffer()).observeBufferOpen)().subscribe(buffer => {
+    this._disposables.add((0, (_textBuffer || _load_textBuffer()).observeBufferOpen)().subscribe(buffer => {
       const subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
       subscriptions.add(new (_BufferSubscription || _load_BufferSubscription()).BufferSubscription(notifiers, buffer));
-      subscriptions.add((0, (_buffer || _load_buffer()).observeBufferCloseOrRename)(buffer).subscribe(closeEvent => {
+      subscriptions.add((0, (_textBuffer || _load_textBuffer()).observeBufferCloseOrRename)(buffer).subscribe(closeEvent => {
         this._disposables.remove(subscriptions);
         subscriptions.dispose();
       }));
@@ -94,23 +95,28 @@ let Activation = exports.Activation = class Activation {
   dispose() {
     this._disposables.dispose();
   }
-};
+}
 
-// Mutable for testing.
+exports.Activation = Activation; // Mutable for testing.
 
 let activation = new Activation();
 
 // exported for testing
 function reset() {
-  activation.dispose();
-  activation = new Activation();
+  if (activation != null) {
+    activation.dispose();
+    activation = null;
+  }
 }
 function getActivation() {
+  if (activation == null) {
+    activation = new Activation();
+  }
   return activation;
 }
 
 function getNotifierByConnection(connection) {
-  return activation.notifiers.getForConnection(connection);
+  return getActivation().notifiers.getForConnection(connection);
 }
 
 function getFileVersionOfEditor(editor) {

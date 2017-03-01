@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,7 +19,17 @@ function _load_fsPromise() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ConfigCache = exports.ConfigCache = class ConfigCache {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ConfigCache {
 
   constructor(configFileName) {
     this._configFileName = configFileName;
@@ -49,4 +50,5 @@ let ConfigCache = exports.ConfigCache = class ConfigCache {
   dispose() {
     this._configCache.reset();
   }
-};
+}
+exports.ConfigCache = ConfigCache;

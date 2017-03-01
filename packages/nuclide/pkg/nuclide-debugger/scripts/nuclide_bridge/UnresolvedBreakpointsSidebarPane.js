@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _NuclideBridge;
 
@@ -48,7 +38,17 @@ function _load_WebInspector() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let UnresolvedBreakpointsComponent = class UnresolvedBreakpointsComponent extends (_react || _load_react()).default.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class UnresolvedBreakpointsComponent extends (_react || _load_react()).default.Component {
 
   constructor(props) {
     super(props);
@@ -74,16 +74,14 @@ let UnresolvedBreakpointsComponent = class UnresolvedBreakpointsComponent extend
 
   render() {
     const children = this.state.breakpoints.map(breakpoint => {
-      var _url$parse = _url.default.parse(breakpoint.url);
-
-      const pathname = _url$parse.pathname;
+      const { pathname } = _url.default.parse(breakpoint.url);
 
       if (!pathname) {
         throw new Error('Invariant violation: "pathname"');
       }
 
-      const longRep = `${ pathname }:${ breakpoint.line + 1 }`;
-      const shortRep = `${ (_nuclideUri || _load_nuclideUri()).default.basename(pathname) }:${ breakpoint.line + 1 }`;
+      const longRep = `${pathname}:${breakpoint.line + 1}`;
+      const shortRep = `${(_nuclideUri || _load_nuclideUri()).default.basename(pathname)}:${breakpoint.line + 1}`;
       return (_react || _load_react()).default.createElement(
         'li',
         {
@@ -118,8 +116,9 @@ let UnresolvedBreakpointsComponent = class UnresolvedBreakpointsComponent extend
       breakpoints: (_NuclideBridge || _load_NuclideBridge()).default.getUnresolvedBreakpointsList()
     };
   }
-};
-let UnresolvedBreakpointsSidebarPane = class UnresolvedBreakpointsSidebarPane extends (_WebInspector || _load_WebInspector()).default.SidebarPane {
+}
+
+class UnresolvedBreakpointsSidebarPane extends (_WebInspector || _load_WebInspector()).default.SidebarPane {
   constructor() {
     // WebInspector classes are not es6 classes, but babel forces a super call.
     super();
@@ -137,6 +136,5 @@ let UnresolvedBreakpointsSidebarPane = class UnresolvedBreakpointsSidebarPane ex
   // an official interface. There's callers to various `reset` functions, so
   // it's probably safer to have this.
   reset() {}
-};
+}
 exports.default = UnresolvedBreakpointsSidebarPane;
-module.exports = exports['default'];

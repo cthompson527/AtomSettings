@@ -1,15 +1,14 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _class, _temp;
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
 var _AtomInput;
 
@@ -22,8 +21,6 @@ var _Checkbox;
 function _load_Checkbox() {
   return _Checkbox = require('../../nuclide-ui/Checkbox');
 }
-
-var _atom = require('atom');
 
 var _reactForAtom = require('react-for-atom');
 
@@ -38,12 +35,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Component that displays UI to create a new file.
  */
-let FileDialogComponent = (_temp = _class = class FileDialogComponent extends _reactForAtom.React.Component {
+class FileDialogComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._isClosed = false;
-    this._subscriptions = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._close = this._close.bind(this);
     this._confirm = this._confirm.bind(this);
     this._handleDocumentMouseDown = this._handleDocumentMouseDown.bind(this);
@@ -52,24 +49,20 @@ let FileDialogComponent = (_temp = _class = class FileDialogComponent extends _r
       options[name] = true;
     }
     this.state = {
-      options: options
+      options
     };
   }
 
   componentDidMount() {
     const input = this.refs.input;
-    this._subscriptions.add(atom.commands.add(_reactForAtom.ReactDOM.findDOMNode(input), {
+    this._disposables.add(atom.commands.add(_reactForAtom.ReactDOM.findDOMNode(input), {
       'core:confirm': this._confirm,
       'core:cancel': this._close
     }));
     const path = this.props.initialValue;
     input.focus();
     if (this.props.selectBasename && path != null) {
-      var _nuclideUri$parsePath = (_nuclideUri || _load_nuclideUri()).default.parsePath(path);
-
-      const dir = _nuclideUri$parsePath.dir,
-            name = _nuclideUri$parsePath.name;
-
+      const { dir, name } = (_nuclideUri || _load_nuclideUri()).default.parsePath(path);
       const selectionStart = dir ? dir.length + 1 : 0;
       const selectionEnd = selectionStart + name.length;
       input.getTextEditor().setSelectedBufferRange([[0, selectionStart], [0, selectionEnd]]);
@@ -78,14 +71,14 @@ let FileDialogComponent = (_temp = _class = class FileDialogComponent extends _r
   }
 
   componentWillUnmount() {
-    this._subscriptions.dispose();
+    this._disposables.dispose();
     document.removeEventListener('mousedown', this._handleDocumentMouseDown);
   }
 
   render() {
     let labelClassName;
     if (this.props.iconClassName != null) {
-      labelClassName = `icon ${ this.props.iconClassName }`;
+      labelClassName = `icon ${this.props.iconClassName}`;
     }
 
     const checkboxes = [];
@@ -123,10 +116,9 @@ let FileDialogComponent = (_temp = _class = class FileDialogComponent extends _r
   }
 
   _handleAdditionalOptionChanged(name, isChecked) {
-    const options = this.state.options;
-
+    const { options } = this.state;
     options[name] = isChecked;
-    this.setState({ options: options });
+    this.setState({ options });
   }
 
   _handleDocumentMouseDown(event) {
@@ -149,9 +141,17 @@ let FileDialogComponent = (_temp = _class = class FileDialogComponent extends _r
       this.props.onClose();
     }
   }
-}, _class.defaultProps = {
+}
+exports.default = FileDialogComponent; /**
+                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                        * All rights reserved.
+                                        *
+                                        * This source code is licensed under the license found in the LICENSE file in
+                                        * the root directory of this source tree.
+                                        *
+                                        * 
+                                        */
+
+FileDialogComponent.defaultProps = {
   additionalOptions: {}
-}, _temp);
-
-
-module.exports = FileDialogComponent;
+};

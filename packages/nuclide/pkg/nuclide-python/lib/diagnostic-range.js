@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,6 +18,16 @@ var _nuclideLogging;
 function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -67,7 +68,7 @@ function getModuleNameRange(message, line, editor) {
     }
     lineNumber += 1;
   }
-  logger.warn(`getModuleNameRange failed for message: ${ message }`);
+  logger.warn(`getModuleNameRange failed for message: ${message}`);
 }
 
 // Computes an appropriate underline range using the diagnostic type information.
@@ -79,11 +80,7 @@ function getDiagnosticRange(diagnostic, editor) {
   // The diagnostic message's line index may be out of bounds if buffer contents
   // have changed. To prevent an exception, we just use the last line of the buffer if
   // unsafeLine is out of bounds.
-  const code = diagnostic.code,
-        unsafeLine = diagnostic.line,
-        column = diagnostic.column,
-        message = diagnostic.message;
-
+  const { code, line: unsafeLine, column, message } = diagnostic;
   const lastRow = buffer.getLastRow();
   const line = unsafeLine <= lastRow ? unsafeLine : lastRow;
 
@@ -165,8 +162,8 @@ function getDiagnosticRange(diagnostic, editor) {
         break;
     }
   } catch (e) {
-    const diagnosticAsString = `${ diagnostic.file }:${ unsafeLine }:${ column } - ${ code }: ${ message }`;
-    logger.error(`Failed to find flake8 diagnostic range: ${ diagnosticAsString }`, e);
+    const diagnosticAsString = `${diagnostic.file}:${unsafeLine}:${column} - ${code}: ${message}`;
+    logger.error(`Failed to find flake8 diagnostic range: ${diagnosticAsString}`, e);
   }
 
   return new _atom.Range([line, trimmedStartCol], [line, trimmedEndCol]);

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -45,8 +36,17 @@ function _load_StatusBarTile() {
 }
 
 exports.BusySignalProviderBase = (_BusySignalProviderBase || _load_BusySignalProviderBase()).BusySignalProviderBase;
-exports.DedupedBusySignalProviderBase = (_DedupedBusySignalProviderBase || _load_DedupedBusySignalProviderBase()).DedupedBusySignalProviderBase;
-let Activation = class Activation {
+exports.DedupedBusySignalProviderBase = (_DedupedBusySignalProviderBase || _load_DedupedBusySignalProviderBase()).DedupedBusySignalProviderBase; /**
+                                                                                                                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                  * All rights reserved.
+                                                                                                                                                  *
+                                                                                                                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                  * the root directory of this source tree.
+                                                                                                                                                  *
+                                                                                                                                                  * 
+                                                                                                                                                  */
+
+class Activation {
 
   constructor() {
     this._disposables = new _atom.CompositeDisposable();
@@ -76,8 +76,7 @@ let Activation = class Activation {
     this._disposables.add(disposable);
     return disposable;
   }
-};
-
+}
 
 let activation = null;
 

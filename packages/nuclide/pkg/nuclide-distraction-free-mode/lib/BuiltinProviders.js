@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,7 +27,17 @@ function getBuiltinProviders() {
   }
 
   return providers;
-}let FindAndReplaceProvider = class FindAndReplaceProvider {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+class FindAndReplaceProvider {
   constructor(name) {
     this.name = name;
   }
@@ -62,9 +63,9 @@ function getBuiltinProviders() {
     const command = this.isVisible() ? 'toggle' : 'show';
     atom.commands.dispatch(atom.views.getView(atom.workspace), this.name + ':' + command);
   }
+}
 
-};
-let ToolBarProvider = class ToolBarProvider {
+class ToolBarProvider {
   constructor() {
     this.name = 'tool-bar';
   }
@@ -74,8 +75,9 @@ let ToolBarProvider = class ToolBarProvider {
   toggle() {
     atom.config.set('tool-bar.visible', !this.isVisible());
   }
-};
-let StatusBarProvider = class StatusBarProvider {
+}
+
+class StatusBarProvider {
   constructor() {
     this.name = 'status-bar';
     this._oldDisplay = null;
@@ -104,4 +106,4 @@ let StatusBarProvider = class StatusBarProvider {
   _getStatusBarElement() {
     return document.querySelector('status-bar');
   }
-};
+}

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,6 +19,16 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  * node EventEmitter semantics: namely, that adding the same combination of eventName and callback
  * adds a second listener.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function attachEvent(emitter, eventName, callback) {
   emitter.addListener(eventName, callback);
   return new (_eventKit || _load_eventKit()).Disposable(() => {

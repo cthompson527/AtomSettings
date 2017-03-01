@@ -1,21 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = debounce;
-function debounce(func, wait) {
-  let immediate = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+function debounce(func, wait, immediate = false) {
   // Taken from: https://github.com/jashkenas/underscore/blob/b10b2e6d72/underscore.js#L815.
   let timeout;
   let args;
@@ -43,9 +32,9 @@ function debounce(func, wait) {
     }
   };
 
-  return function () {
+  const debounced = function (...args_) {
     context = this;
-    args = arguments;
+    args = args_;
     timestamp = Date.now();
     const callNow = immediate && !timeout;
     if (!timeout) {
@@ -58,4 +47,21 @@ function debounce(func, wait) {
 
     return result;
   };
-}module.exports = exports['default'];
+
+  debounced.dispose = () => {
+    if (timeout) {
+      clearTimeout(timeout);
+      timeout = context = args = null;
+    }
+  };
+
+  return debounced;
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */

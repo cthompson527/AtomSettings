@@ -1,13 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.matchesFilter = matchesFilter;
+exports.filterName = filterName;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -18,6 +15,16 @@ function _load_classnames() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const SPECIAL_CHARACTERS = './@_';
 
@@ -43,7 +50,7 @@ function filterName(name, filter, isSelected) {
       'text-highlight': !isSelected
     });
 
-    return name.split(new RegExp(`(?:(?=${ formatFilter(filter) }))`, 'ig')).map((text, i) => {
+    return name.split(new RegExp(`(?:(?=${formatFilter(filter)}))`, 'ig')).map((text, i) => {
       if (matchesFilter(text, filter)) {
         return _reactForAtom.React.createElement(
           'span',
@@ -69,8 +76,3 @@ function filterName(name, filter, isSelected) {
   }
   return name;
 }
-
-module.exports = {
-  filterName: filterName,
-  matchesFilter: matchesFilter
-};

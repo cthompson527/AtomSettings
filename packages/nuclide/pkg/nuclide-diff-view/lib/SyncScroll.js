@@ -1,22 +1,12 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
-let SyncScroll = class SyncScroll {
+class SyncScroll {
 
   constructor(editor1Element, editor2Element) {
     // Atom master or >= v1.0.18 have changed the scroll logic to the editor element.
@@ -30,8 +20,7 @@ let SyncScroll = class SyncScroll {
     }];
     this._syncInfo.forEach((editorInfo, i) => {
       // Note that `onDidChangeScrollTop` isn't technically in the public API.
-      const scrollElement = editorInfo.scrollElement;
-
+      const { scrollElement } = editorInfo;
       const updateScrollPosition = () => this._scrollPositionChanged(i);
       this._subscriptions.add(scrollElement.onDidChangeScrollTop(updateScrollPosition));
       this._subscriptions.add(scrollElement.onDidChangeScrollLeft(updateScrollPosition));
@@ -45,15 +34,13 @@ let SyncScroll = class SyncScroll {
       return;
     }
     const otherInfo = this._syncInfo[1 - changeScrollIndex];
-    const otherElement = otherInfo.scrollElement;
-
+    const { scrollElement: otherElement } = otherInfo;
     if (otherElement.component == null) {
       // The other editor isn't yet attached,
       // while both editors were already in sync when attached.
       return;
     }
-    const thisElement = thisInfo.scrollElement;
-
+    const { scrollElement: thisElement } = thisInfo;
     otherInfo.scrolling = true;
     otherElement.setScrollTop(thisElement.getScrollTop());
     otherElement.setScrollLeft(thisElement.getScrollLeft());
@@ -63,6 +50,13 @@ let SyncScroll = class SyncScroll {
   dispose() {
     this._subscriptions.dispose();
   }
-};
-exports.default = SyncScroll;
-module.exports = exports['default'];
+}
+exports.default = SyncScroll; /**
+                               * Copyright (c) 2015-present, Facebook, Inc.
+                               * All rights reserved.
+                               *
+                               * This source code is licensed under the license found in the LICENSE file in
+                               * the root directory of this source tree.
+                               *
+                               * 
+                               */

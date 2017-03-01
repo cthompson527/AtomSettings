@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,6 +15,16 @@ function _load_observeGrammarForTextEditors() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const START_OBSERVING_TEXT_EDITOR_EVENT = 'start-observing-text-editor';
 const STOP_OBSERVING_TEXT_EDITOR_EVENT = 'stop-observing-text-editor';
 
@@ -33,7 +34,7 @@ const STOP_OBSERVING_TEXT_EDITOR_EVENT = 'stop-observing-text-editor';
  * This exists as its own class to make it possible to reuse instances when
  * multiple callers observe on text editors with the same grammar scopes.
  */
-let LanguageTextEditorsListener = class LanguageTextEditorsListener {
+class LanguageTextEditorsListener {
 
   constructor(grammarScopes) {
     this._grammarScopes = grammarScopes;
@@ -86,7 +87,7 @@ let LanguageTextEditorsListener = class LanguageTextEditorsListener {
     this._destroySubscriptionsMap.clear();
     this._grammarSubscription.dispose();
   }
-};
+}
 
 /**
  * Perform actions on text editors of a given language.
@@ -96,7 +97,6 @@ let LanguageTextEditorsListener = class LanguageTextEditorsListener {
  * @param cleanupFn This is called when a text editor no longer matches the
  * grammars or is destroyed.
  */
-
 function observeLanguageTextEditors(grammarScopes, fn, cleanupFn) {
   const subscriptions = new _atom.CompositeDisposable();
   const listener = new LanguageTextEditorsListener(new Set(grammarScopes));
@@ -104,4 +104,3 @@ function observeLanguageTextEditors(grammarScopes, fn, cleanupFn) {
   subscriptions.add(listener.observeLanguageTextEditors(fn, cleanupFn || (() => {})));
   return subscriptions;
 }
-module.exports = exports['default'];

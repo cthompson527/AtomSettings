@@ -1,22 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
-
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _desc, _value, _class;
 
 var _atom = require('atom');
 
@@ -28,95 +14,44 @@ function _load_nuclideAnalytics() {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-var _notifications;
-
-function _load_notifications() {
-  return _notifications = require('./notifications');
-}
-
-var _textEditor;
-
-function _load_textEditor() {
-  return _textEditor = require('../../commons-atom/text-editor');
-}
-
 var _createEmptyAppState;
 
 function _load_createEmptyAppState() {
   return _createEmptyAppState = require('./redux/createEmptyAppState');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-const ACTIVE_BUFFER_CHANGE_MODIFIED_EVENT = 'active-buffer-change-modified';
 const DID_UPDATE_STATE_EVENT = 'did-update-state';
 
-let DiffViewModel = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('diff-view.save-file'), (_class = class DiffViewModel {
+class DiffViewModel {
 
   constructor(actionCreators, progressUpdates) {
     this._actionCreators = actionCreators;
     this._progressUpdates = progressUpdates;
     this._emitter = new _atom.Emitter();
-    this._publishUpdates = new _rxjsBundlesRxMinJs.Subject();
     this._state = (0, (_createEmptyAppState || _load_createEmptyAppState()).createEmptyAppState)();
   }
 
   diffFile(filePath) {
-    this._actionCreators.diffFile(filePath, this.emitActiveBufferChangeModified.bind(this));
+    this._actionCreators.diffFile(filePath);
   }
 
   getDirtyFileChangesCount() {
-    const dirtyFiles = this._state.activeRepositoryState.dirtyFiles;
-
+    const { activeRepositoryState: { dirtyFiles } } = this._state;
     return dirtyFiles.size;
   }
 
   setViewMode(viewMode) {
     this._actionCreators.setViewMode(viewMode);
-  }
-
-  emitActiveBufferChangeModified() {
-    this._emitter.emit(ACTIVE_BUFFER_CHANGE_MODIFIED_EVENT);
-  }
-
-  onDidActiveBufferChangeModified(callback) {
-    return this._emitter.on(ACTIVE_BUFFER_CHANGE_MODIFIED_EVENT, callback);
-  }
-
-  isActiveBufferModified() {
-    const filePath = this._state.fileDiff.filePath;
-
-    const buffer = (0, (_textEditor || _load_textEditor()).bufferForUri)(filePath);
-    return buffer.isModified();
   }
 
   setCompareRevision(revision) {
@@ -129,50 +64,28 @@ let DiffViewModel = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).
     this._actionCreators.setCompareId(this._state.activeRepository, revision.id);
   }
 
-  getPublishUpdates() {
-    return this._publishUpdates;
+  publishDiff(publishMessage, isPrepareMode) {
+    const activeRepository = this._state.activeRepository;
+
+    if (!(activeRepository != null)) {
+      throw new Error('Cannot publish without an active stack!');
+    }
+
+    this._actionCreators.publishDiff(activeRepository, publishMessage, isPrepareMode, this._state.lintExcuse, this._progressUpdates);
   }
 
-  saveActiveFile() {
-    const filePath = this._state.fileDiff.filePath;
-
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-save-file');
-    return this._saveFile(filePath).catch((_notifications || _load_notifications()).notifyInternalError);
-  }
-
-  publishDiff(publishMessage, isPrepareMode, lintExcuse) {
-    var _this = this;
-
-    return (0, _asyncToGenerator.default)(function* () {
-      const activeRepository = _this._state.activeRepository;
-
-      if (!(activeRepository != null)) {
-        throw new Error('Cannot publish without an active stack!');
-      }
-
-      _this._actionCreators.publishDiff(activeRepository, publishMessage, isPrepareMode, lintExcuse, _this._publishUpdates);
-    })();
-  }
-
-  _saveFile(filePath) {
-    return (0, _asyncToGenerator.default)(function* () {
-      const buffer = (0, (_textEditor || _load_textEditor()).bufferForUri)(filePath);
-      if (buffer == null) {
-        throw new Error(`Could not find file buffer to save: \`${ filePath }\``);
-      }
-      try {
-        yield buffer.save();
-      } catch (err) {
-        throw new Error(`Could not save file buffer: \`${ filePath }\` - ${ err.toString() }`);
-      }
-    })();
+  updatePublishMessage(message) {
+    const { publish } = this._state;
+    this._actionCreators.updatePublishState(Object.assign({}, publish, {
+      message
+    }));
   }
 
   onDidUpdateState(callback) {
     return this._emitter.on(DID_UPDATE_STATE_EVENT, callback);
   }
 
-  commit(message) {
+  commit(message, bookmarkName) {
     if (message === '') {
       atom.notifications.addError('Commit aborted', { detail: 'Commit message empty' });
       return;
@@ -183,7 +96,7 @@ let DiffViewModel = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).
       throw new Error('No active repository stack');
     }
 
-    this._actionCreators.commit(activeRepository, message, this._progressUpdates);
+    this._actionCreators.commit(activeRepository, message, this._progressUpdates, bookmarkName);
   }
 
   injectState(newState) {
@@ -202,6 +115,31 @@ let DiffViewModel = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).
   setShouldAmendRebase(shouldRebaseOnAmend) {
     this._actionCreators.setShouldRebaseOnAmend(shouldRebaseOnAmend);
   }
-}, (_applyDecoratedDescriptor(_class.prototype, 'saveActiveFile', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, 'saveActiveFile'), _class.prototype)), _class));
+
+  setShouldCommitInteractively(shouldCommitInteractively) {
+    this._actionCreators.setShouldCommitInteractively(shouldCommitInteractively);
+  }
+
+  setShouldPublishOnCommit(shoulPublishOnCommit) {
+    this._actionCreators.setShouldPublishOnCommit(shoulPublishOnCommit);
+  }
+
+  updatePublishStateWithMessage(message) {
+    this._actionCreators.updatePublishState(Object.assign({}, this._state.publish, {
+      message
+    }));
+  }
+
+  setLintExcuse(lintExcuse) {
+    this._actionCreators.setLintExcuse(lintExcuse);
+  }
+
+  setIsPrepareMode(isPrepareMode) {
+    this._actionCreators.setIsPrepareMode(isPrepareMode);
+  }
+
+  setVerbatimModeEnabled(verbatimModeEnabled) {
+    this._actionCreators.setVerbatimModeEnabled(verbatimModeEnabled);
+  }
+}
 exports.default = DiffViewModel;
-module.exports = exports['default'];

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _classnames;
 
@@ -36,12 +26,11 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let RevisionTimelineNode = class RevisionTimelineNode extends _reactForAtom.React.Component {
+class RevisionTimelineNode extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handlePhabricatorRevisionClick = this._handlePhabricatorRevisionClick.bind(this);
-    this._handleSelectionChange = this._handleSelectionChange.bind(this);
   }
 
   _handlePhabricatorRevisionClick(event) {
@@ -50,35 +39,20 @@ let RevisionTimelineNode = class RevisionTimelineNode extends _reactForAtom.Reac
     event.stopPropagation();
 
     const revision = (0, (_utils || _load_utils()).getPhabricatorRevisionFromCommitMessage)(this.props.revision.description);
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-phabricator-diff-open', { revision: revision });
-  }
-
-  _handleSelectionChange() {
-    this.props.onSelectionChange(this.props.revision);
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-phabricator-diff-open', { revision });
   }
 
   render() {
-    var _props = this.props;
-    const revisionStatus = _props.revisionStatus,
-          index = _props.index,
-          revision = _props.revision,
-          revisionsCount = _props.revisionsCount,
-          selectedIndex = _props.selectedIndex;
-    const author = revision.author,
-          bookmarks = revision.bookmarks,
-          date = revision.date,
-          description = revision.description,
-          hash = revision.hash,
-          title = revision.title;
-
-    const revisionClassName = (0, (_classnames || _load_classnames()).default)('revision revision--actionable', {
-      'selected-revision-inrange': index < selectedIndex,
-      'selected-revision-end': index === selectedIndex,
-      'selected-revision-last': index === revisionsCount - 1
+    const { revisionStatus, index, revision, revisionsCount, selectedIndex } = this.props;
+    const { author, bookmarks, date, description, hash, title } = revision;
+    const revisionClassName = (0, (_classnames || _load_classnames()).default)('revision', {
+      'selected-revision-inrange': index < selectedIndex - 1,
+      'selected-revision-end': index === selectedIndex - 1,
+      'selected-revision-last': index === revisionsCount - 2
     });
-    const tooltip = `${ hash }: ${ title }
-  Author: ${ author }
-  Date: ${ date.toString() }`;
+    const tooltip = `${hash}: ${title}
+  Author: ${author}
+  Date: ${date.toString()}`;
 
     const commitAuthor = (0, (_utils || _load_utils()).getCommitAuthorFromAuthorEmail)(author);
     let commitAuthorElement;
@@ -153,7 +127,7 @@ let RevisionTimelineNode = class RevisionTimelineNode extends _reactForAtom.Reac
       'div',
       {
         className: revisionClassName,
-        onClick: this._handleSelectionChange,
+        onClick: this.props.onSelectionChange,
         title: tooltip },
       _reactForAtom.React.createElement('div', { className: 'revision-bubble' }),
       _reactForAtom.React.createElement(
@@ -178,6 +152,13 @@ let RevisionTimelineNode = class RevisionTimelineNode extends _reactForAtom.Reac
       )
     );
   }
-};
-exports.default = RevisionTimelineNode;
-module.exports = exports['default'];
+}
+exports.default = RevisionTimelineNode; /**
+                                         * Copyright (c) 2015-present, Facebook, Inc.
+                                         * All rights reserved.
+                                         *
+                                         * This source code is licensed under the license found in the LICENSE file in
+                                         * the root directory of this source tree.
+                                         *
+                                         * 
+                                         */

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,7 +18,7 @@ let getProviderData = (() => {
     }
     const point = editor.getCursorBufferPosition();
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('find-references:activate', {
-      path: path,
+      path,
       row: point.row.toString(),
       column: point.column.toString()
     });
@@ -53,21 +44,18 @@ let tryCreateView = (() => {
     try {
       const data = yield getProviderData();
       if (data == null) {
-        showError('Symbol references are not available for this project.');
+        showWarning('Symbol references are not available for this project.');
       } else if (data.type === 'error') {
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('find-references:error', { message: data.message });
-        showError(data.message);
+        showWarning(data.message);
       } else if (!data.references.length) {
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('find-references:success', { resultCount: '0' });
-        showError('No references found.');
+        showWarning('No references found.');
       } else {
-        const baseUri = data.baseUri,
-              referencedSymbolName = data.referencedSymbolName,
-              references = data.references;
-
+        const { baseUri, referencedSymbolName, references } = data;
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('find-references:success', {
-          baseUri: baseUri,
-          referencedSymbolName: referencedSymbolName,
+          baseUri,
+          referencedSymbolName,
           resultCount: references.length.toString()
         });
         const model = new (_FindReferencesModel || _load_FindReferencesModel()).default(baseUri, referencedSymbolName, references);
@@ -77,7 +65,7 @@ let tryCreateView = (() => {
     } catch (e) {
       // TODO(peterhal): Remove this when unhandled rejections have a default handler.
       logger.error('Exception in nuclide-find-references', e);
-      showError(e);
+      atom.notifications.addError(`nuclide-find-references: ${e}`, { dismissable: true });
     }
   });
 
@@ -92,12 +80,16 @@ exports.consumeProvider = consumeProvider;
 
 var _crypto = _interopRequireDefault(require('crypto'));
 
-var _atom = require('atom');
+var _textEditor;
 
-var _collection;
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
 
-function _load_collection() {
-  return _collection = require('../../commons-node/collection');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _nuclideAnalytics;
@@ -126,6 +118,18 @@ function _load_FindReferencesModel() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/* global getSelection */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 const FIND_REFERENCES_URI = 'atom://nuclide/find-references/';
@@ -134,8 +138,8 @@ let subscriptions = null;
 let providers = [];
 const supportedProviders = new Map();
 
-function showError(message) {
-  atom.notifications.addError('nuclide-find-references: ' + message, { dismissable: true });
+function showWarning(message) {
+  atom.notifications.addWarning('nuclide-find-references: ' + message, { dismissable: true });
 }
 
 function enableForEditor(editor) {
@@ -143,8 +147,24 @@ function enableForEditor(editor) {
   elem.classList.add('enable-nuclide-find-references');
 }
 
+function disableForEditor(editor) {
+  const elem = atom.views.getView(editor);
+  elem.classList.remove('enable-nuclide-find-references');
+}
+
+// Returns true if this is this adds the supported provider.
+function addSupportedProvider(editor, provider) {
+  let supported = supportedProviders.get(editor);
+  if (supported == null) {
+    supported = [];
+    supportedProviders.set(editor, supported);
+  }
+  supported.push(provider);
+  return supported.length === 1;
+}
+
 function activate(state) {
-  subscriptions = new _atom.CompositeDisposable();
+  subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   subscriptions.add(atom.commands.add('atom-text-editor', 'nuclide-find-references:activate', (0, _asyncToGenerator.default)(function* () {
     const view = yield tryCreateView();
     if (view != null) {
@@ -156,6 +176,8 @@ function activate(state) {
           return view;
         }
       });
+      // not a file URI
+      // eslint-disable-next-line nuclide-internal/atom-apis
       atom.workspace.open(uri);
       // The new tab opens instantly, so this is no longer needed.
       disposable.dispose();
@@ -164,29 +186,26 @@ function activate(state) {
 
   // Mark text editors with a working provider with a special CSS class.
   // This ensures the context menu option only appears in supported projects.
-  subscriptions.add(atom.workspace.observeTextEditors((() => {
+  subscriptions.add((0, (_textEditor || _load_textEditor()).observeTextEditors)((() => {
     var _ref4 = (0, _asyncToGenerator.default)(function* (editor) {
       const path = editor.getPath();
       if (!path || supportedProviders.get(editor)) {
         return;
       }
-      let supported = yield Promise.all(providers.map((() => {
+      supportedProviders.set(editor, []);
+      yield Promise.all(providers.map((() => {
         var _ref5 = (0, _asyncToGenerator.default)(function* (provider) {
           if (yield provider.isEditorSupported(editor)) {
-            return provider;
+            if (addSupportedProvider(editor, provider)) {
+              enableForEditor(editor);
+            }
           }
-          return null;
         });
 
         return function (_x2) {
           return _ref5.apply(this, arguments);
         };
       })()));
-      supported = (0, (_collection || _load_collection()).arrayCompact)(supported);
-      if (supported.length) {
-        enableForEditor(editor);
-      }
-      supportedProviders.set(editor, supported);
       if (subscriptions) {
         const disposable = editor.onDidDestroy(function () {
           supportedProviders.delete(editor);
@@ -205,8 +224,11 @@ function activate(state) {
 
   // Enable text copy from the symbol reference view
   subscriptions.add(atom.commands.add('nuclide-find-references-view', 'core:copy', () => {
-    const selectedText = window.getSelection().toString();
-    atom.clipboard.write(selectedText);
+    const selection = getSelection();
+    if (selection != null) {
+      const selectedText = selection.toString();
+      atom.clipboard.write(selectedText);
+    }
   }));
 }
 
@@ -221,18 +243,31 @@ function deactivate() {
 function consumeProvider(provider) {
   providers.push(provider);
   // Editors are often open before providers load, so update existing ones too.
-  supportedProviders.forEach((() => {
-    var _ref6 = (0, _asyncToGenerator.default)(function* (supported, editor) {
+  atom.workspace.getTextEditors().forEach((() => {
+    var _ref6 = (0, _asyncToGenerator.default)(function* (editor) {
       if (yield provider.isEditorSupported(editor)) {
-        if (!supported.length) {
+        if (addSupportedProvider(editor, provider)) {
           enableForEditor(editor);
         }
-        supported.push(provider);
       }
     });
 
-    return function (_x3, _x4) {
+    return function (_x3) {
       return _ref6.apply(this, arguments);
     };
   })());
+
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+    providers = providers.filter(p => p !== provider);
+
+    supportedProviders.forEach((supported, editor) => {
+      const providerIdx = supported.indexOf(provider);
+      if (providerIdx !== -1) {
+        supported.splice(providerIdx, 1);
+        if (supported.length === 0) {
+          disableForEditor(editor);
+        }
+      }
+    });
+  });
 }

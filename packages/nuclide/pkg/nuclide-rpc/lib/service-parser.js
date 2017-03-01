@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -56,6 +47,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function isPrivateMemberName(name) {
   return name.startsWith('_');
 }
@@ -70,24 +71,24 @@ function parseServiceDefinition(fileName, source, predefinedTypes) {
   return new ServiceParser(predefinedTypes).parseService(fileName, source);
 }
 
-let ServiceParser = class ServiceParser {
+class ServiceParser {
 
   constructor(predefinedTypes) {
-    this._defs = new Map();
+    this._defs = {};
     this._filesTodo = [];
     this._filesSeen = new Set();
 
     // Add all builtin types
     const defineBuiltinType = name => {
-      if (!!this._defs.has(name)) {
+      if (!!this._defs.hasOwnProperty(name)) {
         throw new Error('Duplicate builtin type');
       }
 
-      this._defs.set(name, {
+      this._defs[name] = {
         kind: 'alias',
-        name: name,
+        name,
         location: { type: 'builtin' }
-      });
+      };
     };
     (_builtinTypes || _load_builtinTypes()).namedBuiltinTypes.forEach(defineBuiltinType);
     predefinedTypes.forEach(defineBuiltinType);
@@ -121,14 +122,15 @@ let ServiceParser = class ServiceParser {
       }
     }
   }
-};
-let FileParser = class FileParser {
+}
+
+class FileParser {
   // Maps type names to the imported name and file that they are imported from.
   constructor(fileName, fileType, defs) {
     this._fileType = fileType;
     this._fileName = fileName;
     this._defs = defs;
-    this._imports = new Map();
+    this._imports = {};
     this._importsUsed = new Set();
   }
   // Set of files required by imports
@@ -143,17 +145,17 @@ let FileParser = class FileParser {
   }
 
   _nodeLocationString(node) {
-    return `${ this._fileName }(${ node.loc.start.line })`;
+    return `${this._fileName}(${node.loc.start.line})`;
   }
 
   _errorLocations(locations, message) {
-    let fullMessage = `${ (0, (_location || _load_location()).locationToString)(locations[0]) }:${ message }`;
-    fullMessage = fullMessage.concat(...locations.slice(1).map(location => `\n${ (0, (_location || _load_location()).locationToString)(location) }: Related location`));
+    let fullMessage = `${(0, (_location || _load_location()).locationToString)(locations[0])}:${message}`;
+    fullMessage = fullMessage.concat(...locations.slice(1).map(location => `\n${(0, (_location || _load_location()).locationToString)(location)}: Related location`));
     return new Error(fullMessage);
   }
 
   _error(node, message) {
-    return new Error(`${ this._nodeLocationString(node) }:${ message }`);
+    return new Error(`${this._nodeLocationString(node)}:${message}`);
   }
 
   _assert(node, condition, message) {
@@ -165,7 +167,7 @@ let FileParser = class FileParser {
   // Returns set of imported files required.
   // The file names returned are relative to the file being parsed.
   parse(source) {
-    this._imports = new Map();
+    this._imports = {};
 
     const ast = (_babylon || _load_babylon()).parse(source, {
       sourceType: 'module',
@@ -232,7 +234,7 @@ let FileParser = class FileParser {
         break;
       // Unknown export declaration.
       default:
-        throw this._error(declaration, `Unknown declaration type ${ declaration.type } in definition body.`);
+        throw this._error(declaration, `Unknown declaration type ${declaration.type} in definition body.`);
     }
   }
 
@@ -247,27 +249,27 @@ let FileParser = class FileParser {
       if (specifier.type === 'ImportSpecifier') {
         const imported = specifier.imported.name;
         const local = specifier.local.name;
-        this._imports.set(local, {
-          imported: imported,
+        this._imports[local] = {
+          imported,
           file: from,
           added: false,
           location: this._locationOfNode(specifier)
-        });
+        };
       }
     }
   }
 
   _add(definition) {
-    if (this._defs.has(definition.name)) {
-      const existingDef = this._defs.get(definition.name);
+    if (this._defs.hasOwnProperty(definition.name)) {
+      const existingDef = this._defs[definition.name];
 
       if (!(existingDef != null)) {
         throw new Error('Invariant violation: "existingDef != null"');
       }
 
-      throw this._errorLocations([definition.location, existingDef.location], `Duplicate definition for ${ definition.name }`);
+      throw this._errorLocations([definition.location, existingDef.location], `Duplicate definition for ${definition.name}`);
     } else {
-      this._defs.set(definition.name, definition);
+      this._defs[definition.name] = definition;
     }
   }
 
@@ -293,7 +295,7 @@ let FileParser = class FileParser {
         location: this._locationOfNode(declaration),
         kind: 'function',
         argumentTypes: declaration.params.map(param => this._parseParameter(param)),
-        returnType: returnType
+        returnType
       }
     };
   }
@@ -326,8 +328,8 @@ let FileParser = class FileParser {
       name: declaration.id.name,
       location: this._locationOfNode(declaration),
       constructorArgs: [],
-      staticMethods: new Map(),
-      instanceMethods: new Map()
+      staticMethods: {},
+      instanceMethods: {}
     };
 
     const classBody = declaration.body;
@@ -339,18 +341,14 @@ let FileParser = class FileParser {
         }
       } else {
         if (!isPrivateMemberName(method.key.name)) {
-          var _parseClassMethod = this._parseClassMethod(method);
-
-          const name = _parseClassMethod.name,
-                type = _parseClassMethod.type;
-
+          const { name, type } = this._parseClassMethod(method);
           const isStatic = Boolean(method.static);
           this._validateMethod(method, name, type, isStatic);
           this._defineMethod(name, type, isStatic ? def.staticMethods : def.instanceMethods);
         }
       }
     }
-    if (!def.instanceMethods.has('dispose')) {
+    if (!def.instanceMethods.hasOwnProperty('dispose')) {
       throw this._error(declaration, 'Remotable interfaces must include a dispose method');
     }
     return def;
@@ -378,8 +376,8 @@ let FileParser = class FileParser {
       name: declaration.id.name,
       location: this._locationOfNode(declaration),
       constructorArgs: null,
-      staticMethods: new Map(),
-      instanceMethods: new Map()
+      staticMethods: {},
+      instanceMethods: {}
     };
 
     if (!(declaration.body.type === 'ObjectTypeAnnotation')) {
@@ -393,10 +391,7 @@ let FileParser = class FileParser {
       }
 
       if (!isPrivateMemberName(property.key.name)) {
-        var _parseInterfaceClassM = this._parseInterfaceClassMethod(property);
-
-        const name = _parseInterfaceClassM.name,
-              type = _parseInterfaceClassM.type;
+        const { name, type } = this._parseInterfaceClassMethod(property);
 
         if (!!property.static) {
           throw new Error('static interface members are a parse error');
@@ -406,19 +401,18 @@ let FileParser = class FileParser {
         this._defineMethod(name, type, def.instanceMethods);
       }
     }
-    if (!def.instanceMethods.has('dispose')) {
+    if (!def.instanceMethods.hasOwnProperty('dispose')) {
       throw this._error(declaration, 'Remotable interfaces must include a dispose method');
     }
     return def;
   }
 
   _defineMethod(name, type, peers) {
-    if (peers.has(name)) {
-      // $FlowFixMe(peterhal)
-      const relatedLocation = peers.get(name).location;
-      throw this._errorLocations([type.location, relatedLocation], `Duplicate method definition ${ name }`);
+    if (peers.hasOwnProperty(name)) {
+      const peer = peers[name];
+      throw this._errorLocations([type.location, peer.location], `Duplicate method definition ${name}`);
     } else {
-      peers.set(name, type);
+      peers[name] = type;
     }
   }
 
@@ -431,7 +425,7 @@ let FileParser = class FileParser {
   _parseClassMethod(definition) {
     this._assert(definition, definition.type === 'ClassMethod', 'This is a ClassMethod object.');
     this._assert(definition, definition.key && definition.key.type === 'Identifier', 'This method defintion has an key (a name).');
-    this._assert(definition, definition.returnType && definition.returnType.type === 'TypeAnnotation', `${ definition.key.name } missing a return type annotation.`);
+    this._assert(definition, definition.returnType && definition.returnType.type === 'TypeAnnotation', `${definition.key.name} missing a return type annotation.`);
 
     const returnType = this._parseTypeAnnotation(definition.returnType.typeAnnotation);
     return {
@@ -441,7 +435,7 @@ let FileParser = class FileParser {
         location: this._locationOfNode(definition),
         kind: 'function',
         argumentTypes: definition.params.map(param => this._parseParameter(param)),
-        returnType: returnType
+        returnType
       }
     };
   }
@@ -456,7 +450,7 @@ let FileParser = class FileParser {
   _parseInterfaceClassMethod(definition) {
     this._assert(definition, definition.type === 'ObjectTypeProperty', 'This is a ObjectTypeProperty object.');
     this._assert(definition, definition.key && definition.key.type === 'Identifier', 'This method definition has an key (a name).');
-    this._assert(definition, definition.value.returnType != null, `${ definition.key.name } missing a return type annotation.`);
+    this._assert(definition, definition.value.returnType != null, `${definition.key.name} missing a return type annotation.`);
 
     const returnType = this._parseTypeAnnotation(definition.value.returnType);
 
@@ -471,14 +465,14 @@ let FileParser = class FileParser {
         location: this._locationOfNode(definition.value),
         kind: 'function',
         argumentTypes: definition.value.params.map(param => this._parseInterfaceParameter(param)),
-        returnType: returnType
+        returnType
       }
     };
   }
 
   _parseInterfaceParameter(param) {
     if (!param.typeAnnotation) {
-      throw this._error(param, `Parameter ${ param.name } doesn't have type annotation.`);
+      throw this._error(param, `Parameter ${param.name} doesn't have type annotation.`);
     } else {
       const name = param.name.name;
 
@@ -489,17 +483,17 @@ let FileParser = class FileParser {
       const type = this._parseTypeAnnotation(param.typeAnnotation);
       if (param.optional && type.kind !== 'nullable') {
         return {
-          name: name,
+          name,
           type: {
             location: this._locationOfNode(param),
             kind: 'nullable',
-            type: type
+            type
           }
         };
       } else {
         return {
-          name: name,
-          type: type
+          name,
+          type
         };
       }
     }
@@ -516,23 +510,23 @@ let FileParser = class FileParser {
     }
 
     if (!param.typeAnnotation) {
-      throw this._error(param, `Parameter ${ param.name } doesn't have type annotation.`);
+      throw this._error(param, `Parameter ${param.name} doesn't have type annotation.`);
     } else {
       const name = param.name;
       const type = this._parseTypeAnnotation(param.typeAnnotation.typeAnnotation);
       if (param.optional && type.kind !== 'nullable') {
         return {
-          name: name,
+          name,
           type: {
             location: this._locationOfNode(param),
             kind: 'nullable',
-            type: type
+            type
           }
         };
       } else {
         return {
-          name: name,
-          type: type
+          name,
+          type
         };
       }
     }
@@ -546,30 +540,30 @@ let FileParser = class FileParser {
     const location = this._locationOfNode(typeAnnotation);
     switch (typeAnnotation.type) {
       case 'AnyTypeAnnotation':
-        return { location: location, kind: 'any' };
+        return { location, kind: 'any' };
       case 'MixedTypeAnnotation':
-        return { location: location, kind: 'mixed' };
+        return { location, kind: 'mixed' };
       case 'StringTypeAnnotation':
-        return { location: location, kind: 'string' };
+        return { location, kind: 'string' };
       case 'NumberTypeAnnotation':
-        return { location: location, kind: 'number' };
+        return { location, kind: 'number' };
       case 'BooleanTypeAnnotation':
-        return { location: location, kind: 'boolean' };
+        return { location, kind: 'boolean' };
       case 'StringLiteralTypeAnnotation':
-        return { location: location, kind: 'string-literal', value: typeAnnotation.value };
+        return { location, kind: 'string-literal', value: typeAnnotation.value };
       case 'NumericLiteralTypeAnnotation':
-        return { location: location, kind: 'number-literal', value: typeAnnotation.value };
+        return { location, kind: 'number-literal', value: typeAnnotation.value };
       case 'BooleanLiteralTypeAnnotation':
-        return { location: location, kind: 'boolean-literal', value: typeAnnotation.value };
+        return { location, kind: 'boolean-literal', value: typeAnnotation.value };
       case 'NullableTypeAnnotation':
         return {
-          location: location,
+          location,
           kind: 'nullable',
           type: this._parseTypeAnnotation(typeAnnotation.typeAnnotation)
         };
       case 'ObjectTypeAnnotation':
         return {
-          location: location,
+          location,
           kind: 'object',
           fields: typeAnnotation.properties.map(prop => {
             if (!(prop.type === 'ObjectTypeProperty')) {
@@ -585,29 +579,29 @@ let FileParser = class FileParser {
           })
         };
       case 'VoidTypeAnnotation':
-        return { location: location, kind: 'void' };
+        return { location, kind: 'void' };
       case 'TupleTypeAnnotation':
         return {
-          location: location,
+          location,
           kind: 'tuple',
           types: typeAnnotation.types.map(this._parseTypeAnnotation.bind(this))
         };
       case 'UnionTypeAnnotation':
         return {
-          location: location,
+          location,
           kind: 'union',
           types: typeAnnotation.types.map(this._parseTypeAnnotation.bind(this))
         };
       case 'IntersectionTypeAnnotation':
         return {
-          location: location,
+          location,
           kind: 'intersection',
           types: typeAnnotation.types.map(this._parseTypeAnnotation.bind(this))
         };
       case 'GenericTypeAnnotation':
         return this._parseGenericTypeAnnotation(typeAnnotation);
       default:
-        throw this._error(typeAnnotation, `Unknown type annotation ${ typeAnnotation.type }.`);
+        throw this._error(typeAnnotation, `Unknown type annotation ${typeAnnotation.type}.`);
     }
   }
 
@@ -625,32 +619,32 @@ let FileParser = class FileParser {
     switch (id) {
       case 'Array':
         return {
-          location: location,
+          location,
           kind: 'array',
           type: this._parseGenericTypeParameterOfKnownType(id, typeAnnotation)
         };
       case 'Set':
         return {
-          location: location,
+          location,
           kind: 'set',
           type: this._parseGenericTypeParameterOfKnownType(id, typeAnnotation)
         };
       case 'Promise':
         return {
-          location: location,
+          location,
           kind: 'promise',
           type: this._parseGenericTypeParameterOfKnownType(id, typeAnnotation)
         };
       case 'ConnectableObservable':
         return {
-          location: location,
+          location,
           kind: 'observable',
           type: this._parseGenericTypeParameterOfKnownType(id, typeAnnotation)
         };
       case 'Map':
-        this._assert(typeAnnotation, typeAnnotation.typeParameters != null && typeAnnotation.typeParameters.params.length === 2, `${ id } takes exactly two type parameters.`);
+        this._assert(typeAnnotation, typeAnnotation.typeParameters != null && typeAnnotation.typeParameters.params.length === 2, `${id} takes exactly two type parameters.`);
         return {
-          location: location,
+          location,
           kind: 'map',
           keyType: this._parseTypeAnnotation(typeAnnotation.typeParameters.params[0]),
           valueType: this._parseTypeAnnotation(typeAnnotation.typeParameters.params[1])
@@ -659,22 +653,22 @@ let FileParser = class FileParser {
         this._assert(typeAnnotation, id !== 'Observable', 'Use of Observable in RPC interface. Use ConnectableObservable instead.');
 
         // Named types are represented as Generic types with no type parameters.
-        this._assert(typeAnnotation, typeAnnotation.typeParameters == null, `Unknown generic type ${ id }.`);
+        this._assert(typeAnnotation, typeAnnotation.typeParameters == null, `Unknown generic type ${id}.`);
 
-        const imp = this._imports.get(id);
-        if (!this._defs.has(id) && imp != null && !imp.added) {
+        const imp = this._imports.hasOwnProperty(id) ? this._imports[id] : null;
+        if (!this._defs.hasOwnProperty(id) && imp != null && !imp.added) {
           imp.added = true;
           this._importsUsed.add(imp.file);
           if (id !== imp.imported) {
-            return { location: location, kind: 'named', name: imp.imported };
+            return { location, kind: 'named', name: imp.imported };
           }
         }
-        return { location: location, kind: 'named', name: id };
+        return { location, kind: 'named', name: id };
     }
   }
 
   _parseGenericTypeParameterOfKnownType(id, typeAnnotation) {
-    this._assert(typeAnnotation, typeAnnotation.typeParameters != null && typeAnnotation.typeParameters.params.length === 1, `${ id } has exactly one type parameter.`);
+    this._assert(typeAnnotation, typeAnnotation.typeParameters != null && typeAnnotation.typeParameters.params.length === 1, `${id} has exactly one type parameter.`);
     return this._parseTypeAnnotation(typeAnnotation.typeParameters.params[0]);
   }
 
@@ -691,13 +685,12 @@ let FileParser = class FileParser {
           throw new Error('Invariant violation: "type.id.type === \'Identifier\'"');
         }
 
-        return `${ this._parseTypeName(type.qualification) }.${ type.id.name }`;
+        return `${this._parseTypeName(type.qualification)}.${type.id.name}`;
       default:
-        throw this._error(type, `Expected named type. Found ${ type.type }`);
+        throw this._error(type, `Expected named type. Found ${type.type}`);
     }
   }
-};
-
+}
 
 function isValidDisposeReturnType(type) {
   return type.kind === 'void' || type.kind === 'promise' && type.type.kind === 'void';

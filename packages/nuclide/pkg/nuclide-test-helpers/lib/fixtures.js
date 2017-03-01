@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.generateFixture = exports.copyBuildFixture = exports.generateHgRepo2Fixture = exports.generateHgRepo1Fixture = exports.copyFixture = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 /**
  * Traverses up the parent directories looking for `fixtures/FIXTURE_NAME`.
@@ -80,7 +69,15 @@ let copyFixture = exports.copyFixture = (() => {
  *
  * @returns the path to the temporary directory that this function creates.
  */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 let generateHgRepo1Fixture = exports.generateHgRepo1Fixture = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* () {
@@ -88,6 +85,7 @@ let generateHgRepo1Fixture = exports.generateHgRepo1Fixture = (() => {
     const tempDir = yield generateFixture('hg_repo_1', new Map([['.watchmanconfig', '{}\n'], ['test.txt', testTxt]]));
     const repoPath = yield (_fsPromise || _load_fsPromise()).default.realpath(tempDir);
     yield (0, (_process || _load_process()).checkOutput)('hg', ['init'], { cwd: repoPath });
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, '.hg', 'hgrc'), '[ui]\nusername = Test <test@mail.com>\n');
     yield (0, (_process || _load_process()).checkOutput)('hg', ['commit', '-A', '-m', 'first commit'], { cwd: repoPath });
     yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, 'test.txt'), testTxt + '\nthis line added on second commit\n');
     yield (0, (_process || _load_process()).checkOutput)('hg', ['commit', '-A', '-m', 'second commit'], { cwd: repoPath });
@@ -120,7 +118,7 @@ let generateHgRepo2Fixture = exports.generateHgRepo2Fixture = (() => {
     const tempDir = yield generateFixture('hg_repo_2', new Map([['.watchmanconfig', '{}\n'], ['test.txt', testTxt]]));
     const repoPath = yield (_fsPromise || _load_fsPromise()).default.realpath(tempDir);
     yield (0, (_process || _load_process()).checkOutput)('hg', ['init'], { cwd: repoPath });
-    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, '.hg/hgrc'), '[paths]\ndefault = .\n');
+    yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, '.hg', 'hgrc'), '[paths]\ndefault = .\n' + '[ui]\nusername = Test <test@mail.com>\n');
     yield (0, (_process || _load_process()).checkOutput)('hg', ['commit', '-A', '-m', 'first commit'], { cwd: repoPath });
     yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(repoPath, 'test.txt'), testTxt + '\nthis line added on second commit\n');
     yield (0, (_process || _load_process()).checkOutput)('hg', ['commit', '-A', '-m', 'second commit'], { cwd: repoPath });
@@ -222,10 +220,7 @@ let generateFixture = exports.generateFixture = (() => {
     });
 
     // Dedupe the dirs that we have to make.
-    const dirsToMake = fileTuples.map(function (_ref8) {
-      var _ref9 = _slicedToArray(_ref8, 1);
-
-      let filename = _ref9[0];
+    const dirsToMake = fileTuples.map(function ([filename]) {
       return (_nuclideUri || _load_nuclideUri()).default.dirname(filename);
     }).filter(function (dirname, i, arr) {
       return arr.indexOf(dirname) === i;
@@ -235,12 +230,7 @@ let generateFixture = exports.generateFixture = (() => {
       return (_fsPromise || _load_fsPromise()).default.mkdirp(dirname);
     });
 
-    yield (0, (_promise || _load_promise()).asyncLimit)(fileTuples, MAX_CONCURRENT_FILE_OPS, function (_ref10) {
-      var _ref11 = _slicedToArray(_ref10, 2);
-
-      let filename = _ref11[0],
-          contents = _ref11[1];
-
+    yield (0, (_promise || _load_promise()).asyncLimit)(fileTuples, MAX_CONCURRENT_FILE_OPS, function ([filename, contents]) {
       // We can't use fsPromise/fs-plus because it does too much extra work.
       // They call `mkdirp` before `writeFile`. We know that the target dir
       // exists, so we can optimize by going straight to `fs`. When you're

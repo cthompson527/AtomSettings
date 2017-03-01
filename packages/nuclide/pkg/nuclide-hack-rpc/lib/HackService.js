@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -127,15 +118,36 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
+var _nuclideHackCommon;
+
+function _load_nuclideHackCommon() {
+  return _nuclideHackCommon = require('../../nuclide-hack-common');
+}
+
+var _autocomplete;
+
+function _load_autocomplete() {
+  return _autocomplete = require('../../nuclide-hack-common/lib/autocomplete');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const HH_DIAGNOSTICS_DELAY_MS = 600;
+const HH_DIAGNOSTICS_DELAY_MS = 600; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      */
+
 const HH_CLIENT_MAX_TRIES = 10;
 
-let HackLanguageServiceImpl = class HackLanguageServiceImpl extends (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ServerLanguageService {
+class HackLanguageServiceImpl extends (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ServerLanguageService {
 
   constructor(useIdeConnection, fileNotifier) {
-    super(fileNotifier, new HackLanguageAnalyzer(useIdeConnection, fileNotifier));
+    super(fileNotifier, new HackSingleFileLanguageService(useIdeConnection, fileNotifier));
     this._useIdeConnection = useIdeConnection;
     this._resources = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     if (useIdeConnection) {
@@ -147,24 +159,27 @@ let HackLanguageServiceImpl = class HackLanguageServiceImpl extends (_nuclideLan
       this._resources.add(configObserver, configObserver.observeConfigs().subscribe(configs => {
         (0, (_HackProcess || _load_HackProcess()).ensureProcesses)(fileNotifier, configs);
       }));
+      this._resources.add(() => {
+        (0, (_HackProcess || _load_HackProcess()).closeProcesses)(fileNotifier);
+      });
     }
   }
 
-  getAutocompleteSuggestions(fileVersion, position, activatedManually) {
+  getAutocompleteSuggestions(fileVersion, position, activatedManually, prefix) {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       if (_this._useIdeConnection) {
-        const process = yield (0, (_HackProcess || _load_HackProcess()).getHackProcess)(_this._fileCache, fileVersion.filePath);
-        if (process == null) {
-          return [];
-        } else {
+        try {
+          const process = yield (0, (_HackProcess || _load_HackProcess()).getHackProcess)(_this._fileCache, fileVersion.filePath);
           return process.getAutocompleteSuggestions(fileVersion, position, activatedManually);
+        } catch (e) {
+          return null;
         }
       } else {
         // Babel workaround: w/o the es2015-classes transform, async functions can't call `super`.
         // https://github.com/babel/babel/issues/3930
-        return (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ServerLanguageService.prototype.getAutocompleteSuggestions.call(_this, fileVersion, position, activatedManually);
+        return (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ServerLanguageService.prototype.getAutocompleteSuggestions.call(_this, fileVersion, position, activatedManually, prefix);
       }
     })();
   }
@@ -177,11 +192,14 @@ let HackLanguageServiceImpl = class HackLanguageServiceImpl extends (_nuclideLan
   }
 
   dispose() {
+    (_hackConfig || _load_hackConfig()).logger.logInfo('Disposing HackLanguageServiceImpl');
+
     this._resources.dispose();
     super.dispose();
   }
-};
-let HackLanguageAnalyzer = class HackLanguageAnalyzer {
+}
+
+class HackSingleFileLanguageService {
 
   constructor(useIdeConnection, fileNotifier) {
     this._useIdeConnection = useIdeConnection;
@@ -213,41 +231,33 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
   }
 
   observeDiagnostics() {
-    (_hackConfig || _load_hackConfig()).logger.logTrace('observeDiagnostics');
+    (_hackConfig || _load_hackConfig()).logger.log('observeDiagnostics');
 
     if (!this._useIdeConnection) {
       throw new Error('Invariant violation: "this._useIdeConnection"');
     }
 
     return (0, (_HackProcess || _load_HackProcess()).observeConnections)(this._fileCache).mergeMap(connection => {
-      (_hackConfig || _load_hackConfig()).logger.logTrace('notifyDiagnostics');
-      const filesWithErrors = new Set();
-      const diagnostics = connection.notifyDiagnostics().refCount().catch(error => {
-        (_hackConfig || _load_hackConfig()).logger.logError(`Error: notifyDiagnostics ${ error }`);
+      (_hackConfig || _load_hackConfig()).logger.log('notifyDiagnostics');
+      return (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ensureInvalidations)((_hackConfig || _load_hackConfig()).logger, connection.notifyDiagnostics().refCount().catch(error => {
+        (_hackConfig || _load_hackConfig()).logger.logError(`Error: notifyDiagnostics ${error}`);
         return _rxjsBundlesRxMinJs.Observable.empty();
+      }).filter(hackDiagnostics => {
+        // This is passed over RPC as NuclideUri, which is not allowed
+        // to be an empty string. It's better to silently skip a
+        // (most likely) useless error, than crash the entire connection.
+        // TODO: figure out a better way to display those errors
+        return hackDiagnostics.filename !== '';
       }).map(hackDiagnostics => {
-        (_hackConfig || _load_hackConfig()).logger.logTrace(`Got hack error in ${ hackDiagnostics.filename }`);
+        (_hackConfig || _load_hackConfig()).logger.log(`Got hack error in ${hackDiagnostics.filename}`);
         return {
           filePath: hackDiagnostics.filename,
           messages: hackDiagnostics.errors.map(diagnostic => (0, (_Diagnostics || _load_Diagnostics()).hackMessageToDiagnosticMessage)(diagnostic.message))
         };
-      }).do(diagnostic => {
-        const filePath = diagnostic.filePath;
-        if (diagnostic.messages.length === 0) {
-          (_hackConfig || _load_hackConfig()).logger.logTrace(`Removing ${ filePath } from files with errors`);
-          filesWithErrors.delete(filePath);
-        } else {
-          (_hackConfig || _load_hackConfig()).logger.logTrace(`Adding ${ filePath } to files with errors`);
-          filesWithErrors.add(filePath);
-        }
-      });
-
-      const fileInvalidations = _rxjsBundlesRxMinJs.Observable.defer(() => _rxjsBundlesRxMinJs.Observable.from(Array.from(filesWithErrors).map(file => ({
-        filePath: file,
-        messages: []
-      }))));
-
-      return diagnostics.concat(fileInvalidations);
+      }));
+    }).catch(error => {
+      (_hackConfig || _load_hackConfig()).logger.logError(`Error: observeDiagnostics ${error}`);
+      throw error;
     });
   }
 
@@ -256,7 +266,7 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
       const contents = buffer.getText();
       const offset = buffer.characterIndexForPosition(position);
 
-      const replacementPrefix = (0, (_Completions || _load_Completions()).findHackPrefix)(buffer, position);
+      const replacementPrefix = (0, (_autocomplete || _load_autocomplete()).findHackPrefix)(buffer, position);
       if (replacementPrefix === '' && !(0, (_Completions || _load_Completions()).hasPrefix)(buffer, position)) {
         return [];
       }
@@ -403,7 +413,7 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
 
       const id = getIdentifierAtPosition(buffer, position);
       if (id == null) {
-        return [];
+        return null;
       }
 
       const result = yield (0, (_HackHelpers || _load_HackHelpers()).callHHClient)(
@@ -411,7 +421,7 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
       /* errorStream */false,
       /* processInput */contents,
       /* file */filePath);
-      return result == null ? [] : result.map((_HackHelpers || _load_HackHelpers()).hackRangeToAtomRange);
+      return result == null ? null : result.map((_HackHelpers || _load_HackHelpers()).hackRangeToAtomRange);
     })();
   }
 
@@ -432,10 +442,14 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
       } else if (response.internal_error) {
         throw new Error('Internal error formatting hack source.');
       } else if (response.error_message !== '') {
-        throw new Error(`Error formatting hack source: ${ response.error_message }`);
+        throw new Error(`Error formatting hack source: ${response.error_message}`);
       }
       return response.result;
     })();
+  }
+
+  formatEntireFile(filePath, buffer, range) {
+    throw new Error('Not implemented');
   }
 
   getEvaluationExpression(filePath, buffer, position) {
@@ -460,15 +474,14 @@ let HackLanguageAnalyzer = class HackLanguageAnalyzer {
   }
 
   dispose() {}
-};
-
+}
 
 function formatAtomLineColumn(position) {
   return formatLineColumn(position.row + 1, position.column + 1);
 }
 
 function formatLineColumn(line, column) {
-  return `${ line }:${ column }`;
+  return `${line}:${column}`;
 }
 
 // Calculate the offset of the cursor from the beginning of the file.
@@ -478,7 +491,7 @@ function markFileForCompletion(contents, offset) {
 }
 
 function getIdentifierAndRange(buffer, position) {
-  const matchData = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, (_HackHelpers || _load_HackHelpers()).HACK_WORD_REGEX);
+  const matchData = (0, (_range || _load_range()).wordAtPositionFromBuffer)(buffer, position, (_nuclideHackCommon || _load_nuclideHackCommon()).HACK_WORD_REGEX);
   return matchData == null || matchData.wordMatch.length === 0 ? null : { id: matchData.wordMatch[0], range: matchData.range };
 }
 

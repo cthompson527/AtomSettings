@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -38,6 +29,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function sendHttpRequest(actions, store) {
   return actions.ofType((_Actions || _load_Actions()).SEND_REQUEST).do(action => {
     if (!(action.type === (_Actions || _load_Actions()).SEND_REQUEST)) {
@@ -45,16 +46,9 @@ function sendHttpRequest(actions, store) {
     }
 
     const credentials = 'include'; // We always want to send cookies.
-
-    var _store$getState = store.getState();
-
-    const uri = _store$getState.uri,
-          method = _store$getState.method,
-          headers = _store$getState.headers,
-          body = _store$getState.body;
-
-    const options = method === 'POST' ? { method: method, credentials: credentials, headers: headers, body: body } : { method: method, credentials: credentials, headers: headers };
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-http-request-sender:http-request', { uri: uri, options: options });
+    const { uri, method, headers, body } = store.getState();
+    const options = method === 'POST' ? { method, credentials, headers, body } : { method, credentials, headers };
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-http-request-sender:http-request', { uri, options });
     (0, (_xfetch || _load_xfetch()).default)(uri, options);
   })
   // This epic is just for side-effects.

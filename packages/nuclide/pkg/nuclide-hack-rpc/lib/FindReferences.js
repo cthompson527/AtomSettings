@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,7 +12,6 @@ function _load_HackHelpers() {
 }
 
 function convertReferences(hackResult, projectRoot) {
-
   let symbolName = hackResult[0].name;
   // Strip off the global namespace indicator.
   if (symbolName.startsWith('\\')) {
@@ -41,6 +31,14 @@ function convertReferences(hackResult, projectRoot) {
     type: 'data',
     baseUri: projectRoot,
     referencedSymbolName: symbolName,
-    references: references
+    references
   };
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */

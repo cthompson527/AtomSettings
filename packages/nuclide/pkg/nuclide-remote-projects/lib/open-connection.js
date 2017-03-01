@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -51,7 +42,16 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
 let dialogPromiseQueue = null;
 
 /**
@@ -59,7 +59,7 @@ let dialogPromiseQueue = null;
  * for connection parameters (e.g. username, server name, etc), and optionally
  * asking for additional (e.g. 2-fac) authentication.
  */
-function openConnectionDialog(props) {
+function openConnectionDialog(options) {
   if (!dialogPromiseQueue) {
     dialogPromiseQueue = new (_promiseExecutors || _load_promiseExecutors()).PromiseQueue();
   }
@@ -67,7 +67,7 @@ function openConnectionDialog(props) {
   return dialogPromiseQueue.submit(() => new Promise((resolve, reject) => {
     // During the lifetime of this 'openConnectionDialog' flow, the 'default'
     // connection profile should not change (even if it is reset by the user
-    const defaultConnectionProfile = (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getDefaultConnectionProfile)();
+    const defaultConnectionProfile = (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getDefaultConnectionProfile)(options);
     // The `compositeConnectionProfiles` is the combination of the default connection
     // profile plus any user-created connection profiles. Initialize this to the
     // default connection profile. This array of profiles may change in the lifetime
@@ -157,8 +157,9 @@ function openConnectionDialog(props) {
 
       const initialDialogProps = {
         onCancel: closeNewProfileForm,
-        onSave: onSave,
-        initialFormFields: defaultConnectionProfile.params
+        onSave,
+        initialFormFields: defaultConnectionProfile.params,
+        profileHosts: (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getUniqueHostsForProfiles)(compositeConnectionProfiles)
       };
 
       newProfilePanel = atom.workspace.addModalPanel({ item: hostElementForNewProfileForm });
@@ -182,9 +183,9 @@ function openConnectionDialog(props) {
       // to the ConnectionDialog will not.
       // Note: the `cleanupSubscriptionFunc` is called when the dialog closes:
       // `onConnect`, `onError`, or `onCancel`.
-      const baseDialogProps = Object.assign({
-        indexOfInitiallySelectedConnectionProfile: indexOfInitiallySelectedConnectionProfile,
-        onAddProfileClicked: onAddProfileClicked,
+      const baseDialogProps = {
+        indexOfInitiallySelectedConnectionProfile,
+        onAddProfileClicked,
         onCancel: () => {
           resolve( /* connection */null);
           cleanupSubscriptionFunc();
@@ -212,9 +213,9 @@ function openConnectionDialog(props) {
           (0, (_connectionProfileUtils || _load_connectionProfileUtils()).saveConnectionConfig)(config, (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getOfficialRemoteServerCommand)());
           cleanupSubscriptionFunc();
         },
-        onDeleteProfileClicked: onDeleteProfileClicked,
+        onDeleteProfileClicked,
         onSaveProfile: saveProfile
-      }, props);
+      };
 
       // If/when the saved connection profiles change, we want to re-render the dialog
       // with the new set of connection profiles.

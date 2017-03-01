@@ -1,20 +1,8 @@
-'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.arrayRemove = arrayRemove;
 exports.arrayEqual = arrayEqual;
 exports.arrayCompact = arrayCompact;
@@ -32,6 +20,22 @@ exports.collect = collect;
 exports.objectEntries = objectEntries;
 exports.objectFromMap = objectFromMap;
 exports.concatIterators = concatIterators;
+exports.someOfIterable = someOfIterable;
+exports.findInIterable = findInIterable;
+exports.filterIterable = filterIterable;
+exports.mapIterable = mapIterable;
+exports.firstOfIterable = firstOfIterable;
+exports.iterableIsEmpty = iterableIsEmpty;
+exports.iterableContains = iterableContains;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function arrayRemove(array, element) {
   const index = array.indexOf(element);
@@ -79,20 +83,10 @@ function arrayFindLastIndex(array, predicate, thisArg) {
  * Merges a given arguments of maps into one Map, with the latest maps
  * overriding the values of the prior maps.
  */
-function mapUnion() {
+function mapUnion(...maps) {
   const unionMap = new Map();
-
-  for (var _len = arguments.length, maps = Array(_len), _key = 0; _key < _len; _key++) {
-    maps[_key] = arguments[_key];
-  }
-
   for (const map of maps) {
-    for (const _ref of map) {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      const key = _ref2[0];
-      const value = _ref2[1];
-
+    for (const [key, value] of map) {
       unionMap.set(key, value);
     }
   }
@@ -101,12 +95,7 @@ function mapUnion() {
 
 function mapFilter(map, selector) {
   const selected = new Map();
-  for (const _ref3 of map) {
-    var _ref4 = _slicedToArray(_ref3, 2);
-
-    const key = _ref4[0];
-    const value = _ref4[1];
-
+  for (const [key, value] of map) {
     if (selector(key, value)) {
       selected.set(key, value);
     }
@@ -114,17 +103,13 @@ function mapFilter(map, selector) {
   return selected;
 }
 
-function mapEqual(map1, map2) {
+function mapEqual(map1, map2, equalComparator) {
   if (map1.size !== map2.size) {
     return false;
   }
-  for (const _ref5 of map1) {
-    var _ref6 = _slicedToArray(_ref5, 2);
-
-    const key1 = _ref6[0];
-    const value1 = _ref6[1];
-
-    if (map2.get(key1) !== value1) {
+  const equalFunction = equalComparator || ((a, b) => a === b);
+  for (const [key1, value1] of map1) {
+    if (!map2.has(key1) || !equalFunction(value1, map2.get(key1))) {
       return false;
     }
   }
@@ -197,11 +182,7 @@ function keyMirror(obj) {
 function collect(pairs) {
   const result = new Map();
   for (const pair of pairs) {
-    var _pair = _slicedToArray(pair, 2);
-
-    const k = _pair[0],
-          v = _pair[1];
-
+    const [k, v] = pair;
     let list = result.get(k);
     if (list == null) {
       list = [];
@@ -212,7 +193,7 @@ function collect(pairs) {
   return result;
 }
 
-let MultiMap = exports.MultiMap = class MultiMap {
+class MultiMap {
   // Invariant: no empty sets. They should be removed instead.
   constructor() {
     this._map = new Map();
@@ -313,7 +294,9 @@ let MultiMap = exports.MultiMap = class MultiMap {
   forEach(callback) {
     this._map.forEach((values, key) => values.forEach(value => callback(value, key, this)));
   }
-};
+}
+
+exports.MultiMap = MultiMap;
 function objectEntries(obj) {
   if (obj == null) {
     throw new TypeError();
@@ -335,14 +318,58 @@ function objectFromMap(map) {
   return obj;
 }
 
-function* concatIterators() {
-  for (var _len2 = arguments.length, iterators = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-    iterators[_key2] = arguments[_key2];
-  }
-
+function* concatIterators(...iterators) {
   for (const iterator of iterators) {
     for (const element of iterator) {
       yield element;
     }
   }
+}
+
+function someOfIterable(iterable, predicate) {
+  for (const element of iterable) {
+    if (predicate(element)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function findInIterable(iterable, predicate) {
+  for (const element of iterable) {
+    if (predicate(element)) {
+      return element;
+    }
+  }
+  return null;
+}
+
+function* filterIterable(iterable, predicate) {
+  for (const element of iterable) {
+    if (predicate(element)) {
+      yield element;
+    }
+  }
+}
+
+function* mapIterable(iterable, projectorFn) {
+  for (const element of iterable) {
+    yield projectorFn(element);
+  }
+}
+
+function firstOfIterable(iterable) {
+  return findInIterable(iterable, () => true);
+}
+
+function iterableIsEmpty(iterable) {
+  // eslint-disable-next-line no-unused-vars
+  for (const element of iterable) {
+    return false;
+  }
+  return true;
+}
+
+function iterableContains(iterable, value) {
+  return !iterableIsEmpty(filterIterable(iterable, element => element === value));
 }

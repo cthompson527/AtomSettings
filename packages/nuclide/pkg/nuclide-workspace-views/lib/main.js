@@ -1,28 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createPackage;
 
 function _load_createPackage() {
   return _createPackage = _interopRequireDefault(require('../../commons-atom/createPackage'));
-}
-
-var _syncAtomCommands;
-
-function _load_syncAtomCommands() {
-  return _syncAtomCommands = _interopRequireDefault(require('../../commons-atom/sync-atom-commands'));
 }
 
 var _reduxObservable;
@@ -35,6 +16,18 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+var _event;
+
+function _load_event() {
+  return _event = require('../../commons-node/event');
+}
+
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../commons-node/observable');
 }
 
 var _nuclideLogging;
@@ -75,17 +68,31 @@ function _load_redux() {
   return _redux = require('redux');
 }
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = class Activation {
+class Activation {
 
   constructor(rawState) {
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    this._needToDispatchActivatedAction = false;
+
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(
+    // We don't know if this package is being activated as part of Atom's initial package
+    // activation phase or being enabled through the settings later (in which case we would have
+    // missed the `onDidActivatePackage` event).
+    (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => atom.packages.onDidActivatePackage(cb)).race((_observable || _load_observable()).nextTick).first().subscribe(() => {
+      this._needToDispatchActivatedAction = true;
+      this._maybeDispatchActivatedAction();
+    }));
     this._rawState = rawState;
+  }
+
+  _maybeDispatchActivatedAction() {
+    if (this._needToDispatchActivatedAction && this._store != null) {
+      this._needToDispatchActivatedAction = false;
+      this._store.dispatch((_Actions || _load_Actions()).didActivateInitialPackages());
+    }
   }
 
   dispose() {
@@ -94,14 +101,9 @@ let Activation = class Activation {
 
   _getStore() {
     if (this._store == null) {
-      var _createPackageStore = createPackageStore(this._rawState || {});
-
-      const store = _createPackageStore.store,
-            disposables = _createPackageStore.disposables;
-
+      this._store = createPackageStore(this._rawState || {});
       this._rawState = null;
-      this._store = store;
-      this._disposables.add(disposables);
+      this._maybeDispatchActivatedAction();
     }
     return this._store;
   }
@@ -117,18 +119,6 @@ let Activation = class Activation {
     });
 
     return {
-      registerFactory: viewableFactory => {
-        if (!(pkg != null)) {
-          throw new Error('Viewables API used after deactivation');
-        }
-
-        pkg._getStore().dispatch((_Actions || _load_Actions()).registerViewableFactory(viewableFactory));
-        return new _atom.Disposable(() => {
-          if (pkg != null) {
-            pkg._getStore().dispatch((_Actions || _load_Actions()).unregisterViewableFactory(viewableFactory.id));
-          }
-        });
-      },
       registerLocation: locationFactory => {
         if (!(pkg != null)) {
           throw new Error('Viewables API used after deactivation');
@@ -141,27 +131,50 @@ let Activation = class Activation {
           }
         });
       },
-      getViewableFactories: function (location) {
+      addOpener(opener) {
         if (!(pkg != null)) {
           throw new Error('Viewables API used after deactivation');
         }
 
-        return Array.from(pkg._getStore().getState().viewableFactories.values());
+        pkg._getStore().dispatch((_Actions || _load_Actions()).addOpener(opener));
+        return new _atom.Disposable(() => {
+          if (pkg != null) {
+            pkg._getStore().dispatch((_Actions || _load_Actions()).removeOpener(opener));
+          }
+        });
       },
-      observeViewableFactories: function (location, cb) {
+      destroyWhere(predicate) {
+        if (pkg == null) {
+          return;
+        }
+        pkg._getStore().dispatch((_Actions || _load_Actions()).destroyWhere(predicate));
+      },
+      open(uri, options) {
         if (!(pkg != null)) {
           throw new Error('Viewables API used after deactivation');
         }
 
-        return new (_UniversalDisposable || _load_UniversalDisposable()).default(
-        // $FlowFixMe: Teach flow about Symbol.observable
-        _rxjsBundlesRxMinJs.Observable.from(pkg._getStore()).map(state => state.viewableFactories).distinctUntilChanged().map(viewableFactories => new Set(viewableFactories.values())).subscribe(cb));
+        pkg._getStore().dispatch((_Actions || _load_Actions()).open(uri, options));
+      },
+      toggle(uri, options) {
+        if (!(pkg != null)) {
+          throw new Error('Viewables API used after deactivation');
+        }
+
+        const visible = options != null ? options.visible : undefined;
+        pkg._getStore().dispatch((_Actions || _load_Actions()).toggleItemVisibility(uri, visible));
       }
     };
   }
-
-};
-
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function createPackageStore(rawState) {
   const initialState = (_AppSerialization || _load_AppSerialization()).deserialize(rawState);
@@ -174,21 +187,7 @@ function createPackageStore(rawState) {
   });
   const store = (0, (_redux || _load_redux()).createStore)((0, (_redux || _load_redux()).combineReducers)(_Reducers || _load_Reducers()), initialState, (0, (_redux || _load_redux()).applyMiddleware)((0, (_reduxObservable || _load_reduxObservable()).createEpicMiddleware)(rootEpic)));
 
-  const states = _rxjsBundlesRxMinJs.Observable.from(store);
-
-  // Add a toggle command for every viewable provider. We avoid debouncing here so that commands
-  // will immediately be available to packages after they register themselves.
-  const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_syncAtomCommands || _load_syncAtomCommands()).default)(states.map(state => state.viewableFactories).distinctUntilChanged().map(viewableFactories => new Set(Array.from(viewableFactories.values()).filter(viewableFactory => viewableFactory.toggleCommand != null))), viewableFactory => ({
-    'atom-workspace': {
-      [viewableFactory.toggleCommand]: event => {
-        const visible = event.detail == null ? undefined : event.detail.visible;
-        store.dispatch((_Actions || _load_Actions()).toggleItemVisibility(viewableFactory.id, visible));
-      }
-    }
-  })));
-
-  return { store: store, disposables: disposables };
+  return store;
 }
 
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

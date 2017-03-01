@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.getEmptBookShelfState = getEmptBookShelfState;
 exports.serializeBookShelfState = serializeBookShelfState;
 exports.deserializeBookShelfState = deserializeBookShelfState;
@@ -48,10 +36,10 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _nuclideAnalytics;
@@ -62,6 +50,16 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function getEmptBookShelfState() {
   return {
     repositoryPathToState: (_immutable || _load_immutable()).default.Map()
@@ -70,14 +68,8 @@ function getEmptBookShelfState() {
 
 // Maps are serialized as key/value pairs array to match Map `enries` format.
 function serializeBookShelfState(bookShelfState) {
-  const repositoryPathToState = bookShelfState.repositoryPathToState;
-
-  const serializedRepositoryPathToState = Array.from(repositoryPathToState.entries()).map((_ref) => {
-    var _ref2 = _slicedToArray(_ref, 2);
-
-    let repositoryPath = _ref2[0],
-        repositoryState = _ref2[1];
-
+  const { repositoryPathToState } = bookShelfState;
+  const serializedRepositoryPathToState = Array.from(repositoryPathToState.entries()).map(([repositoryPath, repositoryState]) => {
     const serializedShortHeadToFileList = {
       activeShortHead: repositoryState.activeShortHead,
       shortHeadsToFileList: Array.from(repositoryState.shortHeadsToFileList.entries())
@@ -93,12 +85,7 @@ function deserializeBookShelfState(serializedBookShelfState) {
   if (serializedBookShelfState == null || serializedBookShelfState.repositoryPathToState == null) {
     return getEmptBookShelfState();
   }
-  const repositoryPathToState = (_immutable || _load_immutable()).default.Map(serializedBookShelfState.repositoryPathToState.map((_ref3) => {
-    var _ref4 = _slicedToArray(_ref3, 2);
-
-    let repositoryPath = _ref4[0],
-        repositoryState = _ref4[1];
-
+  const repositoryPathToState = (_immutable || _load_immutable()).default.Map(serializedBookShelfState.repositoryPathToState.map(([repositoryPath, repositoryState]) => {
     return [repositoryPath, {
       activeShortHead: repositoryState.activeShortHead,
       isRestoring: false,
@@ -106,22 +93,16 @@ function deserializeBookShelfState(serializedBookShelfState) {
     }];
   }));
   return {
-    repositoryPathToState: repositoryPathToState
+    repositoryPathToState
   };
 }
 
 function getRepoPathToEditors() {
   const reposToEditors = new Map();
   atom.workspace.getTextEditors().filter(textEditor => textEditor.getPath() != null && textEditor.getPath() !== '').map(textEditor => ({
-    textEditor: textEditor,
-    repository: (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).repositoryForPath)(textEditor.getPath() || '')
-  })).filter((_ref5) => {
-    let repository = _ref5.repository;
-    return repository != null;
-  }).forEach((_ref6) => {
-    let repository = _ref6.repository,
-        textEditor = _ref6.textEditor;
-
+    textEditor,
+    repository: (0, (_vcs || _load_vcs()).repositoryForPath)(textEditor.getPath() || '')
+  })).filter(({ repository }) => repository != null).forEach(({ repository, textEditor }) => {
     if (!repository) {
       throw new Error('Invariant violation: "repository"');
     }
@@ -137,9 +118,9 @@ function shortHeadChangedNotification(repository, newShortHead, restorePaneItemS
     const workingDirectoryName = (_nuclideUri || _load_nuclideUri()).default.basename(repository.getWorkingDirectory());
 
     // TODO(most): Should we handle empty bookmark switches differently?
-    const newShortHeadDisplayText = newShortHead.length > 0 ? `to \`${ newShortHead }\`` : '';
+    const newShortHeadDisplayText = newShortHead.length > 0 ? `to \`${newShortHead}\`` : '';
 
-    const shortHeadChangeNotification = atom.notifications.addInfo(`\`${ workingDirectoryName }\`'s active bookmark has changed ${ newShortHeadDisplayText }`, {
+    const shortHeadChangeNotification = atom.notifications.addInfo(`\`${workingDirectoryName}\`'s active bookmark has changed ${newShortHeadDisplayText}`, {
       detail: 'Would you like to open the files you had active then?\n \n' + 'ProTip: Change the default behavior from \'Nuclide Settings>IDE Settings>Book Shelf\'',
       dismissable: true,
       buttons: [{
@@ -170,32 +151,17 @@ function shortHeadChangedNotification(repository, newShortHead, restorePaneItemS
 }
 
 function getShortHeadChangesFromStateStream(states) {
-  return states.pairwise().flatMap((_ref7) => {
-    var _ref8 = _slicedToArray(_ref7, 2);
+  return states.pairwise().flatMap(([oldBookShelfState, newBookShelfState]) => {
+    const { repositoryPathToState: oldRepositoryPathToState } = oldBookShelfState;
 
-    let oldBookShelfState = _ref8[0],
-        newBookShelfState = _ref8[1];
-    const oldRepositoryPathToState = oldBookShelfState.repositoryPathToState;
-
-
-    return _rxjsBundlesRxMinJs.Observable.from(Array.from(newBookShelfState.repositoryPathToState.entries()).filter((_ref9) => {
-      var _ref10 = _slicedToArray(_ref9, 2);
-
-      let repositoryPath = _ref10[0],
-          newRepositoryState = _ref10[1];
-
+    return _rxjsBundlesRxMinJs.Observable.from(Array.from(newBookShelfState.repositoryPathToState.entries()).filter(([repositoryPath, newRepositoryState]) => {
       const oldRepositoryState = oldRepositoryPathToState.get(repositoryPath);
       return oldRepositoryState != null && oldRepositoryState.activeShortHead !== newRepositoryState.activeShortHead;
-    }).map((_ref11) => {
-      var _ref12 = _slicedToArray(_ref11, 2);
-
-      let repositoryPath = _ref12[0],
-          newRepositoryState = _ref12[1];
-      const activeShortHead = newRepositoryState.activeShortHead;
-
+    }).map(([repositoryPath, newRepositoryState]) => {
+      const { activeShortHead } = newRepositoryState;
       return {
-        repositoryPath: repositoryPath,
-        activeShortHead: activeShortHead
+        repositoryPath,
+        activeShortHead
       };
     }));
   });

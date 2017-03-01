@@ -1,18 +1,21 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.FileTree = undefined;
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../commons-node/observable');
+}
 
 var _FileTreeStore;
 
@@ -28,10 +31,10 @@ function _load_FileTreeEntryComponent() {
   return _FileTreeEntryComponent = require('./FileTreeEntryComponent');
 }
 
-var _EmptyComponent;
+var _ProjectSelection;
 
-function _load_EmptyComponent() {
-  return _EmptyComponent = require('./EmptyComponent');
+function _load_ProjectSelection() {
+  return _ProjectSelection = require('./ProjectSelection');
 }
 
 var _classnames;
@@ -40,24 +43,29 @@ function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
 }
 
-var _atom = require('atom');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const BUFFER_ELEMENTS = 15;
+const BUFFER_ELEMENTS = 15; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             */
 
-let FileTree = exports.FileTree = class FileTree extends _reactForAtom.React.Component {
+class FileTree extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
-    this._disposables = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
     this.state = {
       elementHeight: 22 };
 
     this._initialHeightMeasured = false;
-    this._afRequestId = null;
     this._measureHeights = this._measureHeights.bind(this);
   }
 
@@ -68,19 +76,17 @@ let FileTree = exports.FileTree = class FileTree extends _reactForAtom.React.Com
 
     this._disposables.add(atom.themes.onDidChangeActiveThemes(() => {
       this._initialHeightMeasured = false;
-      this._afRequestId = window.requestAnimationFrame(() => {
-        this._afRequestId = null;
+      const sub = (_observable || _load_observable()).nextAnimationFrame.subscribe(() => {
+        this._disposables.remove(sub);
         this._measureHeights();
       });
-    }), new _atom.Disposable(() => {
+      this._disposables.add(sub);
+    }), () => {
       window.removeEventListener('resize', this._measureHeights);
-    }));
+    });
   }
 
   componentWillUnmount() {
-    if (this._afRequestId != null) {
-      window.cancelAnimationFrame(this._afRequestId);
-    }
     this._disposables.dispose();
   }
 
@@ -112,7 +118,7 @@ let FileTree = exports.FileTree = class FileTree extends _reactForAtom.React.Com
     const node = _reactForAtom.ReactDOM.findDOMNode(measuredComponent);
     const elementHeight = node.clientHeight;
     if (elementHeight !== this.state.elementHeight && elementHeight > 0) {
-      this.setState({ elementHeight: elementHeight });
+      this.setState({ elementHeight });
     }
   }
 
@@ -136,7 +142,7 @@ let FileTree = exports.FileTree = class FileTree extends _reactForAtom.React.Com
     const childrenCount = countShownNodes(roots);
 
     if (childrenCount === 0) {
-      return _reactForAtom.React.createElement((_EmptyComponent || _load_EmptyComponent()).EmptyComponent, null);
+      return _reactForAtom.React.createElement((_ProjectSelection || _load_ProjectSelection()).ProjectSelection, null);
     }
 
     const scrollTop = this.props.containerScrollTop;
@@ -190,9 +196,9 @@ let FileTree = exports.FileTree = class FileTree extends _reactForAtom.React.Com
       _reactForAtom.React.createElement('div', { style: { height: bottomPlaceholderSize + 'px' } })
     );
   }
-};
+}
 
-
+exports.FileTree = FileTree;
 function findFirstNodeToRender(roots, firstToRender) {
   let skipped = 0;
 

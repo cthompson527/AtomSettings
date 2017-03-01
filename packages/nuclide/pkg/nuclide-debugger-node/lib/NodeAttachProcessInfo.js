@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,7 +27,17 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let NodeAttachProcessInfo = exports.NodeAttachProcessInfo = class NodeAttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class NodeAttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
 
   constructor(targetUri, targetInfo) {
     super('node', targetUri);
@@ -57,12 +58,8 @@ let NodeAttachProcessInfo = exports.NodeAttachProcessInfo = class NodeAttachProc
     const debuggerConfig = {
       logLevel: (0, (_utils || _load_utils()).getConfig)().serverLogLevel
     };
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('NodeDebuggerService', this.getTargetUri());
-
-    if (!service) {
-      throw new Error('Invariant violation: "service"');
-    }
-
+    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getNodeDebuggerServiceByNuclideUri)(this.getTargetUri());
     return new service.NodeDebuggerService(debuggerConfig);
   }
-};
+}
+exports.NodeAttachProcessInfo = NodeAttachProcessInfo;

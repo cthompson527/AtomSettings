@@ -13,14 +13,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 17
+          line: 16
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "CommandService.js",
-            line: 17
+            line: 16
           },
           kind: "named",
           name: "AtomCommands"
@@ -37,14 +37,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 21
+          line: 20
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "CommandService.js",
-            line: 21
+            line: 20
           },
           kind: "named",
           name: "ConnectionDetails"
@@ -237,412 +237,431 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["getAtomCommands", {
-    kind: "function",
-    name: "getAtomCommands",
-    location: {
-      type: "source",
-      fileName: "CommandService.js",
-      line: 17
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    type: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    getAtomCommands: {
+      kind: "function",
+      name: "getAtomCommands",
       location: {
         type: "source",
         fileName: "CommandService.js",
-        line: 17
+        line: 16
       },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 17
+          line: 16
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
           location: {
             type: "source",
             fileName: "CommandService.js",
-            line: 17
+            line: 16
           },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "CommandService.js",
-              line: 17
+              line: 16
             },
-            kind: "named",
-            name: "AtomCommands"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "CommandService.js",
+                line: 16
+              },
+              kind: "named",
+              name: "AtomCommands"
+            }
           }
         }
       }
-    }
-  }], ["getConnectionDetails", {
-    kind: "function",
-    name: "getConnectionDetails",
-    location: {
-      type: "source",
-      fileName: "CommandService.js",
-      line: 21
     },
-    type: {
+    getConnectionDetails: {
+      kind: "function",
+      name: "getConnectionDetails",
       location: {
         type: "source",
         fileName: "CommandService.js",
-        line: 21
+        line: 20
       },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "CommandService.js",
-          line: 21
+          line: 20
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
           location: {
             type: "source",
             fileName: "CommandService.js",
-            line: 21
+            line: 20
           },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "CommandService.js",
-              line: 21
+              line: 20
             },
-            kind: "named",
-            name: "ConnectionDetails"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "CommandService.js",
+                line: 20
+              },
+              kind: "named",
+              name: "ConnectionDetails"
+            }
           }
         }
       }
-    }
-  }], ["AtomFileEvent", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 14
     },
-    name: "AtomFileEvent",
-    definition: {
+    AtomFileEvent: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 14
       },
-      kind: "union",
-      types: [{
+      name: "AtomFileEvent",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
           line: 14
         },
-        kind: "string-literal",
-        value: "open"
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 14
-        },
-        kind: "string-literal",
-        value: "close"
-      }]
-    }
-  }], ["AtomCommands", {
-    kind: "interface",
-    name: "AtomCommands",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 15
+        kind: "union",
+        types: [{
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 14
+          },
+          kind: "string-literal",
+          value: "open"
+        }, {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 14
+          },
+          kind: "string-literal",
+          value: "close"
+        }]
+      }
     },
-    constructorArgs: null,
-    staticMethods: new Map(),
-    instanceMethods: new Map([["openFile", {
+    AtomCommands: {
+      kind: "interface",
+      name: "AtomCommands",
       location: {
         type: "source",
         fileName: "rpc-types.js",
-        line: 16
+        line: 15
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "filePath",
-        type: {
+      constructorArgs: null,
+      staticMethods: {},
+      instanceMethods: {
+        openFile: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 17
+            line: 16
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 18
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 19
-          },
-          kind: "number"
-        }
-      }, {
-        name: "isWaiting",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 20
-          },
-          kind: "boolean"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 21
+          kind: "function",
+          argumentTypes: [{
+            name: "filePath",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 17
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
+          }, {
+            name: "line",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 18
+              },
+              kind: "number"
+            }
+          }, {
+            name: "column",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 19
+              },
+              kind: "number"
+            }
+          }, {
+            name: "isWaiting",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 20
+              },
+              kind: "boolean"
+            }
+          }],
+          returnType: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 21
+            },
+            kind: "observable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 21
+              },
+              kind: "named",
+              name: "AtomFileEvent"
+            }
+          }
         },
-        kind: "observable",
-        type: {
+        openRemoteFile: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 21
+            line: 22
           },
-          kind: "named",
-          name: "AtomFileEvent"
-        }
-      }
-    }], ["openRemoteFile", {
-      location: {
-        type: "source",
-        fileName: "rpc-types.js",
-        line: 22
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "uri",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 23
-          },
-          kind: "string"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 24
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 25
-          },
-          kind: "number"
-        }
-      }, {
-        name: "isWaiting",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 26
-          },
-          kind: "boolean"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 27
+          kind: "function",
+          argumentTypes: [{
+            name: "uri",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 23
+              },
+              kind: "string"
+            }
+          }, {
+            name: "line",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 24
+              },
+              kind: "number"
+            }
+          }, {
+            name: "column",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 25
+              },
+              kind: "number"
+            }
+          }, {
+            name: "isWaiting",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 26
+              },
+              kind: "boolean"
+            }
+          }],
+          returnType: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 27
+            },
+            kind: "observable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 27
+              },
+              kind: "named",
+              name: "AtomFileEvent"
+            }
+          }
         },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "rpc-types.js",
-            line: 27
-          },
-          kind: "named",
-          name: "AtomFileEvent"
-        }
-      }
-    }], ["addProject", {
-      location: {
-        type: "source",
-        fileName: "rpc-types.js",
-        line: 28
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "projectPath",
-        type: {
+        addProject: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 28
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 28
+          kind: "function",
+          argumentTypes: [{
+            name: "projectPath",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 28
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
+          }],
+          returnType: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 28
+            },
+            kind: "promise",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 28
+              },
+              kind: "void"
+            }
+          }
         },
-        kind: "promise",
-        type: {
+        dispose: {
           location: {
             type: "source",
             fileName: "rpc-types.js",
-            line: 28
+            line: 29
           },
-          kind: "void"
+          kind: "function",
+          argumentTypes: [],
+          returnType: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 29
+            },
+            kind: "void"
+          }
         }
       }
-    }], ["dispose", {
-      location: {
-        type: "source",
-        fileName: "rpc-types.js",
-        line: 29
-      },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 29
-        },
-        kind: "void"
-      }
-    }]])
-  }], ["ConnectionDetails", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 32
     },
-    name: "ConnectionDetails",
-    definition: {
+    ConnectionDetails: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 32
       },
-      kind: "object",
-      fields: [{
+      name: "ConnectionDetails",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 33
+          line: 32
         },
-        name: "port",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 33
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 34
-        },
-        name: "family",
-        type: {
+          name: "port",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 33
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 34
           },
-          kind: "string"
-        },
-        optional: false
-      }]
+          name: "family",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 34
+            },
+            kind: "string"
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

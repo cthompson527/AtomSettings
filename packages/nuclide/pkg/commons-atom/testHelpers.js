@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -38,20 +29,30 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param metaKeys An object denoting which meta keys are pressed for this
  * keyboard event.
  */
-function dispatchKeyboardEvent(key, target) {
-  let metaKeys = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  const alt = metaKeys.alt,
-        cmd = metaKeys.cmd,
-        ctrl = metaKeys.ctrl,
-        shift = metaKeys.shift;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+function dispatchKeyboardEvent(key, target, metaKeys = {}) {
+  const { alt, cmd, ctrl, shift } = metaKeys;
   // Atom requires `key` to be uppercase when `shift` is specified.
 
   if (!(shift !== true || key.toUpperCase() === key)) {
     throw new Error('Invariant violation: "shift !== true || key.toUpperCase() === key"');
   }
 
+  if (!(target != null)) {
+    throw new Error('Invariant violation: "target != null"');
+  }
+
   const event = atom.keymaps.constructor.buildKeydownEvent(key, {
-    target: target,
+    target,
     alt: Boolean(alt),
     cmd: Boolean(cmd),
     ctrl: Boolean(ctrl),
@@ -72,10 +73,9 @@ const rangeMatchers = exports.rangeMatchers = {
    * @this A JasmineMatcher object.
    * @returns True if the Ranges are equal.
    */
-  toEqualAtomRange: function (expected) {
+  toEqualAtomRange(expected) {
     return Boolean(this.actual && expected && this.actual.isEqual(expected));
   },
-
 
   /**
    * Same as `toEqualAtomRange` but for an array of Ranges. This function should
@@ -84,7 +84,7 @@ const rangeMatchers = exports.rangeMatchers = {
    * @this A JasmineMatcher object.
    * @returns True if the array of Ranges are equal.
    */
-  toEqualAtomRanges: function (expected) {
+  toEqualAtomRanges(expected) {
     let allEqual = true;
     if (!this.actual || !expected) {
       return false;
@@ -122,10 +122,8 @@ function setLocalProject(projectPath) {
  * Waits for the specified file to become the active text editor.
  * Can only be used in a Jasmine context.
  */
-function waitsForFile(filename) {
-  let timeoutMs = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 10000;
-
-  waitsFor(`${ filename } to become active`, timeoutMs, () => {
+function waitsForFile(filename, timeoutMs = 10000) {
+  waitsFor(`${filename} to become active`, timeoutMs, () => {
     const editor = atom.workspace.getActiveTextEditor();
     if (editor == null) {
       return false;
@@ -138,10 +136,8 @@ function waitsForFile(filename) {
   });
 }
 
-function waitsForFilePosition(filename, row, column) {
-  let timeoutMs = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 10000;
-
-  waitsFor(`${ filename } to become active at ${ row }:${ column }`, timeoutMs, () => {
+function waitsForFilePosition(filename, row, column, timeoutMs = 10000) {
+  waitsFor(`${filename} to become active at ${row}:${column}`, timeoutMs, () => {
     const editor = atom.workspace.getActiveTextEditor();
     if (editor == null) {
       return false;

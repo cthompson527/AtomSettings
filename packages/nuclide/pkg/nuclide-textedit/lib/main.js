@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,17 @@ function _load_textEditor() {
  * Returns true if the application was successful, otherwise false (e.g. if the oldText did not
  * match).
  */
-function applyTextEdits(path) {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+function applyTextEdits(path, ...edits) {
   const editor = (0, (_textEditor || _load_textEditor()).existingEditorForUri)(path);
 
   if (!(editor != null)) {
@@ -44,11 +45,6 @@ function applyTextEdits(path) {
 
   // Iterate through in reverse order. Edits earlier in the file can move around text later in the
   // file, so to avoid conflicts edits should be applied last first.
-
-  for (var _len = arguments.length, edits = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    edits[_key - 1] = arguments[_key];
-  }
-
   for (let i = edits.length - 1; i >= 0; i--) {
     const edit = edits[i];
     const success = applyToBuffer(buffer, edit);
@@ -81,4 +77,3 @@ function applyToBuffer(buffer, edit) {
   buffer.setTextInRange(edit.oldRange, edit.newText);
   return true;
 }
-module.exports = exports['default'];

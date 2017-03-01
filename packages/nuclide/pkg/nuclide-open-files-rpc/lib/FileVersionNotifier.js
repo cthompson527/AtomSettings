@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,7 @@ function _load_collection() {
   return _collection = require('../../commons-node/collection');
 }
 
-let FileVersionNotifier = exports.FileVersionNotifier = class FileVersionNotifier {
+class FileVersionNotifier {
 
   constructor() {
     this._versions = new Map();
@@ -55,7 +46,7 @@ let FileVersionNotifier = exports.FileVersionNotifier = class FileVersionNotifie
         this._versions.set(filePath, changeCount);
         break;
       default:
-        throw new Error(`Unexpected LocalFileEvent.kind: ${ event.kind }`);
+        throw new Error(`Unexpected LocalFileEvent.kind: ${event.kind}`);
     }
     this._checkRequests(filePath);
   }
@@ -99,14 +90,23 @@ let FileVersionNotifier = exports.FileVersionNotifier = class FileVersionNotifie
     resolves.forEach(request => request.resolve(true));
     rejects.forEach(request => request.resolve(false));
   }
-};
+}
 
+exports.FileVersionNotifier = FileVersionNotifier; /**
+                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                    * All rights reserved.
+                                                    *
+                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                    * the root directory of this source tree.
+                                                    *
+                                                    * 
+                                                    */
 
 function createRejectError() {
   return new Error('File modified past requested change');
 }
 
-let Request = class Request extends (_promise || _load_promise()).Deferred {
+class Request extends (_promise || _load_promise()).Deferred {
 
   constructor(filePath, changeCount) {
     super();
@@ -114,4 +114,4 @@ let Request = class Request extends (_promise || _load_promise()).Deferred {
     this.filePath = filePath;
     this.changeCount = changeCount;
   }
-};
+}

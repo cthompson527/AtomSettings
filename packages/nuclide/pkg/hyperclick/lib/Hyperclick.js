@@ -1,28 +1,28 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 /**
  * Calls the given functions and returns the first non-null return value.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let findTruthyReturnValue = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (fns) {
     for (const fn of fns) {
-      // eslint-disable-next-line babel/no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop
       const result = typeof fn === 'function' ? yield fn() : null;
       if (result) {
         return result;
@@ -53,16 +53,16 @@ function _load_SuggestionList() {
   return _SuggestionList = _interopRequireDefault(require('./SuggestionList'));
 }
 
-var _SuggestionListElement;
-
-function _load_SuggestionListElement() {
-  return _SuggestionListElement = _interopRequireDefault(require('./SuggestionListElement'));
-}
-
 var _hyperclickUtils;
 
 function _load_hyperclickUtils() {
   return _hyperclickUtils = require('./hyperclick-utils');
+}
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
 }
 
 var _nuclideAnalytics;
@@ -73,16 +73,14 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Hyperclick = class Hyperclick {
+class Hyperclick {
 
   constructor() {
     this._consumedProviders = [];
 
     this._suggestionList = new (_SuggestionList || _load_SuggestionList()).default();
-    this._suggestionListViewSubscription = atom.views.addViewProvider((_SuggestionList || _load_SuggestionList()).default, model => new (_SuggestionListElement || _load_SuggestionListElement()).default().initialize(model));
-
     this._hyperclickForTextEditors = new Set();
-    this._textEditorSubscription = atom.workspace.observeTextEditors(this.observeTextEditor.bind(this));
+    this._textEditorSubscription = (0, (_textEditor || _load_textEditor()).observeTextEditors)(this.observeTextEditor.bind(this));
   }
 
   observeTextEditor(textEditor) {
@@ -96,9 +94,6 @@ let Hyperclick = class Hyperclick {
 
   dispose() {
     this._suggestionList.hide();
-    if (this._suggestionListViewSubscription) {
-      this._suggestionListViewSubscription.dispose();
-    }
     if (this._textEditorSubscription) {
       this._textEditorSubscription.dispose();
     }
@@ -159,18 +154,13 @@ let Hyperclick = class Hyperclick {
     return findTruthyReturnValue(this._consumedProviders.map(provider => {
       if (provider.getSuggestion) {
         const getSuggestion = provider.getSuggestion.bind(provider);
-        return () => (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(getProviderName(provider) + '.getSuggestion', () => getSuggestion(textEditor, position));
+        return () => (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(getProviderName(provider) + '.getSuggestion', () => getSuggestion(textEditor, position));
       } else if (provider.getSuggestionForWord) {
         const getSuggestionForWord = provider.getSuggestionForWord.bind(provider);
         return () => {
           const wordRegExp = provider.wordRegExp || defaultWordRegExp;
-
-          var _getWordTextAndRange = (0, (_hyperclickUtils || _load_hyperclickUtils()).getWordTextAndRange)(textEditor, position, wordRegExp);
-
-          const text = _getWordTextAndRange.text,
-                range = _getWordTextAndRange.range;
-
-          return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(getProviderName(provider) + '.getSuggestionForWord', () => getSuggestionForWord(textEditor, text, range));
+          const { text, range } = (0, (_hyperclickUtils || _load_hyperclickUtils()).getWordTextAndRange)(textEditor, position, wordRegExp);
+          return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(getProviderName(provider) + '.getSuggestionForWord', () => getSuggestionForWord(textEditor, text, range));
         };
       }
 
@@ -181,11 +171,10 @@ let Hyperclick = class Hyperclick {
   showSuggestionList(textEditor, suggestion) {
     this._suggestionList.show(textEditor, suggestion);
   }
-};
+}
 
-/** Returns the provider name or a default value */
+exports.default = Hyperclick; /** Returns the provider name or a default value */
 
-exports.default = Hyperclick;
 function getProviderName(provider) {
   if (provider.providerName != null) {
     return provider.providerName;
@@ -193,4 +182,3 @@ function getProviderName(provider) {
     return 'unnamed-hyperclick-provider';
   }
 }
-module.exports = exports['default'];

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.WatchExpressionStore = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _DebuggerStore;
 
@@ -58,7 +47,17 @@ function _load_normalizeRemoteObjectValue() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionStore {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class WatchExpressionStore {
 
   constructor(dispatcher, bridge) {
     this._evaluationId = 0;
@@ -99,19 +98,13 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
         }
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.RECEIVED_GET_PROPERTIES_RESPONSE:
         {
-          var _payload$data = payload.data;
-          const id = _payload$data.id,
-                response = _payload$data.response;
-
+          const { id, response } = payload.data;
           this._handleResponseForPendingRequest(id, response);
           break;
         }
       case (_DebuggerDispatcher || _load_DebuggerDispatcher()).ActionTypes.RECEIVED_EXPRESSION_EVALUATION_RESPONSE:
         {
-          var _payload$data2 = payload.data;
-          const id = _payload$data2.id,
-                response = _payload$data2.response;
-
+          const { id, response } = payload.data;
           response.result = (0, (_normalizeRemoteObjectValue || _load_normalizeRemoteObjectValue()).normalizeRemoteObjectValue)(response.result);
           this._handleResponseForPendingRequest(id, response);
           break;
@@ -125,12 +118,7 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
 
   _triggerReevaluation() {
     this._cancelRequestsToBridge();
-    for (const _ref of this._watchExpressions) {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      const expression = _ref2[0];
-      const subject = _ref2[1];
-
+    for (const [expression, subject] of this._watchExpressions) {
       if (subject.observers == null || subject.observers.length === 0) {
         // Nobody is watching this expression anymore.
         this._watchExpressions.delete(expression);
@@ -224,7 +212,7 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
         // TODO: It would be nice to expose a better error from the backend here.
         return {
           type: 'text',
-          value: `Failed to evaluate: ${ expression }`
+          value: `Failed to evaluate: ${expression}`
         };
       } else {
         return result;
@@ -241,7 +229,7 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
         // TODO: It would be nice to expose a better error from the backend here.
         return {
           type: 'text',
-          value: `Failed to evaluate: ${ expression }`
+          value: `Failed to evaluate: ${expression}`
         };
       } else {
         return result;
@@ -249,26 +237,20 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
     })();
   }
 
-  _sendEvaluationCommand(command) {
-    var _this3 = this,
-        _arguments = arguments;
+  _sendEvaluationCommand(command, ...args) {
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
       const deferred = new (_promise || _load_promise()).Deferred();
       const evalId = _this3._evaluationId;
       ++_this3._evaluationId;
       _this3._evaluationRequestsInFlight.set(evalId, deferred);
-
-      for (var _len = _arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = _arguments[_key];
-      }
-
       _this3._bridge.sendEvaluationCommand(command, evalId, ...args);
       let result = null;
       try {
         result = yield deferred.promise;
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`${ command }: Error getting result.`, e);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`${command}: Error getting result.`, e);
       }
       _this3._evaluationRequestsInFlight.delete(evalId);
       return result;
@@ -276,9 +258,7 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
   }
 
   _handleResponseForPendingRequest(id, response) {
-    const result = response.result,
-          error = response.error;
-
+    const { result, error } = response;
     const deferred = this._evaluationRequestsInFlight.get(id);
     if (deferred == null) {
       // Nobody is listening for the result of this expression.
@@ -294,4 +274,5 @@ let WatchExpressionStore = exports.WatchExpressionStore = class WatchExpressionS
   dispose() {
     this._disposables.dispose();
   }
-};
+}
+exports.WatchExpressionStore = WatchExpressionStore;

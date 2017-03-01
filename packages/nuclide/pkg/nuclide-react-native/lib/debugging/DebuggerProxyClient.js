@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -80,7 +71,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *                             executorResults <- executorResponses
  *
  */
-let DebuggerProxyClient = exports.DebuggerProxyClient = class DebuggerProxyClient {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class DebuggerProxyClient {
 
   constructor() {
     const executorResults = new _rxjsBundlesRxMinJs.Subject();
@@ -101,15 +102,11 @@ let DebuggerProxyClient = exports.DebuggerProxyClient = class DebuggerProxyClien
 
     this._executorResponses = (0, (_executeRequests || _load_executeRequests()).executeRequests)(executorRequests).catch(err => {
       if (err.code === 'ENOENT') {
-        var _formatEnoentNotifica = (0, (_formatEnoentNotification || _load_formatEnoentNotification()).default)({
+        const { message, meta } = (0, (_formatEnoentNotification || _load_formatEnoentNotification()).default)({
           feature: 'React Native debugging',
           toolName: 'node',
           pathSetting: 'nuclide-react-native.pathToNode'
         });
-
-        const message = _formatEnoentNotifica.message,
-              meta = _formatEnoentNotifica.meta;
-
         atom.notifications.addError(message, meta);
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
@@ -179,4 +176,5 @@ let DebuggerProxyClient = exports.DebuggerProxyClient = class DebuggerProxyClien
   onDidEvalApplicationScript(callback) {
     return new (_UniversalDisposable || _load_UniversalDisposable()).default(this._pids.subscribe(callback));
   }
-};
+}
+exports.DebuggerProxyClient = DebuggerProxyClient;

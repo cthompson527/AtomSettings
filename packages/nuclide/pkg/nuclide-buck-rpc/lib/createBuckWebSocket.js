@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,9 +21,19 @@ function _load_ws() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function createBuckWebSocket(httpPort) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
-    const uri = `ws://localhost:${ httpPort }/ws/build`;
+    const uri = `ws://localhost:${httpPort}/ws/build`;
     const socket = new (_ws || _load_ws()).default(uri);
     let buildId = null;
 
@@ -80,4 +81,3 @@ function createBuckWebSocket(httpPort) {
     };
   });
 }
-module.exports = exports['default'];

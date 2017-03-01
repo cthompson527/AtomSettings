@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,6 +18,16 @@ function _load_simpleTextBuffer() {
 // start/end are column indices.
 // Line/start/end are 1 based.
 // end is inclusive.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const UNCHECKED_MESSAGE = 'Un-type checked code. Consider adding type annotations.';
 const PARTIAL_MESSAGE = 'Partially type checked code. Consider adding type annotations.';
 
@@ -38,7 +39,7 @@ function convertCoverage(filePath, regions) {
   const uncoveredRegions = hackCoverageResult.uncoveredRegions.map(region => convertHackRegionToCoverageRegion(filePath, region));
   return {
     percentage: hackCoverageResult.percentage,
-    uncoveredRegions: uncoveredRegions
+    uncoveredRegions
   };
 }
 
@@ -68,8 +69,8 @@ function convertTypedRegionsToCoverageResult(regions) {
           last.end = endColumn;
         } else {
           unfilteredResults.push({
-            type: type,
-            line: line,
+            type,
+            line,
             start: column,
             end: endColumn
           });

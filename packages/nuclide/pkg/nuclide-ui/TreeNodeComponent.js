@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,7 +15,16 @@ function _load_classnames() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const INDENT_IN_PX = 10;
+const INDENT_IN_PX = 10; /**
+                          * Copyright (c) 2015-present, Facebook, Inc.
+                          * All rights reserved.
+                          *
+                          * This source code is licensed under the license found in the LICENSE file in
+                          * the root directory of this source tree.
+                          *
+                          * 
+                          */
+
 const INDENT_PER_LEVEL_IN_PX = 15;
 const DOWN_ARROW = '\uF0A3';
 const RIGHT_ARROW = '\uF078';
@@ -33,7 +33,7 @@ const SPINNER = '\uF087';
 /**
  * Represents one entry in a TreeComponent.
  */
-let TreeNodeComponent = exports.TreeNodeComponent = class TreeNodeComponent extends _reactForAtom.React.PureComponent {
+class TreeNodeComponent extends _reactForAtom.React.PureComponent {
 
   constructor(props) {
     super(props);
@@ -116,4 +116,5 @@ let TreeNodeComponent = exports.TreeNodeComponent = class TreeNodeComponent exte
   _onMouseDown(event) {
     this.props.onMouseDown(event, this.props.node);
   }
-};
+}
+exports.TreeNodeComponent = TreeNodeComponent;

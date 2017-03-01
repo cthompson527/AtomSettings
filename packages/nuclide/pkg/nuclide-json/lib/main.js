@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40,7 +31,7 @@ function _load_CodeFormatHelpers() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = class Activation {
+class Activation {
 
   constructor(state) {
     this._disposables = new _atom.CompositeDisposable();
@@ -49,8 +40,15 @@ let Activation = class Activation {
   dispose() {
     this._disposables.dispose();
   }
-};
-
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 let activation = null;
 
@@ -72,7 +70,7 @@ function provideOutlines() {
     grammarScopes: ['source.json'],
     priority: 1,
     name: 'Nuclide JSON',
-    getOutline: function (editor) {
+    getOutline(editor) {
       return Promise.resolve((0, (_JSONOutlineProvider || _load_JSONOutlineProvider()).getOutline)(editor.getText()));
     }
   };
@@ -86,7 +84,7 @@ function provideCodeFormat() {
   return {
     selector: 'source.json',
     inclusionPriority: 1,
-    formatEntireFile: function (editor, range) {
+    formatEntireFile(editor, range) {
       return (_CodeFormatHelpers || _load_CodeFormatHelpers()).default.formatEntireFile(editor, range);
     }
   };

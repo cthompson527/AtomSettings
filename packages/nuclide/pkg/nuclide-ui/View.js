@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,7 +12,7 @@ var _reactForAtom = require('react-for-atom');
  * Because we're going through Atom's ViewRegistry (which returns DOM nodes), we need to render an
  * empty element and manually attach the view (DOM element) we get from Atom.
  */
-let View = exports.View = class View extends _reactForAtom.React.Component {
+class View extends _reactForAtom.React.Component {
 
   shouldComponentUpdate(nextProps) {
     return this.props.item !== nextProps.item;
@@ -57,4 +48,13 @@ let View = exports.View = class View extends _reactForAtom.React.Component {
   render() {
     return _reactForAtom.React.createElement('nuclide-react-mount-root', null);
   }
-};
+}
+exports.View = View; /**
+                      * Copyright (c) 2015-present, Facebook, Inc.
+                      * All rights reserved.
+                      *
+                      * This source code is licensed under the license found in the LICENSE file in
+                      * the root directory of this source tree.
+                      *
+                      * 
+                      */

@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _classnames;
 
@@ -32,7 +27,17 @@ function _load_nuclideAnalytics() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Stick this to the left of remote-projects (-99)
-const STATUS_BAR_PRIORITY = -99.5;let StatusBarTile = class StatusBarTile {
+const STATUS_BAR_PRIORITY = -99.5; /**
+                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                    * All rights reserved.
+                                    *
+                                    * This source code is licensed under the license found in the LICENSE file in
+                                    * the root directory of this source tree.
+                                    *
+                                    * 
+                                    */
+
+class StatusBarTile {
 
   constructor() {
     this._diagnosticUpdaters = new Map();
@@ -67,7 +72,7 @@ const STATUS_BAR_PRIORITY = -99.5;let StatusBarTile = class StatusBarTile {
     item.className = 'inline-block';
     this._render();
     this._tile = statusBar.addLeftTile({
-      item: item,
+      item,
       priority: STATUS_BAR_PRIORITY
     });
   }
@@ -84,8 +89,8 @@ const STATUS_BAR_PRIORITY = -99.5;let StatusBarTile = class StatusBarTile {
       }
     }
     this._diagnosticUpdaters.set(diagnosticUpdater, {
-      errorCount: errorCount,
-      warningCount: warningCount
+      errorCount,
+      warningCount
     });
 
     // Recalculate the total diagnostic count.
@@ -121,8 +126,12 @@ const STATUS_BAR_PRIORITY = -99.5;let StatusBarTile = class StatusBarTile {
       this._tile = null;
     }
   }
-};
-let StatusBarTileComponent = class StatusBarTileComponent extends _reactForAtom.React.Component {
+}
+
+exports.default = StatusBarTile;
+
+
+class StatusBarTileComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -163,7 +172,4 @@ let StatusBarTileComponent = class StatusBarTileComponent extends _reactForAtom.
     atom.commands.dispatch(target, 'nuclide-diagnostics-ui:toggle-table');
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diagnostics-show-table-from-status-bar');
   }
-};
-
-
-module.exports = StatusBarTile;
+}

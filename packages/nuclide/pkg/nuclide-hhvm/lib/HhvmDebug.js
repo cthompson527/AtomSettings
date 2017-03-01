@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17,13 +8,28 @@ exports.debug = undefined;
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let debug = exports.debug = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (debugMode, currentFilePath, target) {
+  var _ref = (0, _asyncToGenerator.default)(function* (debugMode, activeProjectRoot, target) {
     let processInfo = null;
+
+    if (!(activeProjectRoot != null)) {
+      throw new Error('Active project is null');
+    }
+
     if (debugMode === 'script') {
-      processInfo = new (_LaunchProcessInfo || _load_LaunchProcessInfo()).LaunchProcessInfo(currentFilePath, target);
+      processInfo = new (_LaunchProcessInfo || _load_LaunchProcessInfo()).LaunchProcessInfo(activeProjectRoot, target);
     } else {
-      processInfo = new (_AttachProcessInfo || _load_AttachProcessInfo()).AttachProcessInfo(currentFilePath);
+      processInfo = new (_AttachProcessInfo || _load_AttachProcessInfo()).AttachProcessInfo(activeProjectRoot);
     }
 
     // Use commands here to trigger package activation.

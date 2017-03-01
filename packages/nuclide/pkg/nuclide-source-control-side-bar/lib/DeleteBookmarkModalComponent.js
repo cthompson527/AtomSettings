@@ -1,22 +1,34 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _reactForAtom = require('react-for-atom');
+
+var _Button;
+
+function _load_Button() {
+  return _Button = require('../../nuclide-ui/Button');
+}
+
+var _ButtonGroup;
+
+function _load_ButtonGroup() {
+  return _ButtonGroup = require('../../nuclide-ui/ButtonGroup');
+}
+
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = undefined;
-
-var _reactForAtom = require('react-for-atom');
-
-let DeleteBookmarkModalComponent = class DeleteBookmarkModalComponent extends _reactForAtom.React.Component {
+class DeleteBookmarkModalComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -57,22 +69,21 @@ let DeleteBookmarkModalComponent = class DeleteBookmarkModalComponent extends _r
         'div',
         { className: 'text-right' },
         _reactForAtom.React.createElement(
-          'div',
-          { className: 'btn-group btn-group-sm' },
+          (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
+          { size: (_ButtonGroup || _load_ButtonGroup()).ButtonGroupSizes.SMALL },
           _reactForAtom.React.createElement(
-            'button',
-            { className: 'btn', onClick: this.props.onCancel, ref: 'cancelButton' },
+            (_Button || _load_Button()).Button,
+            { onClick: this.props.onCancel, ref: 'cancelButton' },
             'Cancel'
           ),
           _reactForAtom.React.createElement(
-            'button',
-            { className: 'btn btn-error', onClick: this._handleDeleteClick },
+            (_Button || _load_Button()).Button,
+            { buttonType: (_Button || _load_Button()).ButtonTypes.ERROR, onClick: this._handleDeleteClick },
             'Delete'
           )
         )
       )
     );
   }
-};
+}
 exports.default = DeleteBookmarkModalComponent;
-module.exports = exports['default'];

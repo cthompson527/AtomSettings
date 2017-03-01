@@ -1,17 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _collection;
 
@@ -39,9 +32,19 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
-let TypeHintManager = class TypeHintManager {
+class TypeHintManager {
 
   constructor() {
     this._typeHintProviders = [];
@@ -58,13 +61,8 @@ let TypeHintManager = class TypeHintManager {
 
     return (0, _asyncToGenerator.default)(function* () {
       const grammar = editor.getGrammar();
-      const scopeName = grammar.scopeName;
-
-      var _getMatchingProviders = _this._getMatchingProvidersForScopeName(scopeName),
-          _getMatchingProviders2 = _slicedToArray(_getMatchingProviders, 1);
-
-      const provider = _getMatchingProviders2[0];
-
+      const { scopeName } = grammar;
+      const [provider] = _this._getMatchingProvidersForScopeName(scopeName);
       if (provider == null) {
         return null;
       }
@@ -75,15 +73,13 @@ let TypeHintManager = class TypeHintManager {
         name = 'unknown';
         logger.error('Type hint provider has no name', provider);
       }
-      const typeHint = yield (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(name + '.typeHint', function () {
+      const typeHint = yield (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(name + '.typeHint', function () {
         return provider.typeHint(editor, position);
       });
       if (!typeHint || _this._marker) {
         return;
       }
-      const hint = typeHint.hint,
-            hintTree = typeHint.hintTree,
-            range = typeHint.range;
+      const { hint, hintTree, range } = typeHint;
       // For now, actual hint text is required.
 
       if (!(hint != null)) {
@@ -98,7 +94,7 @@ let TypeHintManager = class TypeHintManager {
       });
       return {
         component: (0, (_TypeHintComponent || _load_TypeHintComponent()).makeTypeHintComponent)(hintTree || hint, grammar),
-        range: range
+        range
       };
     })();
   }
@@ -119,7 +115,5 @@ let TypeHintManager = class TypeHintManager {
   removeProvider(provider) {
     (0, (_collection || _load_collection()).arrayRemove)(this._typeHintProviders, provider);
   }
-};
-
-
-module.exports = TypeHintManager;
+}
+exports.default = TypeHintManager;

@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Combobox = undefined;
-
-var _class, _temp;
 
 var _UniversalDisposable;
 
@@ -48,7 +37,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * TODO use generic search provider
  * TODO move combobox to separate package.
  */
-let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reactForAtom.React.Component {
+class Combobox extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -115,7 +104,7 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
     this.setState({
       error: null,
       options: newOptions,
-      filteredOptions: filteredOptions,
+      filteredOptions,
       selectedIndex: this._getNewSelectedIndex(filteredOptions)
     });
   }
@@ -143,7 +132,7 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
       const valueLowercase = option.toLowerCase();
       return {
         value: option,
-        valueLowercase: valueLowercase,
+        valueLowercase,
         matchIndex: valueLowercase.indexOf(lowerCaseState)
       };
     }).filter(option => option.matchIndex !== -1).sort((a, b) => {
@@ -160,6 +149,11 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
   _getOptionsElement() {
     if (this._optionsElement == null) {
       this._optionsElement = document.createElement('div');
+
+      if (!(document.body != null)) {
+        throw new Error('Invariant violation: "document.body != null"');
+      }
+
       document.body.appendChild(this._optionsElement);
       this._subscriptions.add(() => {
         this._optionsElement.remove();
@@ -190,7 +184,7 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
     this.setState({
       textInput: newText,
       optionsVisible: true,
-      filteredOptions: filteredOptions,
+      filteredOptions,
       selectedIndex: this._getNewSelectedIndex(filteredOptions)
     });
     this.props.onChange(newText);
@@ -209,13 +203,18 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
     });
   }
 
-  _handleInputBlur() {
-    // Delay hiding the combobox long enough for a click inside the combobox to trigger on it in
-    // case the blur was caused by a click inside the combobox. 150ms is empirically long enough to
-    // let the stack clear from this blur event and for the click event to trigger.
-    setTimeout(this._handleCancel, 150);
-    const onBlur = this.props.onBlur;
-
+  _handleInputBlur(event) {
+    const { relatedTarget } = event;
+    if (relatedTarget == null ||
+    // TODO(hansonw): Move this check inside AtomInput.
+    // See https://github.com/atom/atom/blob/master/src/text-editor-element.coffee#L145
+    relatedTarget.tagName === 'INPUT' && relatedTarget.classList.contains('hidden-input') ||
+    // Selecting a menu item registers on the document body.
+    relatedTarget === document.body) {
+      return;
+    }
+    this._handleCancel();
+    const { onBlur } = this.props;
     if (onBlur != null) {
       onBlur(this.getText());
     }
@@ -228,6 +227,8 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
       const input = _reactForAtom.ReactDOM.findDOMNode(this.refs.freeformInput);
       if (input) {
         input.focus();
+        // Focusing usually shows the options, so hide them immediately.
+        setImmediate(() => this.setState({ optionsVisible: false }));
       }
     });
   }
@@ -258,7 +259,7 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
   }
 
   _setSelectedIndex(selectedIndex) {
-    this.setState({ selectedIndex: selectedIndex });
+    this.setState({ selectedIndex });
   }
 
   _scrollSelectedOptionIntoViewIfNeeded() {
@@ -347,14 +348,14 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
       );
     }
 
-    var _props = this.props;
-    const initialTextInput = _props.initialTextInput,
-          placeholderText = _props.placeholderText,
-          size = _props.size,
-          width = _props.width;
-
+    const {
+      initialTextInput,
+      placeholderText,
+      size,
+      width
+    } = this.props;
     const wrapperStyle = {
-      width: width == null ? undefined : `${ width }px`
+      width: width == null ? undefined : `${width}px`
     };
     return _reactForAtom.React.createElement(
       'div',
@@ -367,16 +368,28 @@ let Combobox = exports.Combobox = (_temp = _class = class Combobox extends _reac
         placeholderText: placeholderText,
         ref: 'freeformInput',
         size: size,
-        width: width
+        width: width,
+        disabled: this.props.disabled
       }),
       optionsContainer
     );
   }
+}
+exports.Combobox = Combobox; /**
+                              * Copyright (c) 2015-present, Facebook, Inc.
+                              * All rights reserved.
+                              *
+                              * This source code is licensed under the license found in the LICENSE file in
+                              * the root directory of this source tree.
+                              *
+                              * 
+                              */
 
-}, _class.defaultProps = {
+Combobox.defaultProps = {
   className: '',
   maxOptionCount: 10,
   onChange: newValue => {},
   onSelect: newValue => {},
-  width: 200
-}, _temp);
+  width: 200,
+  disabled: false
+};

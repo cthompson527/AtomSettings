@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,11 +27,21 @@ function _load_classnames() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const REALLY_BAD_THRESHOLD = 50;
 const NOT_GREAT_THRESHOLD = 80;
 const COLOR_DISPLAY_SETTING = 'nuclide-type-coverage.colorizeStatusBar';
 
-let StatusBarTileComponent = exports.StatusBarTileComponent = class StatusBarTileComponent extends _reactForAtom.React.Component {
+class StatusBarTileComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -63,7 +64,7 @@ let StatusBarTileComponent = exports.StatusBarTileComponent = class StatusBarTil
         'nuclide-type-coverage-status-bar-pending': this.props.pending,
         'nuclide-type-coverage-status-bar-ready': !this.props.pending
       }, colorClasses));
-      const formattedPercentage = `${ Math.floor(percentage) }%`;
+      const formattedPercentage = `${Math.floor(percentage)}%`;
       const tooltipString = getTooltipString(formattedPercentage, result.providerName);
       return _reactForAtom.React.createElement(
         'div',
@@ -82,9 +83,9 @@ let StatusBarTileComponent = exports.StatusBarTileComponent = class StatusBarTil
       return null;
     }
   }
-};
+}
 
-
+exports.StatusBarTileComponent = StatusBarTileComponent;
 function getTooltipString(formattedPercentage, providerName) {
-  return `This file is ${ formattedPercentage } covered by ${ providerName }.<br/>` + 'Click to toggle display of uncovered areas.';
+  return `This file is ${formattedPercentage} covered by ${providerName}.<br/>` + 'Click to toggle display of uncovered areas.';
 }

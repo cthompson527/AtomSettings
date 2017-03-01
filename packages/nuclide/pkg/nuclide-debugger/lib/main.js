@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _dec, _desc, _value, _class2;
-
+exports.createDebuggerView = createDebuggerView;
 exports.activate = activate;
 exports.serialize = serialize;
 exports.deactivate = deactivate;
@@ -27,6 +16,7 @@ exports.provideRemoteControlService = provideRemoteControlService;
 exports.consumeDatatipService = consumeDatatipService;
 exports.consumeRegisterNuxService = consumeRegisterNuxService;
 exports.consumeTriggerNuxService = consumeTriggerNuxService;
+exports.consumeWorkspaceViewsService = consumeWorkspaceViewsService;
 
 var _UniversalDisposable;
 
@@ -62,6 +52,12 @@ function _load_DebuggerModel() {
   return _DebuggerModel = _interopRequireDefault(require('./DebuggerModel'));
 }
 
+var _DebuggerModel2;
+
+function _load_DebuggerModel2() {
+  return _DebuggerModel2 = require('./DebuggerModel');
+}
+
 var _DebuggerDatatip;
 
 function _load_DebuggerDatatip() {
@@ -76,6 +72,12 @@ function _load_DebuggerLaunchAttachUI() {
   return _DebuggerLaunchAttachUI = require('./DebuggerLaunchAttachUI');
 }
 
+var _renderReactRoot;
+
+function _load_renderReactRoot() {
+  return _renderReactRoot = require('../../commons-atom/renderReactRoot');
+}
+
 var _nuclideUri;
 
 function _load_nuclideUri() {
@@ -86,12 +88,6 @@ var _nuclideRemoteConnection;
 
 function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
-}
-
-var _PanelComponent;
-
-function _load_PanelComponent() {
-  return _PanelComponent = require('../../nuclide-ui/PanelComponent');
 }
 
 var _nuclideDebuggerBase;
@@ -120,48 +116,30 @@ function _load_range() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const DATATIP_PACKAGE_NAME = 'nuclide-debugger-datatip';
 const NUX_NEW_DEBUGGER_UI_ID = 4377;
 const GK_NEW_DEBUGGER_UI_NUX = 'mp_nuclide_new_debugger_ui';
 const NUX_NEW_DEBUGGER_UI_NAME = 'nuclide_new_debugger_ui';
 
-let DebuggerView = class DebuggerView extends _reactForAtom.React.Component {
+class DebuggerView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
       showOldView: false
     };
-    this._toggleOldView = this._toggleOldView.bind(this);
+    this._openDevTools = this._openDevTools.bind(this);
+    this._stopDebugging = this._stopDebugging.bind(this);
   }
 
   _getUiTypeForAnalytics() {
@@ -194,58 +172,54 @@ let DebuggerView = class DebuggerView extends _reactForAtom.React.Component {
     }
   }
 
-  _toggleOldView() {
-    this.setState({
-      showOldView: !this.state.showOldView
-    });
+  _openDevTools() {
+    this.props.model.getActions().openDevTools();
+  }
+
+  _stopDebugging() {
+    this.props.model.getActions().stopDebugging();
   }
 
   render() {
-    const model = this.props.model;
-    const showOldView = this.state.showOldView;
-
+    const {
+      model
+    } = this.props;
+    const { showOldView } = this.state;
     return _reactForAtom.React.createElement(
-      (_PanelComponent || _load_PanelComponent()).PanelComponent,
-      { initialLength: 500, dock: 'right' },
+      'div',
+      { className: 'nuclide-debugger-root' },
       _reactForAtom.React.createElement(
         'div',
-        { className: 'nuclide-debugger-root' },
-        _reactForAtom.React.createElement(
-          'div',
-          { className: (0, (_classnames || _load_classnames()).default)({ 'nuclide-debugger-container-old-enabled': showOldView }) },
-          _reactForAtom.React.createElement((_DebuggerControllerView || _load_DebuggerControllerView()).default, {
-            store: model.getStore(),
-            bridge: model.getBridge(),
-            actions: model.getActions(),
-            breakpointStore: model.getBreakpointStore(),
-            showOldView: showOldView,
-            toggleOldView: this._toggleOldView
-          })
-        ),
-        !showOldView ? _reactForAtom.React.createElement((_NewDebuggerView || _load_NewDebuggerView()).NewDebuggerView, {
-          model: model,
-          watchExpressionListStore: model.getWatchExpressionListStore()
-        }) : null
-      )
+        { className: (0, (_classnames || _load_classnames()).default)({ 'nuclide-debugger-container-old-enabled': showOldView }) },
+        _reactForAtom.React.createElement((_DebuggerControllerView || _load_DebuggerControllerView()).default, {
+          store: model.getStore(),
+          bridge: model.getBridge(),
+          breakpointStore: model.getBreakpointStore(),
+          openDevTools: this._openDevTools,
+          stopDebugging: this._stopDebugging
+        })
+      ),
+      !showOldView ? _reactForAtom.React.createElement((_NewDebuggerView || _load_NewDebuggerView()).NewDebuggerView, {
+        model: model,
+        watchExpressionListStore: model.getWatchExpressionListStore()
+      }) : null
     );
   }
-};
-
+}
 
 function createDebuggerView(model) {
-  const elem = document.createElement('div');
+  if (!(model instanceof (_DebuggerModel || _load_DebuggerModel()).default)) {
+    return;
+  }
+  const elem = (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(_reactForAtom.React.createElement(DebuggerView, { model: model }));
   elem.className = 'nuclide-debugger-container';
-  _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement(DebuggerView, {
-    model: model
-  }), elem);
   return elem;
 }
 
-let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-debugger-atom:toggleBreakpoint'), (_class2 = class Activation {
+class Activation {
 
   constructor(state) {
     this._model = new (_DebuggerModel || _load_DebuggerModel()).default(state);
-    this._panel = null;
     this._launchAttachDialog = null;
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._model,
     // Listen for removed connections and kill the debugger if it is using that connection.
@@ -267,10 +241,6 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     atom.commands.add('atom-workspace', {
       'nuclide-debugger:toggle': this._toggleLaunchAttachDialog.bind(this)
     }), atom.commands.add('atom-workspace', {
-      'nuclide-debugger:show': this._show.bind(this)
-    }), atom.commands.add('atom-workspace', {
-      'nuclide-debugger:hide': this._hide.bind(this)
-    }), atom.commands.add('atom-workspace', {
       'nuclide-debugger:continue-debugging': this._continue.bind(this)
     }), atom.commands.add('atom-workspace', {
       'nuclide-debugger:stop-debugging': this._stop.bind(this)
@@ -288,6 +258,10 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
       'nuclide-debugger:remove-all-breakpoints': this._deleteAllBreakpoints.bind(this)
     }), atom.commands.add('atom-workspace', {
       'nuclide-debugger:add-to-watch': this._addToWatch.bind(this)
+    }), atom.commands.add('atom-workspace', {
+      'nuclide-debugger:run-to-location': this._runToLocation.bind(this)
+    }), atom.commands.add('.nuclide-debugger-root', {
+      'nuclide-debugger:copy-debugger-expression-value': this._copyDebuggerExpressionValue.bind(this)
     }),
 
     // Context Menu Items.
@@ -295,6 +269,10 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
       '.nuclide-debugger-breakpoint': [{
         label: 'Remove All Breakpoints',
         command: 'nuclide-debugger:remove-all-breakpoints'
+      }],
+      '.nuclide-debugger-expression-value-list .list-item': [{
+        label: 'Copy',
+        command: 'nuclide-debugger:copy-debugger-expression-value'
       }],
       'atom-text-editor': [{ type: 'separator' }, {
         label: 'Debugger',
@@ -304,16 +282,14 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
         }, {
           label: 'Add to Watch',
           command: 'nuclide-debugger:add-to-watch'
+        }, {
+          label: 'Run to Location',
+          command: 'nuclide-debugger:run-to-location'
         }]
       }, { type: 'separator' }]
     }));
     this._hideLaunchAttachDialog = this._hideLaunchAttachDialog.bind(this);
     this._handleDefaultAction = this._handleDefaultAction.bind(this);
-    this._setupView();
-  }
-
-  _setupView() {
-    this._disposables.add(atom.views.addViewProvider((_DebuggerModel || _load_DebuggerModel()).default, model => createDebuggerView(model)));
   }
 
   serialize() {
@@ -325,9 +301,6 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
 
   dispose() {
     this._disposables.dispose();
-    if (this._panel) {
-      this._panel.destroy();
-    }
   }
 
   getModel() {
@@ -340,6 +313,24 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     return disposable;
   }
 
+  consumeWorkspaceViewsService(api) {
+    this._disposables.add(api.addOpener(uri => {
+      if (uri === (_DebuggerModel2 || _load_DebuggerModel2()).WORKSPACE_VIEW_URI) {
+        return this._model;
+      }
+    }), () => {
+      api.destroyWhere(item => item instanceof (_DebuggerModel || _load_DebuggerModel()).default);
+    }, atom.commands.add('atom-workspace', {
+      'nuclide-debugger:show': () => {
+        api.open((_DebuggerModel2 || _load_DebuggerModel2()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
+      }
+    }), atom.commands.add('atom-workspace', {
+      'nuclide-debugger:hide': () => {
+        api.destroyWhere(item => item instanceof (_DebuggerModel || _load_DebuggerModel()).default);
+      }
+    }));
+  }
+
   setTriggerNux(triggerNux) {
     this._tryTriggerNux = triggerNux;
   }
@@ -348,14 +339,6 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     if (this._tryTriggerNux != null) {
       this._tryTriggerNux(id);
     }
-  }
-
-  _show() {
-    this._getPanel().show();
-  }
-
-  _hide() {
-    this._getPanel().hide();
   }
 
   _continue() {
@@ -381,12 +364,26 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
   }
 
   _toggleBreakpoint() {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-debugger-atom:toggleBreakpoint', () => {
+      this._executeWithEditorPath((filePath, line) => {
+        this._model.getActions().toggleBreakpoint(filePath, line);
+      });
+    });
+  }
+
+  _runToLocation() {
+    this._executeWithEditorPath((path, line) => {
+      this._model.getBridge().runToLocation(path, line);
+    });
+  }
+
+  _executeWithEditorPath(fn) {
     const editor = atom.workspace.getActiveTextEditor();
     if (editor && editor.getPath()) {
       const filePath = editor.getPath();
       if (filePath) {
         const line = editor.getLastCursor().getBufferRow();
-        this._model.getActions().toggleBreakpoint(filePath, line);
+        fn(filePath, line);
       }
     }
   }
@@ -403,6 +400,7 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     } else {
       dialog.show();
     }
+    this._emitLaunchAttachVisibilityChangedEvent();
   }
 
   _hideLaunchAttachDialog() {
@@ -410,6 +408,12 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     if (dialog.isVisible()) {
       dialog.hide();
     }
+    this._emitLaunchAttachVisibilityChangedEvent();
+  }
+
+  _emitLaunchAttachVisibilityChangedEvent() {
+    const dialog = this._getLaunchAttachDialog();
+    this._model.getLaunchAttachActionEventEmitter().emit((_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachEventTypes.VISIBILITY_CHANGED, dialog.isVisible());
   }
 
   _handleDefaultAction() {
@@ -426,8 +430,7 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
         debuggerActions: this._model.getActions(),
         emitter: this._model.getLaunchAttachActionEventEmitter()
       });
-      const host = document.createElement('div');
-      _reactForAtom.ReactDOM.render(component, host);
+      const host = (0, (_renderReactRoot || _load_renderReactRoot()).renderReactRoot)(component);
       this._launchAttachDialog = atom.workspace.addModalPanel({
         item: host,
         visible: false });
@@ -447,25 +450,6 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     return this._launchAttachDialog;
   }
 
-  /**
-   * Lazy panel creation.
-   */
-  _getPanel() {
-    if (!this._panel) {
-      const panel = atom.workspace.addRightPanel({
-        item: this._model,
-        visible: false,
-        // Move this left of the toolbar, when it is on the right.
-        priority: 150
-      });
-      // Flow doesn't track non-null when assigning into nullable directly.
-      this._panel = panel;
-      return panel;
-    } else {
-      return this._panel;
-    }
-  }
-
   _addToWatch() {
     const editor = atom.workspace.getActiveTextEditor();
     if (!editor) {
@@ -479,8 +463,12 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
       this._model.getActions().addWatchExpression(watchExpression);
     }
   }
-}, (_applyDecoratedDescriptor(_class2.prototype, '_toggleBreakpoint', [_dec], Object.getOwnPropertyDescriptor(_class2.prototype, '_toggleBreakpoint'), _class2.prototype)), _class2));
 
+  _copyDebuggerExpressionValue(event) {
+    const clickedElement = event.target;
+    atom.clipboard.write(clickedElement.textContent);
+  }
+}
 
 function createDatatipProvider() {
   if (datatipProvider == null) {
@@ -547,8 +535,8 @@ function registerConsoleExecutor(watchExpressionStore, registerExecutor) {
   disposables.add(registerExecutor({
     id: 'debugger',
     name: 'Debugger',
-    send: send,
-    output: output,
+    send,
+    output,
     getProperties: watchExpressionStore.getProperties.bind(watchExpressionStore)
   }));
   return disposables;
@@ -590,11 +578,12 @@ function consumeEvaluationExpressionProvider(provider) {
 function consumeToolBar(getToolBar) {
   const toolBar = getToolBar('nuclide-debugger');
   toolBar.addButton({
-    icon: 'plug',
+    iconset: 'icon-nuclicon',
+    icon: 'debugger',
     callback: 'nuclide-debugger:toggle',
     tooltip: 'Toggle Debugger',
     priority: 500
-  });
+  }).element;
   const disposable = new _atom.Disposable(() => {
     toolBar.removeItems();
   });
@@ -636,16 +625,10 @@ function createDebuggerNuxTourModel() {
     position: 'left'
   };
 
-  const toggleOldNewUiNux = {
-    content: 'You can always switch back to the old UI.',
-    selector: '.nuclide-debugger-toggle-old-ui-button',
-    position: 'bottom'
-  };
-
   const newDebuggerUINuxTour = {
     id: NUX_NEW_DEBUGGER_UI_ID,
     name: NUX_NEW_DEBUGGER_UI_NAME,
-    nuxList: [welcomeToNewUiNux, toggleOldNewUiNux],
+    nuxList: [welcomeToNewUiNux],
     gatekeeperID: GK_NEW_DEBUGGER_UI_NUX
   };
 
@@ -664,4 +647,12 @@ function consumeTriggerNuxService(tryTriggerNux) {
   if (activation != null) {
     activation.setTriggerNux(tryTriggerNux);
   }
+}
+
+function consumeWorkspaceViewsService(api) {
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
+  }
+
+  activation.consumeWorkspaceViewsService(api);
 }

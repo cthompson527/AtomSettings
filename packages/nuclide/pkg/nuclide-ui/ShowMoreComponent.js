@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,17 @@ function _load_Button() {
  * aligned at the bottom. Clicking "Show More" will remove the max height restriction
  * and expand the component to full height.
  */
-let ShowMoreComponent = exports.ShowMoreComponent = class ShowMoreComponent extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ShowMoreComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -54,14 +55,14 @@ let ShowMoreComponent = exports.ShowMoreComponent = class ShowMoreComponent exte
   }
 
   render() {
-    var _state = this.state;
-    const showingMore = _state.showingMore,
-          currentHeight = _state.currentHeight;
-    const maxHeight = this.props.maxHeight;
-
+    const { showingMore, currentHeight } = this.state;
+    const { maxHeight } = this.props;
 
     const showMessage = showingMore ? 'Show Less' : 'Show More';
-    const conditionalStyle = !showingMore ? { 'max-height': `${ maxHeight }px`, 'overflow-y': 'hidden' } : {};
+    const conditionalStyle = !showingMore ? {
+      maxHeight: `${maxHeight}px`,
+      overflowY: 'hidden'
+    } : {};
     const displayNoneIfBelowMaxHeight = currentHeight <= maxHeight ? { display: 'none' } : {};
     const showMoreButton = _reactForAtom.React.createElement(
       'div',
@@ -95,4 +96,5 @@ let ShowMoreComponent = exports.ShowMoreComponent = class ShowMoreComponent exte
   _toggleShowMore() {
     this.setState({ showingMore: !this.state.showingMore });
   }
-};
+}
+exports.ShowMoreComponent = ShowMoreComponent;

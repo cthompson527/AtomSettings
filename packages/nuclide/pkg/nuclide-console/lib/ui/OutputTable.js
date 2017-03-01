@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _Hasher;
 
@@ -30,7 +20,17 @@ function _load_RecordView() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let OutputTable = class OutputTable extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class OutputTable extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -66,7 +66,5 @@ let OutputTable = class OutputTable extends _reactForAtom.React.Component {
       showSourceLabel: this.props.showSourceLabels
     });
   }
-
-};
+}
 exports.default = OutputTable;
-module.exports = exports['default'];

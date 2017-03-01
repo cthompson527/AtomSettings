@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,7 +45,17 @@ function _load_SimpleValueComponent() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExpressionComponent extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class WatchExpressionComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -63,9 +64,19 @@ let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExp
     this._resetExpressionEditState = this._resetExpressionEditState.bind(this);
     this._onEditorCancel = this._onEditorCancel.bind(this);
     this._onEditorBlur = this._onEditorBlur.bind(this);
+    this._expansionStates = new Map();
     this.state = {
       rowBeingEdited: null
     };
+  }
+
+  _getExpansionStateIdForExpression(expression) {
+    let expansionStateId = this._expansionStates.get(expression);
+    if (expansionStateId == null) {
+      expansionStateId = {};
+      this._expansionStates.set(expression, expansionStateId);
+    }
+    return expansionStateId;
   }
 
   removeExpression(index, event) {
@@ -123,9 +134,10 @@ let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExp
   }
 
   _renderExpression(fetchChildren, watchExpression, index) {
-    const expression = watchExpression.expression,
-          value = watchExpression.value;
-
+    const {
+      expression,
+      value
+    } = watchExpression;
     if (index === this.state.rowBeingEdited) {
       return _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
         className: 'nuclide-debugger-watch-expression-input',
@@ -147,12 +159,13 @@ let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExp
       _reactForAtom.React.createElement(
         'div',
         {
-          className: 'nuclide-debugger-expression-value-content',
+          className: (0, (_classnames || _load_classnames()).default)('nuclide-debugger-expression-value-content', 'nuclide-debugger-watch-expression-value-content'),
           onDoubleClick: this._setRowBeingEdited.bind(this, index) },
         _reactForAtom.React.createElement(ValueComponent, {
           expression: expression,
           fetchChildren: fetchChildren,
-          simpleValueComponent: (_SimpleValueComponent || _load_SimpleValueComponent()).default
+          simpleValueComponent: (_SimpleValueComponent || _load_SimpleValueComponent()).default,
+          expansionStateId: this._getExpansionStateIdForExpression(expression)
         })
       ),
       _reactForAtom.React.createElement('i', {
@@ -163,10 +176,10 @@ let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExp
   }
 
   render() {
-    var _props = this.props;
-    const watchExpressions = _props.watchExpressions,
-          watchExpressionStore = _props.watchExpressionStore;
-
+    const {
+      watchExpressions,
+      watchExpressionStore
+    } = this.props;
     const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
     const expressions = watchExpressions.map(this._renderExpression.bind(this, fetchChildren));
     const addNewExpressionInput = _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
@@ -183,4 +196,5 @@ let WatchExpressionComponent = exports.WatchExpressionComponent = class WatchExp
       addNewExpressionInput
     );
   }
-};
+}
+exports.WatchExpressionComponent = WatchExpressionComponent;

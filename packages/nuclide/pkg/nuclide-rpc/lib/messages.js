@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,23 +15,26 @@ exports.createDisposeMessage = createDisposeMessage;
 exports.createUnsubscribeMessage = createUnsubscribeMessage;
 exports.createErrorResponseMessage = createErrorResponseMessage;
 
-var _config;
-
-function _load_config() {
-  return _config = require('./config');
-}
 
 // TODO: This should be a custom marshaller registered in the TypeRegistry
 
 
-// Encodes the structure of messages that can be sent from the client to the server.
-
-
 // Encodes the structure of messages that can be sent from the server to the client.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+// Encodes the structure of messages that can be sent from the client to the server.
 function decodeError(message, encodedError) {
   if (encodedError != null && typeof encodedError === 'object') {
     const resultError = new Error();
-    resultError.message = `Remote Error: ${ encodedError.message } processing message ${ JSON.stringify(message) }\n` + JSON.stringify(encodedError.stack);
+    resultError.message = `Remote Error: ${encodedError.message} processing message ${JSON.stringify(message)}\n` + JSON.stringify(encodedError.stack);
     // $FlowIssue - some Errors (notably file operations) have a code.
     resultError.code = encodedError.code;
     resultError.stack = encodedError.stack;
@@ -48,94 +42,96 @@ function decodeError(message, encodedError) {
   } else {
     return encodedError;
   }
-}function createCallMessage(functionName, id, args) {
+}
+
+function createCallMessage(protocol, functionName, id, args) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'call',
     method: functionName,
-    id: id,
-    args: args
+    id,
+    args
   };
 }
 
-function createCallObjectMessage(methodName, objectId, id, args) {
+function createCallObjectMessage(protocol, methodName, objectId, id, args) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'call-object',
     method: methodName,
-    objectId: objectId,
-    id: id,
-    args: args
+    objectId,
+    id,
+    args
   };
 }
 
-function createNewObjectMessage(interfaceName, id, args) {
+function createNewObjectMessage(protocol, interfaceName, id, args) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'new',
     interface: interfaceName,
-    id: id,
-    args: args
+    id,
+    args
   };
 }
 
-function createPromiseMessage(id, result) {
+function createPromiseMessage(protocol, id, result) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'response',
-    id: id,
-    result: result
+    id,
+    result
   };
 }
 
-function createNextMessage(id, value) {
+function createNextMessage(protocol, id, value) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'next',
-    id: id,
-    value: value
+    id,
+    value
   };
 }
 
-function createCompleteMessage(id) {
+function createCompleteMessage(protocol, id) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'complete',
-    id: id
+    id
   };
 }
 
-function createObserveErrorMessage(id, error) {
+function createObserveErrorMessage(protocol, id, error) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'error',
-    id: id,
+    id,
     error: formatError(error)
   };
 }
 
-function createDisposeMessage(id, objectId) {
+function createDisposeMessage(protocol, id, objectId) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'dispose',
-    id: id,
-    objectId: objectId
+    id,
+    objectId
   };
 }
 
-function createUnsubscribeMessage(id) {
+function createUnsubscribeMessage(protocol, id) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'unsubscribe',
-    id: id
+    id
   };
 }
 
-function createErrorResponseMessage(id, error) {
+function createErrorResponseMessage(protocol, id, error) {
   return {
-    protocol: (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL,
+    protocol,
     type: 'error-response',
-    id: id,
+    id,
     error: formatError(error)
   };
 }
@@ -157,9 +153,9 @@ function formatError(error) {
     return undefined;
   } else {
     try {
-      return `Unknown Error: ${ JSON.stringify(error, null, 2) }`;
+      return `Unknown Error: ${JSON.stringify(error, null, 2)}`;
     } catch (jsonError) {
-      return `Unknown Error: ${ error.toString() }`;
+      return `Unknown Error: ${error.toString()}`;
     }
   }
 }

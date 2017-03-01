@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _NuclideBridge;
 
@@ -42,7 +37,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * The one method, `presentUI` is called by `Main` to attach the UI into the
  * DOM. Here we can inject any modifications into the UI.
  */
-let NuclideApp = class NuclideApp extends (_WebInspector || _load_WebInspector()).default.App {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class NuclideApp extends (_WebInspector || _load_WebInspector()).default.App {
 
   presentUI() {
     (_NuclideBridge || _load_NuclideBridge()).default.onDebuggerSettingsChanged(this._handleSettingsUpdated.bind(this));
@@ -65,7 +70,7 @@ let NuclideApp = class NuclideApp extends (_WebInspector || _load_WebInspector()
       sourcesPanel.sidebarPaneView = null;
       sourcesPanel._dockSideChanged();
 
-      window.WebInspector.inspectorView.showInitialPanel();
+      (_WebInspector || _load_WebInspector()).default.inspectorView.showInitialPanel();
       sourcesPanel._splitView.hideMain();
       rootView.attachToDocument(document);
       // eslint-disable-next-line no-console
@@ -93,12 +98,11 @@ let NuclideApp = class NuclideApp extends (_WebInspector || _load_WebInspector()
       (_WebInspector || _load_WebInspector()).default.settings.breakpoints.set([]);
     }
   }
-};
-let NuclideAppProvider = class NuclideAppProvider extends (_WebInspector || _load_WebInspector()).default.AppProvider {
+}
+
+class NuclideAppProvider extends (_WebInspector || _load_WebInspector()).default.AppProvider {
   createApp() {
     return new NuclideApp();
   }
-};
-
-
-module.exports = NuclideAppProvider;
+}
+exports.default = NuclideAppProvider;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,7 +34,6 @@ let getServerLogAppenderConfig = exports.getServerLogAppenderConfig = (() => {
 
 let getDefaultConfig = exports.getDefaultConfig = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* () {
-
     if (!logDirectoryInitialized) {
       yield (_fsPromise || _load_fsPromise()).default.mkdirp(LOG_DIRECTORY);
       logDirectoryInitialized = true;
@@ -86,6 +76,8 @@ let getDefaultConfig = exports.getDefaultConfig = (() => {
 })();
 
 exports.getPathToLogFile = getPathToLogFile;
+exports.addAdditionalLogFile = addAdditionalLogFile;
+exports.getAdditionalLogFiles = getAdditionalLogFiles;
 
 var _ScribeProcess;
 
@@ -105,12 +97,6 @@ function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('../../commons-node/fsPromise'));
 }
 
-var _userInfo;
-
-function _load_userInfo() {
-  return _userInfo = _interopRequireDefault(require('../../commons-node/userInfo'));
-}
-
 var _os = _interopRequireDefault(require('os'));
 
 var _nuclideUri;
@@ -121,10 +107,23 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const LOG_DIRECTORY = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `/nuclide-${ (0, (_userInfo || _load_userInfo()).default)().username }-logs`);const LOG_FILE_PATH = exports.LOG_FILE_PATH = (_nuclideUri || _load_nuclideUri()).default.join(LOG_DIRECTORY, 'nuclide.log');
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const LOG_DIRECTORY = (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `/nuclide-${_os.default.userInfo().username}-logs`);
+const LOG_FILE_PATH = exports.LOG_FILE_PATH = (_nuclideUri || _load_nuclideUri()).default.join(LOG_DIRECTORY, 'nuclide.log');
 
 let logDirectoryInitialized = false;
 const scribeAppenderPath = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../fb/scribeAppender.js');
+
+const additionalLogFiles = [];
 
 const MAX_LOG_SIZE = 1024 * 1024;
 const MAX_LOG_BACKUPS = 10;
@@ -136,12 +135,28 @@ function getPathToLogFile() {
 const FileAppender = exports.FileAppender = {
   type: 'file',
   filename: LOG_FILE_PATH,
-  logSize: MAX_LOG_SIZE,
-  numBackups: MAX_LOG_BACKUPS,
+  maxLogSize: MAX_LOG_SIZE,
+  backups: MAX_LOG_BACKUPS,
   layout: {
     type: 'pattern',
     // Format log in following pattern:
     // yyyy-MM-dd HH:mm:ss.mil $Level (pid:$pid) $categroy - $message.
-    pattern: `%d{ISO8601} %p (pid:${ process.pid }) %c - %m`
+    pattern: `%d{ISO8601} %p (pid:${process.pid}) %c - %m`
   }
 };
+
+function addAdditionalLogFile(title, filename) {
+  const filePath = (_nuclideUri || _load_nuclideUri()).default.join(LOG_DIRECTORY, filename);
+  const logFile = {
+    title,
+    filename: filePath
+  };
+
+  if (additionalLogFiles.filter(entry => entry.filename === filename && entry.title === title).length === 0) {
+    additionalLogFiles.push(logFile);
+  }
+}
+
+function getAdditionalLogFiles() {
+  return additionalLogFiles;
+}

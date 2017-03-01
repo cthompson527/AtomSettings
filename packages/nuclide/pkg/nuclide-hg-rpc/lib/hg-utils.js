@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,12 +15,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
  */
 let hgAsyncExecute = exports.hgAsyncExecute = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (args_, options_) {
-    var _getHgExecParams = getHgExecParams(args_, options_);
-
-    const command = _getHgExecParams.command,
-          args = _getHgExecParams.args,
-          options = _getHgExecParams.options;
-
+    const { command, args, options } = yield getHgExecParams(args_, options_);
     const result = yield (0, (_process || _load_process()).asyncExecute)(command, args, options);
     if (result.exitCode === 0) {
       return result;
@@ -48,40 +34,77 @@ let hgAsyncExecute = exports.hgAsyncExecute = (() => {
  */
 
 
+let getHgExecParams = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (args_, options_) {
+    let args = args_;
+    const options = Object.assign({}, options_, {
+      env: Object.assign({}, (yield (0, (_process || _load_process()).getOriginalEnvironment)()), {
+        ATOM_BACKUP_EDITOR: 'false'
+      })
+    });
+    if (!options.NO_HGPLAIN) {
+      // Setting HGPLAIN=1 overrides any custom aliases a user has defined.
+      options.env.HGPLAIN = 1;
+    }
+    if (options.HGEDITOR != null) {
+      options.env.HGEDITOR = options.HGEDITOR;
+    }
+
+    let command;
+    if (options.TTY_OUTPUT) {
+      command = 'script';
+      args = (0, (_process || _load_process()).createArgsForScriptCommand)('hg', args);
+    } else {
+      command = 'hg';
+    }
+    return { command, args, options };
+  });
+
+  return function getHgExecParams(_x3, _x4) {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
 let createCommmitMessageTempFile = exports.createCommmitMessageTempFile = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (commitMessage) {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (commitMessage) {
     const tempFile = yield (_fsPromise || _load_fsPromise()).default.tempfile();
     const strippedMessage = commitMessage.replace(COMMIT_MESSAGE_STRIP_LINE, '');
     yield (_fsPromise || _load_fsPromise()).default.writeFile(tempFile, strippedMessage);
     return tempFile;
   });
 
-  return function createCommmitMessageTempFile(_x3) {
-    return _ref2.apply(this, arguments);
+  return function createCommmitMessageTempFile(_x5) {
+    return _ref3.apply(this, arguments);
   };
 })();
 
 let getEditMergeConfigs = exports.getEditMergeConfigs = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* () {
+  var _ref4 = (0, _asyncToGenerator.default)(function* () {
     const connectionDetails = yield (0, (_nuclideRemoteAtomRpc || _load_nuclideRemoteAtomRpc()).getConnectionDetails)();
     if (connectionDetails == null) {
-      throw new Error('CommandServer not initialized!');
+      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error('CommandServer not initialized!');
+      return {
+        args: [],
+        hgEditor: ''
+      };
     }
     // Atom RPC needs to agree with the Atom process / nuclide server on the address and port.
-    const hgEditor = getAtomRpcScriptPath() + ` -f ${ connectionDetails.family } -p ${ connectionDetails.port } --wait`;
+    const hgEditor = getAtomRpcScriptPath() + ` -f ${connectionDetails.family} -p ${connectionDetails.port} --wait`;
     return {
       args: ['--config', 'merge-tools.editmerge.check=conflicts', '--config', 'ui.merge=editmerge'],
-      hgEditor: hgEditor
+      hgEditor
     };
   });
 
   return function getEditMergeConfigs() {
-    return _ref3.apply(this, arguments);
+    return _ref4.apply(this, arguments);
   };
 })();
 
 exports.hgObserveExecution = hgObserveExecution;
 exports.hgRunCommand = hgRunCommand;
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _process;
 
@@ -116,14 +139,18 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Note: `(?m)` converts to `/m` in JavaScript-flavored RegExp to mean 'multiline'.
 //
 // [1] https://selenic.com/hg/file/3.7.2/mercurial/cmdutil.py#l2734
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const COMMIT_MESSAGE_STRIP_LINE = /^HG:.*(\n|$)/gm;function hgObserveExecution(args_, options_) {
-  var _getHgExecParams2 = getHgExecParams(args_, options_);
-
-  const command = _getHgExecParams2.command,
-        args = _getHgExecParams2.args,
-        options = _getHgExecParams2.options;
-
-  return (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(command, args, options), true);
+  return _rxjsBundlesRxMinJs.Observable.fromPromise(getHgExecParams(args_, options_)).switchMap(({ command, args, options }) => (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).scriptSafeSpawn)(command, args, options), true));
 }
 
 /**
@@ -131,48 +158,17 @@ const COMMIT_MESSAGE_STRIP_LINE = /^HG:.*(\n|$)/gm;function hgObserveExecution(a
  * Resolves to stdout.
  */
 function hgRunCommand(args_, options_) {
-  var _getHgExecParams3 = getHgExecParams(args_, options_);
-
-  const command = _getHgExecParams3.command,
-        args = _getHgExecParams3.args,
-        options = _getHgExecParams3.options;
-
-  return (0, (_process || _load_process()).runCommand)(command, args, options, true /* kill process tree on complete */);
+  return _rxjsBundlesRxMinJs.Observable.fromPromise(getHgExecParams(args_, options_)).switchMap(({ command, args, options }) => (0, (_process || _load_process()).runCommand)(command, args, options, true /* kill process tree on complete */));
 }
 
 function logAndThrowHgError(args, options, stdout, stderr) {
-  (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error executing hg command: ${ JSON.stringify(args) }\n` + `stderr: ${ stderr }\nstdout: ${ stdout }\n` + `options: ${ JSON.stringify(options) }`);
+  (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error executing hg command: ${JSON.stringify(args)}\n` + `stderr: ${stderr}\nstdout: ${stdout}\n` + `options: ${JSON.stringify(options)}`);
   if (stderr.length > 0 && stdout.length > 0) {
-    throw new Error(`hg error\nstderr: ${ stderr }\nstdout: ${ stdout }`);
+    throw new Error(`hg error\nstderr: ${stderr}\nstdout: ${stdout}`);
   } else {
     // One of `stderr` or `stdout` is empty - not both.
     throw new Error(stderr || stdout);
   }
-}
-
-function getHgExecParams(args_, options_) {
-  let args = args_;
-  const options = Object.assign({}, options_, {
-    env: Object.assign({}, (0, (_process || _load_process()).getOriginalEnvironment)(), {
-      ATOM_BACKUP_EDITOR: 'false'
-    })
-  });
-  if (!options.NO_HGPLAIN) {
-    // Setting HGPLAIN=1 overrides any custom aliases a user has defined.
-    options.env.HGPLAIN = 1;
-  }
-  if (options.HGEDITOR != null) {
-    options.env.HGEDITOR = options.HGEDITOR;
-  }
-
-  let command;
-  if (options.TTY_OUTPUT) {
-    command = 'script';
-    args = (0, (_process || _load_process()).createArgsForScriptCommand)('hg', args);
-  } else {
-    command = 'hg';
-  }
-  return { command: command, args: args, options: options };
 }
 
 let atomRpcEditorPath;

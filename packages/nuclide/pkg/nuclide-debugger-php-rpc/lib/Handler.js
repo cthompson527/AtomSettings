@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _utils;
 
@@ -23,7 +18,17 @@ function _load_ClientCallback() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Handler = class Handler {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Handler {
 
   constructor(domain, clientCallback) {
     this._domain = domain;
@@ -53,13 +58,11 @@ let Handler = class Handler {
   }
 
   sendMethod(method, params) {
-    this._clientCallback.sendMethod(this._clientCallback.getServerMessageObservable(), method, params);
+    this._clientCallback.sendServerMethod(method, params);
   }
 
   sendUserMessage(type, message) {
     this._clientCallback.sendUserMessage(type, message);
   }
-};
-
-
-module.exports = Handler;
+}
+exports.default = Handler;

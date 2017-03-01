@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 var _atom = require('atom');
 
@@ -21,6 +12,12 @@ var _createPackage;
 
 function _load_createPackage() {
   return _createPackage = _interopRequireDefault(require('../../commons-atom/createPackage'));
+}
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
 }
 
 var _UniversalDisposable;
@@ -69,6 +66,16 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const LINTER_PACKAGE = 'linter';
 const MAX_OPEN_ALL_FILES = 20;
 
@@ -76,7 +83,7 @@ function disableLinter() {
   atom.packages.disablePackage(LINTER_PACKAGE);
 }
 
-let Activation = class Activation {
+class Activation {
 
   constructor(state_) {
     this._diagnosticUpdaters = new _rxjsBundlesRxMinJs.BehaviorSubject(null);
@@ -144,29 +151,31 @@ let Activation = class Activation {
         title: 'Diagnostics',
         icon: 'law',
         description: 'Displays diagnostics, errors, and lint warnings for your files and projects.',
-        command: 'nuclide-diagnostics-ui:show-table'
+        command: () => {
+          atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-diagnostics-ui:toggle-table', { visible: true });
+        }
       },
       priority: 4
     };
   }
 
   _createDiagnosticsPanelModel() {
-    return new (_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).DiagnosticsPanelModel(this._diagnosticUpdaters.switchMap(updater => updater == null ? _rxjsBundlesRxMinJs.Observable.of([]) : updater.allMessageUpdates), this._state.filterByActiveTextEditor, (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-diagnostics-ui.showDiagnosticTraces'), disableLinter, filterByActiveTextEditor => {
+    return new (_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).DiagnosticsPanelModel(this._diagnosticUpdaters.switchMap(updater => updater == null ? _rxjsBundlesRxMinJs.Observable.of([]) : updater.allMessageUpdates), (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-diagnostics-ui.showDiagnosticTraces'), showTraces => {
+      (_featureConfig || _load_featureConfig()).default.set('nuclide-diagnostics-ui.showDiagnosticTraces', showTraces);
+    }, disableLinter, observeLinterPackageEnabled(), this._state.filterByActiveTextEditor, filterByActiveTextEditor => {
       if (this._state != null) {
         this._state.filterByActiveTextEditor = filterByActiveTextEditor;
       }
-    }, observeLinterPackageEnabled());
+    });
   }
 
   consumeWorkspaceViewsService(api) {
-    this._subscriptions.add(api.registerFactory({
-      id: 'nuclide-diagnostics-ui',
-      name: 'Diagnostics',
-      iconName: 'law',
-      toggleCommand: 'nuclide-diagnostics-ui:toggle-table',
-      defaultLocation: 'bottom-panel',
-      create: () => this._createDiagnosticsPanelModel(),
-      isInstance: item => item instanceof (_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).DiagnosticsPanelModel
+    this._subscriptions.add(api.addOpener(uri => {
+      if (uri === (_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).WORKSPACE_VIEW_URI) {
+        return this._createDiagnosticsPanelModel();
+      }
+    }), () => api.destroyWhere(item => item instanceof (_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).DiagnosticsPanelModel), atom.commands.add('atom-workspace', 'nuclide-diagnostics-ui:toggle-table', event => {
+      api.toggle((_DiagnosticsPanelModel || _load_DiagnosticsPanelModel()).WORKSPACE_VIEW_URI, event.detail);
     }));
   }
 
@@ -176,13 +185,11 @@ let Activation = class Activation {
     }
     return this._statusBarTile;
   }
-
-};
-
+}
 
 function gutterConsumeDiagnosticUpdates(diagnosticUpdater) {
   const fixer = diagnosticUpdater.applyFix.bind(diagnosticUpdater);
-  return atom.workspace.observeTextEditors(editor => {
+  return (0, (_textEditor || _load_textEditor()).observeTextEditors)(editor => {
     const filePath = editor.getPath();
     if (!filePath) {
       return; // The file is likely untitled.
@@ -220,29 +227,46 @@ function addAtomCommands(diagnosticUpdater) {
   const openAllFilesWithErrors = () => {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diagnostics-panel-open-all-files-with-errors');
     diagnosticUpdater.allMessageUpdates.first().subscribe(messages => {
-      if (messages.length > MAX_OPEN_ALL_FILES) {
-        atom.notifications.addError(`Diagnostics: Will not open more than ${ MAX_OPEN_ALL_FILES } files`);
+      const errorsToOpen = getTopMostErrorLocationsByFilePath(messages);
+
+      if (errorsToOpen.size > MAX_OPEN_ALL_FILES) {
+        atom.notifications.addError(`Diagnostics: Will not open more than ${MAX_OPEN_ALL_FILES} files`);
         return;
       }
-      for (let index = 0; index < messages.length; index++) {
-        const rowData = messages[index];
-        if (rowData.scope === 'file' && rowData.filePath != null) {
-          const uri = rowData.filePath;
-          // If initialLine is N, Atom will navigate to line N+1.
-          // Flow sometimes reports a row of -1, so this ensures the line is at least one.
-          const line = Math.max(rowData.range ? rowData.range.start.row : 0, 0);
-          const column = 0;
-          (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri, line, column);
-        }
-      }
+
+      const column = 0;
+      errorsToOpen.forEach((line, uri) => (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri, line, column));
     });
   };
 
   return new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.commands.add('atom-workspace', 'nuclide-diagnostics-ui:fix-all-in-current-file', fixAllInCurrentFile), atom.commands.add('atom-workspace', 'nuclide-diagnostics-ui:open-all-files-with-errors', openAllFilesWithErrors), new KeyboardShortcuts(diagnosticUpdater));
 }
 
+function getTopMostErrorLocationsByFilePath(messages) {
+  const errorLocations = new Map();
+
+  messages.forEach(message => {
+    if (message.scope !== 'file' || message.filePath == null) {
+      return;
+    }
+    const filePath = message.filePath;
+    // If initialLine is N, Atom will navigate to line N+1.
+    // Flow sometimes reports a row of -1, so this ensures the line is at least one.
+    let line = Math.max(message.range ? message.range.start.row : 0, 0);
+
+    const prevMinLine = errorLocations.get(filePath);
+    if (prevMinLine != null) {
+      line = Math.min(prevMinLine, line);
+    }
+
+    errorLocations.set(filePath, line);
+  });
+
+  return errorLocations;
+}
+
 // TODO(peterhal): The current index should really live in the DiagnosticStore.
-let KeyboardShortcuts = class KeyboardShortcuts {
+class KeyboardShortcuts {
 
   constructor(diagnosticUpdater) {
     this._index = null;
@@ -349,11 +373,10 @@ let KeyboardShortcuts = class KeyboardShortcuts {
   dispose() {
     this._subscriptions.dispose();
   }
-};
-
+}
 
 function observeLinterPackageEnabled() {
   return _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.of(atom.packages.isPackageActive(LINTER_PACKAGE)), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.packages.onDidActivatePackage.bind(atom.packages)).filter(pkg => pkg.name === LINTER_PACKAGE).mapTo(true), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.packages.onDidDeactivatePackage.bind(atom.packages)).filter(pkg => pkg.name === LINTER_PACKAGE).mapTo(false));
 }
 
-module.exports = (0, (_createPackage || _load_createPackage()).default)(Activation);
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

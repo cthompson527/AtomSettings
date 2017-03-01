@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40,9 +31,15 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
+var _goToLocation;
+
+function _load_goToLocation() {
+  return _goToLocation = require('../../commons-atom/go-to-location');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let OpenFilesListComponent = exports.OpenFilesListComponent = class OpenFilesListComponent extends _reactForAtom.React.PureComponent {
+class OpenFilesListComponent extends _reactForAtom.React.PureComponent {
 
   constructor(props) {
     super(props);
@@ -71,8 +68,8 @@ let OpenFilesListComponent = exports.OpenFilesListComponent = class OpenFilesLis
       return;
     }
 
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-open-from-open-files', { uri: uri });
-    atom.workspace.open(uri, { searchAllPanes: true });
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-open-from-open-files', { uri });
+    (0, (_goToLocation || _load_goToLocation()).goToLocation)(uri);
   }
 
   _onCloseClick(entry, event) {
@@ -82,7 +79,7 @@ let OpenFilesListComponent = exports.OpenFilesListComponent = class OpenFilesLis
   }
 
   _closeFile(uri) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-close-from-open-files', { uri: uri });
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-close-from-open-files', { uri });
     atom.workspace.getPanes().forEach(pane => {
       pane.getItems().filter(item => item.getPath && item.getPath() === uri).forEach(item => {
         pane.destroyItem(item);
@@ -138,7 +135,7 @@ let OpenFilesListComponent = exports.OpenFilesListComponent = class OpenFilesLis
               }),
               _reactForAtom.React.createElement(
                 'span',
-                { className: 'icon icon-file-text' },
+                { className: 'icon icon-file-text', 'data-name': e.name },
                 e.name
               )
             );
@@ -147,14 +144,23 @@ let OpenFilesListComponent = exports.OpenFilesListComponent = class OpenFilesLis
       )
     );
   }
-};
+}
 
+exports.OpenFilesListComponent = OpenFilesListComponent; /**
+                                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                                          * All rights reserved.
+                                                          *
+                                                          * This source code is licensed under the license found in the LICENSE file in
+                                                          * the root directory of this source tree.
+                                                          *
+                                                          * 
+                                                          */
 
 function propsToEntries(props) {
   const entries = props.uris.map(uri => {
     const isModified = props.modifiedUris.indexOf(uri) >= 0;
     const isSelected = uri === props.activeUri;
-    return { uri: uri, name: (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToName(uri), isModified: isModified, isSelected: isSelected };
+    return { uri, name: (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToName(uri), isModified, isSelected };
   });
 
   entries.sort((e1, e2) => e1.name.toLowerCase().localeCompare(e2.name.toLowerCase()));

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -33,7 +24,15 @@ const defaultConfig = {
   phpRuntimeArgs: '',
   dummyRequestFilePath: 'php_only_xdebug_request.php',
   stopOneStopAll: false
-};
+}; /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */
 
 let config = defaultConfig;
 
@@ -43,7 +42,7 @@ function getConfig() {
 
 function setConfig(newConfig) {
   config = Object.assign({}, newConfig);
-  (_utils || _load_utils()).default.log(`Config was set to ${ JSON.stringify(config) }`);
+  (_utils || _load_utils()).default.log(`Config was set to ${JSON.stringify(config)}`);
 }
 
 function clearConfig() {

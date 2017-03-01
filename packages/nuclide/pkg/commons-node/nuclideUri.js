@@ -1,18 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-// NuclideUri's are either a local file path, or a URI
-// of the form nuclide://<host><path>
-//
-// This package creates, queries and decomposes NuclideUris.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -31,6 +17,21 @@ function _load_string() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+// NuclideUri's are either a local file path, or a URI
+// of the form nuclide://<host><path>
+//
+// This package creates, queries and decomposes NuclideUris.
+
 const REMOTE_PATH_URI_PREFIX = 'nuclide://';
 // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
 
@@ -47,12 +48,17 @@ function isBrokenDeserializedUri(uri) {
   return uri != null && uri.match(/nuclide:[\\/][^/]/) != null;
 }
 
+// Atom often puts its URIs in places where we'd expect to see Nuclide URIs (or plain paths)
+function isAtomUri(uri) {
+  return uri.startsWith('atom://');
+}
+
 function isUri(uri) {
   return URI_PREFIX_REGEX.test(uri);
 }
 
 function isLocal(uri) {
-  return !isRemote(uri) && !isUri(uri);
+  return !isRemote(uri) && !isUri(uri) && !isAtomUri(uri);
 }
 
 function createRemoteUri(hostname, remotePath) {
@@ -60,80 +66,42 @@ function createRemoteUri(hostname, remotePath) {
     throw new Error('NuclideUri must include a path.');
   }
 
-  return `nuclide://${ hostname }${ remotePath }`;
+  return `nuclide://${hostname}${remotePath}`;
 }
 
 /**
- * Parses `uri` with Node's `url.parse` and calls `decodeURI` on `href`, `path`, and `pathname` of
- * the parsed URL object.
+ * Parses valid Nuclide URIs into the hostname and path components.
+ * Throws an Error on invalid URIs. Invalid URIs are:
+ *  1) Any URI that does not start with 'nuclide://' protocol.
+ *  2) A URI starting with 'nuclide://' that doesn't contain either a hostname or a path
  *
- * * `url.parse` seems to apply encodeURI to the URL, and we typically don't want this behavior.
- * * Nuclide URIs disallow use of the `hash` attribute, and any hash characters are interpreted as
- *   as literal hashes.
- *
- *   For example:
- *
- *       parse('nuclide://f.co/path/to/#foo.txt#')
- *       >
- *         {
- *           ...
- *           path: '/path/to/#foo.txt#',
- *           ...
- *         }
+ * Everything that does not contain a '://' is assumed to be a local path. Both POSIX and Windows
+ * paths are legal
  */
 function parse(uri) {
-  const parsedUri = _url.default.parse(_escapeSpecialCharacters(uri));
-  if (parsedUri.protocol == null) {
-    return {
-      auth: null,
-      host: null,
-      hostname: null,
-      href: uri,
-      path: uri,
-      pathname: uri,
-      protocol: null,
-      query: null,
-      search: null,
-      slashes: null
-    };
+  if (uri.startsWith(REMOTE_PATH_URI_PREFIX)) {
+    const hostAndPath = uri.substr(REMOTE_PATH_URI_PREFIX.length);
+    const hostSep = hostAndPath.indexOf('/');
+
+    if (!(hostSep !== -1)) {
+      throw new Error(`Remote URIs must contain a hostname and a path. Failed to parse ${uri}`);
+    }
+
+    const hostname = hostAndPath.substr(0, hostSep);
+
+    if (!(hostname !== '')) {
+      throw new Error(`Remote URIs must contain a hostname. Failed to parse ${uri}`);
+    }
+
+    const path = hostAndPath.substr(hostSep);
+    return { hostname, path };
   }
 
-  if (!parsedUri.path) {
-    throw new Error('Nuclide URIs must contain paths, ' + `${ (0, (_string || _load_string()).maybeToString)(parsedUri.path) }' found while parsing '${ uri }'`);
+  if (!(uri.indexOf('://') === -1)) {
+    throw new Error('Nuclide URI must be either local file names or URLs starting with nuclide://');
   }
 
-  let path = parsedUri.path;
-  // `url.parse` treates the first '#' character as the beginning of the `hash` attribute. That
-  // feature is not used in Nuclide and is instead treated as part of the path.
-  if (parsedUri.hash != null) {
-    path += parsedUri.hash;
-  }
-
-  if (!parsedUri.pathname) {
-    throw new Error('Nuclide URIs must contain pathnamess, ' + `'${ (0, (_string || _load_string()).maybeToString)(parsedUri.pathname) }' found while parsing '${ uri }'`);
-  }
-
-  let pathname = parsedUri.pathname;
-  // `url.parse` treates the first '#' character as the beginning of the `hash` attribute. That
-  // feature is not used in Nuclide and is instead treated as part of the pathname.
-  if (parsedUri.hash != null) {
-    pathname += parsedUri.hash;
-  }
-
-  // Explicitly copying object properties appeases Flow's "maybe" type handling. Using the `...`
-  // operator causes null/undefined errors, and `Object.assign` bypasses type checking.
-  return {
-    auth: parsedUri.auth,
-    host: parsedUri.host,
-    hostname: parsedUri.hostname,
-    href: decodeURI(parsedUri.href),
-    path: decodeURI(path),
-    pathname: decodeURI(pathname),
-    protocol: parsedUri.protocol,
-    query: parsedUri.query,
-    search: parsedUri.search,
-    slashes: parsedUri.slashes
-  };
+  return { hostname: null, path: uri };
 }
 
 function parseRemoteUri(remoteUri) {
@@ -143,7 +111,7 @@ function parseRemoteUri(remoteUri) {
   const parsedUri = parse(remoteUri);
 
   if (!parsedUri.hostname) {
-    throw new Error(`Remote Nuclide URIs must contain hostnames, '${ (0, (_string || _load_string()).maybeToString)(parsedUri.hostname) }' found ` + `while parsing '${ remoteUri }'`);
+    throw new Error(`Remote Nuclide URIs must contain hostnames, '${(0, (_string || _load_string()).maybeToString)(parsedUri.hostname)}' found ` + `while parsing '${remoteUri}'`);
   }
 
   // Explicitly copying object properties appeases Flow's "maybe" type handling. Using the `...`
@@ -151,16 +119,8 @@ function parseRemoteUri(remoteUri) {
 
 
   return {
-    auth: parsedUri.auth,
-    host: parsedUri.host,
     hostname: parsedUri.hostname,
-    href: parsedUri.href,
-    path: parsedUri.path,
-    pathname: parsedUri.pathname,
-    protocol: parsedUri.protocol,
-    query: parsedUri.query,
-    search: parsedUri.search,
-    slashes: parsedUri.slashes
+    path: parsedUri.path
   };
 }
 
@@ -180,19 +140,11 @@ function getHostnameOpt(remoteUri) {
   return getHostname(remoteUri);
 }
 
-function join(uri) {
+function join(uri, ...relativePath) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
-
-  for (var _len = arguments.length, relativePath = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-    relativePath[_key - 1] = arguments[_key];
-  }
-
   if (isRemote(uri)) {
-    var _parseRemoteUri = parseRemoteUri(uri);
-
-    const hostname = _parseRemoteUri.hostname,
-          path = _parseRemoteUri.path;
-
+    const { hostname, path } = parseRemoteUri(uri);
     relativePath.splice(0, 0, path);
     return createRemoteUri(hostname, uriPathModule.join.apply(null, relativePath));
   } else {
@@ -202,13 +154,10 @@ function join(uri) {
 }
 
 function normalize(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   if (isRemote(uri)) {
-    var _parseRemoteUri2 = parseRemoteUri(uri);
-
-    const hostname = _parseRemoteUri2.hostname,
-          path = _parseRemoteUri2.path;
-
+    const { hostname, path } = parseRemoteUri(uri);
     return createRemoteUri(hostname, uriPathModule.normalize(path));
   } else {
     return uriPathModule.normalize(uri);
@@ -225,10 +174,11 @@ function getParent(uri) {
 }
 
 function relative(uri, other) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   const remote = isRemote(uri);
   if (remote !== isRemote(other) || remote && getHostname(uri) !== getHostname(other)) {
-    throw new Error(`Cannot relative urls on different hosts: ${ uri } and ${ other }`);
+    throw new Error(`Cannot relative urls on different hosts: ${uri} and ${other}`);
   }
   if (remote) {
     return uriPathModule.relative(getPath(uri), getPath(other));
@@ -237,21 +187,17 @@ function relative(uri, other) {
   }
 }
 
-function basename(uri) {
-  let ext = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-
+function basename(uri, ext = '') {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   return uriPathModule.basename(getPath(uri), ext);
 }
 
 function dirname(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   if (isRemote(uri)) {
-    var _parseRemoteUri3 = parseRemoteUri(uri);
-
-    const hostname = _parseRemoteUri3.hostname,
-          path = _parseRemoteUri3.path;
-
+    const { hostname, path } = parseRemoteUri(uri);
     return createRemoteUri(hostname, uriPathModule.dirname(path));
   } else {
     return uriPathModule.dirname(uri);
@@ -259,17 +205,33 @@ function dirname(uri) {
 }
 
 function extname(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   return uriPathModule.extname(getPath(uri));
 }
 
 function stripExtension(uri) {
+  _testForAtomUri(uri);
   const ext = extname(uri);
   if (ext.length === 0) {
     return uri;
   }
 
   return uri.slice(0, -1 * ext.length);
+}
+
+function _isWindowsPath(path) {
+  return _pathModuleFor(path) === _path.default.win32;
+}
+
+function _getWindowsPathFromWindowsFileUri(uri) {
+  const prefix = 'file://';
+  if (!uri.startsWith(prefix)) {
+    return null;
+  }
+
+  const path = uri.substr(prefix.length);
+  return _isWindowsPath(path) ? path : null;
 }
 
 /**
@@ -279,6 +241,15 @@ function stripExtension(uri) {
  * Returns null if not a valid file: URI.
  */
 function uriToNuclideUri(uri) {
+  const windowsPathFromUri = _getWindowsPathFromWindowsFileUri(uri);
+  if (windowsPathFromUri) {
+    // If the specified URI is a local file:// URI to a Windows path,
+    // handle specially first. url.parse() gets confused by the "X:"
+    // part of the Windows path and thinks the X is the name of a remote
+    // host.
+    return windowsPathFromUri;
+  }
+
   const urlParts = _url.default.parse(_escapeSpecialCharacters(uri), false);
   if (urlParts.protocol === 'file:' && urlParts.path) {
     // only handle real files for now.
@@ -294,6 +265,7 @@ function uriToNuclideUri(uri) {
  * Converts local paths to file: URI's. Leaves remote URI's alone.
  */
 function nuclideUriToUri(uri) {
+  _testForAtomUri(uri);
   if (isRemote(uri)) {
     return uri;
   } else {
@@ -305,6 +277,9 @@ function nuclideUriToUri(uri) {
  * Returns true if child is equal to, or is a proper child of parent.
  */
 function contains(parent, child) {
+  _testForAtomUri(parent);
+  _testForAtomUri(child);
+
   // Can't just do startsWith here. If this directory is "www" and you
   // are trying to check "www-base", just using startsWith would return
   // true, even though "www-base" is at the same level as "Www", not
@@ -375,6 +350,7 @@ function registerHostnameFormatter(formatter) {
  * This function returns a human usable string.
  */
 function nuclideUriToDisplayString(uri) {
+  _testForAtomUri(uri);
   if (isRemote(uri)) {
     let hostname = getHostname(uri);
     for (const formatter of hostFormatters) {
@@ -384,13 +360,14 @@ function nuclideUriToDisplayString(uri) {
         break;
       }
     }
-    return `${ hostname }/${ getPath(uri) }`;
+    return `${hostname}:${getPath(uri)}`;
   } else {
     return uri;
   }
 }
 
 function ensureTrailingSeparator(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   if (uri.endsWith(uriPathModule.sep)) {
     return uri;
@@ -400,6 +377,7 @@ function ensureTrailingSeparator(uri) {
 }
 
 function trimTrailingSeparator(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   let stripped = uri;
 
@@ -411,11 +389,13 @@ function trimTrailingSeparator(uri) {
 }
 
 function endsWithSeparator(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   return uri.endsWith(uriPathModule.sep);
 }
 
 function isAbsolute(uri) {
+  _testForAtomUri(uri);
   if (isRemote(uri)) {
     return true;
   } else {
@@ -424,19 +404,11 @@ function isAbsolute(uri) {
   }
 }
 
-function resolve(uri) {
+function resolve(uri, ...paths) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
-
-  for (var _len2 = arguments.length, paths = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-    paths[_key2 - 1] = arguments[_key2];
-  }
-
   if (isRemote(uri)) {
-    var _parseRemoteUri4 = parseRemoteUri(uri);
-
-    const hostname = _parseRemoteUri4.hostname,
-          path = _parseRemoteUri4.path;
-
+    const { hostname, path } = parseRemoteUri(uri);
     paths.splice(0, 0, path);
     return createRemoteUri(hostname, uriPathModule.resolve.apply(null, paths));
   } else {
@@ -446,6 +418,7 @@ function resolve(uri) {
 }
 
 function expandHomeDir(uri) {
+  _testForAtomUri(uri);
   // This function is POSIX only functionality, so using the posix path directly
 
   // Do not expand non home relative uris
@@ -453,7 +426,7 @@ function expandHomeDir(uri) {
     return uri;
   }
 
-  const HOME = process.env.HOME;
+  const { HOME } = process.env;
 
   if (!(HOME != null)) {
     throw new Error('Invariant violation: "HOME != null"');
@@ -468,7 +441,7 @@ function expandHomeDir(uri) {
     return uri;
   }
 
-  return posixPath.resolve(HOME, uri.replace('~', '.'));
+  return _path.default.posix.resolve(HOME, uri.replace('~', '.'));
 }
 
 /**
@@ -511,6 +484,7 @@ function joinPathList(paths) {
  * which is `./` on *nix and .\ on Windows
  */
 function ensureLocalPrefix(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
 
   if (!!isRemote(uri)) {
@@ -521,7 +495,7 @@ function ensureLocalPrefix(uri) {
     throw new Error('Local prefix can not be added to an absolute path');
   }
 
-  const localPrefix = `.${ uriPathModule.sep }`;
+  const localPrefix = `.${uriPathModule.sep}`;
   if (uri.startsWith(localPrefix)) {
     return uri;
   }
@@ -530,10 +504,12 @@ function ensureLocalPrefix(uri) {
 }
 
 function isRoot(uri) {
+  _testForAtomUri(uri);
   return dirname(uri) === uri;
 }
 
 function parsePath(uri) {
+  _testForAtomUri(uri);
   const uriPathModule = _pathModuleFor(uri);
   return uriPathModule.parse(getPath(uri));
 }
@@ -557,52 +533,21 @@ function split(uri) {
   return parts;
 }
 
-/**
- * win32.isAbsolute is buggy in Node 5.10.0, but not in Node 5.1.1 or 6.0.0+.
- * As long as we support Node 5, we'll use the fixed version of win32.isAbsolute.
- * https://github.com/nodejs/node/commit/3072546feb9d7f78f12d75bec28ef00e5958f7be
- */
-
-function _win32PathIsAbsolute(path) {
-  if (typeof path !== 'string') {
-    throw new TypeError('Path must be a string. Received ' + String(path));
-  }
-  const len = path.length;
-  if (len === 0) {
-    return false;
-  }
-  let code = path.charCodeAt(0);
-  if (code === 47 || code === 92) {
-    return true;
-  } else if (code >= 65 && code <= 90 || code >= 97 && code <= 122) {
-    if (len > 2 && path.charCodeAt(1) === 58) {
-      code = path.charCodeAt(2);
-      if (code === 47 || code === 92) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-const posixPath = Object.assign({}, _path.default.posix);
-const win32Path = Object.assign({}, _path.default.win32, { isAbsolute: _win32PathIsAbsolute });
-
 function _pathModuleFor(uri) {
-  if (uri.startsWith(posixPath.sep)) {
-    return posixPath;
+  if (uri.startsWith(_path.default.posix.sep)) {
+    return _path.default.posix;
   }
   if (uri.indexOf('://') > -1) {
-    return posixPath;
+    return _path.default.posix;
   }
-  if (uri[1] === ':' && uri[2] === win32Path.sep) {
-    return win32Path;
+  if (uri[1] === ':' && uri[2] === _path.default.win32.sep) {
+    return _path.default.win32;
   }
 
-  if (uri.split(win32Path.sep).length > uri.split(posixPath.sep).length) {
-    return win32Path;
+  if (uri.split(_path.default.win32.sep).length > uri.split(_path.default.posix.sep).length) {
+    return _path.default.win32;
   } else {
-    return posixPath;
+    return _path.default.posix;
   }
 }
 
@@ -613,6 +558,12 @@ function _pathModuleFor(uri) {
  */
 function _escapeSpecialCharacters(uri) {
   return uri.replace(/%/g, '%25').replace(/\\/g, '%5C');
+}
+
+function _testForAtomUri(uri) {
+  if (uri != null && isAtomUri(uri)) {
+    throw new Error(`Path operation invoked on Atom URI ${uri}`);
+  }
 }
 
 const NUCLIDE_URI_TYPE_NAME = 'NuclideUri';
@@ -626,7 +577,7 @@ function validate(uri, mustBeRemote) {
   }
 
   if (!(typeof uri === 'string')) {
-    throw new Error(`Unexpected NuclideUri type: ${ String(uri) }`);
+    throw new Error(`Unexpected NuclideUri type: ${String(uri)}`);
   }
 
   if (isRemote(uri)) {
@@ -647,46 +598,45 @@ function validate(uri, mustBeRemote) {
 }
 
 exports.default = {
-  basename: basename,
-  dirname: dirname,
-  extname: extname,
-  stripExtension: stripExtension,
-  isRemote: isRemote,
-  isBrokenDeserializedUri: isBrokenDeserializedUri,
-  isLocal: isLocal,
-  createRemoteUri: createRemoteUri,
-  parse: parse,
-  parseRemoteUri: parseRemoteUri,
-  validate: validate,
-  getPath: getPath,
-  getHostname: getHostname,
-  getHostnameOpt: getHostnameOpt,
-  join: join,
-  relative: relative,
-  normalize: normalize,
-  normalizeDir: normalizeDir,
-  getParent: getParent,
-  uriToNuclideUri: uriToNuclideUri,
-  nuclideUriToUri: nuclideUriToUri,
-  contains: contains,
-  collapse: collapse,
-  nuclideUriToDisplayString: nuclideUriToDisplayString,
-  registerHostnameFormatter: registerHostnameFormatter,
-  ensureTrailingSeparator: ensureTrailingSeparator,
-  trimTrailingSeparator: trimTrailingSeparator,
-  endsWithSeparator: endsWithSeparator,
-  isAbsolute: isAbsolute,
-  resolve: resolve,
-  expandHomeDir: expandHomeDir,
-  splitPathList: splitPathList,
-  joinPathList: joinPathList,
-  ensureLocalPrefix: ensureLocalPrefix,
-  isRoot: isRoot,
-  parsePath: parsePath,
-  split: split,
-  NUCLIDE_URI_TYPE_NAME: NUCLIDE_URI_TYPE_NAME
+  basename,
+  dirname,
+  extname,
+  stripExtension,
+  isRemote,
+  isBrokenDeserializedUri,
+  isLocal,
+  createRemoteUri,
+  parse,
+  parseRemoteUri,
+  validate,
+  getPath,
+  getHostname,
+  getHostnameOpt,
+  join,
+  relative,
+  normalize,
+  normalizeDir,
+  getParent,
+  uriToNuclideUri,
+  nuclideUriToUri,
+  contains,
+  collapse,
+  nuclideUriToDisplayString,
+  registerHostnameFormatter,
+  ensureTrailingSeparator,
+  trimTrailingSeparator,
+  endsWithSeparator,
+  isAbsolute,
+  resolve,
+  expandHomeDir,
+  splitPathList,
+  joinPathList,
+  ensureLocalPrefix,
+  isRoot,
+  parsePath,
+  split,
+  NUCLIDE_URI_TYPE_NAME
 };
 const __TEST__ = exports.__TEST__ = {
-  _pathModuleFor: _pathModuleFor,
-  _win32PathIsAbsolute: _win32PathIsAbsolute
+  _pathModuleFor
 };

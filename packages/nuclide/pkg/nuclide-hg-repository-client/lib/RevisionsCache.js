@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _collection;
 
@@ -27,6 +17,16 @@ var _nuclideLogging;
 function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const FETCH_REVISIONS_DEBOUNCE_MS = 100;
 // The request timeout is 60 seconds anyways.
@@ -49,7 +49,7 @@ function isEqualRevisions(revisions1, revisions2) {
   });
 }
 
-let RevisionsCache = class RevisionsCache {
+class RevisionsCache {
 
   constructor(hgService) {
     this._hgService = hgService;
@@ -67,7 +67,12 @@ let RevisionsCache = class RevisionsCache {
   }
 
   _fetchSmartlogRevisions() {
-    return this._hgService.fetchSmartlogRevisions().refCount().timeout(FETCH_REVISIONS_TIMEOUT_MS, new Error('Timed out fetching smartlog revisions'));
+    return this._hgService.fetchSmartlogRevisions().refCount().timeout(FETCH_REVISIONS_TIMEOUT_MS).catch(err => {
+      if (err instanceof _rxjsBundlesRxMinJs.TimeoutError) {
+        throw new Error('Timed out fetching smartlog revisions');
+      }
+      throw err;
+    });
   }
 
   refreshRevisions() {
@@ -81,7 +86,5 @@ let RevisionsCache = class RevisionsCache {
   observeRevisionChanges() {
     return this._lazyRevisionFetcher.startWith(this.getCachedRevisions());
   }
-
-};
+}
 exports.default = RevisionsCache;
-module.exports = exports['default'];

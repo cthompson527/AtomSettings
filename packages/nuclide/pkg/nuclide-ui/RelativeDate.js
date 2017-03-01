@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
-
-var _class, _temp;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -24,7 +12,23 @@ function _load_string() {
   return _string = require('../commons-node/string');
 }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('./add-tooltip'));
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
+                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                              */
 
 const DEFAULT_RERENDER_DELAY = 10000; // ms
 
@@ -34,11 +38,10 @@ const DEFAULT_RERENDER_DELAY = 10000; // ms
  *
  * Does not respond to changes to the initial `delay` for simplicity's sake.
  */
-let Revision = (_temp = _class = class Revision extends _reactForAtom.React.Component {
+class RelativeDate extends _reactForAtom.React.Component {
 
   componentDidMount() {
-    const delay = this.props.delay;
-
+    const { delay } = this.props;
     this._interval = setInterval(() => this.forceUpdate(), delay);
   }
 
@@ -49,19 +52,30 @@ let Revision = (_temp = _class = class Revision extends _reactForAtom.React.Comp
   }
 
   render() {
-    var _props = this.props;
-
-    const date = _props.date,
-          remainingProps = _objectWithoutProperties(_props, ['date']);
-
+    const _props = this.props,
+          {
+      date,
+      // eslint-disable-next-line no-unused-vars
+      delay: _,
+      shorten,
+      withToolip
+    } = _props,
+          remainingProps = _objectWithoutProperties(_props, ['date', 'delay', 'shorten', 'withToolip']);
     return _reactForAtom.React.createElement(
       'span',
-      remainingProps,
-      (0, (_string || _load_string()).relativeDate)(date)
+      Object.assign({}, remainingProps, {
+        ref: withToolip ? (0, (_addTooltip || _load_addTooltip()).default)({
+          title: date.toLocaleString(),
+          delay: 200,
+          placement: 'top'
+        }) : null }),
+      (0, (_string || _load_string()).relativeDate)(date, undefined, shorten)
     );
   }
-}, _class.defaultProps = {
-  delay: DEFAULT_RERENDER_DELAY
-}, _temp);
-exports.default = Revision;
-module.exports = exports['default'];
+}
+exports.default = RelativeDate;
+RelativeDate.defaultProps = {
+  delay: DEFAULT_RERENDER_DELAY,
+  shorten: false,
+  withToolip: false
+};

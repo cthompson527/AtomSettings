@@ -1,23 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/**
- *                  _  _ _  _ ____ _    _ ___  ____
- *                  |\ | |  | |    |    | |  \ |___
- *                  | \| |__| |___ |___ | |__/ |___
- * _  _ _  _ _ ____ _ ____ ___     ___  ____ ____ _  _ ____ ____ ____
- * |  | |\ | | |___ | |___ |  \    |__] |__| |    |_/  |__| | __ |___
- * |__| | \| | |    | |___ |__/    |    |  | |___ | \_ |  | |__] |___
- *
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,6 +6,9 @@ Object.defineProperty(exports, "__esModule", {
 exports.config = undefined;
 exports.activate = activate;
 exports.deactivate = deactivate;
+exports.serialize = serialize;
+
+require('./preload-dependencies');
 
 var _featureConfig;
 
@@ -61,7 +45,27 @@ function _load_package() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
-const remote = _electron.default.remote;
+const { remote } = _electron.default; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */
+
+/**
+ *                  _  _ _  _ ____ _    _ ___  ____
+ *                  |\ | |  | |    |    | |  \ |___
+ *                  | \| |__| |___ |___ | |__/ |___
+ * _  _ _  _ _ ____ _ ____ ___     ___  ____ ____ _  _ ____ ____ ____
+ * |  | |\ | | |___ | |___ |  \    |__] |__| |    |_/  |__| | __ |___
+ * |__| | \| | |    | |___ |__/    |    |  | |___ | \_ |  | |__] |___
+ *
+ */
+
+/* global localStorage */
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
@@ -81,7 +85,7 @@ if (!(remote != null)) {
 
 atom.deserializers.add({
   name: 'nuclide.ForceMainModuleLoad',
-  deserialize: function () {}
+  deserialize() {}
 });
 
 // Exported "config" object
@@ -108,8 +112,6 @@ const config = exports.config = {
 const _useLocalRpc = atom.config.get('nuclide.useLocalRpc');
 const _shouldUseLocalRpc = typeof _useLocalRpc !== 'boolean' ? config.useLocalRpc.default : _useLocalRpc;
 (0, (_serviceManager || _load_serviceManager()).setUseLocalRpc)(_shouldUseLocalRpc);
-
-const runningNuclideVersion = (_package || _load_package()).default.version;
 
 // Nuclide packages for Atom are called "features"
 const FEATURES_DIR = _path.default.join(__dirname, '../pkg');
@@ -150,9 +152,9 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
     }
 
     features[pkg.name] = {
-      pkg: pkg,
-      dirname: dirname,
-      useKeyPath: `nuclide.use.${ pkg.name }`
+      pkg,
+      dirname,
+      useKeyPath: `nuclide.use.${pkg.name}`
     };
   }
 });
@@ -166,27 +168,26 @@ _fs.default.readdirSync(FEATURES_DIR).forEach(item => {
  * https://atom.io/docs/api/latest/Config
  */
 Object.keys(features).forEach(name => {
-  const pkg = features[name].pkg;
+  const { pkg } = features[name];
 
   // Sample packages are disabled by default. They are meant for development
   // use only, and aren't included in Nuclide builds.
-
   const enabled = !name.startsWith('sample-');
 
   // Entry for enabling/disabling the feature
   const setting = {
-    title: `Enable the "${ name }" feature`,
+    title: `Enable the "${name}" feature`,
     description: pkg.description || '',
     type: 'boolean',
     default: enabled
   };
   if (pkg.providedServices) {
     const provides = Object.keys(pkg.providedServices).join(', ');
-    setting.description += `<br/>**Provides:** _${ provides }_`;
+    setting.description += `<br/>**Provides:** _${provides}_`;
   }
   if (pkg.consumedServices) {
     const consumes = Object.keys(pkg.consumedServices).join(', ');
-    setting.description += `<br/>**Consumes:** _${ consumes }_`;
+    setting.description += `<br/>**Consumes:** _${consumes}_`;
   }
   config.use.properties[name] = setting;
 
@@ -250,31 +251,7 @@ function activate() {
   // w/o our knowledge. This can happen during OSS upgrades.
 
 
-  window.localStorage.removeItem(nuclidePack.getCanDeferMainModuleRequireStorageKey());
-
-  // This version mismatch happens during OSS updates. After updates, Nuclide is
-  // still in the module cache - with all of its glorious state - which usually
-  // results in a red box of some kind because the disk content doesn't match
-  // the expectations of the code that is in memory.
-  const pkgJsonPath = _path.default.join(nuclidePack.path, 'package.json');
-  const installedPkg = JSON.parse(_fs.default.readFileSync(pkgJsonPath, 'utf8'));
-  const installedNuclideVersion = installedPkg.version;
-  if (installedNuclideVersion !== runningNuclideVersion) {
-    atom.notifications.addWarning(`Nuclide's version has changed from
-      v${ runningNuclideVersion } to v${ installedNuclideVersion }.
-      Reload Atom to use the new version.`, {
-      buttons: [{
-        className: 'icon icon-zap',
-        onDidClick: function () {
-          atom.reload();
-        },
-
-        text: 'Reload Atom'
-      }],
-      dismissable: true
-    });
-    return;
-  }
+  localStorage.removeItem(nuclidePack.getCanDeferMainModuleRequireStorageKey());
 
   disposables = new _atom.CompositeDisposable();
 
@@ -282,7 +259,7 @@ function activate() {
   disposables.add(atom.menu.add([{
     label: 'Nuclide',
     submenu: [{
-      label: `Version ${ runningNuclideVersion }`,
+      label: `Version ${(_package || _load_package()).default.version}`,
       enabled: false
     }]
   }]));
@@ -345,7 +322,9 @@ function activate() {
 
 function deactivate() {
   Object.keys(features).forEach(name => {
-    safeDeactivate(name);
+    // Deactivate the packge, but don't serialize. That needs to be done in a separate phase so that
+    // we don't end up disconnecting a service and then serializing the disconnected state.
+    safeDeactivate(name, true);
   });
 
   if (!(disposables != null)) {
@@ -356,14 +335,36 @@ function deactivate() {
   disposables = null;
 }
 
-function safeDeactivate(name) {
+function serialize() {
+  // When Nuclide is serialized, all of its features need to be serialized. This is an abuse of
+  // `serialize()` since we're using it to do side effects instead of returning the serialization,
+  // but it ensures that serialization of the Atom packages happens at the right point in the
+  // package lifecycle. Unfortunately, it also means that Nuclide features will be serialized twice
+  // on deactivation.
+  Object.keys(features).forEach(safeSerialize);
+}
+
+function safeDeactivate(name, suppressSerialization) {
   try {
-    const pack = atom.packages.getActivePackage(name);
+    const pack = atom.packages.getLoadedPackage(name);
     if (pack != null) {
-      atom.packages.deactivatePackage(name);
+      atom.packages.deactivatePackage(name, suppressSerialization);
     }
   } catch (err) {
     // eslint-disable-next-line no-console
-    console.error(`Error deactivating "${ name }": ${ err.message }`);
+    console.error(`Error deactivating "${name}": ${err.message}`);
+  }
+}
+
+function safeSerialize(name) {
+  try {
+    const pack = atom.packages.getActivePackage(name);
+    if (pack != null) {
+      // Serialize the package
+      atom.packages.serializePackage(pack);
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`Error serializing "${name}": ${err.message}`);
   }
 }

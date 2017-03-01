@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -31,10 +22,10 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-var _getDiagnostics;
+var _DiagnosticsParser;
 
-function _load_getDiagnostics() {
-  return _getDiagnostics = _interopRequireDefault(require('./getDiagnostics'));
+function _load_DiagnosticsParser() {
+  return _DiagnosticsParser = _interopRequireDefault(require('./DiagnosticsParser'));
 }
 
 var _process;
@@ -44,6 +35,16 @@ function _load_process() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const PROGRESS_OUTPUT_INTERVAL = 5 * 1000;
 const BUILD_FAILED_MESSAGE = 'BUILD FAILED:';
@@ -61,14 +62,11 @@ function convertJavaLevel(level) {
 }
 
 function getEventsFromSocket(socketStream) {
-  const log = function (message) {
-    let level = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'log';
-    return _rxjsBundlesRxMinJs.Observable.of({
-      type: 'log',
-      message: message,
-      level: level
-    });
-  };
+  const log = (message, level = 'log') => _rxjsBundlesRxMinJs.Observable.of({
+    type: 'log',
+    message,
+    level
+  });
 
   const eventStream = socketStream.flatMap(message => {
     switch (message.type) {
@@ -83,7 +81,7 @@ function getEventsFromSocket(socketStream) {
       case 'InstallFinished':
         return log('Install finished.', 'info');
       case 'BuildFinished':
-        return log(`Build finished with exit code ${ message.exitCode }.`, message.exitCode === 0 ? 'info' : 'error');
+        return log(`Build finished with exit code ${message.exitCode}.`, message.exitCode === 0 ? 'info' : 'error');
       case 'BuildProgressUpdated':
         return _rxjsBundlesRxMinJs.Observable.of({
           type: 'progress',
@@ -103,7 +101,7 @@ function getEventsFromSocket(socketStream) {
   // Periodically emit log events for progress updates.
   const progressEvents = eventStream.switchMap(event => {
     if (event.type === 'progress' && event.progress != null && event.progress > 0 && event.progress < 1) {
-      return log(`Building... [${ Math.round(event.progress * 100) }%]`);
+      return log(`Building... [${Math.round(event.progress * 100)}%]`);
     }
     return _rxjsBundlesRxMinJs.Observable.empty();
   });
@@ -117,10 +115,10 @@ function getEventsFromProcess(processStream) {
       case 'error':
         return {
           type: 'error',
-          message: `Buck failed: ${ message.error.message }`
+          message: `Buck failed: ${message.error.message}`
         };
       case 'exit':
-        const logMessage = `Buck exited with ${ (0, (_process || _load_process()).exitEventToMessage)(message) }.`;
+        const logMessage = `Buck exited with ${(0, (_process || _load_process()).exitEventToMessage)(message)}.`;
         if (message.exitCode === 0) {
           return {
             type: 'log',
@@ -169,7 +167,6 @@ function combineEventStreams(subcommand, socketEvents, processEvents) {
 
   // Error/info logs from the process represent exit/error conditions, so always take them.
   // We ensure that error/info logs will not duplicate messages from the websocket.
-  // $FlowFixMe: add skipWhile to flow-typed rx definitions
   processEvents.skipWhile(isRegularLogMessage));
   if (subcommand === 'test') {
     // The websocket does not reliably provide test output.
@@ -180,9 +177,7 @@ function combineEventStreams(subcommand, socketEvents, processEvents) {
   } else if (subcommand === 'install') {
     // Add a message indicating that install has started after build completes.
     // The websocket does not naturally provide any indication.
-    mergedEvents = _rxjsBundlesRxMinJs.Observable.merge(mergedEvents, finiteSocketEvents.filter(isBuildFinishEvent)
-    // $FlowFixMe: add switchMapTo to flow-typed
-    .switchMapTo(_rxjsBundlesRxMinJs.Observable.of({
+    mergedEvents = _rxjsBundlesRxMinJs.Observable.merge(mergedEvents, finiteSocketEvents.filter(isBuildFinishEvent).switchMapTo(_rxjsBundlesRxMinJs.Observable.of({
       type: 'progress',
       progress: null
     }, {
@@ -195,10 +190,11 @@ function combineEventStreams(subcommand, socketEvents, processEvents) {
 }
 
 function getDiagnosticEvents(events, buckRoot) {
+  const diagnosticsParser = new (_DiagnosticsParser || _load_DiagnosticsParser()).default();
   return events.flatMap(event => {
     // For log messages, try to detect compile errors and emit diagnostics.
     if (event.type === 'log') {
-      return _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_getDiagnostics || _load_getDiagnostics()).default)(event.message, event.level, buckRoot)).map(diagnostics => ({ type: 'diagnostics', diagnostics: diagnostics }));
+      return _rxjsBundlesRxMinJs.Observable.fromPromise(diagnosticsParser.getDiagnostics(event.message, event.level, buckRoot)).map(diagnostics => ({ type: 'diagnostics', diagnostics }));
     }
     return _rxjsBundlesRxMinJs.Observable.empty();
   });

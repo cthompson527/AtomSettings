@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.WORKSPACE_VIEW_URI = undefined;
 
 var _immutable;
 
@@ -60,6 +51,18 @@ function _load_Checkbox() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/home';
+
 const NUCLIDE_DOCS_URL = (0, (_createUtmUrl || _load_createUtmUrl()).default)('http://nuclide.io', 'welcome');
 const DEFAULT_WELCOME = _reactForAtom.React.createElement(
   'div',
@@ -104,7 +107,7 @@ const DEFAULT_WELCOME = _reactForAtom.React.createElement(
   )
 );
 
-let HomePaneItem = class HomePaneItem extends _reactForAtom.React.Component {
+class HomePaneItem extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -117,8 +120,8 @@ let HomePaneItem = class HomePaneItem extends _reactForAtom.React.Component {
 
   componentDidMount() {
     // Note: We're assuming that the allHomeFragmentsStream prop never changes.
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this.props.allHomeFragmentsStream.subscribe(allHomeFragments => this.setState({ allHomeFragments: allHomeFragments })), (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-home.showHome').subscribe(showOnStartup => {
-      this.setState({ showOnStartup: showOnStartup });
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this.props.allHomeFragmentsStream.subscribe(allHomeFragments => this.setState({ allHomeFragments })), (_featureConfig || _load_featureConfig()).default.observeAsStream('nuclide-home.showHome').subscribe(showOnStartup => {
+      this.setState({ showOnStartup });
     }));
   }
 
@@ -127,9 +130,7 @@ let HomePaneItem = class HomePaneItem extends _reactForAtom.React.Component {
     const features = [];
     const sortedHomeFragments = Array.from(this.state.allHomeFragments).sort((fragmentA, fragmentB) => (fragmentB.priority || 0) - (fragmentA.priority || 0));
     sortedHomeFragments.forEach(fragment => {
-      const welcome = fragment.welcome,
-            feature = fragment.feature;
-
+      const { welcome, feature } = fragment;
       if (welcome) {
         welcomes.push(_reactForAtom.React.createElement(
           'div',
@@ -206,12 +207,18 @@ let HomePaneItem = class HomePaneItem extends _reactForAtom.React.Component {
     return false;
   }
 
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getDefaultLocation() {
+    return 'pane';
+  }
+
   componentWillUnmount() {
     if (this._disposables != null) {
       this._disposables.dispose();
     }
   }
-
-};
+}
 exports.default = HomePaneItem;
-module.exports = exports['default'];

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -46,10 +36,19 @@ function _load_passesGK() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const GK_THREAD_SWITCH_UI = 'nuclide_debugger_thread_switch_ui';
+const GK_THREAD_SWITCH_UI = 'nuclide_debugger_thread_switch_ui'; /**
+                                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                                  * All rights reserved.
+                                                                  *
+                                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                                  * the root directory of this source tree.
+                                                                  *
+                                                                  * 
+                                                                  */
+
 const GK_TIMEOUT = 5000;
 
-let ThreadStore = class ThreadStore {
+class ThreadStore {
 
   constructor(dispatcher) {
     const dispatcherToken = dispatcher.register(this._handlePayload.bind(this));
@@ -146,6 +145,9 @@ let ThreadStore = class ThreadStore {
       // only handle real files for now
       const datatipService = _this._datatipService;
       if (datatipService != null && path != null && atom.workspace != null) {
+        // This should be goToLocation instead but since the searchAllPanes option is correctly
+        // provided it's not urgent.
+        // eslint-disable-next-line nuclide-internal/atom-apis
         atom.workspace.open(path, { searchAllPanes: true }).then(function (editor) {
           const buffer = editor.getBuffer();
           const rowRange = buffer.rangeForRow(notificationLineNumber);
@@ -183,6 +185,5 @@ let ThreadStore = class ThreadStore {
     this._cleanUpDatatip();
     this._disposables.dispose();
   }
-};
+}
 exports.default = ThreadStore;
-module.exports = exports['default'];

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,11 +27,20 @@ function _load_config() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const HEARTBEAT_INTERVAL_MS = 10000;
+const HEARTBEAT_INTERVAL_MS = 10000; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      */
+
 const HEARTBEAT_TIMEOUT_MS = 10000;
 const MAX_HEARTBEAT_AWAY_RECONNECT_MS = 60000;
 
-let XhrConnectionHeartbeat = exports.XhrConnectionHeartbeat = class XhrConnectionHeartbeat {
+class XhrConnectionHeartbeat {
 
   constructor(serverUri, agentOptions) {
     this._heartbeatConnectedOnce = false;
@@ -70,10 +70,7 @@ let XhrConnectionHeartbeat = exports.XhrConnectionHeartbeat = class XhrConnectio
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref = yield (0, (_utils || _load_utils()).asyncRequest)(_this._options);
-
-      const body = _ref.body;
-
+      const { body } = yield (0, (_utils || _load_utils()).asyncRequest)(_this._options);
       return body;
     })();
   }
@@ -99,9 +96,7 @@ let XhrConnectionHeartbeat = exports.XhrConnectionHeartbeat = class XhrConnectio
         // Error code could could be one of:
         // ['ENOTFOUND', 'ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT']
         // A heuristic mapping is done between the xhr error code to the state of server connection.
-        const originalCode = err.code,
-              message = err.message;
-
+        const { code: originalCode, message } = err;
         let code = null;
         switch (originalCode) {
           case 'ENOTFOUND':
@@ -136,7 +131,7 @@ let XhrConnectionHeartbeat = exports.XhrConnectionHeartbeat = class XhrConnectio
             code = originalCode;
             break;
         }
-        _this2._emitter.emit('heartbeat.error', { code: code, originalCode: originalCode, message: message });
+        _this2._emitter.emit('heartbeat.error', { code, originalCode, message });
       }
     })();
   }
@@ -158,4 +153,5 @@ let XhrConnectionHeartbeat = exports.XhrConnectionHeartbeat = class XhrConnectio
       clearInterval(this._heartbeatInterval);
     }
   }
-};
+}
+exports.XhrConnectionHeartbeat = XhrConnectionHeartbeat;

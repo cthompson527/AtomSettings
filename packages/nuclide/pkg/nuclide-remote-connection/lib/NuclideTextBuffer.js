@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -51,9 +41,19 @@ function _load_loadingNotification() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Diffing is O(lines^2), so don't bother for files with too many lines.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DIFF_LINE_LIMIT = 10000;
 
-let NuclideTextBuffer = class NuclideTextBuffer extends _atom.TextBuffer {
+class NuclideTextBuffer extends _atom.TextBuffer {
 
   // This is a counter that will be incremented after every successful save request.
   // We use this to accurately detect changes on disk - conflicts should not be reported
@@ -135,7 +135,7 @@ let NuclideTextBuffer = class NuclideTextBuffer extends _atom.TextBuffer {
         }
 
         _this._pendingSaveContents = toSaveContents;
-        yield (0, (_loadingNotification || _load_loadingNotification()).default)(file.write(toSaveContents), `Saving ${ (_nuclideUri || _load_nuclideUri()).default.nuclideUriToDisplayString(filePath) }...`, 1000);
+        yield (0, (_loadingNotification || _load_loadingNotification()).default)(file.write(toSaveContents), `Saving ${(_nuclideUri || _load_nuclideUri()).default.nuclideUriToDisplayString(filePath)}...`, 1000);
         _this.cachedDiskContents = toSaveContents;
         _this._saveID++;
         _this.conflict = false;
@@ -153,11 +153,13 @@ let NuclideTextBuffer = class NuclideTextBuffer extends _atom.TextBuffer {
         // Unfortunately, we can't interrupt the user action, but we can at least reopen the buffer.
         if (_this.destroyed) {
           message += '<br><br>Opening a new tab with your unsaved changes.';
+          // goToLocation does not support opening an untitled editor
+          // eslint-disable-next-line nuclide-internal/atom-apis
           atom.workspace.open().then(function (editor) {
             return editor.setText(toSaveContents);
           });
         }
-        atom.notifications.addError(`Failed to save remote file ${ filePath }: ${ message }`);
+        atom.notifications.addError(`Failed to save remote file ${filePath}: ${message}`);
         success = false;
       }
 
@@ -278,6 +280,5 @@ let NuclideTextBuffer = class NuclideTextBuffer extends _atom.TextBuffer {
       return !this.isEmpty();
     }
   }
-};
+}
 exports.default = NuclideTextBuffer;
-module.exports = exports['default'];

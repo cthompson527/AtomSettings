@@ -1,13 +1,11 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.convertProperties = convertProperties;
+exports.convertProperty = convertProperty;
+exports.getPagedProperties = getPagedProperties;
 
 var _utils;
 
@@ -37,6 +35,16 @@ function convertProperties(id, properties) {
 /**
  * Converts a DbgpProperty to a Chrome PropertyDescriptor.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function convertProperty(contextId, dbgpProperty) {
   (_utils || _load_utils()).default.log('Converting to Chrome property: ' + JSON.stringify(dbgpProperty));
   const result = {
@@ -67,18 +75,12 @@ function getPagedProperties(pagedId) {
     return {
       configurable: false,
       enumerable: true,
-      name: `Elements(${ childStartIndex }..${ childStartIndex + childCount - 1 })`,
+      name: `Elements(${childStartIndex}..${childStartIndex + childCount - 1})`,
       value: {
-        description: `${ childCount } elements`,
+        description: `${childCount} elements`,
         type: 'object',
         objectId: (0, (_ObjectId || _load_ObjectId()).remoteObjectIdOfObjectId)(childId)
       }
     };
   });
 }
-
-module.exports = {
-  convertProperties: convertProperties,
-  convertProperty: convertProperty,
-  getPagedProperties: getPagedProperties
-};

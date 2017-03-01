@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _settingsUtils;
 
@@ -22,7 +12,7 @@ function _load_settingsUtils() {
 
 var _reactForAtom = require('react-for-atom');
 
-let SettingsCheckbox = class SettingsCheckbox extends _reactForAtom.React.Component {
+class SettingsCheckbox extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -66,6 +56,13 @@ let SettingsCheckbox = class SettingsCheckbox extends _reactForAtom.React.Compon
       )
     );
   }
-};
-exports.default = SettingsCheckbox;
-module.exports = exports['default'];
+}
+exports.default = SettingsCheckbox; /**
+                                     * Copyright (c) 2015-present, Facebook, Inc.
+                                     * All rights reserved.
+                                     *
+                                     * This source code is licensed under the license found in the LICENSE file in
+                                     * the root directory of this source tree.
+                                     *
+                                     * 
+                                     */

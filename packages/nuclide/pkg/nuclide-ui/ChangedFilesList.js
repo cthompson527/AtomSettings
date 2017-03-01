@@ -1,20 +1,14 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('./add-tooltip'));
+}
 
 var _classnames;
 
@@ -22,10 +16,10 @@ function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
 }
 
-var _constants;
+var _vcs;
 
-function _load_constants() {
-  return _constants = require('../nuclide-hg-git-bridge/lib/constants');
+function _load_vcs() {
+  return _vcs = require('../commons-atom/vcs');
 }
 
 var _nuclideUri;
@@ -36,39 +30,70 @@ function _load_nuclideUri() {
 
 var _reactForAtom = require('react-for-atom');
 
+var _Icon;
+
+function _load_Icon() {
+  return _Icon = require('./Icon');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ChangedFilesList = class ChangedFilesList extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const FILE_CHANGES_INITIAL_PAGE_SIZE = 100;
+
+class ChangedFilesList extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      isCollapsed: false
+      isCollapsed: false,
+      visiblePagesCount: 1
     };
   }
 
   _getFileClassname(file, fileChangeValue) {
-    const selectedFile = this.props.selectedFile;
-
+    const { selectedFile } = this.props;
     return (0, (_classnames || _load_classnames()).default)('list-item', {
       selected: file === selectedFile
-    }, (_constants || _load_constants()).FileChangeStatusToTextColor[fileChangeValue]);
+    }, (_vcs || _load_vcs()).FileChangeStatusToTextColor[fileChangeValue]);
   }
 
   render() {
-    var _props = this.props;
-    const fileChanges = _props.fileChanges,
-          commandPrefix = _props.commandPrefix;
-
+    const { fileChanges, commandPrefix } = this.props;
     if (fileChanges.size === 0 && this.props.hideEmptyFolders) {
       return null;
     }
+
+    const filesToShow = FILE_CHANGES_INITIAL_PAGE_SIZE * this.state.visiblePagesCount;
+    const sizeLimitedFileChanges = Array.from(fileChanges.entries()).slice(0, filesToShow);
 
     const rootClassName = (0, (_classnames || _load_classnames()).default)('list-nested-item', {
       collapsed: this.state.isCollapsed
     });
 
-    const fileClassName = (0, (_classnames || _load_classnames()).default)('icon', 'icon-file-text', 'nuclide-file-changes-file-entry', `${ commandPrefix }-file-entry`);
+    const repository = (0, (_vcs || _load_vcs()).repositoryForPath)(this.props.rootPath);
+    const fileClassName = (0, (_classnames || _load_classnames()).default)('icon', 'icon-file-text', 'nuclide-file-changes-file-entry', {
+      [`${commandPrefix}-file-entry`]: repository != null && repository.getType() === 'hg'
+    });
+
+    const showMoreFilesElement = fileChanges.size > filesToShow ? _reactForAtom.React.createElement('div', {
+      className: 'icon icon-ellipsis',
+      ref: (0, (_addTooltip || _load_addTooltip()).default)({
+        title: 'Show more files with uncommitted changes',
+        delay: 100,
+        placement: 'bottom'
+      }),
+      onClick: () => this.setState({ visiblePagesCount: this.state.visiblePagesCount + 1 })
+    }) : null;
 
     return _reactForAtom.React.createElement(
       'ul',
@@ -93,11 +118,8 @@ let ChangedFilesList = class ChangedFilesList extends _reactForAtom.React.Compon
         _reactForAtom.React.createElement(
           'ul',
           { className: 'list-tree has-flat-children' },
-          Array.from(fileChanges.entries()).map((_ref) => {
-            var _ref2 = _slicedToArray(_ref, 2);
-
-            let filePath = _ref2[0],
-                fileChangeValue = _ref2[1];
+          sizeLimitedFileChanges.map(([filePath, fileChangeValue]) => {
+            const baseName = (_nuclideUri || _load_nuclideUri()).default.basename(filePath);
             return _reactForAtom.React.createElement(
               'li',
               {
@@ -105,21 +127,26 @@ let ChangedFilesList = class ChangedFilesList extends _reactForAtom.React.Compon
                 className: this._getFileClassname(filePath, fileChangeValue),
                 key: filePath,
                 onClick: () => this.props.onFileChosen(filePath) },
+              _reactForAtom.React.createElement((_Icon || _load_Icon()).Icon, { icon: (_vcs || _load_vcs()).FileChangeStatusToIcon[fileChangeValue] }),
               _reactForAtom.React.createElement(
                 'span',
                 {
                   className: fileClassName,
+                  'data-name': baseName,
                   'data-path': filePath,
                   'data-root': this.props.rootPath },
-                (_constants || _load_constants()).FileChangeStatusToPrefix[fileChangeValue],
-                (_nuclideUri || _load_nuclideUri()).default.basename(filePath)
+                baseName
               )
             );
-          })
+          }),
+          _reactForAtom.React.createElement(
+            'li',
+            null,
+            showMoreFilesElement
+          )
         )
       )
     );
   }
-};
+}
 exports.default = ChangedFilesList;
-module.exports = exports['default'];

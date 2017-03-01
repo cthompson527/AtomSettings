@@ -4,7 +4,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Manages remote projects",
-  "atomTestRunner": "../../lib/test-runner.js",
+  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "configMetadata": {
       "pathComponents": [
@@ -52,12 +52,17 @@
       "versions": {
         "0.0.0": "getHomeFragments"
       }
+    },
+    "nuclide-remote-projects": {
+      "versions": {
+        "0.0.0": "provideRemoteProjectsService"
+      }
     }
   },
   "consumedServices": {
     "status-bar": {
       "versions": {
-        "1.0.0": "consumeStatusBar"
+        "^1.0.0": "consumeStatusBar"
       }
     }
   }

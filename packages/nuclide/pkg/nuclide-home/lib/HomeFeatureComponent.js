@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _reactForAtom = require('react-for-atom');
 
@@ -17,7 +12,17 @@ function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
 }
 
-let HomeFeatureComponent = class HomeFeatureComponent extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class HomeFeatureComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -25,8 +30,7 @@ let HomeFeatureComponent = class HomeFeatureComponent extends _reactForAtom.Reac
   }
 
   _tryIt() {
-    const command = this.props.command;
-
+    const { command } = this.props;
     if (command == null) {
       return;
     }
@@ -43,16 +47,13 @@ let HomeFeatureComponent = class HomeFeatureComponent extends _reactForAtom.Reac
   }
 
   render() {
-    var _props = this.props;
-    const title = _props.title,
-          command = _props.command;
-
+    const { title, command } = this.props;
     return _reactForAtom.React.createElement(
       'details',
       { className: 'nuclide-home-card' },
       _reactForAtom.React.createElement(
         'summary',
-        { className: `nuclide-home-summary icon icon-${ this.props.icon }` },
+        { className: `nuclide-home-summary icon icon-${this.props.icon}` },
         title,
         command ? _reactForAtom.React.createElement(
           (_Button || _load_Button()).Button,
@@ -70,7 +71,5 @@ let HomeFeatureComponent = class HomeFeatureComponent extends _reactForAtom.Reac
       )
     );
   }
-};
-
-
-module.exports = HomeFeatureComponent;
+}
+exports.default = HomeFeatureComponent;

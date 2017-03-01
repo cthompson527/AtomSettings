@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,32 +13,39 @@ function _load_Actions() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function accumulateState(state, action) {
   switch (action.type) {
     case (_Actions || _load_Actions()).RECORD_RECEIVED:
       {
-        const record = action.payload.record;
-
+        const { record } = action.payload;
         return Object.assign({}, state, {
           records: state.records.concat(record).slice(-state.maxMessageCount)
         });
       }
     case (_Actions || _load_Actions()).SET_MAX_MESSAGE_COUNT:
       {
-        const maxMessageCount = action.payload.maxMessageCount;
-
+        const { maxMessageCount } = action.payload;
         if (maxMessageCount <= 0) {
           return state;
         }
         return Object.assign({}, state, {
-          maxMessageCount: maxMessageCount,
+          maxMessageCount,
           records: state.records.slice(-maxMessageCount)
         });
       }
     case (_Actions || _load_Actions()).REGISTER_RECORD_PROVIDER:
       {
-        const recordProvider = action.payload.recordProvider;
-
+        const { recordProvider } = action.payload;
         return Object.assign({}, state, {
           providers: new Map(state.providers).set(recordProvider.id, recordProvider)
         });
@@ -60,24 +58,21 @@ function accumulateState(state, action) {
       }
     case (_Actions || _load_Actions()).REGISTER_EXECUTOR:
       {
-        const executor = action.payload.executor;
-
+        const { executor } = action.payload;
         return Object.assign({}, state, {
           executors: new Map(state.executors).set(executor.id, executor)
         });
       }
     case (_Actions || _load_Actions()).SELECT_EXECUTOR:
       {
-        const executorId = action.payload.executorId;
-
+        const { executorId } = action.payload;
         return Object.assign({}, state, {
           currentExecutorId: executorId
         });
       }
     case (_Actions || _load_Actions()).REMOVE_SOURCE:
       {
-        const sourceId = action.payload.sourceId;
-
+        const { sourceId } = action.payload;
         const providers = new Map(state.providers);
         const providerStatuses = new Map(state.providerStatuses);
         const executors = new Map(state.executors);
@@ -85,17 +80,14 @@ function accumulateState(state, action) {
         providerStatuses.delete(sourceId);
         executors.delete(sourceId);
         return Object.assign({}, state, {
-          providers: providers,
-          providerStatuses: providerStatuses,
-          executors: executors
+          providers,
+          providerStatuses,
+          executors
         });
       }
     case (_Actions || _load_Actions()).UPDATE_STATUS:
       {
-        var _action$payload = action.payload;
-        const status = _action$payload.status,
-              providerId = _action$payload.providerId;
-
+        const { status, providerId } = action.payload;
         return Object.assign({}, state, {
           providerStatuses: new Map(state.providerStatuses).set(providerId, status)
         });
@@ -111,4 +103,3 @@ function accumulateState(state, action) {
 
   return state;
 }
-module.exports = exports['default'];

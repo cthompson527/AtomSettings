@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,7 +16,17 @@ exports.setMaxMessageCount = setMaxMessageCount;
 exports.removeSource = removeSource;
 exports.unregisterExecutor = unregisterExecutor;
 exports.updateStatus = updateStatus;
-const CLEAR_RECORDS = exports.CLEAR_RECORDS = 'CLEAR_RECORDS';const REGISTER_EXECUTOR = exports.REGISTER_EXECUTOR = 'REGISTER_EXECUTOR';
+const CLEAR_RECORDS = exports.CLEAR_RECORDS = 'CLEAR_RECORDS'; /**
+                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                * All rights reserved.
+                                                                *
+                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                * the root directory of this source tree.
+                                                                *
+                                                                * 
+                                                                */
+
+const REGISTER_EXECUTOR = exports.REGISTER_EXECUTOR = 'REGISTER_EXECUTOR';
 const EXECUTE = exports.EXECUTE = 'EXECUTE';
 const REGISTER_RECORD_PROVIDER = exports.REGISTER_RECORD_PROVIDER = 'REGISTER_RECORD_PROVIDER';
 const SELECT_EXECUTOR = exports.SELECT_EXECUTOR = 'SELECT_EXECUTOR';
@@ -41,21 +42,21 @@ function clearRecords() {
 function recordReceived(record) {
   return {
     type: RECORD_RECEIVED,
-    payload: { record: record }
+    payload: { record }
   };
 }
 
 function registerExecutor(executor) {
   return {
     type: REGISTER_EXECUTOR,
-    payload: { executor: executor }
+    payload: { executor }
   };
 }
 
 function execute(code) {
   return {
     type: EXECUTE,
-    payload: { code: code }
+    payload: { code }
   };
 }
 
@@ -75,7 +76,7 @@ function registerOutputProvider(outputProvider) {
 function registerRecordProvider(recordProvider) {
   return {
     type: REGISTER_RECORD_PROVIDER,
-    payload: { recordProvider: recordProvider }
+    payload: { recordProvider }
   };
 }
 
@@ -90,21 +91,21 @@ function unregisterOutputProvider(outputProvider) {
 function selectExecutor(executorId) {
   return {
     type: SELECT_EXECUTOR,
-    payload: { executorId: executorId }
+    payload: { executorId }
   };
 }
 
 function setMaxMessageCount(maxMessageCount) {
   return {
     type: SET_MAX_MESSAGE_COUNT,
-    payload: { maxMessageCount: maxMessageCount }
+    payload: { maxMessageCount }
   };
 }
 
 function removeSource(sourceId) {
   return {
     type: REMOVE_SOURCE,
-    payload: { sourceId: sourceId }
+    payload: { sourceId }
   };
 }
 
@@ -115,6 +116,6 @@ function unregisterExecutor(executor) {
 function updateStatus(providerId, status) {
   return {
     type: UPDATE_STATUS,
-    payload: { providerId: providerId, status: status }
+    payload: { providerId, status }
   };
 }

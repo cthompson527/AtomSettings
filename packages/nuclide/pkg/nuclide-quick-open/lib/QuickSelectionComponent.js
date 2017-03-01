@@ -1,20 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _AtomInput;
 
@@ -34,12 +24,16 @@ function _load_Tabs() {
   return _Tabs = _interopRequireDefault(require('../../nuclide-ui/Tabs'));
 }
 
-var _atom = require('atom');
+var _UniversalDisposable;
 
-var _debounce;
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
-function _load_debounce() {
-  return _debounce = _interopRequireDefault(require('../../commons-node/debounce'));
+var _event;
+
+function _load_event() {
+  return _event = require('../../commons-node/event');
 }
 
 var _humanizeKeystroke;
@@ -48,30 +42,12 @@ function _load_humanizeKeystroke() {
   return _humanizeKeystroke = _interopRequireDefault(require('../../commons-node/humanizeKeystroke'));
 }
 
-var _collection;
-
-function _load_collection() {
-  return _collection = require('../../commons-node/collection');
-}
-
 var _reactForAtom = require('react-for-atom');
-
-var _SearchResultManager;
-
-function _load_SearchResultManager() {
-  return _SearchResultManager = _interopRequireDefault(require('./SearchResultManager'));
-}
 
 var _classnames;
 
 function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
-}
-
-var _searchResultHelpers;
-
-function _load_searchResultHelpers() {
-  return _searchResultHelpers = require('./searchResultHelpers');
 }
 
 var _nuclideUri;
@@ -80,17 +56,13 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
-var _QuickSelectionActions;
+var _searchResultHelpers;
 
-function _load_QuickSelectionActions() {
-  return _QuickSelectionActions = _interopRequireDefault(require('./QuickSelectionActions'));
+function _load_searchResultHelpers() {
+  return _searchResultHelpers = require('./searchResultHelpers');
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const RESULTS_CHANGED_DEBOUNCE_DELAY = 50;
-
-const searchResultManager = (_SearchResultManager || _load_SearchResultManager()).default.getInstance();
 
 /**
  * Determine what the applicable shortcut for a given action is within this component's context.
@@ -99,228 +71,247 @@ const searchResultManager = (_SearchResultManager || _load_SearchResultManager()
 function _findKeybindingForAction(action, target) {
   const matchingKeyBindings = atom.keymaps.findKeyBindings({
     command: action,
-    target: target
+    target
   });
   const keystroke = matchingKeyBindings.length && matchingKeyBindings[0].keystrokes || '';
   return (0, (_humanizeKeystroke || _load_humanizeKeystroke()).default)(keystroke);
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
-function sortServiceNames(names) {
-  return names.sort((serviceName1, serviceName2) => {
-    const provider1 = searchResultManager.getProviderByName(serviceName1);
-    const provider2 = searchResultManager.getProviderByName(serviceName2);
-    if (provider1.priority == null || provider2.priority == null || provider1.priority === provider2.priority) {
-      return provider1.name.localeCompare(provider2.name);
-    }
-    return provider1.priority - provider2.priority;
-  });
-}
-
-let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAtom.React.Component {
+class QuickSelectionComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
-    this._emitter = new _atom.Emitter();
-    this._subscriptions = new _atom.CompositeDisposable();
-    this._boundSelect = () => this.select();
-    this._isMounted = false;
+    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+
+    const initialProviderName = this.props.searchResultManager.getActiveProviderName();
+    const initialActiveTab = this.props.searchResultManager.getProviderByName(initialProviderName);
+    const initialQuery = this.props.searchResultManager.getLastQuery() || '';
+    const initialResults = this.props.searchResultManager.getResults(initialQuery, initialProviderName);
+    const topOuterResult = (0, (_searchResultHelpers || _load_searchResultHelpers()).getOuterResults)('top', initialResults);
+
     this.state = {
-      activeTab: searchResultManager.getProviderByName(searchResultManager.getActiveProviderName()),
+      activeTab: initialActiveTab,
       // treated as immutable
-      resultsByService: {},
-      renderableProviders: searchResultManager.getRenderableProviders(),
-      selectedService: '',
-      selectedDirectory: '',
-      selectedItemIndex: -1,
-      hasUserSelection: false
+      resultsByService: initialResults,
+      renderableProviders: this.props.searchResultManager.getRenderableProviders(),
+      selectedService: topOuterResult != null ? topOuterResult.serviceName : '',
+      selectedDirectory: topOuterResult != null ? topOuterResult.directoryName : '',
+      selectedItemIndex: topOuterResult != null ? 0 : -1,
+      hasUserSelection: false,
+      initialQuery
     };
+
+    this._handleClickOpenAll = this._handleClickOpenAll.bind(this);
+    this._handleDocumentMouseDown = this._handleDocumentMouseDown.bind(this);
+    this._handleKeyPress = this._handleKeyPress.bind(this);
+    this._handleMoveDown = this._handleMoveDown.bind(this);
+    this._handleMoveNextTab = this._handleMoveNextTab.bind(this);
+    this._handleMovePreviousTab = this._handleMovePreviousTab.bind(this);
+    this._handleMoveToBottom = this._handleMoveToBottom.bind(this);
+    this._handleMoveToTop = this._handleMoveToTop.bind(this);
+    this._handleMoveUp = this._handleMoveUp.bind(this);
+    this._handleProvidersChange = this._handleProvidersChange.bind(this);
+    this._handleResultsChange = this._handleResultsChange.bind(this);
     this._handleTabChange = this._handleTabChange.bind(this);
-    this.handleProvidersChange = this.handleProvidersChange.bind(this);
-    this.handleResultsChange = this.handleResultsChange.bind(this);
-    this.handleDocumentMouseDown = this.handleDocumentMouseDown.bind(this);
+    this._handleTextInputChange = this._handleTextInputChange.bind(this);
+    this._select = this._select.bind(this);
   }
 
+  /**
+   * Public API
+   */
+  focus() {
+    this._getInputTextEditor().focus();
+  }
+
+  setInputValue(value) {
+    this._getTextEditor().setText(value);
+  }
+
+  /**
+   * Private API
+   */
   componentWillReceiveProps(nextProps) {
-    if (nextProps.activeProvider !== this.props.activeProvider) {
-      if (nextProps.activeProvider) {
-        this._getTextEditor().setPlaceholderText(nextProps.activeProvider.prompt);
-        const newResults = {};
-        this.setState({
-          activeTab: nextProps.activeProvider || this.state.activeTab,
-          resultsByService: newResults
-        }, () => {
-          setImmediate(() => this.setQuery(this.refs.queryInput.getText()));
-          this._updateQueryHandler();
-          this._emitter.emit('items-changed', newResults);
+    // Prevent clowniness:
+    if (this.props.searchResultManager !== nextProps.searchResultManager) {
+      throw new Error('quick-open: searchResultManager instance changed.');
+    }
+    // TODO: Find a better way to trigger an update.
+    const nextProviderName = this.props.searchResultManager.getActiveProviderName();
+    if (this.state.activeTab.name === nextProviderName) {
+      process.nextTick(() => {
+        const query = this.refs.queryInput.getText();
+        this.props.quickSelectionActions.query(query);
+      });
+    } else {
+      const activeProvider = this.props.searchResultManager.getProviderByName(nextProviderName);
+      const lastResults = this.props.searchResultManager.getResults(this.refs.queryInput.getText(), nextProviderName);
+      this._getTextEditor().setPlaceholderText(activeProvider.prompt);
+      this.setState({
+        activeTab: activeProvider,
+        resultsByService: lastResults
+      }, () => {
+        process.nextTick(() => {
+          const query = this.refs.queryInput.getText();
+          this.props.quickSelectionActions.query(query);
         });
-      }
+        if (this.props.onItemsChanged != null) {
+          this.props.onItemsChanged(lastResults);
+        }
+      });
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.resultsByService !== this.state.resultsByService) {
-      this._emitter.emit('items-changed', this.state.resultsByService);
+      if (this.props.onItemsChanged != null) {
+        this.props.onItemsChanged(this.state.resultsByService);
+      }
     }
-
     if (prevState.selectedItemIndex !== this.state.selectedItemIndex || prevState.selectedService !== this.state.selectedService || prevState.selectedDirectory !== this.state.selectedDirectory) {
       this._updateScrollPosition();
     }
   }
 
   componentDidMount() {
-    this._isMounted = true;
-    this._modalNode = _reactForAtom.ReactDOM.findDOMNode(this);
-    this._subscriptions.add(atom.commands.add(this._modalNode, 'core:move-to-bottom', this.handleMoveToBottom.bind(this)), atom.commands.add(this._modalNode, 'core:move-to-top', this.handleMoveToTop.bind(this)), atom.commands.add(this._modalNode, 'core:move-down', this.handleMoveDown.bind(this)), atom.commands.add(this._modalNode, 'core:move-up', this.handleMoveUp.bind(this)), atom.commands.add(this._modalNode, 'core:confirm', this.select.bind(this)));
+    const modalNode = _reactForAtom.ReactDOM.findDOMNode(this);
+    this._subscriptions.add(atom.commands.add(modalNode, 'core:move-to-bottom', this._handleMoveToBottom), atom.commands.add(modalNode, 'core:move-to-top', this._handleMoveToTop), atom.commands.add(modalNode, 'core:move-down', this._handleMoveDown), atom.commands.add(modalNode, 'core:move-up', this._handleMoveUp), atom.commands.add(modalNode, 'core:confirm', this._select), atom.commands.add(modalNode, 'pane:show-previous-item', this._handleMovePreviousTab), atom.commands.add(modalNode, 'pane:show-next-item', this._handleMoveNextTab), atom.commands.add('body', 'core:cancel', () => {
+      this.props.onCancellation();
+    }), _rxjsBundlesRxMinJs.Observable.fromEvent(document, 'mousedown').subscribe(this._handleDocumentMouseDown), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => this._getTextEditor().onDidChange(cb))
+    // $FlowFixMe: Missing def for debounce and timer.
+    .debounce(() => _rxjsBundlesRxMinJs.Observable.timer(this.state.activeTab.debounceDelay || 0)).subscribe(this._handleTextInputChange), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => this.props.searchResultManager.onProvidersChanged(cb)).debounceTime(0, _rxjsBundlesRxMinJs.Scheduler.animationFrame).subscribe(this._handleProvidersChange), (0, (_event || _load_event()).observableFromSubscribeFunction)(cb => this.props.searchResultManager.onResultsChanged(cb)).debounceTime(50)
+    // debounceTime seems to have issues canceling scheduled work. So
+    // schedule it after we've debounced the events. See
+    // https://github.com/ReactiveX/rxjs/pull/2135
+    .debounceTime(0, _rxjsBundlesRxMinJs.Scheduler.animationFrame).subscribe(this._handleResultsChange));
 
-    // Close quick open if user clicks outside the frame.
-    document.addEventListener('mousedown', this.handleDocumentMouseDown);
-    this._subscriptions.add(new _atom.Disposable(() => {
-      document.removeEventListener('mousedown', this.handleDocumentMouseDown);
-    }));
-
-    const inputTextEditor = this.getInputTextEditor();
-    this._subscriptions.add(searchResultManager.on(searchResultManager.PROVIDERS_CHANGED, this.handleProvidersChange), searchResultManager.on(searchResultManager.RESULTS_CHANGED, (0, (_debounce || _load_debounce()).default)(this.handleResultsChange, RESULTS_CHANGED_DEBOUNCE_DELAY, false)));
-
-    this._updateQueryHandler();
-    inputTextEditor.getModel().onDidChange(() => this._handleTextInputChange());
-    this.clear();
+    // TODO: Find a better way to trigger an update.
+    this._getTextEditor().setText(this.refs.queryInput.getText());
+    this._getTextEditor().selectAll();
   }
 
   componentWillUnmount() {
-    this._isMounted = false;
-    this._emitter.dispose();
     this._subscriptions.dispose();
   }
 
-  handleMoveToBottom() {
-    this.moveSelectionToBottom();
-    this.onUserDidChangeSelection();
-  }
-
-  handleMoveToTop() {
-    this.moveSelectionToTop();
-    this.onUserDidChangeSelection();
-  }
-
-  handleMoveDown() {
-    this.moveSelectionDown();
-    this.onUserDidChangeSelection();
-  }
-
-  handleMoveUp() {
-    this.moveSelectionUp();
-    this.onUserDidChangeSelection();
-  }
-
-  handleDocumentMouseDown(event) {
-    const modal = this.refs.modal;
-    // If the click did not happen on the modal or on any of its descendants,
-    // the click was elsewhere on the document and should close the modal.
-    if (event.target !== modal && !modal.contains(event.target)) {
-      this.props.onBlur();
+  _handleClickOpenAll() {
+    if (this.state.activeTab.canOpenAll) {
+      this._openAll();
     }
   }
 
-  onCancellation(callback) {
-    return this._emitter.on('canceled', callback);
-  }
-
-  onSelection(callback) {
-    return this._emitter.on('selected', callback);
-  }
-
-  onSelectionChanged(callback) {
-    return this._emitter.on('selection-changed', callback);
-  }
-
-  onItemsChanged(callback) {
-    return this._emitter.on('items-changed', callback);
-  }
-
-  _updateQueryHandler() {
-    this._debouncedQueryHandler = (0, (_debounce || _load_debounce()).default)(() => {
-      if (this._isMounted) {
-        this.setKeyboardQuery(this.getInputTextEditor().getModel().getText());
+  _handleKeyPress(e) {
+    if (e.shiftKey && e.key === 'Enter') {
+      if (this.state.activeTab.canOpenAll) {
+        this._openAll();
       }
-    }, this.getProvider().debounceDelay || 0, false);
+    }
+  }
+
+  _handleMovePreviousTab(event) {
+    const currentProviderName = this.props.searchResultManager.getActiveProviderName();
+    const currentTabIndex = this.state.renderableProviders.findIndex(tab => tab.name === currentProviderName);
+    const previousProvider = this.state.renderableProviders[currentTabIndex - 1] || this.state.renderableProviders[this.state.renderableProviders.length - 1];
+    this.props.quickSelectionActions.changeActiveProvider(previousProvider.name);
+    event.stopImmediatePropagation();
+  }
+
+  _handleMoveNextTab(event) {
+    const currentProviderName = this.props.searchResultManager.getActiveProviderName();
+    const currentTabIndex = this.state.renderableProviders.findIndex(tab => tab.name === currentProviderName);
+    const nextProvider = this.state.renderableProviders[currentTabIndex + 1] || this.state.renderableProviders[0];
+    this.props.quickSelectionActions.changeActiveProvider(nextProvider.name);
+    event.stopImmediatePropagation();
+  }
+
+  _handleMoveToBottom() {
+    this._moveSelectionToBottom( /* userInitiated */true);
+  }
+
+  _handleMoveToTop() {
+    this._moveSelectionToTop( /* userInitiated */true);
+  }
+
+  _handleMoveDown() {
+    this._moveSelectionDown( /* userInitiated */true);
+  }
+
+  _handleMoveUp() {
+    this._moveSelectionUp( /* userInitiated */true);
+  }
+
+  _handleDocumentMouseDown(event) {
+    // If the click did not happen on the modal or on any of its descendants,
+    // the click was elsewhere on the document and should close the modal.
+    // Otherwise, refocus the input box.
+    if (event.target !== this.refs.modal && !this.refs.modal.contains(event.target)) {
+      this.props.onCancellation();
+    } else {
+      process.nextTick(() => this._getInputTextEditor().focus());
+    }
   }
 
   _handleTextInputChange() {
-    this._debouncedQueryHandler();
+    this.setState({ hasUserSelection: false });
+    const query = this._getTextEditor().getText();
+    this.props.quickSelectionActions.query(query);
   }
 
-  handleResultsChange() {
-    // This function is running on a timer (debounced), it is possible that it
-    // may be called after the component has unmounted.
-    if (this._isMounted) {
-      const activeProviderName = searchResultManager.getActiveProviderName();
-      this._updateResults(activeProviderName);
-    }
+  _handleResultsChange() {
+    this._updateResults();
   }
 
-  _updateResults(activeProviderName) {
-    const updatedResults = searchResultManager.getResults(this.refs.queryInput.getText(), activeProviderName);
+  _handleProvidersChange() {
+    this._updateResults();
+  }
 
-    var _sortServiceNames = sortServiceNames(Object.keys(updatedResults)),
-        _sortServiceNames2 = _slicedToArray(_sortServiceNames, 1);
-
-    const topProviderName = _sortServiceNames2[0];
-
+  _updateResults() {
+    const activeProviderName = this.props.searchResultManager.getActiveProviderName();
+    const updatedResults = this.props.searchResultManager.getResults(this.refs.queryInput.getText(), activeProviderName);
+    const [topProviderName] = Object.keys(updatedResults);
+    const renderableProviders = this.props.searchResultManager.getRenderableProviders();
     this.setState({
+      renderableProviders,
       resultsByService: updatedResults
     }, () => {
       if (!this.state.hasUserSelection && topProviderName != null && this.state.resultsByService[topProviderName] != null) {
         const topProviderResults = this.state.resultsByService[topProviderName].results;
         if (!Object.keys(topProviderResults).some(dirName => topProviderResults[dirName].loading)) {
-          this.moveSelectionToTop();
+          this._moveSelectionToTop( /* userInitiated */false);
         }
       }
     });
   }
 
-  handleProvidersChange() {
-    const renderableProviders = searchResultManager.getRenderableProviders();
-    const activeProviderName = searchResultManager.getActiveProviderName();
-    this._updateResults(activeProviderName);
-    this.setState({
-      renderableProviders: renderableProviders,
-      activeProviderName: activeProviderName
-    });
-  }
-
-  select() {
-    const selectedItem = this.getSelectedItem();
+  _select() {
+    const selectedItem = this._getItemAtIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex);
     if (!selectedItem) {
-      this.cancel();
+      this.props.onCancellation();
     } else {
-      this._emitter.emit('selected', selectedItem);
+      const providerName = this.props.searchResultManager.getActiveProviderName();
+      const query = this._getTextEditor().getText();
+      this.props.onSelection([selectedItem], providerName, query);
     }
-  }
-
-  onUserDidChangeSelection() {
-    this.setState({
-      hasUserSelection: true
-    });
-  }
-
-  cancel() {
-    this._emitter.emit('canceled');
-  }
-
-  clearSelection() {
-    this.setSelectedIndex('', '', -1);
   }
 
   _getCurrentResultContext() {
     const nonEmptyResults = (0, (_searchResultHelpers || _load_searchResultHelpers()).filterEmptyResults)(this.state.resultsByService);
-    const serviceNames = sortServiceNames(Object.keys(nonEmptyResults));
-    const currentServiceIndex = serviceNames.indexOf(this.state.selectedService);
     const currentService = nonEmptyResults[this.state.selectedService];
 
     if (!currentService) {
       return null;
     }
 
+    const serviceNames = Object.keys(nonEmptyResults);
+    const currentServiceIndex = serviceNames.indexOf(this.state.selectedService);
     const directoryNames = Object.keys(currentService.results);
     const currentDirectoryIndex = directoryNames.indexOf(this.state.selectedDirectory);
     const currentDirectory = currentService.results[this.state.selectedDirectory];
@@ -330,58 +321,58 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
     }
 
     return {
-      nonEmptyResults: nonEmptyResults,
-      serviceNames: serviceNames,
-      currentServiceIndex: currentServiceIndex,
-      currentService: currentService,
-      directoryNames: directoryNames,
-      currentDirectoryIndex: currentDirectoryIndex,
-      currentDirectory: currentDirectory
+      nonEmptyResults,
+      serviceNames,
+      currentServiceIndex,
+      currentService,
+      directoryNames,
+      currentDirectoryIndex,
+      currentDirectory
     };
   }
 
-  moveSelectionDown() {
+  _moveSelectionDown(userInitiated) {
     const context = this._getCurrentResultContext();
     if (!context) {
-      this.moveSelectionToTop();
+      this._moveSelectionToTop(userInitiated);
       return;
     }
 
     if (this.state.selectedItemIndex < context.currentDirectory.results.length - 1) {
       // only bump the index if remaining in current directory
-      this.setSelectedIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex + 1);
+      this._setSelectedIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex + 1, userInitiated);
     } else {
       // otherwise go to next directory...
       if (context.currentDirectoryIndex < context.directoryNames.length - 1) {
-        this.setSelectedIndex(this.state.selectedService, context.directoryNames[context.currentDirectoryIndex + 1], 0);
+        this._setSelectedIndex(this.state.selectedService, context.directoryNames[context.currentDirectoryIndex + 1], 0, userInitiated);
       } else {
         // ...or the next service...
         if (context.currentServiceIndex < context.serviceNames.length - 1) {
           const newServiceName = context.serviceNames[context.currentServiceIndex + 1];
           const newDirectoryName = Object.keys(context.nonEmptyResults[newServiceName].results).shift();
-          this.setSelectedIndex(newServiceName, newDirectoryName, 0);
+          this._setSelectedIndex(newServiceName, newDirectoryName, 0, userInitiated);
         } else {
           // ...or wrap around to the very top
-          this.moveSelectionToTop();
+          this._moveSelectionToTop(userInitiated);
         }
       }
     }
   }
 
-  moveSelectionUp() {
+  _moveSelectionUp(userInitiated) {
     const context = this._getCurrentResultContext();
     if (!context) {
-      this.moveSelectionToBottom();
+      this._moveSelectionToBottom(userInitiated);
       return;
     }
 
     if (this.state.selectedItemIndex > 0) {
       // only decrease the index if remaining in current directory
-      this.setSelectedIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex - 1);
+      this._setSelectedIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex - 1, userInitiated);
     } else {
       // otherwise, go to the previous directory...
       if (context.currentDirectoryIndex > 0) {
-        this.setSelectedIndex(this.state.selectedService, context.directoryNames[context.currentDirectoryIndex - 1], context.currentService.results[context.directoryNames[context.currentDirectoryIndex - 1]].results.length - 1);
+        this._setSelectedIndex(this.state.selectedService, context.directoryNames[context.currentDirectoryIndex - 1], context.currentService.results[context.directoryNames[context.currentDirectoryIndex - 1]].results.length - 1, userInitiated);
       } else {
         // ...or the previous service...
         if (context.currentServiceIndex > 0) {
@@ -394,10 +385,10 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
           if (resultsForDirectory == null || resultsForDirectory.results == null) {
             return;
           }
-          this.setSelectedIndex(newServiceName, newDirectoryName, resultsForDirectory.results.length - 1);
+          this._setSelectedIndex(newServiceName, newDirectoryName, resultsForDirectory.results.length - 1, userInitiated);
         } else {
           // ...or wrap around to the very bottom
-          this.moveSelectionToBottom();
+          this._moveSelectionToBottom(userInitiated);
         }
       }
     }
@@ -418,53 +409,34 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
     }
   }
 
-  moveSelectionToBottom() {
-    const bottom = this._getOuterResults(Array.prototype.pop);
+  _moveSelectionToBottom(userInitiated) {
+    const bottom = (0, (_searchResultHelpers || _load_searchResultHelpers()).getOuterResults)('bottom', this.state.resultsByService);
     if (!bottom) {
       return;
     }
-    this.setSelectedIndex(bottom.serviceName, bottom.directoryName, bottom.results.length - 1);
+    this._setSelectedIndex(bottom.serviceName, bottom.directoryName, bottom.results.length - 1, userInitiated);
   }
 
-  moveSelectionToTop() {
-    const top = this._getOuterResults(Array.prototype.shift);
+  _moveSelectionToTop(userInitiated) {
+    const top = (0, (_searchResultHelpers || _load_searchResultHelpers()).getOuterResults)('top', this.state.resultsByService);
     if (!top) {
       return;
     }
-    this.setSelectedIndex(top.serviceName, top.directoryName, 0);
+    this._setSelectedIndex(top.serviceName, top.directoryName, 0, userInitiated);
   }
 
-  _getOuterResults(arrayOperation) {
-    const nonEmptyResults = (0, (_searchResultHelpers || _load_searchResultHelpers()).filterEmptyResults)(this.state.resultsByService);
-    const serviceName = arrayOperation.call(sortServiceNames(Object.keys(nonEmptyResults)));
-    if (!serviceName) {
-      return null;
-    }
-    const service = nonEmptyResults[serviceName];
-    const directoryName = arrayOperation.call(Object.keys(service.results));
-    return {
-      serviceName: serviceName,
-      directoryName: directoryName,
-      results: nonEmptyResults[serviceName].results[directoryName].results
-    };
-  }
-
-  getSelectedItem() {
-    return this.getItemAtIndex(this.state.selectedService, this.state.selectedDirectory, this.state.selectedItemIndex);
-  }
-
-  getItemAtIndex(serviceName, directory, itemIndex) {
+  _getItemAtIndex(serviceName, directory, itemIndex) {
     if (itemIndex === -1 || !this.state.resultsByService[serviceName] || !this.state.resultsByService[serviceName].results[directory] || !this.state.resultsByService[serviceName].results[directory].results[itemIndex]) {
       return null;
     }
     return this.state.resultsByService[serviceName].results[directory].results[itemIndex];
   }
 
-  componentForItem(item, serviceName, dirName) {
-    return searchResultManager.getRendererForProvider(serviceName)(item, serviceName, dirName);
+  _componentForItem(item, serviceName, dirName) {
+    return this.props.searchResultManager.getRendererForProvider(serviceName)(item, serviceName, dirName);
   }
 
-  getSelectedIndex() {
+  _getSelectedIndex() {
     return {
       selectedDirectory: this.state.selectedDirectory,
       selectedService: this.state.selectedService,
@@ -472,62 +444,25 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
     };
   }
 
-  setSelectedIndex(service, directory, itemIndex) {
-    this.setState({
+  _setSelectedIndex(service, directory, itemIndex, userInitiated) {
+    const newState = {
       selectedService: service,
       selectedDirectory: directory,
-      selectedItemIndex: itemIndex
-    }, () => {
-      this._emitter.emit('selection-changed', this.getSelectedIndex());
-      this.onUserDidChangeSelection();
+      selectedItemIndex: itemIndex,
+      hasUserSelection: userInitiated
+    };
+    this.setState(newState, () => {
+      const selectedIndex = this._getSelectedIndex();
+      const providerName = this.props.searchResultManager.getActiveProviderName();
+      const query = this._getTextEditor().getText();
+      if (this.props.onSelectionChanged != null) {
+        this.props.onSelectionChanged(selectedIndex, providerName, query);
+      }
     });
   }
 
-  resetSelection() {
-    this.setState({
-      selectedService: '',
-      selectedDirectory: '',
-      selectedItemIndex: -1,
-      hasUserSelection: false
-    });
-  }
-
-  setKeyboardQuery(query) {
-    this.resetSelection();
-    this.setQuery(query);
-  }
-
-  setQuery(query) {
-    (_QuickSelectionActions || _load_QuickSelectionActions()).default.query(query);
-  }
-
-  getProvider() {
-    return this.props.activeProvider;
-  }
-
-  getInputTextEditor() {
+  _getInputTextEditor() {
     return _reactForAtom.ReactDOM.findDOMNode(this.refs.queryInput);
-  }
-
-  clear() {
-    this.getInputTextEditor().getModel().setText('');
-    this.clearSelection();
-  }
-
-  focus() {
-    this.getInputTextEditor().focus();
-  }
-
-  blur() {
-    this.getInputTextEditor().blur();
-  }
-
-  setInputValue(value) {
-    this._getTextEditor().setText(value);
-  }
-
-  selectInput() {
-    this._getTextEditor().selectAll();
   }
 
   _getTextEditor() {
@@ -539,17 +474,18 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
    *     _renderTabs(), which created the tab object in the first place.
    */
   _handleTabChange(newTab) {
-    const providerName = newTab.name;
-    if (providerName !== this.props.activeProvider.name) {
-      (_QuickSelectionActions || _load_QuickSelectionActions()).default.changeActiveProvider(providerName);
+    const newProviderName = newTab.name;
+    const currentProviderName = this.props.searchResultManager.getActiveProviderName();
+    if (newProviderName !== currentProviderName) {
+      this.props.quickSelectionActions.changeActiveProvider(newProviderName);
     }
-    this.refs.queryInput.focus();
   }
 
   _renderTabs() {
+    const workspace = atom.views.getView(atom.workspace);
     const tabs = this.state.renderableProviders.map(tab => {
       let keyBinding = null; // TODO
-      const humanizedKeybinding = _findKeybindingForAction(tab.action || '', this._modalNode);
+      const humanizedKeybinding = tab.action ? _findKeybindingForAction(tab.action, workspace) : '';
       if (humanizedKeybinding !== '') {
         keyBinding = _reactForAtom.React.createElement(
           'kbd',
@@ -578,37 +514,18 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
     );
   }
 
-  _renderEmptyMessage(message) {
-    return _reactForAtom.React.createElement(
-      'ul',
-      { className: 'background-message centered' },
-      _reactForAtom.React.createElement(
-        'li',
-        null,
-        message
-      )
-    );
-  }
-
-  openAll(files) {
-    files.map(file => {
-      this._emitter.emit('selected', this.getItemAtIndex(file.selectedService, file.selectedDirectory, file.selectedItemIndex));
-    });
-  }
-
-  _handleKeyPress(e, files) {
-    if (e.shiftKey && e.key === 'Enter') {
-      this.openAll(files);
-    }
+  _openAll() {
+    const selections = (0, (_searchResultHelpers || _load_searchResultHelpers()).flattenResults)(this.state.resultsByService);
+    const providerName = this.props.searchResultManager.getActiveProviderName();
+    const query = this._getTextEditor().getText();
+    this.props.onSelection(selections, providerName, query);
   }
 
   render() {
-    const filesToOpen = [];
     let numTotalResultsRendered = 0;
     const isOmniSearchActive = this.state.activeTab.name === 'OmniSearchResultProvider';
     let numQueriesOutstanding = 0;
-    const serviceNames = sortServiceNames(Object.keys(this.state.resultsByService));
-    const services = serviceNames.map(serviceName => {
+    const services = Object.keys(this.state.resultsByService).map(serviceName => {
       let numResultsForService = 0;
       const directories = this.state.resultsByService[serviceName].results;
       const serviceTitle = this.state.resultsByService[serviceName].title;
@@ -651,11 +568,6 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
           numResultsForService++;
           numTotalResultsRendered++;
           const isSelected = serviceName === this.state.selectedService && dirName === this.state.selectedDirectory && itemIndex === this.state.selectedItemIndex;
-          filesToOpen.push({
-            selectedService: serviceName,
-            selectedDirectory: dirName,
-            selectedItemIndex: itemIndex
-          });
           return _reactForAtom.React.createElement(
             'li',
             {
@@ -665,9 +577,10 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
                 'selected': isSelected
               }),
               key: serviceName + dirName + itemIndex,
-              onMouseDown: this._boundSelect,
-              onMouseEnter: this.setSelectedIndex.bind(this, serviceName, dirName, itemIndex) },
-            this.componentForItem(item, serviceName, dirName)
+              onMouseDown: this._select,
+              onMouseEnter: this._setSelectedIndex.bind(this, serviceName, dirName, itemIndex,
+              /* userInitiated */true) },
+            this._componentForItem(item, serviceName, dirName)
           );
         });
         let directoryLabel = null;
@@ -720,21 +633,7 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
       }
       return directoriesForService;
     });
-    let noResultsMessage = null;
-    let hasSearchResult = false;
-    if ((0, (_collection || _load_collection()).isEmpty)(this.state.resultsByService)) {
-      noResultsMessage = this._renderEmptyMessage('Search away!');
-    } else if (numTotalResultsRendered === 0) {
-      noResultsMessage = this._renderEmptyMessage(_reactForAtom.React.createElement(
-        'span',
-        null,
-        'No results'
-      ));
-    } else {
-      hasSearchResult = true;
-    }
-    const currentProvider = this.getProvider();
-    const promptText = currentProvider && currentProvider.prompt || '';
+    const hasSearchResult = numTotalResultsRendered > 0;
     let omniSearchStatus = null;
     if (isOmniSearchActive && numQueriesOutstanding > 0) {
       omniSearchStatus = _reactForAtom.React.createElement(
@@ -743,39 +642,47 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
         _reactForAtom.React.createElement('span', { className: 'loading loading-spinner-tiny inline-block' }),
         'Loading...'
       );
+    } else if (isOmniSearchActive && !hasSearchResult) {
+      omniSearchStatus = _reactForAtom.React.createElement(
+        'li',
+        null,
+        _reactForAtom.React.createElement(
+          'span',
+          null,
+          _reactForAtom.React.createElement('span', { className: 'icon icon-x' }),
+          'No results'
+        )
+      );
     }
+    const disableOpenAll = !hasSearchResult || !this.state.activeTab.canOpenAll;
     return _reactForAtom.React.createElement(
       'div',
       {
         className: 'select-list omnisearch-modal',
         ref: 'modal',
-        onKeyPress: e => this._handleKeyPress(e, filesToOpen) },
+        onKeyPress: this._handleKeyPress },
       _reactForAtom.React.createElement(
         'div',
         { className: 'omnisearch-search-bar' },
         _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
           className: 'omnisearch-pane',
           ref: 'queryInput',
-          placeholderText: promptText
+          initialValue: this.state.initialQuery,
+          placeholderText: this.state.activeTab.prompt
         }),
         _reactForAtom.React.createElement(
           (_Button || _load_Button()).Button,
           {
             className: 'omnisearch-open-all',
-            onClick: () => this.openAll(filesToOpen),
-            disabled: !hasSearchResult },
+            onClick: this._handleClickOpenAll,
+            disabled: disableOpenAll },
           'Open All'
         )
       ),
       this._renderTabs(),
       _reactForAtom.React.createElement(
         'div',
-        {
-          className: 'omnisearch-results',
-          style: {
-            maxHeight: this.props.scrollableAreaHeightGap ? `calc(100vh - ${ this.props.scrollableAreaHeightGap }px)` : '100vh'
-          } },
-        noResultsMessage,
+        { className: 'omnisearch-results' },
         _reactForAtom.React.createElement(
           'div',
           { className: 'omnisearch-pane' },
@@ -789,6 +696,5 @@ let QuickSelectionComponent = class QuickSelectionComponent extends _reactForAto
       )
     );
   }
-};
+}
 exports.default = QuickSelectionComponent;
-module.exports = exports['default'];

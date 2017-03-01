@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -52,14 +42,21 @@ function _load_Modal() {
   return _Modal = require('../../../nuclide-ui/Modal');
 }
 
-let BuckToolbarSettings = class BuckToolbarSettings extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class BuckToolbarSettings extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
-    var _props$settings = props.settings;
-    const args = _props$settings.arguments,
-          runArguments = _props$settings.runArguments;
-
+    const { arguments: args, runArguments } = props.settings;
     this.state = {
       arguments: args == null ? '' : (0, (_shellQuote || _load_shellQuote()).quote)(args),
       runArguments: runArguments == null ? '' : (0, (_shellQuote || _load_shellQuote()).quote)(runArguments)
@@ -67,26 +64,6 @@ let BuckToolbarSettings = class BuckToolbarSettings extends _reactForAtom.React.
   }
 
   render() {
-    let runArguments;
-    if (this.props.buildType === 'debug' || this.props.buildType === 'run') {
-      runArguments = _reactForAtom.React.createElement(
-        'div',
-        null,
-        _reactForAtom.React.createElement(
-          'label',
-          null,
-          'Run Arguments:'
-        ),
-        _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-          tabIndex: '0',
-          initialValue: this.state.runArguments,
-          placeholderText: 'Custom command-line arguments to pass to the app/binary',
-          onDidChange: this._onRunArgsChange.bind(this),
-          onConfirm: this._onSave.bind(this)
-        })
-      );
-    }
-
     return _reactForAtom.React.createElement(
       (_Modal || _load_Modal()).Modal,
       { onDismiss: this.props.onDismiss },
@@ -96,16 +73,6 @@ let BuckToolbarSettings = class BuckToolbarSettings extends _reactForAtom.React.
         _reactForAtom.React.createElement(
           'div',
           { className: 'block' },
-          _reactForAtom.React.createElement(
-            'h5',
-            null,
-            'Buck Settings for build type: ',
-            _reactForAtom.React.createElement(
-              'b',
-              null,
-              this.props.buildType
-            )
-          ),
           _reactForAtom.React.createElement(
             'label',
             null,
@@ -132,7 +99,22 @@ let BuckToolbarSettings = class BuckToolbarSettings extends _reactForAtom.React.
             onDidChange: this._onArgsChange.bind(this),
             onConfirm: this._onSave.bind(this)
           }),
-          runArguments
+          _reactForAtom.React.createElement(
+            'div',
+            null,
+            _reactForAtom.React.createElement(
+              'label',
+              null,
+              'Run Arguments:'
+            ),
+            _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+              tabIndex: '0',
+              initialValue: this.state.runArguments,
+              placeholderText: 'Custom command-line arguments to pass to the app/binary',
+              onDidChange: this._onRunArgsChange.bind(this),
+              onConfirm: this._onSave.bind(this)
+            })
+          )
         ),
         _reactForAtom.React.createElement(
           'div',
@@ -176,7 +158,5 @@ let BuckToolbarSettings = class BuckToolbarSettings extends _reactForAtom.React.
       atom.notifications.addError('Could not parse arguments', { detail: err.stack });
     }
   }
-
-};
+}
 exports.default = BuckToolbarSettings;
-module.exports = exports['default'];

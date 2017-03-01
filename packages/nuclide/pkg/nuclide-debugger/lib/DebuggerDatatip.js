@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.debuggerDatatip = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let debuggerDatatip = exports.debuggerDatatip = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (model, editor, position) {
@@ -31,9 +20,10 @@ let debuggerDatatip = exports.debuggerDatatip = (() => {
     if (evaluationExpression == null) {
       return null;
     }
-    const expression = evaluationExpression.expression,
-          range = evaluationExpression.range;
-
+    const {
+      expression,
+      range
+    } = evaluationExpression;
     if (expression == null) {
       return null;
     }
@@ -47,12 +37,12 @@ let debuggerDatatip = exports.debuggerDatatip = (() => {
     const propStream = evaluation.filter(function (result) {
       return result != null;
     }).map(function (result) {
-      return { expression: expression, evaluationResult: result, watchExpressionStore: watchExpressionStore };
+      return { expression, evaluationResult: result, watchExpressionStore };
     });
     return {
       component: (0, (_bindObservableAsProps || _load_bindObservableAsProps()).bindObservableAsProps)(propStream, (_DebuggerDatatipComponent || _load_DebuggerDatatipComponent()).DebuggerDatatipComponent),
       pinnable: true,
-      range: range
+      range
     };
   });
 
@@ -87,30 +77,35 @@ function _load_DebuggerDatatipComponent() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DEFAULT_WORD_REGEX = /\w+/gi;
 function defaultGetEvaluationExpression(editor, position) {
   const extractedIdentifier = (0, (_range || _load_range()).wordAtPosition)(editor, position, DEFAULT_WORD_REGEX);
   if (extractedIdentifier == null) {
     return Promise.resolve(null);
   }
-  const wordMatch = extractedIdentifier.wordMatch,
-        range = extractedIdentifier.range;
-
-  var _wordMatch = _slicedToArray(wordMatch, 1);
-
-  const expression = _wordMatch[0];
-
+  const {
+    wordMatch,
+    range
+  } = extractedIdentifier;
+  const [expression] = wordMatch;
   return Promise.resolve({
-    expression: expression,
-    range: range
+    expression,
+    range
   });
 }
 
 function getEvaluationExpression(model, editor, position) {
-  var _editor$getGrammar = editor.getGrammar();
-
-  const scopeName = _editor$getGrammar.scopeName;
-
+  const { scopeName } = editor.getGrammar();
   const allProviders = model.getStore().getEvaluationExpressionProviders();
   let matchingProvider = null;
   for (const provider of allProviders) {

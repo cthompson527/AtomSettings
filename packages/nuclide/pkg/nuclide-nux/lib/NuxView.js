@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -42,6 +33,18 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/* global getComputedStyle */
+
 const VALID_NUX_POSITIONS = new Set(['top', 'bottom', 'left', 'right', 'auto']);
 // The maximum number of times the NuxView will attempt to attach to the DOM.
 const ATTACHMENT_ATTEMPT_THRESHOLD = 5;
@@ -56,7 +59,7 @@ function validatePlacement(position) {
   return VALID_NUX_POSITIONS.has(position);
 }
 
-let NuxView = exports.NuxView = class NuxView {
+class NuxView {
 
   /**
    * Constructor for the NuxView.
@@ -78,11 +81,7 @@ let NuxView = exports.NuxView = class NuxView {
    *
    * @throws Errors if both `selectorString` and `selectorFunction` are null.
    */
-  constructor(tourId, selectorString, selectorFunction, position, content) {
-    let completePredicate = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-    let indexInTour = arguments[6];
-    let tourSize = arguments[7];
-
+  constructor(tourId, selectorString, selectorFunction, position, content, completePredicate = null, indexInTour, tourSize) {
     this._tourId = tourId;
     if (selectorFunction != null) {
       this._selector = selectorFunction;
@@ -100,15 +99,13 @@ let NuxView = exports.NuxView = class NuxView {
     this._disposables = new _atom.CompositeDisposable();
   }
 
-  _createNux() {
-    let creationAttempt = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 1;
-
+  _createNux(creationAttempt = 1) {
     if (creationAttempt > ATTACHMENT_ATTEMPT_THRESHOLD) {
       this._onNuxComplete(false);
       // An error is logged and tracked instead of simply throwing an error since this function
       // will execute outside of the parent scope's execution and cannot be caught.
-      const error = `NuxView #${ this._index } for NUX#"${ this._tourId }" ` + 'failed to succesfully attach to the DOM.';
-      logger.error(`ERROR: ${ error }`);
+      const error = `NuxView #${this._index} for NUX#"${this._tourId}" ` + 'failed to succesfully attach to the DOM.';
+      logger.error(`ERROR: ${error}`);
       this._track(error, error);
       return;
     }
@@ -149,7 +146,7 @@ let NuxView = exports.NuxView = class NuxView {
       if (element.style.position !== 'fixed') {
         isHidden = element.offsetParent === null;
       } else {
-        isHidden = window.getComputedStyle(element).display === 'none';
+        isHidden = getComputedStyle(element).display === 'none';
       }
       if (isHidden) {
         // Consider the NUX to be dismissed and mark it as completed.
@@ -194,8 +191,8 @@ let NuxView = exports.NuxView = class NuxView {
     // In this case we show a hint to the user.
     const nextLinkButton = `\
       <span
-        class="nuclide-nux-link ${ nextLinkStyle } nuclide-nux-next-link-${ this._index }"
-        ${ nextLinkStyle === LINK_DISABLED ? 'title="Interact with the indicated UI element to proceed."' : '' }>
+        class="nuclide-nux-link ${nextLinkStyle} nuclide-nux-next-link-${this._index}"
+        ${nextLinkStyle === LINK_DISABLED ? 'title="Interact with the indicated UI element to proceed."' : ''}>
         Continue
       </span>
     `;
@@ -208,13 +205,13 @@ let NuxView = exports.NuxView = class NuxView {
     const content = `\
       <span class="nuclide-nux-content-container">
         <div class="nuclide-nux-content">
-            ${ this._content }
+            ${this._content}
         </div>
         <div class="nuclide-nux-navigation">
-          <span class="nuclide-nux-link ${ LINK_ENABLED } nuclide-nux-dismiss-link-${ this._index }">
-            ${ !this._finalNuxInTour ? 'Dismiss' : 'Complete' } Tour
+          <span class="nuclide-nux-link ${LINK_ENABLED} nuclide-nux-dismiss-link-${this._index}">
+            ${!this._finalNuxInTour ? 'Dismiss' : 'Complete'} Tour
           </span>
-          ${ !this._finalNuxInTour ? nextLinkButton : '' }
+          ${!this._finalNuxInTour ? nextLinkButton : ''}
       </div>
     </span>`;
 
@@ -232,7 +229,12 @@ let NuxView = exports.NuxView = class NuxView {
 
     if (nextLinkStyle === LINK_ENABLED) {
       const nextElementClickListener = this._handleDisposableClick.bind(this, true /* continue to the next NUX in the tour */);
-      const nextElement = document.querySelector(`.nuclide-nux-next-link-${ this._index }`);
+      const nextElement = document.querySelector(`.nuclide-nux-next-link-${this._index}`);
+
+      if (!(nextElement != null)) {
+        throw new Error('Invariant violation: "nextElement != null"');
+      }
+
       nextElement.addEventListener('click', nextElementClickListener);
       this._disposables.add(new _atom.Disposable(() => nextElement.removeEventListener('click', nextElementClickListener)));
     }
@@ -240,15 +242,18 @@ let NuxView = exports.NuxView = class NuxView {
     // Record the NUX as dismissed iff it is not the last NUX in the tour.
     // Clicking "Complete Tour" on the last NUX should be tracked as succesful completion.
     const dismissElementClickListener = !this._finalNuxInTour ? this._handleDisposableClick.bind(this, false /* skip to the end of the tour */) : this._handleDisposableClick.bind(this, true /* continue to the next NUX in the tour */);
-    const dismissElement = document.querySelector(`.nuclide-nux-dismiss-link-${ this._index }`);
+    const dismissElement = document.querySelector(`.nuclide-nux-dismiss-link-${this._index}`);
+
+    if (!(dismissElement != null)) {
+      throw new Error('Invariant violation: "dismissElement != null"');
+    }
+
     dismissElement.addEventListener('click', dismissElementClickListener);
 
     this._disposables.add(new _atom.Disposable(() => dismissElement.removeEventListener('click', dismissElementClickListener)));
   }
 
-  _handleDisposableClick() {
-    let success = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
+  _handleDisposableClick(success = true) {
     // If a completion predicate exists, only consider the NUX as complete
     // if the completion condition has been met.
     // Use `success` to short circuit the check and immediately dispose of the NUX.
@@ -271,9 +276,7 @@ let NuxView = exports.NuxView = class NuxView {
     this._callback = callback;
   }
 
-  _onNuxComplete() {
-    let success = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
+  _onNuxComplete(success = true) {
     if (this._callback) {
       this._callback(success);
       // Avoid the callback being invoked again.
@@ -290,8 +293,9 @@ let NuxView = exports.NuxView = class NuxView {
   _track(message, error) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nux-view-action', {
       tourId: this._tourId,
-      message: `${ message }`,
+      message: `${message}`,
       error: (0, (_string || _load_string()).maybeToString)(error)
     });
   }
-};
+}
+exports.NuxView = NuxView;

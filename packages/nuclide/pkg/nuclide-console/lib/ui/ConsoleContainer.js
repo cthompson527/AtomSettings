@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ConsoleContainer = undefined;
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+exports.ConsoleContainer = exports.WORKSPACE_VIEW_URI = undefined;
 
 var _viewableFromReactElement;
 
@@ -26,6 +15,12 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../../commons-node/UniversalDisposable'));
+}
+
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../../commons-node/observable');
 }
 
 var _getCurrentExecutorId;
@@ -60,18 +55,27 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/console';
+
 // NOTE: We're not accounting for the "store" prop being changed.
-let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ConsoleContainer extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._selectSources = this._selectSources.bind(this);
     this._toggleRegExpFilter = this._toggleRegExpFilter.bind(this);
     this._updateFilterText = this._updateFilterText.bind(this);
-    const initialFilterText = props.initialFilterText,
-          initialEnableRegExpFilter = props.initialEnableRegExpFilter,
-          initialUnselectedSourceIds = props.initialUnselectedSourceIds;
-
+    const { initialFilterText, initialEnableRegExpFilter, initialUnselectedSourceIds } = props;
     this.state = {
       ready: false,
       currentExecutor: null,
@@ -102,10 +106,18 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
     if (this.state.sources.length - this.state.unselectedSourceIds.length === 1) {
       const selectedSource = this.state.sources.find(source => this.state.unselectedSourceIds.indexOf(source.id) === -1);
       if (selectedSource) {
-        return `Console: ${ selectedSource.name }`;
+        return `Console: ${selectedSource.name}`;
       }
     }
     return 'Console';
+  }
+
+  getDefaultLocation() {
+    return 'bottom-panel';
+  }
+
+  getURI() {
+    return WORKSPACE_VIEW_URI;
   }
 
   onDidChangeTitle(callback) {
@@ -113,16 +125,13 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
   }
 
   componentDidMount() {
-    const raf = _rxjsBundlesRxMinJs.Observable.create(observer => {
-      window.requestAnimationFrame(observer.complete.bind(observer));
-    });
     // $FlowFixMe: How do we tell flow about Symbol.observable?
-    this._statesSubscription = _rxjsBundlesRxMinJs.Observable.from(this.props.store).audit(() => raf).subscribe(state => {
+    this._statesSubscription = _rxjsBundlesRxMinJs.Observable.from(this.props.store).audit(() => (_observable || _load_observable()).nextAnimationFrame).subscribe(state => {
       const currentExecutorId = (0, (_getCurrentExecutorId || _load_getCurrentExecutorId()).default)(state);
       const currentExecutor = currentExecutorId != null ? state.executors.get(currentExecutorId) : null;
       this.setState({
         ready: true,
-        currentExecutor: currentExecutor,
+        currentExecutor,
         executors: state.executors,
         providers: state.providers,
         providerStatuses: state.providerStatuses,
@@ -148,8 +157,7 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
 
   _getBoundActionCreators() {
     if (this._actionCreators == null) {
-      const store = this.props.store;
-
+      const { store } = this.props;
       this._actionCreators = {
         execute: code => {
           store.dispatch((_Actions || _load_Actions()).execute(code));
@@ -172,11 +180,7 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
 
     const actionCreators = this._getBoundActionCreators();
 
-    var _getFilterPattern = this._getFilterPattern(this.state.filterText, this.state.enableRegExpFilter);
-
-    const pattern = _getFilterPattern.pattern,
-          isValid = _getFilterPattern.isValid;
-
+    const { pattern, isValid } = this._getFilterPattern(this.state.filterText, this.state.enableRegExpFilter);
 
     const selectedSourceIds = this.state.sources.map(source => source.id).filter(sourceId => this.state.unselectedSourceIds.indexOf(sourceId) === -1);
 
@@ -213,7 +217,7 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
   _selectSources(selectedSourceIds) {
     const sourceIds = this.state.sources.map(source => source.id);
     const unselectedSourceIds = sourceIds.filter(sourceId => selectedSourceIds.indexOf(sourceId) === -1);
-    this.setState({ unselectedSourceIds: unselectedSourceIds });
+    this.setState({ unselectedSourceIds });
   }
 
   _toggleRegExpFilter() {
@@ -221,7 +225,7 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
   }
 
   _updateFilterText(filterText) {
-    this.setState({ filterText: filterText });
+    this.setState({ filterText });
   }
 
   _getFilterPattern(filterText, isRegExp) {
@@ -241,18 +245,12 @@ let ConsoleContainer = exports.ConsoleContainer = class ConsoleContainer extends
       };
     }
   }
+}
 
-};
-
-
+exports.ConsoleContainer = ConsoleContainer;
 function getSources(state) {
   // Convert the providers to a map of sources.
-  const mapOfSources = new Map(Array.from(state.providers.entries()).map((_ref) => {
-    var _ref2 = _slicedToArray(_ref, 2);
-
-    let k = _ref2[0],
-        provider = _ref2[1];
-
+  const mapOfSources = new Map(Array.from(state.providers.entries()).map(([k, provider]) => {
     const source = {
       id: provider.id,
       name: provider.id,

@@ -1,22 +1,18 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _atom = require('atom');
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
 
 var _config;
 
@@ -26,14 +22,24 @@ function _load_config() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let CodeFormatManager = class CodeFormatManager {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class CodeFormatManager {
 
   constructor() {
     const subscriptions = this._subscriptions = new _atom.CompositeDisposable();
     subscriptions.add(atom.commands.add('atom-text-editor', 'nuclide-code-format:format-code',
     // Atom doesn't accept in-command modification of the text editor contents.
     () => process.nextTick(this._formatCodeInActiveTextEditor.bind(this))));
-    subscriptions.add(atom.workspace.observeTextEditors(this._addEditor.bind(this)));
+    subscriptions.add((0, (_textEditor || _load_textEditor()).observeTextEditors)(this._addEditor.bind(this)));
     this._codeFormatProviders = [];
     this._pendingFormats = new Map();
   }
@@ -89,23 +95,17 @@ let CodeFormatManager = class CodeFormatManager {
         return false;
       }
 
-      return yield _this2._formatCodeInTextEditor(editor);
+      return _this2._formatCodeInTextEditor(editor);
     })();
   }
 
   // Formats code in the editor specified, returning whether or not the code
   // formatted successfully.
-  _formatCodeInTextEditor(editor) {
-    var _arguments = arguments,
-        _this3 = this;
+  _formatCodeInTextEditor(editor, displayErrors = true) {
+    var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let displayErrors = _arguments.length > 1 && _arguments[1] !== undefined ? _arguments[1] : true;
-
-      var _editor$getGrammar = editor.getGrammar();
-
-      const scopeName = _editor$getGrammar.scopeName;
-
+      const { scopeName } = editor.getGrammar();
       const matchingProviders = _this3._getMatchingProvidersForScopeName(scopeName);
 
       if (!matchingProviders.length) {
@@ -117,9 +117,7 @@ let CodeFormatManager = class CodeFormatManager {
 
       const buffer = editor.getBuffer();
       const selectionRange = editor.getSelectedBufferRange();
-      const selectionStart = selectionRange.start,
-            selectionEnd = selectionRange.end;
-
+      const { start: selectionStart, end: selectionEnd } = selectionRange;
       let formatRange = null;
       const selectionRangeEmpty = selectionRange.isEmpty();
       if (selectionRangeEmpty) {
@@ -146,12 +144,8 @@ let CodeFormatManager = class CodeFormatManager {
           }
           return true;
         } else if (provider.formatEntireFile != null) {
-          var _ref2 = yield provider.formatEntireFile(editor, formatRange);
-
-          const newCursor = _ref2.newCursor,
-                formatted = _ref2.formatted;
+          const { newCursor, formatted } = yield provider.formatEntireFile(editor, formatRange);
           // Throws if contents have changed since the time of triggering format code.
-
           _this3._checkContentsAreSame(contents, editor.getText());
 
           buffer.setTextViaDiff(formatted);
@@ -179,8 +173,8 @@ let CodeFormatManager = class CodeFormatManager {
       const providerGrammars = provider.selector.split(/, ?/);
       return provider.inclusionPriority > 0 && providerGrammars.indexOf(scopeName) !== -1;
     });
-    // $FlowIssue sort doesn't take custom comparator.
     return matchingProviders.sort((providerA, providerB) => {
+      // $FlowFixMe a comparator function should return a number
       return providerA.inclusionPriority < providerB.inclusionPriority;
     });
   }
@@ -197,6 +191,5 @@ let CodeFormatManager = class CodeFormatManager {
     this._codeFormatProviders = [];
     this._pendingFormats.clear();
   }
-};
+}
 exports.default = CodeFormatManager;
-module.exports = exports['default'];

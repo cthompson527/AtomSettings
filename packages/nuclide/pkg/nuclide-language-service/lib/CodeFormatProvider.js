@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,27 +27,46 @@ function _load_nuclideOpenFiles() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let CodeFormatProvider = exports.CodeFormatProvider = class CodeFormatProvider {
+class CodeFormatProvider {
 
-  constructor(name, selector, priority, analyticsEventName, connectionToLanguageService) {
+  constructor(name, selector, priority, analyticsEventName, connectionToLanguageService, busySignalProvider) {
     this.name = name;
     this.selector = selector;
     this.inclusionPriority = priority;
     this._connectionToLanguageService = connectionToLanguageService;
+    this._busySignalProvider = busySignalProvider;
   }
 
-  static register(name, selector, config, connectionToLanguageService) {
-    return atom.packages.serviceHub.provide('nuclide-code-format.provider', config.version, new CodeFormatProvider(name, selector, config.priority, config.analyticsEventName, connectionToLanguageService));
+  static register(name, selector, config, connectionToLanguageService, busySignalProvider) {
+    return atom.packages.serviceHub.provide('nuclide-code-format.provider', config.version, config.formatEntireFile ? new FileFormatProvider(name, selector, config.priority, config.analyticsEventName, connectionToLanguageService, busySignalProvider) : new RangeFormatProvider(name, selector, config.priority, config.analyticsEventName, connectionToLanguageService, busySignalProvider));
+  }
+}
+
+exports.CodeFormatProvider = CodeFormatProvider; /**
+                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                  * All rights reserved.
+                                                  *
+                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                  * the root directory of this source tree.
+                                                  *
+                                                  * 
+                                                  */
+
+class RangeFormatProvider extends CodeFormatProvider {
+  constructor(name, selector, priority, analyticsEventName, connectionToLanguageService, busySignalProvider) {
+    super(name, selector, priority, analyticsEventName, connectionToLanguageService, busySignalProvider);
   }
 
   formatCode(editor, range) {
     var _this = this;
 
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
       const fileVersion = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
       const languageService = _this._connectionToLanguageService.getForUri(editor.getPath());
       if (languageService != null && fileVersion != null) {
-        const result = yield (yield languageService).formatSource(fileVersion, range);
+        const result = yield _this._busySignalProvider.reportBusy(`${_this.name}: Formatting ${fileVersion.filePath}`, (0, _asyncToGenerator.default)(function* () {
+          return (yield languageService).formatSource(fileVersion, range);
+        }));
         if (result != null) {
           return result;
         }
@@ -65,4 +75,29 @@ let CodeFormatProvider = exports.CodeFormatProvider = class CodeFormatProvider {
       return editor.getTextInBufferRange(range);
     }));
   }
-};
+}
+
+class FileFormatProvider extends CodeFormatProvider {
+  constructor(name, selector, priority, analyticsEventName, connectionToLanguageService, busySignalProvider) {
+    super(name, selector, priority, analyticsEventName, connectionToLanguageService, busySignalProvider);
+  }
+
+  formatEntireFile(editor, range) {
+    var _this2 = this;
+
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
+      const fileVersion = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
+      const languageService = _this2._connectionToLanguageService.getForUri(editor.getPath());
+      if (languageService != null && fileVersion != null) {
+        const result = yield _this2._busySignalProvider.reportBusy(`${_this2.name}: Formatting ${fileVersion.filePath}`, (0, _asyncToGenerator.default)(function* () {
+          return (yield languageService).formatEntireFile(fileVersion, range);
+        }));
+        if (result != null) {
+          return result;
+        }
+      }
+
+      return { formatted: editor.getText() };
+    }));
+  }
+}

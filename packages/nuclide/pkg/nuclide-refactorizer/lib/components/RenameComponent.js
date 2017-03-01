@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,7 +27,7 @@ function _load_refactorActions() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-let RenameComponent = exports.RenameComponent = class RenameComponent extends _reactForAtom.React.Component {
+class RenameComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -50,6 +41,8 @@ let RenameComponent = exports.RenameComponent = class RenameComponent extends _r
       'div',
       null,
       _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        autofocus: true,
+        startSelected: true,
         className: 'nuclide-refactorizer-rename-editor',
         initialValue: this.props.phase.symbolAtPoint.text,
         onDidChange: text => this.setState({ newName: text }),
@@ -67,19 +60,24 @@ let RenameComponent = exports.RenameComponent = class RenameComponent extends _r
   }
 
   _runRename() {
-    const newName = this.state.newName;
-    var _props$phase = this.props.phase;
-    const symbolAtPoint = _props$phase.symbolAtPoint,
-          editor = _props$phase.editor,
-          originalPoint = _props$phase.originalPoint;
-
+    const { newName } = this.state;
+    const { symbolAtPoint, editor, originalPoint } = this.props.phase;
     const refactoring = {
       kind: 'rename',
-      newName: newName,
-      originalPoint: originalPoint,
-      symbolAtPoint: symbolAtPoint,
-      editor: editor
+      newName,
+      originalPoint,
+      symbolAtPoint,
+      editor
     };
     this.props.store.dispatch((_refactorActions || _load_refactorActions()).execute(this.props.phase.provider, refactoring));
   }
-};
+}
+exports.RenameComponent = RenameComponent; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            */

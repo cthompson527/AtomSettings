@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -38,16 +29,24 @@ var _electron = _interopRequireDefault(require('electron'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const remote = _electron.default.remote;
+const { remote } = _electron.default; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
 }
 
-let SplitButtonDropdown = exports.SplitButtonDropdown = class SplitButtonDropdown extends _reactForAtom.React.Component {
+class SplitButtonDropdown extends _reactForAtom.React.Component {
 
   render() {
-    const selectedOption = this.props.options.find(option => option.type !== 'separator' && option.value === this.props.value) || this.props.options[0];
+    const selectedOption = this._findSelectedOption(this.props.options) || this.props.options[0];
 
     if (!(selectedOption.type !== 'separator')) {
       throw new Error('Invariant violation: "selectedOption.type !== \'separator\'"');
@@ -94,5 +93,25 @@ let SplitButtonDropdown = exports.SplitButtonDropdown = class SplitButtonDropdow
     }
   }
 
-};
+  _findSelectedOption(options) {
+    let result = null;
+    for (const option of options) {
+      if (option.type === 'separator') {
+        continue;
+      } else if (option.type === 'submenu') {
+        const submenu = option.submenu;
+        result = this._findSelectedOption(submenu);
+      } else if (option.value === this.props.value) {
+        result = option;
+      }
+
+      if (result) {
+        break;
+      }
+    }
+    return result;
+  }
+}
+
+exports.SplitButtonDropdown = SplitButtonDropdown;
 exports.ButtonSizes = (_Button || _load_Button()).ButtonSizes;

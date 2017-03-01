@@ -1,24 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-// PRO-TIP: To debug this file, open it in Atom, and from the console, run:
-//
-// ```
-// require('electron').ipcRenderer.send('run-package-specs',
-//    atom.workspace.getActivePaneItem().getPath());
-// ```
-//
-// This will open it in the spec runner window. Keep in mind that the main
-// process will have production options set - not test options like
-// `--user-data-dir`.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -44,7 +24,28 @@ var _electron = _interopRequireDefault(require('electron'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ipcRenderer = _electron.default.ipcRenderer;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+// PRO-TIP: To debug this file, open it in Atom, and from the console, run:
+//
+// ```
+// require('electron').ipcRenderer.send('run-package-specs',
+//    atom.workspace.getActivePaneItem().getPath());
+// ```
+//
+// This will open it in the spec runner window. Keep in mind that the main
+// process will have production options set - not test options like
+// `--user-data-dir`.
+
+const { ipcRenderer } = _electron.default;
 
 if (!(ipcRenderer != null)) {
   throw new Error('Invariant violation: "ipcRenderer != null"');
@@ -65,16 +66,14 @@ const STDERR_FILTERS = [
 const debugConsole = global.console;
 
 // https://github.com/nodejs/node/blob/v5.1.1/lib/console.js
-const outputConsole = new _console.Console({
-  /* stdout */
-  write: function (chunk) {
+const outputConsole = new _console.Console({ /* stdout */
+  write(chunk) {
     if (!STDOUT_FILTERS.some(re => re.test(chunk))) {
       ipcRenderer.send('write-to-stdout', chunk);
     }
   }
-}, {
-  /* stderr */
-  write: function (chunk) {
+}, { /* stderr */
+  write(chunk) {
     if (!STDERR_FILTERS.some(re => re.test(chunk))) {
       ipcRenderer.send('write-to-stderr', chunk);
     }
@@ -87,8 +86,8 @@ exports.default = (() => {
     try {
       const atomGlobal = params.buildAtomEnvironment({
         applicationDelegate: params.buildDefaultApplicationDelegate(),
-        document: document,
-        window: window
+        document,
+        window
       });
       atomGlobal.atomScriptMode = true;
 
@@ -120,7 +119,12 @@ exports.default = (() => {
 
       // $FlowIgnore
       const handler = require(scriptPath);
-      exitCode = yield handler(scriptArgs);
+      if (handler.__esModule && typeof handler.default === 'function') {
+        // `(0, a.b)` so that `this` is undefined, like babel does.
+        exitCode = yield (0, handler.default)(scriptArgs);
+      } else {
+        exitCode = yield handler(scriptArgs);
+      }
     } catch (e) {
       outputConsole.error(e);
       exitCode = 1;
@@ -135,5 +139,3 @@ exports.default = (() => {
 
   return runTest;
 })();
-
-module.exports = exports['default'];

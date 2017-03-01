@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = exports.ActionTypes = undefined;
+exports.ActionTypes = undefined;
 
 var _Dispatcher;
 
@@ -21,6 +12,16 @@ function _load_Dispatcher() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const ActionTypes = exports.ActionTypes = Object.freeze({
   SET_DEBUGGER_INSTANCE: 'SET_DEBUGGER_INSTANCE',
@@ -40,9 +41,11 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   REMOVE_REGISTER_EXECUTOR: 'REMOVE_REGISTER_EXECUTOR',
   REGISTER_CONSOLE: 'REGISTER_CONSOLE',
   UNREGISTER_CONSOLE: 'UNREGISTER_CONSOLE',
-  UPDATE_CALLSTACK: 'UPDATE_CALLSTACK',
+  OPEN_DEV_TOOLS: 'OPEN_DEV_TOOLS',
   OPEN_SOURCE_LOCATION: 'OPEN_SOURCE_LOCATION',
   CLEAR_INTERFACE: 'CLEAR_INTERFACE',
+  UPDATE_CALLSTACK: 'UPDATE_CALLSTACK',
+  SET_SELECTED_CALLFRAME_INDEX: 'SET_SELECTED_CALLFRAME_INDEX',
   SET_SELECTED_CALLFRAME_LINE: 'SET_SELECTED_CALLFRAME_LINE',
   ADD_BREAKPOINT: 'ADD_BREAKPOINT',
   UPDATE_BREAKPOINT_CONDITION: 'UPDATE_BREAKPOINT_CONDITION',
@@ -52,7 +55,7 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
   TOGGLE_BREAKPOINT: 'TOGGLE_BREAKPOINT',
   DELETE_BREAKPOINT_IPC: 'DELETE_BREAKPOINT_IPC',
   BIND_BREAKPOINT_IPC: 'BIND_BREAKPOINT_IPC',
-  UPDATE_LOCALS: 'UPDATE_LOCALS',
+  UPDATE_SCOPES: 'UPDATE_SCOPES',
   TOGGLE_PAUSE_ON_EXCEPTION: 'TOGGLE_PAUSE_ON_EXCEPTION',
   TOGGLE_PAUSE_ON_CAUGHT_EXCEPTION: 'TOGGLE_PAUSE_ON_CAUGHT_EXCEPTION',
   UPDATE_THREADS: 'UPDATE_THREADS',
@@ -68,5 +71,5 @@ const ActionTypes = exports.ActionTypes = Object.freeze({
 // Flow hack: Every DebuggerAction actionType must be in ActionTypes.
 '';
 
-let DebuggerDispatcher = class DebuggerDispatcher extends (_Dispatcher || _load_Dispatcher()).default {};
+class DebuggerDispatcher extends (_Dispatcher || _load_Dispatcher()).default {}
 exports.default = DebuggerDispatcher;

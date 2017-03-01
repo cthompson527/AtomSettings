@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.Checkbox = undefined;
-
-var _class, _temp;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -24,13 +13,35 @@ function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
 }
 
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('./add-tooltip'));
+}
+
+var _ignoreTextSelectionEvents;
+
+function _load_ignoreTextSelectionEvents() {
+  return _ignoreTextSelectionEvents = _interopRequireDefault(require('./ignoreTextSelectionEvents'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * A checkbox component with an input checkbox and a label. We restrict the label to a string
  * to ensure this component is pure.
  */
-let Checkbox = exports.Checkbox = (_temp = _class = class Checkbox extends _reactForAtom.React.PureComponent {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Checkbox extends _reactForAtom.React.PureComponent {
 
   constructor(props) {
     super(props);
@@ -61,21 +72,34 @@ let Checkbox = exports.Checkbox = (_temp = _class = class Checkbox extends _reac
   }
 
   render() {
-    var _props = this.props;
-    const checked = _props.checked,
-          className = _props.className,
-          disabled = _props.disabled,
-          indeterminate = _props.indeterminate,
-          label = _props.label,
-          onClick = _props.onClick;
+    const {
+      checked,
+      className,
+      disabled,
+      // eslint-disable-next-line no-unused-vars
+      indeterminate, // exclude `indeterminate` from `remainingProps`
+      label,
+      onClick,
+      tooltip,
+      title
+    } = this.props;
 
+    const ref = tooltip ? (0, (_addTooltip || _load_addTooltip()).default)(tooltip) : null;
+    const text = label === '' ? null : _reactForAtom.React.createElement(
+      'span',
+      { className: 'nuclide-ui-checkbox-label-text' },
+      ' ',
+      label
+    );
     return _reactForAtom.React.createElement(
       'label',
       {
         className: (0, (_classnames || _load_classnames()).default)(className, 'nuclide-ui-checkbox-label', {
           'nuclide-ui-checkbox-disabled': disabled
         }),
-        onClick: onClick },
+        ref: ref,
+        onClick: onClick && (0, (_ignoreTextSelectionEvents || _load_ignoreTextSelectionEvents()).default)(onClick),
+        title: title },
       _reactForAtom.React.createElement('input', {
         checked: checked,
         className: 'input-checkbox nuclide-ui-checkbox',
@@ -84,17 +108,14 @@ let Checkbox = exports.Checkbox = (_temp = _class = class Checkbox extends _reac
         ref: 'input',
         type: 'checkbox'
       }),
-      _reactForAtom.React.createElement(
-        'span',
-        { className: 'nuclide-ui-checkbox-label-text' },
-        ' ',
-        label
-      )
+      text
     );
   }
-}, _class.defaultProps = {
+}
+exports.Checkbox = Checkbox;
+Checkbox.defaultProps = {
   disabled: false,
   indeterminate: false,
   label: '',
-  onClick: function (event) {}
-}, _temp);
+  onClick(event) {}
+};

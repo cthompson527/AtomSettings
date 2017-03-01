@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -29,7 +20,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * collapses the component children. Optionally specify collapsedByDefault
  * (defaults to false)
  */
-let Section = exports.Section = class Section extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Section extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -67,7 +68,7 @@ let Section = exports.Section = class Section extends _reactForAtom.React.Compon
       conditionalProps.onClick = this._toggleCollapsed;
       conditionalProps.title = collapsed ? 'Click to expand' : 'Click to collapse';
     }
-    const HeadlineComponent = this.props.size === 'small' ? 'h6' : 'h3';
+    const HeadlineComponent = getHeadlineComponent(this.props.size);
     return _reactForAtom.React.createElement(
       'div',
       { className: this.props.className },
@@ -83,4 +84,16 @@ let Section = exports.Section = class Section extends _reactForAtom.React.Compon
       )
     );
   }
-};
+}
+
+exports.Section = Section;
+function getHeadlineComponent(size) {
+  switch (size) {
+    case 'small':
+      return 'h6';
+    case 'medium':
+      return 'h5';
+    default:
+      return 'h3';
+  }
+}

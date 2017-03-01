@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,26 +15,46 @@ function _load_AtomTextEditor() {
   return _AtomTextEditor = require('../../nuclide-ui/AtomTextEditor');
 }
 
+// Complex types can end up being super long. Truncate them.
+// TODO(hansonw): we could parse these into hint trees
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const MAX_LENGTH = 100;
+
 function makeTypeHintComponent(content, grammar) {
   return () => _reactForAtom.React.createElement(TypeHintComponent, { content: content, grammar: grammar });
 }
 
-let TypeHintComponent = class TypeHintComponent extends _reactForAtom.React.Component {
+class TypeHintComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      expandedNodes: new Set()
+      expandedNodes: new Set(),
+      isPrimitiveExpanded: false
     };
   }
 
   renderPrimitive(value) {
-    const buffer = new _atom.TextBuffer(value);
-    const grammar = this.props.grammar;
-
+    const shouldTruncate = value.length > MAX_LENGTH && !this.state.isPrimitiveExpanded;
+    const buffer = new _atom.TextBuffer(shouldTruncate ? value.substr(0, MAX_LENGTH) + '...' : value);
+    const { grammar } = this.props;
     return _reactForAtom.React.createElement(
       'div',
-      { className: 'nuclide-type-hint-text-editor-container' },
+      {
+        className: 'nuclide-type-hint-text-editor-container',
+        onClick: e => {
+          this.setState({ isPrimitiveExpanded: !this.state.isPrimitiveExpanded });
+          e.stopPropagation();
+        } },
       _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
         className: 'nuclide-type-hint-text-editor',
         gutterHidden: true,
@@ -57,8 +68,7 @@ let TypeHintComponent = class TypeHintComponent extends _reactForAtom.React.Comp
   }
 
   handleChevronClick(tree, event) {
-    const expandedNodes = this.state.expandedNodes;
-
+    const { expandedNodes } = this.state;
     if (expandedNodes.has(tree)) {
       expandedNodes.delete(tree);
     } else {
@@ -79,7 +89,7 @@ let TypeHintComponent = class TypeHintComponent extends _reactForAtom.React.Comp
       { className: 'list-tree' },
       children
     ) : null;
-    const className = 'icon nuclide-type-hint-expandable-chevron ' + `icon-chevron-${ isExpanded ? 'down' : 'right' }`;
+    const className = 'icon nuclide-type-hint-expandable-chevron ' + `icon-chevron-${isExpanded ? 'down' : 'right'}`;
     return _reactForAtom.React.createElement(
       'li',
       { className: 'list-nested-item' },
@@ -101,8 +111,7 @@ let TypeHintComponent = class TypeHintComponent extends _reactForAtom.React.Comp
   }
 
   render() {
-    const content = this.props.content;
-
+    const { content } = this.props;
     if (typeof content === 'string') {
       return this.renderPrimitive(content);
     }
@@ -112,4 +121,4 @@ let TypeHintComponent = class TypeHintComponent extends _reactForAtom.React.Comp
       this.renderHierarchical(content)
     );
   }
-};
+}

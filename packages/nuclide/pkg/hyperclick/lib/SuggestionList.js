@@ -1,18 +1,19 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-let SuggestionList = class SuggestionList {
+class SuggestionList {
 
   show(textEditor, suggestion) {
     if (!textEditor || !suggestion) {
@@ -24,16 +25,13 @@ let SuggestionList = class SuggestionList {
 
     this.hide();
 
-    const range = suggestion.range;
+    const { range } = suggestion;
 
     if (!range) {
       throw new Error('Invariant violation: "range"');
     }
 
-    var _ref = Array.isArray(range) ? range[0] : range;
-
-    const position = _ref.start;
-
+    const { start: position } = Array.isArray(range) ? range[0] : range;
     this._suggestionMarker = textEditor.markBufferPosition(position);
     if (this._suggestionMarker) {
       this._overlayDecoration = textEditor.decorateMarker(this._suggestionMarker, {
@@ -62,6 +60,5 @@ let SuggestionList = class SuggestionList {
   getSuggestion() {
     return this._suggestion;
   }
-};
+}
 exports.default = SuggestionList;
-module.exports = exports['default'];

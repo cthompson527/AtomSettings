@@ -1,17 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 /**
  * Renames a single node to the new path.
@@ -178,12 +171,7 @@ let deleteNodes = (() => {
     }).entrySeq();
 
     yield Promise.all(nodesByHgRepository.map((() => {
-      var _ref7 = (0, _asyncToGenerator.default)(function* (_ref6) {
-        var _ref8 = _slicedToArray(_ref6, 2);
-
-        let hgRepository = _ref8[0],
-            repoNodes = _ref8[1];
-
+      var _ref6 = (0, _asyncToGenerator.default)(function* ([hgRepository, repoNodes]) {
         const hgPaths = (_nuclideUri || _load_nuclideUri()).default.collapse(repoNodes.map(function (node) {
           return (_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath(node.uri);
         }).toJS());
@@ -191,7 +179,7 @@ let deleteNodes = (() => {
       });
 
       return function (_x9) {
-        return _ref7.apply(this, arguments);
+        return _ref6.apply(this, arguments);
       };
     })()));
   });
@@ -235,7 +223,15 @@ function _load_nuclideRemoteConnection() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const MOVE_TIMEOUT = 10000;
+const MOVE_TIMEOUT = 10000; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             */
 
 function getHgRepositoryForNode(node) {
   const repository = node.repo;
@@ -271,12 +267,10 @@ function isValidRename(node, destPath_) {
 
 function resetIsMoving() {
   isMoving = false;
-}
-
-module.exports = {
-  getHgRepositoryForNode: getHgRepositoryForNode,
-  isValidRename: isValidRename,
-  renameNode: renameNode,
-  moveNodes: moveNodes,
-  deleteNodes: deleteNodes
+}exports.default = {
+  getHgRepositoryForNode,
+  isValidRename,
+  renameNode,
+  moveNodes,
+  deleteNodes
 };

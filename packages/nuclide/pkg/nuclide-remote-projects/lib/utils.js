@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,6 +13,16 @@ function _load_nuclideUri() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const NUCLIDE_PROTOCOL_PREFIX = 'nuclide:/';
 const NUCLIDE_PROTOCOL_PREFIX_WIN = 'nuclide:\\';
@@ -42,7 +43,6 @@ function sanitizeNuclideUri(uri_) {
   }
   // Add the missing slash, if removed through a path.normalize() call.
   if (uri.startsWith(NUCLIDE_PROTOCOL_PREFIX) && uri[NUCLIDE_PROTOCOL_PREFIX_LENGTH] !== '/' /* protocol missing last slash */) {
-
       uri = uri.substring(0, NUCLIDE_PROTOCOL_PREFIX_LENGTH) + '/' + uri.substring(NUCLIDE_PROTOCOL_PREFIX_LENGTH);
     }
 
@@ -58,27 +58,24 @@ function* getOpenFileEditorForRemoteProject(connectionConfig) {
   for (const pane of atom.workspace.getPanes()) {
     const paneItems = pane.getItems();
     for (const paneItem of paneItems) {
+      // Here, we're explicitly looking for broken nuclide:/ editors.
+      // eslint-disable-next-line nuclide-internal/atom-apis
       if (!atom.workspace.isTextEditor(paneItem) || !paneItem.getURI()) {
         // Ignore non-text editors and new editors with empty uris / paths.
         continue;
       }
       const uri = sanitizeNuclideUri(paneItem.getURI());
-
-      var _nuclideUri$parse = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-      const fileHostname = _nuclideUri$parse.hostname,
-            filePath = _nuclideUri$parse.path;
-
+      const { hostname: fileHostname, path: filePath } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
       if (fileHostname === connectionConfig.host) {
         if (!fileHostname) {
           throw new Error('Invariant violation: "fileHostname"');
         }
 
         yield {
-          pane: pane,
+          pane,
           editor: paneItem,
-          uri: uri,
-          filePath: filePath
+          uri,
+          filePath
         };
       }
     }

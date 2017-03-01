@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 23
+          line: 22
         },
         kind: "string"
       }
@@ -23,7 +23,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 23
+          line: 22
         },
         kind: "named",
         name: "ClangCompileResult"
@@ -38,7 +38,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 28
+          line: 27
         },
         kind: "string"
       }
@@ -48,7 +48,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 29
+          line: 28
         },
         kind: "number"
       }
@@ -58,7 +58,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 30
+          line: 29
         },
         kind: "number"
       }
@@ -68,7 +68,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 31
+          line: 30
         },
         kind: "number"
       }
@@ -78,7 +78,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 32
+          line: 31
         },
         kind: "string"
       }
@@ -89,21 +89,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 33
+          line: 32
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 33
+            line: 32
           },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 33
+              line: 32
             },
             kind: "named",
             name: "ClangCompletion"
@@ -120,7 +120,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 38
+          line: 37
         },
         kind: "string"
       }
@@ -130,7 +130,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 39
+          line: 38
         },
         kind: "number"
       }
@@ -140,7 +140,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 40
+          line: 39
         },
         kind: "number"
       }
@@ -151,14 +151,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 41
+          line: 40
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 41
+            line: 40
           },
           kind: "named",
           name: "ClangDeclaration"
@@ -174,7 +174,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 46
+          line: 45
         },
         kind: "string"
       }
@@ -184,7 +184,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 47
+          line: 46
         },
         kind: "number"
       }
@@ -194,7 +194,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 48
+          line: 47
         },
         kind: "number"
       }
@@ -205,21 +205,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 49
+          line: 48
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 49
+            line: 48
           },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 49
+              line: 48
             },
             kind: "named",
             name: "ClangCursor"
@@ -236,7 +236,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 54
+          line: 53
         },
         kind: "string"
       }
@@ -247,21 +247,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 55
+          line: 54
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 55
+            line: 54
           },
           kind: "array",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 55
+              line: 54
             },
             kind: "named",
             name: "ClangOutlineTree"
@@ -278,7 +278,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 60
+          line: 59
         },
         kind: "string"
       }
@@ -288,7 +288,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 61
+          line: 60
         },
         kind: "number"
       }
@@ -298,7 +298,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 62
+          line: 61
         },
         kind: "number"
       }
@@ -309,14 +309,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 63
+          line: 62
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 63
+            line: 62
           },
           kind: "named",
           name: "ClangLocalReferences"
@@ -334,1544 +334,1568 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["compile", {
-    kind: "function",
-    name: "compile",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 23
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    type: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    compile: {
+      kind: "function",
+      name: "compile",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 23
+        line: 22
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 23
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "ClangProcessService.js",
-          line: 23
+          line: 22
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 22
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
-            line: 23
+            line: 22
           },
-          kind: "named",
-          name: "ClangCompileResult"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 22
+            },
+            kind: "named",
+            name: "ClangCompileResult"
+          }
         }
       }
-    }
-  }], ["get_completions", {
-    kind: "function",
-    name: "get_completions",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 27
     },
-    type: {
+    get_completions: {
+      kind: "function",
+      name: "get_completions",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 27
+        line: 26
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 28
-          },
-          kind: "string"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 29
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 30
-          },
-          kind: "number"
-        }
-      }, {
-        name: "tokenStartColumn",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 31
-          },
-          kind: "number"
-        }
-      }, {
-        name: "prefix",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangProcessService.js",
+          line: 26
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 27
+            },
+            kind: "string"
+          }
+        }, {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 28
+            },
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 29
+            },
+            kind: "number"
+          }
+        }, {
+          name: "tokenStartColumn",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 30
+            },
+            kind: "number"
+          }
+        }, {
+          name: "prefix",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 31
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
             line: 32
           },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ClangProcessService.js",
-          line: 33
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 33
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 33
+              line: 32
             },
-            kind: "array",
+            kind: "nullable",
             type: {
               location: {
                 type: "source",
                 fileName: "ClangProcessService.js",
-                line: 33
+                line: 32
               },
-              kind: "named",
-              name: "ClangCompletion"
+              kind: "array",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ClangProcessService.js",
+                  line: 32
+                },
+                kind: "named",
+                name: "ClangCompletion"
+              }
             }
           }
         }
       }
-    }
-  }], ["get_declaration", {
-    kind: "function",
-    name: "get_declaration",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 37
     },
-    type: {
+    get_declaration: {
+      kind: "function",
+      name: "get_declaration",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 37
+        line: 36
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 38
-          },
-          kind: "string"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 39
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangProcessService.js",
+          line: 36
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 37
+            },
+            kind: "string"
+          }
+        }, {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 38
+            },
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 39
+            },
+            kind: "number"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
             line: 40
           },
-          kind: "number"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ClangProcessService.js",
-          line: 41
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 41
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 41
+              line: 40
             },
-            kind: "named",
-            name: "ClangDeclaration"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ClangProcessService.js",
+                line: 40
+              },
+              kind: "named",
+              name: "ClangDeclaration"
+            }
           }
         }
       }
-    }
-  }], ["get_declaration_info", {
-    kind: "function",
-    name: "get_declaration_info",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 45
     },
-    type: {
+    get_declaration_info: {
+      kind: "function",
+      name: "get_declaration_info",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 45
+        line: 44
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 46
-          },
-          kind: "string"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 47
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangProcessService.js",
+          line: 44
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 45
+            },
+            kind: "string"
+          }
+        }, {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 46
+            },
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 47
+            },
+            kind: "number"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
             line: 48
           },
-          kind: "number"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ClangProcessService.js",
-          line: 49
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 49
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 49
+              line: 48
             },
-            kind: "array",
+            kind: "nullable",
             type: {
               location: {
                 type: "source",
                 fileName: "ClangProcessService.js",
-                line: 49
+                line: 48
               },
-              kind: "named",
-              name: "ClangCursor"
+              kind: "array",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ClangProcessService.js",
+                  line: 48
+                },
+                kind: "named",
+                name: "ClangCursor"
+              }
             }
           }
         }
       }
-    }
-  }], ["get_outline", {
-    kind: "function",
-    name: "get_outline",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 53
     },
-    type: {
+    get_outline: {
+      kind: "function",
+      name: "get_outline",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 53
+        line: 52
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangProcessService.js",
+          line: 52
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 53
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
             line: 54
           },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ClangProcessService.js",
-          line: 55
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 55
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 55
+              line: 54
             },
-            kind: "array",
+            kind: "nullable",
             type: {
               location: {
                 type: "source",
                 fileName: "ClangProcessService.js",
-                line: 55
+                line: 54
               },
-              kind: "named",
-              name: "ClangOutlineTree"
+              kind: "array",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ClangProcessService.js",
+                  line: 54
+                },
+                kind: "named",
+                name: "ClangOutlineTree"
+              }
             }
           }
         }
       }
-    }
-  }], ["get_local_references", {
-    kind: "function",
-    name: "get_local_references",
-    location: {
-      type: "source",
-      fileName: "ClangProcessService.js",
-      line: 59
     },
-    type: {
+    get_local_references: {
+      kind: "function",
+      name: "get_local_references",
       location: {
         type: "source",
         fileName: "ClangProcessService.js",
-        line: 59
+        line: 58
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 60
-          },
-          kind: "string"
-        }
-      }, {
-        name: "line",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 61
-          },
-          kind: "number"
-        }
-      }, {
-        name: "column",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "ClangProcessService.js",
+          line: 58
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 59
+            },
+            kind: "string"
+          }
+        }, {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 60
+            },
+            kind: "number"
+          }
+        }, {
+          name: "column",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ClangProcessService.js",
+              line: 61
+            },
+            kind: "number"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ClangProcessService.js",
             line: 62
           },
-          kind: "number"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ClangProcessService.js",
-          line: 63
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ClangProcessService.js",
-            line: 63
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ClangProcessService.js",
-              line: 63
+              line: 62
             },
-            kind: "named",
-            name: "ClangLocalReferences"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ClangProcessService.js",
+                line: 62
+              },
+              kind: "named",
+              name: "ClangLocalReferences"
+            }
           }
         }
       }
-    }
-  }], ["ClangCursorType", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 19
     },
-    name: "ClangCursorType",
-    definition: {
+    ClangCursorType: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 19
       },
-      kind: "string"
-    }
-  }], ["ClangLocation", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 21
+      name: "ClangCursorType",
+      definition: {
+        location: {
+          type: "source",
+          fileName: "rpc-types.js",
+          line: 19
+        },
+        kind: "string"
+      }
     },
-    name: "ClangLocation",
-    definition: {
+    ClangLocation: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 21
       },
-      kind: "object",
-      fields: [{
+      name: "ClangLocation",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 22
+          line: 21
         },
-        name: "file",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 22
           },
-          kind: "nullable",
+          name: "file",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 22
             },
-            kind: "named",
-            name: "NuclideUri"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 23
-        },
-        name: "point",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 22
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 23
           },
-          kind: "named",
-          name: "atom$Point"
-        },
-        optional: false
-      }]
-    }
-  }], ["ClangSourceRange", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 26
+          name: "point",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 23
+            },
+            kind: "named",
+            name: "atom$Point"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "ClangSourceRange",
-    definition: {
+    ClangSourceRange: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 26
       },
-      kind: "object",
-      fields: [{
+      name: "ClangSourceRange",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 27
+          line: 26
         },
-        name: "file",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 27
           },
-          kind: "nullable",
+          name: "file",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 27
             },
-            kind: "named",
-            name: "NuclideUri"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 28
-        },
-        name: "range",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 27
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 28
           },
-          kind: "named",
-          name: "atom$Range"
-        },
-        optional: false
-      }]
-    }
-  }], ["ClangCompileResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 31
+          name: "range",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 28
+            },
+            kind: "named",
+            name: "atom$Range"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "ClangCompileResult",
-    definition: {
+    ClangCompileResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 31
       },
-      kind: "object",
-      fields: [{
+      name: "ClangCompileResult",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 32
+          line: 31
         },
-        name: "diagnostics",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 32
           },
-          kind: "array",
+          name: "diagnostics",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 32
             },
-            kind: "object",
-            fields: [{
+            kind: "array",
+            type: {
               location: {
                 type: "source",
                 fileName: "rpc-types.js",
-                line: 33
+                line: 32
               },
-              name: "spelling",
-              type: {
+              kind: "object",
+              fields: [{
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 33
                 },
-                kind: "string"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 34
-              },
-              name: "severity",
-              type: {
+                name: "spelling",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 33
+                  },
+                  kind: "string"
+                },
+                optional: false
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 34
                 },
-                kind: "number"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 35
-              },
-              name: "location",
-              type: {
+                name: "severity",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 34
+                  },
+                  kind: "number"
+                },
+                optional: false
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 35
                 },
-                kind: "named",
-                name: "ClangLocation"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 36
-              },
-              name: "ranges",
-              type: {
+                name: "location",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 35
+                  },
+                  kind: "named",
+                  name: "ClangLocation"
+                },
+                optional: false
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 36
                 },
-                kind: "nullable",
+                name: "ranges",
                 type: {
                   location: {
                     type: "source",
                     fileName: "rpc-types.js",
                     line: 36
                   },
-                  kind: "array",
+                  kind: "nullable",
                   type: {
                     location: {
                       type: "source",
                       fileName: "rpc-types.js",
                       line: 36
                     },
-                    kind: "named",
-                    name: "ClangSourceRange"
+                    kind: "array",
+                    type: {
+                      location: {
+                        type: "source",
+                        fileName: "rpc-types.js",
+                        line: 36
+                      },
+                      kind: "named",
+                      name: "ClangSourceRange"
+                    }
                   }
-                }
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 37
-              },
-              name: "fixits",
-              type: {
+                },
+                optional: false
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 37
                 },
-                kind: "array",
+                name: "fixits",
                 type: {
                   location: {
                     type: "source",
                     fileName: "rpc-types.js",
                     line: 37
                   },
-                  kind: "object",
-                  fields: [{
+                  kind: "array",
+                  type: {
                     location: {
                       type: "source",
                       fileName: "rpc-types.js",
-                      line: 38
+                      line: 37
                     },
-                    name: "range",
-                    type: {
+                    kind: "object",
+                    fields: [{
                       location: {
                         type: "source",
                         fileName: "rpc-types.js",
                         line: 38
                       },
-                      kind: "named",
-                      name: "ClangSourceRange"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "rpc-types.js",
-                      line: 39
-                    },
-                    name: "value",
-                    type: {
+                      name: "range",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "rpc-types.js",
+                          line: 38
+                        },
+                        kind: "named",
+                        name: "ClangSourceRange"
+                      },
+                      optional: false
+                    }, {
                       location: {
                         type: "source",
                         fileName: "rpc-types.js",
                         line: 39
                       },
-                      kind: "string"
-                    },
-                    optional: false
-                  }]
-                }
-              },
-              optional: true
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 49
-              },
-              name: "children",
-              type: {
+                      name: "value",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "rpc-types.js",
+                          line: 39
+                        },
+                        kind: "string"
+                      },
+                      optional: false
+                    }]
+                  }
+                },
+                optional: true
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 49
                 },
-                kind: "array",
+                name: "children",
                 type: {
                   location: {
                     type: "source",
                     fileName: "rpc-types.js",
                     line: 49
                   },
-                  kind: "object",
-                  fields: [{
+                  kind: "array",
+                  type: {
                     location: {
                       type: "source",
                       fileName: "rpc-types.js",
-                      line: 50
+                      line: 49
                     },
-                    name: "spelling",
-                    type: {
+                    kind: "object",
+                    fields: [{
                       location: {
                         type: "source",
                         fileName: "rpc-types.js",
                         line: 50
                       },
-                      kind: "string"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "rpc-types.js",
-                      line: 51
-                    },
-                    name: "location",
-                    type: {
+                      name: "spelling",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "rpc-types.js",
+                          line: 50
+                        },
+                        kind: "string"
+                      },
+                      optional: false
+                    }, {
                       location: {
                         type: "source",
                         fileName: "rpc-types.js",
                         line: 51
                       },
-                      kind: "named",
-                      name: "ClangLocation"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "rpc-types.js",
-                      line: 52
-                    },
-                    name: "ranges",
-                    type: {
+                      name: "location",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "rpc-types.js",
+                          line: 51
+                        },
+                        kind: "named",
+                        name: "ClangLocation"
+                      },
+                      optional: false
+                    }, {
                       location: {
                         type: "source",
                         fileName: "rpc-types.js",
                         line: 52
                       },
-                      kind: "array",
+                      name: "ranges",
                       type: {
                         location: {
                           type: "source",
                           fileName: "rpc-types.js",
                           line: 52
                         },
-                        kind: "named",
-                        name: "ClangSourceRange"
-                      }
-                    },
-                    optional: false
-                  }]
-                }
-              },
-              optional: true
-            }]
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 57
-        },
-        name: "accurateFlags",
-        type: {
+                        kind: "array",
+                        type: {
+                          location: {
+                            type: "source",
+                            fileName: "rpc-types.js",
+                            line: 52
+                          },
+                          kind: "named",
+                          name: "ClangSourceRange"
+                        }
+                      },
+                      optional: false
+                    }]
+                  }
+                },
+                optional: true
+              }]
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 57
           },
-          kind: "boolean"
-        },
-        optional: true
-      }]
-    }
-  }], ["ClangCompletion", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 60
+          name: "accurateFlags",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 57
+            },
+            kind: "boolean"
+          },
+          optional: true
+        }]
+      }
     },
-    name: "ClangCompletion",
-    definition: {
+    ClangCompletion: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 60
       },
-      kind: "object",
-      fields: [{
+      name: "ClangCompletion",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 61
+          line: 60
         },
-        name: "chunks",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 61
           },
-          kind: "array",
+          name: "chunks",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 61
             },
-            kind: "object",
-            fields: [{
+            kind: "array",
+            type: {
               location: {
                 type: "source",
                 fileName: "rpc-types.js",
-                line: 62
+                line: 61
               },
-              name: "spelling",
-              type: {
+              kind: "object",
+              fields: [{
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 62
                 },
-                kind: "string"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 63
-              },
-              name: "isPlaceHolder",
-              type: {
+                name: "spelling",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 62
+                  },
+                  kind: "string"
+                },
+                optional: false
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 63
                 },
-                kind: "boolean"
-              },
-              optional: true
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 64
-              },
-              name: "isOptional",
-              type: {
+                name: "isPlaceHolder",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 63
+                  },
+                  kind: "boolean"
+                },
+                optional: true
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 64
                 },
-                kind: "boolean"
-              },
-              optional: true
-            }, {
-              location: {
-                type: "source",
-                fileName: "rpc-types.js",
-                line: 65
-              },
-              name: "kind",
-              type: {
+                name: "isOptional",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 64
+                  },
+                  kind: "boolean"
+                },
+                optional: true
+              }, {
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 65
                 },
-                kind: "string"
-              },
-              optional: true
-            }]
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 67
-        },
-        name: "result_type",
-        type: {
+                name: "kind",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 65
+                  },
+                  kind: "string"
+                },
+                optional: true
+              }]
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 67
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 68
-        },
-        name: "spelling",
-        type: {
+          name: "result_type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 67
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 68
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 69
-        },
-        name: "cursor_kind",
-        type: {
+          name: "spelling",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 68
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 69
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 70
-        },
-        name: "brief_comment",
-        type: {
+          name: "cursor_kind",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 69
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 70
           },
-          kind: "nullable",
+          name: "brief_comment",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 70
             },
-            kind: "string"
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["ClangDeclaration", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 73
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 70
+              },
+              kind: "string"
+            }
+          },
+          optional: false
+        }]
+      }
     },
-    name: "ClangDeclaration",
-    definition: {
+    ClangDeclaration: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 73
       },
-      kind: "object",
-      fields: [{
+      name: "ClangDeclaration",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 74
+          line: 73
         },
-        name: "file",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 74
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 75
-        },
-        name: "point",
-        type: {
+          name: "file",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 74
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 75
           },
-          kind: "named",
-          name: "atom$Point"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 76
-        },
-        name: "spelling",
-        type: {
+          name: "point",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 75
+            },
+            kind: "named",
+            name: "atom$Point"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 76
           },
-          kind: "nullable",
+          name: "spelling",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 76
             },
-            kind: "string"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 77
-        },
-        name: "type",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 76
+              },
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 77
           },
-          kind: "nullable",
+          name: "type",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 77
             },
-            kind: "string"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 78
-        },
-        name: "extent",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 77
+              },
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 78
           },
-          kind: "named",
-          name: "atom$Range"
-        },
-        optional: false
-      }]
-    }
-  }], ["ClangCursor", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 81
+          name: "extent",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 78
+            },
+            kind: "named",
+            name: "atom$Range"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "ClangCursor",
-    definition: {
+    ClangCursor: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 81
       },
-      kind: "object",
-      fields: [{
+      name: "ClangCursor",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 82
+          line: 81
         },
-        name: "name",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 82
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 83
-        },
-        name: "type",
-        type: {
+          name: "name",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 82
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 83
           },
-          kind: "named",
-          name: "ClangCursorType"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 84
-        },
-        name: "cursor_usr",
-        type: {
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 83
+            },
+            kind: "named",
+            name: "ClangCursorType"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 84
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 85
-        },
-        name: "file",
-        type: {
+          name: "cursor_usr",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 84
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 85
           },
-          kind: "nullable",
+          name: "file",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 85
             },
-            kind: "named",
-            name: "NuclideUri"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 86
-        },
-        name: "extent",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 85
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 86
           },
-          kind: "named",
-          name: "atom$Range"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 87
-        },
-        name: "is_definition",
-        type: {
+          name: "extent",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 86
+            },
+            kind: "named",
+            name: "atom$Range"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 87
           },
-          kind: "boolean"
-        },
-        optional: false
-      }]
-    }
-  }], ["ClangOutlineTree", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 90
+          name: "is_definition",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 87
+            },
+            kind: "boolean"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "ClangOutlineTree",
-    definition: {
+    ClangOutlineTree: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 90
       },
-      kind: "object",
-      fields: [{
+      name: "ClangOutlineTree",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 91
+          line: 90
         },
-        name: "name",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 91
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 92
-        },
-        name: "extent",
-        type: {
+          name: "name",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 91
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 92
           },
-          kind: "named",
-          name: "atom$Range"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 93
-        },
-        name: "cursor_kind",
-        type: {
+          name: "extent",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 92
+            },
+            kind: "named",
+            name: "atom$Range"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 93
           },
-          kind: "named",
-          name: "ClangCursorType"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 95
-        },
-        name: "cursor_type",
-        type: {
+          name: "cursor_kind",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 93
+            },
+            kind: "named",
+            name: "ClangCursorType"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 95
           },
-          kind: "string"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 98
-        },
-        name: "params",
-        type: {
+          name: "cursor_type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 95
+            },
+            kind: "string"
+          },
+          optional: true
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 98
           },
-          kind: "array",
+          name: "params",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 98
             },
-            kind: "string"
-          }
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 100
-        },
-        name: "tparams",
-        type: {
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 98
+              },
+              kind: "string"
+            }
+          },
+          optional: true
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 100
           },
-          kind: "array",
+          name: "tparams",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 100
             },
-            kind: "string"
-          }
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 102
-        },
-        name: "children",
-        type: {
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 100
+              },
+              kind: "string"
+            }
+          },
+          optional: true
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 102
           },
-          kind: "array",
+          name: "children",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 102
             },
-            kind: "named",
-            name: "ClangOutlineTree"
-          }
-        },
-        optional: true
-      }]
-    }
-  }], ["ClangLocalReferences", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 105
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 102
+              },
+              kind: "named",
+              name: "ClangOutlineTree"
+            }
+          },
+          optional: true
+        }]
+      }
     },
-    name: "ClangLocalReferences",
-    definition: {
+    ClangLocalReferences: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 105
       },
-      kind: "object",
-      fields: [{
+      name: "ClangLocalReferences",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 106
+          line: 105
         },
-        name: "cursor_name",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 106
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 107
-        },
-        name: "cursor_kind",
-        type: {
+          name: "cursor_name",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 106
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 107
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 108
-        },
-        name: "references",
-        type: {
+          name: "cursor_kind",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 107
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 108
           },
-          kind: "array",
+          name: "references",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 108
             },
-            kind: "named",
-            name: "atom$Range"
-          }
-        },
-        optional: false
-      }]
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 108
+              },
+              kind: "named",
+              name: "atom$Range"
+            }
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

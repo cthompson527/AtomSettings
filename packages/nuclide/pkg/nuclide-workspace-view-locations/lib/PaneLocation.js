@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,6 +9,12 @@ var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+var _observeAddedPaneItems;
+
+function _load_observeAddedPaneItems() {
+  return _observeAddedPaneItems = require('./observeAddedPaneItems');
 }
 
 var _observePanes;
@@ -36,14 +33,37 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let PaneLocation = exports.PaneLocation = class PaneLocation {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class PaneLocation {
 
   constructor() {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_syncPaneItemVisibility || _load_syncPaneItemVisibility()).syncPaneItemVisibility)((0, (_observePanes || _load_observePanes()).observePanes)(atom.workspace.paneContainer), _rxjsBundlesRxMinJs.Observable.of(true)));
   }
 
+  activate() {
+    // No need to do anything; this is always visible.
+  }
+
   addItem(item) {
     atom.workspace.getActivePane().addItem(item);
+  }
+
+  activateItem(item) {
+    let pane = atom.workspace.paneForItem(item);
+    if (pane == null) {
+      pane = atom.workspace.getActivePane();
+    }
+    pane.activate();
+    pane.activateItem(item);
   }
 
   /**
@@ -84,18 +104,13 @@ let PaneLocation = exports.PaneLocation = class PaneLocation {
     return pane != null && pane.getActiveItem() === item;
   }
 
-  showItem(item) {
-    let pane = atom.workspace.paneForItem(item);
-    if (pane == null) {
-      pane = atom.workspace.getActivePane();
-      pane.addItem(item);
-    }
-    pane.activate();
-    pane.activateItem(item);
-  }
-
   serialize() {
     // We rely on the default Atom serialization for Panes.
     return null;
   }
-};
+
+  onDidAddItem(cb) {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default((0, (_observeAddedPaneItems || _load_observeAddedPaneItems()).observeAddedPaneItems)(atom.workspace.paneContainer).subscribe(cb));
+  }
+}
+exports.PaneLocation = PaneLocation;

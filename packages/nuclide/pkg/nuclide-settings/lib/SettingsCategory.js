@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -24,10 +14,19 @@ function _load_SettingsControl() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let SettingsCategory = class SettingsCategory extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class SettingsCategory extends _reactForAtom.React.Component {
 
   render() {
-
     const children = Object.keys(this.props.packages).sort().map(pkgName => {
       const pkgData = this.props.packages[pkgName];
       const settingsArray = getSortedSettingsArray(pkgData.settings, pkgName);
@@ -77,11 +76,9 @@ let SettingsCategory = class SettingsCategory extends _reactForAtom.React.Compon
       children
     );
   }
+}
 
-};
 exports.default = SettingsCategory;
-
-
 function ControlGroup(props) {
   return _reactForAtom.React.createElement(
     'div',
@@ -100,4 +97,3 @@ function getSortedSettingsArray(settings, pkgName) {
   settingsArray.sort().sort((a, b) => settings[a].order - settings[b].order);
   return settingsArray;
 }
-module.exports = exports['default'];

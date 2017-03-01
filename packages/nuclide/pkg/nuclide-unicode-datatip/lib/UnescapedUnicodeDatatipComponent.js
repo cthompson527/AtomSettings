@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,6 +12,16 @@ var _Unicode;
 function _load_Unicode() {
   return _Unicode = require('./Unicode');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function makeUnescapedUnicodeDatatipComponent(codePoints) {
   return () => _reactForAtom.React.createElement(UnescapedUnicodeDatatipComponent, { codePoints: codePoints });
@@ -82,4 +83,3 @@ const UnescapedUnicodeDatatipComponent = props => {
   );
   return result;
 };
-module.exports = exports['default'];

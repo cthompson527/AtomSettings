@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.fetchRevisionInfo = exports.fetchCommonAncestorOfHeadAndRevision = exports.INFO_REV_END_MARK = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 /**
  * @param revision The revision expression of a revision of interest.
@@ -34,10 +23,7 @@ let fetchCommonAncestorOfHeadAndRevision = exports.fetchCommonAncestorOfHeadAndR
     };
 
     try {
-      var _ref2 = yield (0, (_hgUtils || _load_hgUtils()).hgAsyncExecute)(args, options);
-
-      const ancestorRevisionNumber = _ref2.stdout;
-
+      const { stdout: ancestorRevisionNumber } = yield (0, (_hgUtils || _load_hgUtils()).hgAsyncExecute)(args, options);
       return ancestorRevisionNumber;
     } catch (e) {
       (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn('Failed to get hg common ancestor: ', e.stderr, e.command);
@@ -51,22 +37,19 @@ let fetchCommonAncestorOfHeadAndRevision = exports.fetchCommonAncestorOfHeadAndR
 })();
 
 let fetchRevisionInfo = exports.fetchRevisionInfo = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (revisionExpression, workingDirectory) {
-    var _ref4 = yield fetchRevisions(revisionExpression, workingDirectory).toPromise(),
-        _ref5 = _slicedToArray(_ref4, 1);
-
-    const revisionInfo = _ref5[0];
-
+  var _ref2 = (0, _asyncToGenerator.default)(function* (revisionExpression, workingDirectory) {
+    const [revisionInfo] = yield fetchRevisionsInfo(revisionExpression, workingDirectory).toPromise();
     return revisionInfo;
   });
 
   return function fetchRevisionInfo(_x3, _x4) {
-    return _ref3.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 })();
 
 exports.expressionForRevisionsBeforeHead = expressionForRevisionsBeforeHead;
 exports.expressionForCommonAncestor = expressionForCommonAncestor;
+exports.fetchRevisionsInfo = fetchRevisionsInfo;
 exports.fetchRevisionInfoBetweenRevisions = fetchRevisionInfoBetweenRevisions;
 exports.fetchSmartlogRevisions = fetchSmartlogRevisions;
 exports.parseRevisionInfoOutput = parseRevisionInfoOutput;
@@ -102,6 +85,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 
 // Exported for testing.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const INFO_REV_END_MARK = exports.INFO_REV_END_MARK = '<<NUCLIDE_REV_END_MARK>>';
 
 // We use `{p1node|short} {p2node|short}` instead of `{parents}`
@@ -122,9 +115,9 @@ const REVISION_INFO_TEMPLATE = `{rev}
 {remotenames}
 {tags}
 {p1node|short} {p2node|short}
-{ifcontains(rev, revset('.'), '${ HEAD_MARKER }')}
+{ifcontains(rev, revset('.'), '${HEAD_MARKER}')}
 {desc}
-${ INFO_REV_END_MARK }
+${INFO_REV_END_MARK}
 `;
 
 /**
@@ -153,22 +146,26 @@ function expressionForRevisionsBeforeHead(numberOfRevsBefore_) {
 // Section: Revision Sets
 
 function expressionForCommonAncestor(revision) {
-  const commonAncestorExpression = `ancestor(${ revision }, ${ (_hgConstants || _load_hgConstants()).HEAD_REVISION_EXPRESSION })`;
+  const commonAncestorExpression = `ancestor(${revision}, ${(_hgConstants || _load_hgConstants()).HEAD_REVISION_EXPRESSION})`;
   // shell-escape does not wrap ancestorExpression in quotes without this toString conversion.
   return commonAncestorExpression.toString();
-}
-
-function fetchRevisions(revisionExpression, workingDirectory, options) {
+}function fetchRevisionsInfo(revisionExpression, workingDirectory, options) {
   const revisionLogArgs = ['log', '--template', REVISION_INFO_TEMPLATE, '--rev', revisionExpression];
   if (options == null || options.shouldLimit == null || options.shouldLimit) {
     revisionLogArgs.push('--limit', '20');
   }
+
+  // --hidden prevents mercurial from loading the obsstore, which can be expensive.
+  if (options && options.hidden === true) {
+    revisionLogArgs.push('--hidden');
+  }
+
   const hgOptions = {
     cwd: workingDirectory
   };
   return (0, (_hgUtils || _load_hgUtils()).hgRunCommand)(revisionLogArgs, hgOptions).map(stdout => parseRevisionInfoOutput(stdout)).catch(e => {
-    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn('Failed to get revision info for revisions' + ` ${ revisionExpression }: ${ e.stderr || e }, ${ e.command }`);
-    throw new Error(`Could not fetch revision info for revisions: ${ revisionExpression }`);
+    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn('Failed to get revision info for revisions' + ` ${revisionExpression}: ${e.stderr || e}, ${e.command}`);
+    throw new Error(`Could not fetch revision info for revisions: ${revisionExpression}`);
   });
 }
 
@@ -184,15 +181,15 @@ function fetchRevisions(revisionExpression, workingDirectory, options) {
  * of bookmark names applied to that revision.
  */
 function fetchRevisionInfoBetweenRevisions(revisionFrom, revisionTo, workingDirectory) {
-  const revisionExpression = `${ revisionFrom }::${ revisionTo }`;
-  return fetchRevisions(revisionExpression, workingDirectory).toPromise();
+  const revisionExpression = `${revisionFrom}::${revisionTo}`;
+  return fetchRevisionsInfo(revisionExpression, workingDirectory).toPromise();
 }
 
 function fetchSmartlogRevisions(workingDirectory) {
   // This will get the `smartlog()` expression revisions
   // and the head revision commits to the nearest public commit parent.
-  const revisionExpression = 'smartlog(all) + ancestor(smartlog(all)) + last(::. & public())::.';
-  return fetchRevisions(revisionExpression, workingDirectory, { shouldLimit: false }).publish();
+  const revisionExpression = 'smartlog(all) + parents(smartlog(all))';
+  return fetchRevisionsInfo(revisionExpression, workingDirectory, { shouldLimit: false }).publish();
 }
 
 /**

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -21,7 +12,7 @@ var _reactForAtom = require('react-for-atom');
  * We need to create this custom HTML element so we can hook into the view
  * registry. The overlay decoration only works through the view registry.
  */
-let SuggestionListElement = class SuggestionListElement extends HTMLElement {
+class SuggestionListElement extends HTMLElement {
 
   initialize(model) {
     this._model = model;
@@ -41,8 +32,19 @@ let SuggestionListElement = class SuggestionListElement extends HTMLElement {
       this.parentNode.removeChild(this);
     }
   }
-};
-let SuggestionList = class SuggestionList extends _reactForAtom.React.Component {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+/* global HTMLElement */
+
+class SuggestionList extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -54,8 +56,7 @@ let SuggestionList = class SuggestionList extends _reactForAtom.React.Component 
   }
 
   componentWillMount() {
-    const suggestionList = this.props.suggestionList;
-
+    const { suggestionList } = this.props;
     const suggestion = suggestionList.getSuggestion();
     // TODO(nmote): This is assuming `suggestion.callback` is always an Array, which is not true
     //   according to hyperclick/lib/types. It can also be a function.
@@ -207,8 +208,8 @@ let SuggestionList = class SuggestionList extends _reactForAtom.React.Component 
     const selectedNode = listNode.getElementsByClassName('selected')[0];
     selectedNode.scrollIntoViewIfNeeded(false);
   }
-};
+}
+
 exports.default = document.registerElement('hyperclick-suggestion-list', {
   prototype: SuggestionListElement.prototype
 });
-module.exports = exports['default'];

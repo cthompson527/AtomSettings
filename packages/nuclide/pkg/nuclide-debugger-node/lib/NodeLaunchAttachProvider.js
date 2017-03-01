@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -48,7 +39,17 @@ function _load_LaunchAttachActions() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let NodeLaunchAttachProvider = exports.NodeLaunchAttachProvider = class NodeLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class NodeLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
 
   constructor(debuggingTypeName, targetUri) {
     super(debuggingTypeName, targetUri);
@@ -78,4 +79,5 @@ let NodeLaunchAttachProvider = exports.NodeLaunchAttachProvider = class NodeLaun
     this._store.dispose();
     this._actions.dispose();
   }
-};
+}
+exports.NodeLaunchAttachProvider = NodeLaunchAttachProvider;

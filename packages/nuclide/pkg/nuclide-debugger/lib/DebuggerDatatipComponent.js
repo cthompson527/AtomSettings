@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,14 +21,14 @@ function _load_SimpleValueComponent() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DebuggerDatatipComponent = exports.DebuggerDatatipComponent = class DebuggerDatatipComponent extends _reactForAtom.React.Component {
+class DebuggerDatatipComponent extends _reactForAtom.React.Component {
 
   render() {
-    var _props = this.props;
-    const expression = _props.expression,
-          evaluationResult = _props.evaluationResult,
-          watchExpressionStore = _props.watchExpressionStore;
-
+    const {
+      expression,
+      evaluationResult,
+      watchExpressionStore
+    } = this.props;
     const fetchChildren = watchExpressionStore.getProperties.bind(watchExpressionStore);
     return _reactForAtom.React.createElement(
       'div',
@@ -49,9 +40,19 @@ let DebuggerDatatipComponent = exports.DebuggerDatatipComponent = class Debugger
           evaluationResult: evaluationResult,
           expression: expression,
           fetchChildren: fetchChildren,
-          simpleValueComponent: (_SimpleValueComponent || _load_SimpleValueComponent()).default
+          simpleValueComponent: (_SimpleValueComponent || _load_SimpleValueComponent()).default,
+          expansionStateId: this
         })
       )
     );
   }
-};
+}
+exports.DebuggerDatatipComponent = DebuggerDatatipComponent; /**
+                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                              * All rights reserved.
+                                                              *
+                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                              * the root directory of this source tree.
+                                                              *
+                                                              * 
+                                                              */

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,6 +15,8 @@ exports.provideCodeFormat = provideCodeFormat;
 exports.provideLinter = provideLinter;
 exports.provideOutlineView = provideOutlineView;
 exports.provideRefactoring = provideRefactoring;
+exports.provideRelatedFiles = provideRelatedFiles;
+exports.consumeCompilationDatabase = consumeCompilationDatabase;
 exports.deactivate = deactivate;
 
 var _atom = require('atom');
@@ -91,7 +84,16 @@ function _load_libclang() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-let busySignalProvider = null;
+let busySignalProvider = null; /**
+                                * Copyright (c) 2015-present, Facebook, Inc.
+                                * All rights reserved.
+                                *
+                                * This source code is licensed under the license found in the LICENSE file in
+                                * the root directory of this source tree.
+                                *
+                                * 
+                                */
+
 let subscriptions = null;
 
 function activate() {
@@ -120,7 +122,7 @@ function createAutocompleteProvider() {
     selector: '.source.objc, .source.objcpp, .source.cpp, .source.c',
     inclusionPriority: 1,
     suggestionPriority: 5, // Higher than the snippets provider.
-    getSuggestions: function (request) {
+    getSuggestions(request) {
       return (_AutocompleteHelpers || _load_AutocompleteHelpers()).default.getAutocompleteSuggestions(request);
     }
   };
@@ -131,7 +133,7 @@ function createTypeHintProvider() {
     inclusionPriority: 1,
     providerName: (_constants || _load_constants()).PACKAGE_NAME,
     selector: Array.from((_constants || _load_constants()).GRAMMAR_SET).join(', '),
-    typeHint: function (editor, position) {
+    typeHint(editor, position) {
       return (_TypeHintHelpers || _load_TypeHintHelpers()).default.typeHint(editor, position);
     }
   };
@@ -142,10 +144,10 @@ function provideDefinitions() {
     name: (_constants || _load_constants()).PACKAGE_NAME,
     priority: 20,
     grammarScopes: (_constants || _load_constants()).GRAMMARS,
-    getDefinition: function (editor, position) {
+    getDefinition(editor, position) {
       return (_DefinitionHelpers || _load_DefinitionHelpers()).default.getDefinition(editor, position);
     },
-    getDefinitionById: function (filePath, id) {
+    getDefinitionById(filePath, id) {
       return (_DefinitionHelpers || _load_DefinitionHelpers()).default.getDefinitionById(filePath, id);
     }
   };
@@ -163,7 +165,7 @@ function provideCodeFormat() {
   return {
     selector: Array.from((_constants || _load_constants()).GRAMMAR_SET).join(', '),
     inclusionPriority: 1,
-    formatEntireFile: function (editor, range) {
+    formatEntireFile(editor, range) {
       return (_CodeFormatHelpers || _load_CodeFormatHelpers()).default.formatEntireFile(editor, range);
     }
   };
@@ -176,10 +178,10 @@ function provideLinter() {
     lintOnFly: false,
     name: 'Clang',
     invalidateOnClose: true,
-    lint: function (editor) {
+    lint(editor) {
       const getResult = () => (_ClangLinter || _load_ClangLinter()).default.lint(editor);
       if (busySignalProvider) {
-        return busySignalProvider.reportBusy(`Clang: compiling \`${ editor.getTitle() }\``, getResult);
+        return busySignalProvider.reportBusy(`Clang: compiling \`${editor.getTitle()}\``, getResult);
       }
       return getResult();
     }
@@ -192,7 +194,7 @@ function provideOutlineView() {
     priority: 10,
     grammarScopes: Array.from((_constants || _load_constants()).GRAMMAR_SET),
     updateOnEdit: false,
-    getOutline: function (editor) {
+    getOutline(editor) {
       return (_OutlineViewHelpers || _load_OutlineViewHelpers()).default.getOutline(editor);
     }
   };
@@ -202,13 +204,25 @@ function provideRefactoring() {
   return {
     grammarScopes: Array.from((_constants || _load_constants()).GRAMMAR_SET),
     priority: 1,
-    refactoringsAtPoint: function (editor, point) {
+    refactoringsAtPoint(editor, point) {
       return (_Refactoring || _load_Refactoring()).default.refactoringsAtPoint(editor, point);
     },
-    refactor: function (request) {
+    refactor(request) {
       return (_Refactoring || _load_Refactoring()).default.refactor(request);
     }
   };
+}
+
+function provideRelatedFiles() {
+  return {
+    getRelatedFiles(filePath) {
+      return (0, (_libclang || _load_libclang()).getRelatedSourceOrHeader)(filePath).then(related => related == null ? [] : [related]);
+    }
+  };
+}
+
+function consumeCompilationDatabase(provider) {
+  return (0, (_libclang || _load_libclang()).registerCompilationDatabaseProvider)(provider);
 }
 
 function deactivate() {

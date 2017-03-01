@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -56,7 +47,15 @@ function _load_collection() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
 
 const RESYNC_TIMEOUT_MS = 2000;
 
@@ -77,11 +76,9 @@ function uriMatchesConnection(uri, connection) {
 // Also handles sending 'close' events to the FileNotifier so that
 // the per-Buffer BufferSubscription does not need to live past
 // the buffer being destroyed.
-let NotifiersByConnection = exports.NotifiersByConnection = class NotifiersByConnection {
+class NotifiersByConnection {
 
-  constructor() {
-    let getService = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : getOpenFilesService;
-
+  constructor(getService = getOpenFilesService) {
     this._getService = getService;
     const filterByConnection = (connection, dirs) => new Set(dirs.filter(dir => uriMatchesConnection(dir, connection)));
     this._notifiers = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ConnectionCache(connection => {
@@ -145,14 +142,14 @@ let NotifiersByConnection = exports.NotifiersByConnection = class NotifiersByCon
               kind: (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.CLOSE,
               fileVersion: {
                 notifier: n,
-                filePath: filePath,
-                version: version
+                filePath,
+                version
               }
             };
 
             yield message.fileVersion.notifier.onFileEvent(message);
           } catch (e) {
-            logger.error(`Error sending file close event: ${ filePath } ${ version }`, e);
+            logger.error(`Error sending file close event: ${filePath} ${version}`, e);
             setTimeout(sendMessage, RESYNC_TIMEOUT_MS);
           }
         }
@@ -165,4 +162,5 @@ let NotifiersByConnection = exports.NotifiersByConnection = class NotifiersByCon
 
     sendMessage();
   }
-};
+}
+exports.NotifiersByConnection = NotifiersByConnection;

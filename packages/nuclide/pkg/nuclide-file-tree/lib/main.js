@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,11 +7,18 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 exports.serialize = serialize;
 exports.getContextMenuForFileTree = getContextMenuForFileTree;
-exports.consumeNuclideSideBar = consumeNuclideSideBar;
+exports.consumeWorkspaceViewsService = consumeWorkspaceViewsService;
+exports.getProjectSelectionManagerForFileTree = getProjectSelectionManagerForFileTree;
+exports.deserializeFileTreeSidebarComponent = deserializeFileTreeSidebarComponent;
 exports.consumeWorkingSetsStore = consumeWorkingSetsStore;
 exports.consumeCwdApi = consumeCwdApi;
+exports.consumeRemoteProjectsService = consumeRemoteProjectsService;
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
 var _featureConfig;
 
@@ -28,10 +26,22 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
+var _viewableFromReactElement;
+
+function _load_viewableFromReactElement() {
+  return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
+}
+
 var _debounce;
 
 function _load_debounce() {
   return _debounce = _interopRequireDefault(require('../../commons-node/debounce'));
+}
+
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../commons-node/observable');
 }
 
 var _FileTreeSidebarComponent;
@@ -52,23 +62,39 @@ function _load_nuclideWorkingSetsCommon() {
   return _nuclideWorkingSetsCommon = require('../../nuclide-working-sets-common');
 }
 
+var _Constants;
+
+function _load_Constants() {
+  return _Constants = require('./Constants');
+}
+
+var _reactForAtom = require('react-for-atom');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Minimum interval (in ms) between onChangeActivePaneItem events before revealing the active pane
  * item in the file tree.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const OPEN_FILES_UPDATE_DEBOUNCE_INTERVAL_MS = 150;
 
-const REVEAL_FILE_ON_SWITCH_SETTING = 'nuclide-file-tree.revealFileOnSwitch';
-
-let Activation = class Activation {
-
+class Activation {
+  // Has the package state been restored from a previous session?
   constructor(state) {
-    this._packageState = state;
-    this._subscriptions = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 
-    this._fileTreeController = new (_FileTreeController || _load_FileTreeController()).default(this._packageState);
+    this._fileTreeController = new (_FileTreeController || _load_FileTreeController()).default(state == null ? null : state.tree);
+    this._restored = state != null && state.restored === true;
 
     const excludeVcsIgnoredPathsSetting = 'core.excludeVcsIgnoredPaths';
     const hideIgnoredNamesSetting = 'nuclide-file-tree.hideIgnoredNames';
@@ -76,7 +102,40 @@ let Activation = class Activation {
     const prefixKeyNavSetting = 'nuclide-file-tree.allowKeyboardPrefixNavigation';
     const allowPendingPaneItems = 'core.allowPendingPaneItems';
 
-    this._subscriptions.add((_featureConfig || _load_featureConfig()).default.observe(prefixKeyNavSetting, this._setPrefixKeyNavSetting.bind(this)), (_featureConfig || _load_featureConfig()).default.observe(REVEAL_FILE_ON_SWITCH_SETTING, this._setRevealOnFileSwitch.bind(this)), atom.config.observe(ignoredNamesSetting, this._setIgnoredNames.bind(this)), (_featureConfig || _load_featureConfig()).default.observe(hideIgnoredNamesSetting, this._setHideIgnoredNames.bind(this)), atom.config.observe(excludeVcsIgnoredPathsSetting, this._setExcludeVcsIgnoredPaths.bind(this)), atom.config.observe(allowPendingPaneItems, this._setUsePreviewTabs.bind(this)));
+    this._disposables.add(this._fixContextMenuHighlight(), (_featureConfig || _load_featureConfig()).default.observe(prefixKeyNavSetting, x => this._setPrefixKeyNavSetting(x)), (_featureConfig || _load_featureConfig()).default.observe((_Constants || _load_Constants()).REVEAL_FILE_ON_SWITCH_SETTING, x => this._setRevealOnFileSwitch(x)), atom.config.observe(ignoredNamesSetting, x => this._setIgnoredNames(x)), (_featureConfig || _load_featureConfig()).default.observe(hideIgnoredNamesSetting, x => this._setHideIgnoredNames(x)), atom.config.observe(excludeVcsIgnoredPathsSetting, this._setExcludeVcsIgnoredPaths.bind(this)), atom.config.observe(allowPendingPaneItems, this._setUsePreviewTabs.bind(this)), atom.commands.add('atom-workspace', 'nuclide-file-tree:toggle-focus', () => {
+      const component = this._fileTreeComponent;
+      if (component == null) {
+        return;
+      }
+      if (component.isFocused()) {
+        // Focus the text editor.
+        atom.workspace.getActivePane().activate();
+      } else {
+        // Focus the file tree.
+        component.focus();
+      }
+    }));
+  }
+
+  _fixContextMenuHighlight() {
+    // Giant hack to fix the context menu highlight
+    // For explanation, see https://github.com/atom/atom/pull/13266
+
+    const { showForEvent } = atom.contextMenu;
+    const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      atom.contextMenu.showForEvent = showForEvent;
+    });
+    // $FlowIgnore: Undocumented API
+    atom.contextMenu.showForEvent = function (event) {
+      // $FlowFixMe: Add repeat() to type def
+      const sub = (_observable || _load_observable()).nextAnimationFrame.repeat(3).last().subscribe(() => {
+        showForEvent.call(atom.contextMenu, event);
+        disposables.remove(sub);
+      });
+      disposables.add(sub);
+    };
+
+    return disposables;
   }
 
   consumeCwdApi(cwdApi) {
@@ -89,17 +148,28 @@ let Activation = class Activation {
     }
     const controller = this._fileTreeController;
     controller.setCwdApi(cwdApi);
-    this._cwdApiSubscription = new _atom.Disposable(() => controller.setCwdApi(null));
+    this._cwdApiSubscription = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => controller.setCwdApi(null));
     return this._cwdApiSubscription;
+  }
+
+  consumeRemoteProjectsService(service) {
+    const controller = this._fileTreeController;
+    controller.setRemoteProjectsService(service);
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      controller.setRemoteProjectsService(null);
+    });
   }
 
   dispose() {
     this._deactivate();
-    this._subscriptions.dispose();
+    this._disposables.dispose();
   }
 
   serialize() {
-    return this._fileTreeController.serialize();
+    return {
+      tree: this._fileTreeController.serialize(),
+      restored: true
+    };
   }
 
   consumeWorkingSetsStore(workingSetsStore) {
@@ -109,13 +179,13 @@ let Activation = class Activation {
     const currentSubscription = workingSetsStore.subscribeToCurrent(currentWorkingSet => {
       this._fileTreeController.updateWorkingSet(currentWorkingSet);
     });
-    this._subscriptions.add(currentSubscription);
+    this._disposables.add(currentSubscription);
 
     let updateOpenFilesWorkingSet = this._fileTreeController.updateOpenFilesWorkingSet.bind(this._fileTreeController);
 
-    this._subscriptions.add(new _atom.Disposable(() => {
+    this._disposables.add(() => {
       updateOpenFilesWorkingSet = () => {};
-    }));
+    });
 
     const rebuildOpenFilesWorkingSet = (0, (_debounce || _load_debounce()).default)(() => {
       const openUris = atom.workspace.getTextEditors().filter(te => te.getPath() != null && te.getPath() !== '').map(te => te.getPath());
@@ -125,18 +195,17 @@ let Activation = class Activation {
 
     rebuildOpenFilesWorkingSet();
 
-    const paneObservingDisposable = new _atom.CompositeDisposable();
-    paneObservingDisposable.add(atom.workspace.onDidAddPaneItem(rebuildOpenFilesWorkingSet));
-    paneObservingDisposable.add(atom.workspace.onDidDestroyPaneItem(rebuildOpenFilesWorkingSet));
+    const paneObservingDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    paneObservingDisposable.add(atom.workspace.onDidAddPaneItem(rebuildOpenFilesWorkingSet), atom.workspace.onDidDestroyPaneItem(rebuildOpenFilesWorkingSet));
 
-    this._subscriptions.add(paneObservingDisposable);
+    this._disposables.add(paneObservingDisposable);
 
-    return new _atom.Disposable(() => {
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       this._fileTreeController.updateWorkingSetsStore(null);
       this._fileTreeController.updateWorkingSet(new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet());
       this._fileTreeController.updateOpenFilesWorkingSet(new (_nuclideWorkingSetsCommon || _load_nuclideWorkingSetsCommon()).WorkingSet());
       paneObservingDisposable.dispose();
-      this._subscriptions.remove(currentSubscription);
+      this._disposables.remove(currentSubscription);
       currentSubscription.dispose();
     });
   }
@@ -167,13 +236,13 @@ let Activation = class Activation {
       if (!this._paneItemSubscription) {
         this._paneItemSubscription = atom.workspace.onDidStopChangingActivePaneItem(this._fileTreeController.revealActiveFile.bind(this._fileTreeController,
         /* showIfHidden */false));
-        this._subscriptions.add(this._paneItemSubscription);
+        this._disposables.add(this._paneItemSubscription);
       }
     } else {
       // Use a local so Flow can refine the type.
       const paneItemSubscription = this._paneItemSubscription;
       if (paneItemSubscription) {
-        this._subscriptions.remove(paneItemSubscription);
+        this._disposables.remove(paneItemSubscription);
         paneItemSubscription.dispose();
         this._paneItemSubscription = null;
       }
@@ -204,17 +273,46 @@ let Activation = class Activation {
     return this._fileTreeController.getContextMenu();
   }
 
+  getProjectSelectionManager() {
+    if (!this._fileTreeController) {
+      throw new Error('Invariant violation: "this._fileTreeController"');
+    }
+
+    return this._fileTreeController.getProjectSelectionManager();
+  }
+
   _deactivate() {
     // Guard against deactivate being called twice
     this._fileTreeController.destroy();
   }
-};
 
+  _createView() {
+    // Currently, we assume that only one will be created.
+    this._fileTreeComponent = (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default, null));
+    return this._fileTreeComponent;
+  }
+
+  consumeWorkspaceViewsService(api) {
+    this._disposables.add(api.addOpener(uri => {
+      if (uri === (_Constants || _load_Constants()).WORKSPACE_VIEW_URI) {
+        return this._createView();
+      }
+    }), () => api.destroyWhere(item => item instanceof (_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default), atom.commands.add('atom-workspace', 'nuclide-file-tree:toggle', event => {
+      api.toggle((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, event.detail);
+    }));
+    if (!this._restored) {
+      api.open((_Constants || _load_Constants()).WORKSPACE_VIEW_URI, { searchAllPanes: true });
+    }
+  }
+
+  deserializeFileTreeSidebarComponent() {
+    return this._createView();
+  }
+}
 
 let activation;
 let deserializedState;
 let onDidActivateDisposable;
-let sideBarDisposable;
 
 function disableTreeViewPackage() {
   if (!atom.packages.isPackageDisabled('tree-view')) {
@@ -265,10 +363,6 @@ function deactivate() {
     atom.packages.enablePackage('tree-view');
   }
 
-  if (sideBarDisposable != null) {
-    sideBarDisposable.dispose();
-  }
-
   if (!onDidActivateDisposable.disposed) {
     onDidActivateDisposable.dispose();
   }
@@ -293,33 +387,28 @@ function getContextMenuForFileTree() {
   return activation.getContextMenu();
 }
 
-function consumeNuclideSideBar(sidebar) {
+function consumeWorkspaceViewsService(api) {
   if (!activation) {
     throw new Error('Invariant violation: "activation"');
   }
 
-  sidebar.registerView({
-    getComponent: function () {
-      return (_FileTreeSidebarComponent || _load_FileTreeSidebarComponent()).default;
-    },
-    onDidShow: function () {
-      // If "Reveal File on Switch" is enabled, ensure the scroll position is synced to where the
-      // user expects when the side bar shows the file tree.
-      if ((_featureConfig || _load_featureConfig()).default.get(REVEAL_FILE_ON_SWITCH_SETTING)) {
-        atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:reveal-active-file');
-      }
-    },
+  activation.consumeWorkspaceViewsService(api);
+}
 
-    title: 'File Tree',
-    toggleCommand: 'nuclide-file-tree:toggle',
-    viewId: 'nuclide-file-tree'
-  });
+function getProjectSelectionManagerForFileTree() {
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
+  }
 
-  sideBarDisposable = new _atom.Disposable(() => {
-    sidebar.destroyView('nuclide-file-tree');
-  });
+  return activation.getProjectSelectionManager();
+}
 
-  return sideBarDisposable;
+function deserializeFileTreeSidebarComponent() {
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
+  }
+
+  return activation.deserializeFileTreeSidebarComponent();
 }
 
 function consumeWorkingSetsStore(workingSetsStore) {
@@ -336,4 +425,12 @@ function consumeCwdApi(cwdApi) {
   }
 
   return activation.consumeCwdApi(cwdApi);
+}
+
+function consumeRemoteProjectsService(service) {
+  if (!activation) {
+    throw new Error('Invariant violation: "activation"');
+  }
+
+  return activation.consumeRemoteProjectsService(service);
 }

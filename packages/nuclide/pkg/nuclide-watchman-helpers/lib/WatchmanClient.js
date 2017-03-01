@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -55,10 +50,19 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
 const WATCHMAN_SETTLE_TIME_MS = 2500;
 
-let WatchmanClient = class WatchmanClient {
+class WatchmanClient {
 
   constructor() {
     this._initWatchmanClient();
@@ -166,7 +170,7 @@ let WatchmanClient = class WatchmanClient {
     }
     if (!Array.isArray(response.files)) {
       if (response.canceled === true) {
-        logger.info(`Watch for ${ response.root } was deleted.`);
+        logger.info(`Watch for ${response.root} was deleted.`);
         // Ending the client will trigger a reconnect.
         this._clientPromise.then(client => client.end());
         return;
@@ -174,31 +178,26 @@ let WatchmanClient = class WatchmanClient {
       // TODO(most): use state messages to decide on when to send updates.
       const stateEnter = response['state-enter'];
       const stateLeave = response['state-leave'];
-      const stateMessage = stateEnter != null ? `Entering ${ stateEnter }` : `Leaving ${ (0, (_string || _load_string()).maybeToString)(stateLeave) }`;
-      logger.info(`Subscription state: ${ stateMessage }`);
+      const stateMessage = stateEnter != null ? `Entering ${stateEnter}` : `Leaving ${(0, (_string || _load_string()).maybeToString)(stateLeave)}`;
+      logger.info(`Subscription state: ${stateMessage}`);
       return;
     }
     subscription.emit('change', response.files);
   }
 
-  watchDirectoryRecursive(localDirectoryPath) {
-    var _arguments = arguments,
-        _this5 = this;
+  watchDirectoryRecursive(localDirectoryPath, subscriptionName = localDirectoryPath, subscriptionOptions) {
+    var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let subscriptionName = _arguments.length > 1 && _arguments[1] !== undefined ? _arguments[1] : localDirectoryPath;
-      let subscriptionOptions = _arguments[2];
-
       const existingSubscription = _this5._getSubscription(subscriptionName);
       if (existingSubscription) {
         existingSubscription.subscriptionCount++;
         return existingSubscription;
       } else {
-        var _ref2 = yield _this5._watchProject(localDirectoryPath);
-
-        const watchRoot = _ref2.watch,
-              relativePath = _ref2.relative_path;
-
+        const {
+          watch: watchRoot,
+          relative_path: relativePath
+        } = yield _this5._watchProject(localDirectoryPath);
         const clock = yield _this5._clock(watchRoot);
         const options = Object.assign({}, subscriptionOptions, {
           fields: ['name', 'new', 'exists', 'mode'],
@@ -249,20 +248,22 @@ let WatchmanClient = class WatchmanClient {
    * List all (watched) files in the given directory.
    * Paths will be relative.
    */
-  listFiles(entryPath) {
+  listFiles(entryPath, options = {}) {
     var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref3 = yield _this7._watchProject(entryPath);
-
-      const watch = _ref3.watch,
-            relative_path = _ref3.relative_path;
-
-      const result = yield _this7._command('query', watch, {
-        expression: ['type', 'f'], // all files
+      const { watch, relative_path } = yield _this7._watchProject(entryPath);
+      const result = yield _this7._command('query', watch, Object.assign({
+        expression: ['allof', ['type', 'f'], // all files
+        ['exists']],
+        // Providing `path` will let watchman use path generator, and will perform
+        // a tree walk with respect to the relative_root and path provided.
+        // Path generator will do less work unless the root path of the repository
+        // is passed in as an entry path.
+        path: [''],
         fields: ['name'], // names only
         relative_root: relative_path
-      });
+      }, options));
       return result.files;
     })();
   }
@@ -271,10 +272,7 @@ let WatchmanClient = class WatchmanClient {
     var _this8 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref4 = yield _this8._command('watch-list');
-
-      const roots = _ref4.roots;
-
+      const { roots } = yield _this8._command('watch-list');
       return roots;
     })();
   }
@@ -314,10 +312,7 @@ let WatchmanClient = class WatchmanClient {
     var _this11 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref5 = yield _this11._command('clock', directoryPath);
-
-      const clock = _ref5.clock;
-
+      const { clock } = yield _this11._command('clock', directoryPath);
       return clock;
     })();
   }
@@ -326,10 +321,7 @@ let WatchmanClient = class WatchmanClient {
     var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref6 = yield _this12._command('version');
-
-      const version = _ref6.version;
-
+      const { version } = yield _this12._command('version');
       return version;
     })();
   }
@@ -341,18 +333,12 @@ let WatchmanClient = class WatchmanClient {
   /*
    * Promisify calls to watchman client.
    */
-  _command() {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
+  _command(...args) {
     return new Promise((resolve, reject) => {
       this._clientPromise.then(client => {
         client.command(args, (error, response) => error ? reject(error) : resolve(response));
       }).catch(reject);
     });
   }
-};
-
-
-module.exports = WatchmanClient;
+}
+exports.default = WatchmanClient;

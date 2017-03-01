@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _formatEnoentNotification;
 
@@ -39,7 +34,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = class Activation {
+class Activation {
 
   constructor(state) {
     const message$ = _rxjsBundlesRxMinJs.Observable.defer(() => (0, (_createMessageStream || _load_createMessageStream()).default)((0, (_createProcessStream || _load_createProcessStream()).createProcessStream)()
@@ -59,17 +54,13 @@ let Activation = class Activation {
         stop: 'adb-logcat:stop',
         restart: 'adb-logcat:restart'
       },
-      handleError: function (err) {
+      handleError(err) {
         if (isNoEntError(err)) {
-          var _formatEnoentNotifica = (0, (_formatEnoentNotification || _load_formatEnoentNotification()).default)({
+          const { message, meta } = (0, (_formatEnoentNotification || _load_formatEnoentNotification()).default)({
             feature: 'Tailing Android (adb) logs',
             toolName: 'adb',
             pathSetting: 'nuclide-adb-logcat.pathToAdb'
           });
-
-          const message = _formatEnoentNotifica.message,
-                meta = _formatEnoentNotifica.meta;
-
           atom.notifications.addError(message, meta);
           return;
         }
@@ -103,9 +94,18 @@ let Activation = class Activation {
   dispose() {
     this._disposables.dispose();
   }
-};
+}
+
+exports.default = Activation;
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const isNoEntError = err => err.code === 'ENOENT';
-
-module.exports = Activation;

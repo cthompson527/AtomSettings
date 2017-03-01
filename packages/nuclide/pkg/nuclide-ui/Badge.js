@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,11 +21,23 @@ function _load_string() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const BadgeSizes = exports.BadgeSizes = Object.freeze({
   medium: 'medium',
   small: 'small',
   large: 'large'
-});const BadgeColors = exports.BadgeColors = Object.freeze({
+});
+
+const BadgeColors = exports.BadgeColors = Object.freeze({
   info: 'info',
   success: 'success',
   warning: 'warning',
@@ -55,18 +58,19 @@ const BadgeColorClassNames = Object.freeze({
 });
 
 const Badge = exports.Badge = props => {
-  const className = props.className,
-        color = props.color,
-        icon = props.icon,
-        size = props.size,
-        value = props.value;
-
+  const {
+    className,
+    color,
+    icon,
+    size,
+    value
+  } = props;
   const sizeClassName = size == null ? '' : BadgeSizeClassNames[size] || '';
   const colorClassName = color == null ? '' : BadgeColorClassNames[color] || '';
   const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'badge', {
     [sizeClassName]: size != null,
     [colorClassName]: color != null,
-    [`icon icon-${ (0, (_string || _load_string()).maybeToString)(icon) }`]: icon != null
+    [`icon icon-${(0, (_string || _load_string()).maybeToString)(icon)}`]: icon != null
   });
   return _reactForAtom.React.createElement(
     'span',

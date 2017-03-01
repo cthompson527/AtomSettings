@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.MultiSelectList = undefined;
-
-var _class, _temp;
 
 var _atom = require('atom');
 
@@ -28,7 +17,7 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let MultiSelectList = exports.MultiSelectList = (_temp = _class = class MultiSelectList extends _reactForAtom.React.Component {
+class MultiSelectList extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -60,8 +49,7 @@ let MultiSelectList = exports.MultiSelectList = (_temp = _class = class MultiSel
         this._moveSelectionIndex(1);
       },
       'core:confirm': () => {
-        const selectedValue = this.state.selectedValue;
-
+        const { selectedValue } = this.state;
         if (selectedValue != null) {
           this._toggleActive(selectedValue);
         }
@@ -115,8 +103,8 @@ let MultiSelectList = exports.MultiSelectList = (_temp = _class = class MultiSel
       const active = this.props.value.indexOf(option.value) !== -1;
       const className = (0, (_classnames || _load_classnames()).default)({
         clearfix: true,
-        selected: selected,
-        active: active
+        selected,
+        active
       });
       return _reactForAtom.React.createElement(
         'li',
@@ -137,13 +125,24 @@ let MultiSelectList = exports.MultiSelectList = (_temp = _class = class MultiSel
       );
     });
   }
+}
 
-}, _class.defaultProps = {
+exports.MultiSelectList = MultiSelectList; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            */
+
+MultiSelectList.defaultProps = {
   onChange: values => {},
   optionComponent: DefaultOptionComponent,
   options: [],
   value: []
-}, _temp);
+};
 
 
 function DefaultOptionComponent(props) {

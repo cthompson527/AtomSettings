@@ -1,20 +1,11 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.NodeDebuggerHost = undefined;
 
-var _rxjsBundlesRxMinJs = _interopRequireDefault(require('rxjs/bundles/Rx.min.js'));
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _WebSocketServer;
 
@@ -42,20 +33,28 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (_utils || _load_utils()).default.log;
+const { log } = (_utils || _load_utils()).default;
 
 /**
  * Responsible for bootstrap and host node inspector backend.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-
-let NodeDebuggerHost = exports.NodeDebuggerHost = class NodeDebuggerHost {
+class NodeDebuggerHost {
 
   constructor() {
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._nodeSocketServer = new (_WebSocketServer || _load_WebSocketServer()).WebSocketServer();
     this._subscriptions.add(this._nodeSocketServer);
-    this._close$ = new _rxjsBundlesRxMinJs.default.Subject();
+    this._close$ = new _rxjsBundlesRxMinJs.Subject();
     this._close$.first().subscribe(() => {
       this.dispose();
     });
@@ -67,15 +66,16 @@ let NodeDebuggerHost = exports.NodeDebuggerHost = class NodeDebuggerHost {
     const debugPort = 5858;
     const wsPort = this._generateRandomInteger(2000, 65535);
     this._nodeSocketServer.start(wsPort).then(websocket => {
-      log(`Websocket server created for port: ${ wsPort }`);
+      log(`Websocket server created for port: ${wsPort}`);
       // TODO: do we need to add webSocket into CompositeDisposable?
       const config = {
-        debugPort: debugPort,
-        preload: false };
+        debugPort,
+        preload: false, // This makes the node inspector not load all the source files on startup.
+        inject: false };
       const session = new (_Session || _load_Session()).Session(config, debugPort, websocket);
-      _rxjsBundlesRxMinJs.default.Observable.fromEvent(session, 'close').subscribe(this._close$);
+      _rxjsBundlesRxMinJs.Observable.fromEvent(session, 'close').subscribe(this._close$);
     });
-    return `ws://127.0.0.1:${ wsPort }/`;
+    return `ws://127.0.0.1:${wsPort}/`;
   }
 
   _generateRandomInteger(min, max) {
@@ -89,4 +89,5 @@ let NodeDebuggerHost = exports.NodeDebuggerHost = class NodeDebuggerHost {
   dispose() {
     this._subscriptions.dispose();
   }
-};
+}
+exports.NodeDebuggerHost = NodeDebuggerHost;

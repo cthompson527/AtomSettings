@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -79,19 +70,29 @@ var _atom = require('atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function getHyperclickProvider() {
   return (_HyperclickProvider || _load_HyperclickProvider()).default;
 }
 
 function createAutocompleteProvider() {
   const getSuggestions = request => {
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('nuclide-ocaml:getAutocompleteSuggestions', () => (_AutoComplete || _load_AutoComplete()).default.getAutocompleteSuggestions(request));
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-ocaml:getAutocompleteSuggestions', () => (_AutoComplete || _load_AutoComplete()).default.getAutocompleteSuggestions(request));
   };
   return {
     selector: '.source.ocaml, .source.reason',
     inclusionPriority: 1,
     disableForSelector: '.source.ocaml .comment, .source.reason .comment',
-    getSuggestions: getSuggestions
+    getSuggestions
   };
 }
 
@@ -117,7 +118,7 @@ function createTypeHintProvider() {
     inclusionPriority: 1,
     providerName: 'nuclide-ocaml',
     selector: Array.from((_constants || _load_constants()).GRAMMARS).join(', '),
-    typeHint: typeHint
+    typeHint
   };
 }
 

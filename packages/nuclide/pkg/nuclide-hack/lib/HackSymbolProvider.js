@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -44,7 +35,15 @@ const ICONS = {
   'enum': 'icon-file-binary',
   'default': 'no-icon',
   'unknown': 'icon-squirrel'
-};
+}; /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */
 
 function bestIconForItem(item) {
   if (!item.additionalInfo) {
@@ -64,30 +63,21 @@ function bestIconForItem(item) {
 }
 
 const HackSymbolProvider = exports.HackSymbolProvider = {
-  getName: function () {
-    return 'HackSymbolProvider';
+  providerType: 'DIRECTORY',
+  name: 'HackSymbolProvider',
+  display: {
+    title: 'Hack Symbols',
+    prompt: 'Search Hack symbols... (e.g. @function %constant #class)',
+    action: 'nuclide-hack-symbol-provider:toggle-provider'
   },
-  getProviderType: function () {
-    return 'DIRECTORY';
-  },
-  isRenderable: function () {
-    return true;
-  },
-  getAction: function () {
-    return 'nuclide-hack-symbol-provider:toggle-provider';
-  },
-  getPromptText: function () {
-    return 'Search Hack symbols. Available prefixes: @function %constant #class';
-  },
-  getTabTitle: function () {
-    return 'Hack Symbols';
-  },
-  isEligibleForDirectory: function (directory) {
+
+  isEligibleForDirectory(directory) {
     return (0, (_HackLanguage || _load_HackLanguage()).isFileInHackProject)(directory.getPath());
   },
-  executeQuery: (() => {
-    var _ref = (0, _asyncToGenerator.default)(function* (query, directory) {
-      if (query.length === 0 || directory == null) {
+
+  executeQuery(query, directory) {
+    return (0, _asyncToGenerator.default)(function* () {
+      if (query.length === 0) {
         return [];
       }
 
@@ -99,20 +89,17 @@ const HackSymbolProvider = exports.HackSymbolProvider = {
       const directoryPath = directory.getPath();
       const results = yield service.executeQuery(directoryPath, query);
       return results;
-    });
+    })();
+  },
 
-    return function executeQuery(_x, _x2) {
-      return _ref.apply(this, arguments);
-    };
-  })(),
-  getComponentForItem: function (uncastedItem) {
+  getComponentForItem(uncastedItem) {
     const item = uncastedItem;
     const filePath = item.path;
     const filename = (_nuclideUri || _load_nuclideUri()).default.basename(filePath);
     const name = item.name || '';
 
     const icon = bestIconForItem(item);
-    const symbolClasses = `file icon ${ icon }`;
+    const symbolClasses = `file icon ${icon}`;
     return _reactForAtom.React.createElement(
       'div',
       { title: item.additionalInfo || '' },

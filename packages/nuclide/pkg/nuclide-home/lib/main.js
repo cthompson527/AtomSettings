@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,8 +7,6 @@ exports.activate = activate;
 exports.setHomeFragments = setHomeFragments;
 exports.deactivate = deactivate;
 exports.consumeWorkspaceViewsService = consumeWorkspaceViewsService;
-
-var _atom = require('atom');
 
 var _createUtmUrl;
 
@@ -31,6 +20,12 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
 var _viewableFromReactElement;
 
 function _load_viewableFromReactElement() {
@@ -41,6 +36,12 @@ var _HomePaneItem;
 
 function _load_HomePaneItem() {
   return _HomePaneItem = _interopRequireDefault(require('./HomePaneItem'));
+}
+
+var _HomePaneItem2;
+
+function _load_HomePaneItem2() {
+  return _HomePaneItem2 = require('./HomePaneItem');
 }
 
 var _immutable;
@@ -60,22 +61,32 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 let subscriptions = null;
 
 // A stream of all of the fragments. This is essentially the state of our panel.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const allHomeFragmentsStream = new _rxjsBundlesRxMinJs.BehaviorSubject((_immutable || _load_immutable()).default.Set());
 
 function activate(state) {
   considerDisplayingHome();
-  subscriptions = new _atom.CompositeDisposable();
+  subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   subscriptions.add(
-  // eslint-disable-next-line nuclide-internal/atom-commands
-  atom.commands.add('atom-workspace', 'nuclide-docs:open', e => {
-    const url = (0, (_createUtmUrl || _load_createUtmUrl()).default)('http://nuclide.io/docs', 'help');
+  // eslint-disable-next-line nuclide-internal/atom-apis
+  atom.commands.add('atom-workspace', 'nuclide-home:open-docs', e => {
+    const url = (0, (_createUtmUrl || _load_createUtmUrl()).default)('https://nuclide.io/docs', 'help');
     _electron.shell.openExternal(url);
   }));
 }
 
 function setHomeFragments(homeFragments) {
   allHomeFragmentsStream.next(allHomeFragmentsStream.getValue().add(homeFragments));
-  return new _atom.Disposable(() => {
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
     allHomeFragmentsStream.next(allHomeFragmentsStream.getValue().remove(homeFragments));
   });
 }
@@ -94,14 +105,12 @@ function deactivate() {
 }
 
 function consumeWorkspaceViewsService(api) {
-  subscriptions.add(api.registerFactory({
-    id: 'nuclide-home',
-    name: 'Home',
-    iconName: 'home',
-    toggleCommand: 'nuclide-home:toggle',
-    defaultLocation: 'pane',
-    create: () => (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_HomePaneItem || _load_HomePaneItem()).default, { allHomeFragmentsStream: allHomeFragmentsStream })),
-    isInstance: item => item instanceof (_HomePaneItem || _load_HomePaneItem()).default
+  subscriptions.add(api.addOpener(uri => {
+    if (uri === (_HomePaneItem2 || _load_HomePaneItem2()).WORKSPACE_VIEW_URI) {
+      return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_HomePaneItem || _load_HomePaneItem()).default, { allHomeFragmentsStream: allHomeFragmentsStream }));
+    }
+  }), () => api.destroyWhere(item => item instanceof (_HomePaneItem || _load_HomePaneItem()).default), atom.commands.add('atom-workspace', 'nuclide-home:toggle', event => {
+    api.toggle((_HomePaneItem2 || _load_HomePaneItem2()).WORKSPACE_VIEW_URI, event.detail);
   }));
   considerDisplayingHome();
 }

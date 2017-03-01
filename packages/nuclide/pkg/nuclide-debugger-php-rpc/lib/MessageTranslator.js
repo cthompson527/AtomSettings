@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.MessageTranslator = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _utils;
 
@@ -67,7 +56,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * TODO: Should we proactively push files to the debugger?
  * Currently we reactively push files to the debuger when they appear in a stack trace.
  */
-let MessageTranslator = exports.MessageTranslator = class MessageTranslator {
+class MessageTranslator {
 
   constructor(clientCallback) {
     this._isDisposed = false;
@@ -95,13 +84,7 @@ let MessageTranslator = exports.MessageTranslator = class MessageTranslator {
 
     return (0, _asyncToGenerator.default)(function* () {
       (_utils || _load_utils()).default.log('handleCommand: ' + command);
-
-      var _JSON$parse = JSON.parse(command);
-
-      const id = _JSON$parse.id,
-            method = _JSON$parse.method,
-            params = _JSON$parse.params;
-
+      const { id, method, params } = JSON.parse(command);
 
       if (!method || typeof method !== 'string') {
         _this._replyWithError(id, 'Missing method: ' + command);
@@ -112,12 +95,7 @@ let MessageTranslator = exports.MessageTranslator = class MessageTranslator {
         _this._replyWithError(id, 'Badly formatted method: ' + command);
         return;
       }
-
-      var _methodParts = _slicedToArray(methodParts, 2);
-
-      const domain = _methodParts[0],
-            methodName = _methodParts[1];
-
+      const [domain, methodName] = methodParts;
 
       if (!_this._handlers.has(domain)) {
         _this._replyWithError(id, 'Unknown domain: ' + command);
@@ -133,8 +111,8 @@ let MessageTranslator = exports.MessageTranslator = class MessageTranslator {
 
         yield handler.handleMethod(id, methodName, params);
       } catch (e) {
-        (_utils || _load_utils()).default.logError(`Exception handling command ${ id }: ${ e } ${ e.stack }`);
-        _this._replyWithError(id, `Error handling command: ${ e }\n ${ e.stack }`);
+        (_utils || _load_utils()).default.logError(`Exception handling command ${id}: ${e} ${e.stack}`);
+        _this._replyWithError(id, `Error handling command: ${e}\n ${e.stack}`);
       }
     })();
   }
@@ -150,4 +128,13 @@ let MessageTranslator = exports.MessageTranslator = class MessageTranslator {
       this._connectionMultiplexer.dispose();
     }
   }
-};
+}
+exports.MessageTranslator = MessageTranslator; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */

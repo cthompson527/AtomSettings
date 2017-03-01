@@ -1,15 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/* @providesModule HgConstants */
 
 const StatusCodeId = Object.freeze({
   ADDED: 'A',
@@ -23,6 +12,18 @@ const StatusCodeId = Object.freeze({
 });
 
 // This is to work around flow's missing support of enums.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/* @providesModule HgConstants */
+
 StatusCodeId;
 
 const StatusCodeNumber = Object.freeze({
@@ -80,11 +81,11 @@ const HEAD_REVISION_EXPRESSION = '.';
 CommitPhase;
 
 module.exports = {
-  AmendMode: AmendMode,
-  CommitPhase: CommitPhase,
-  HEAD_REVISION_EXPRESSION: HEAD_REVISION_EXPRESSION,
-  MergeConflictStatus: MergeConflictStatus,
-  StatusCodeId: StatusCodeId,
-  StatusCodeIdToNumber: StatusCodeIdToNumber,
-  StatusCodeNumber: StatusCodeNumber
+  AmendMode,
+  CommitPhase,
+  HEAD_REVISION_EXPRESSION,
+  MergeConflictStatus,
+  StatusCodeId,
+  StatusCodeIdToNumber,
+  StatusCodeNumber
 };

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,7 +21,7 @@ let niceSafeSpawn = exports.niceSafeSpawn = (() => {
 let niceCheckOutput = exports.niceCheckOutput = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (command, args, execOptions) {
     const nicified = yield nicifyCommand(command, args);
-    return yield (0, (_process || _load_process()).checkOutput)(nicified.command, nicified.args, execOptions);
+    return (0, (_process || _load_process()).checkOutput)(nicified.command, nicified.args, execOptions);
   });
 
   return function niceCheckOutput(_x4, _x5, _x6) {
@@ -41,7 +32,7 @@ let niceCheckOutput = exports.niceCheckOutput = (() => {
 let niceAsyncExecute = exports.niceAsyncExecute = (() => {
   var _ref3 = (0, _asyncToGenerator.default)(function* (command, args, execOptions) {
     const nicified = yield nicifyCommand(command, args);
-    return yield (0, (_process || _load_process()).asyncExecute)(nicified.command, nicified.args, execOptions);
+    return (0, (_process || _load_process()).asyncExecute)(nicified.command, nicified.args, execOptions);
   });
 
   return function niceAsyncExecute(_x7, _x8, _x9) {
@@ -114,7 +105,16 @@ function _load_which() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const NICE_COMMAND = 'nice';
+const NICE_COMMAND = 'nice'; /**
+                              * Copyright (c) 2015-present, Facebook, Inc.
+                              * All rights reserved.
+                              *
+                              * This source code is licensed under the license found in the LICENSE file in
+                              * the root directory of this source tree.
+                              *
+                              * 
+                              */
+
 const IONICE_COMMAND = 'ionice';
 
 const commandAvailabilityCache = (0, (_lruCache || _load_lruCache()).default)({

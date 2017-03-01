@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,15 @@ function _load_nuclideOpenFilesRpc() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
 
 const RESYNC_TIMEOUT_MS = 2000;
 
@@ -48,7 +47,7 @@ const RESYNC_TIMEOUT_MS = 2000;
 // renamed or destroyed, so rather than keep the per-buffer info around after
 // a buffer is destroyed, the outstanding close messages are kept with the
 // per-connection info in NotifiersByConnection.
-let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
+class BufferSubscription {
 
   constructor(notifiers, buffer) {
     var _this = this;
@@ -87,9 +86,9 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
           _this.sendEvent({
             kind: (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.EDIT,
             fileVersion: {
-              notifier: notifier,
-              filePath: filePath,
-              version: version
+              notifier,
+              filePath,
+              version
             },
             oldRange: event.oldRange,
             newRange: event.newRange,
@@ -133,9 +132,9 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
     this.sendEvent({
       kind: (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.OPEN,
       fileVersion: {
-        notifier: notifier,
-        filePath: filePath,
-        version: version
+        notifier,
+        filePath,
+        version
       },
       contents: this._buffer.getText()
     });
@@ -153,7 +152,7 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
         yield event.fileVersion.notifier.onFileEvent(event);
         _this2.updateServerVersion(event.fileVersion.version);
       } catch (e) {
-        logger.error(`Error sending file event: ${ eventToString(event) }`, e);
+        logger.error(`Error sending file event: ${eventToString(event)}`, e);
 
         if (event.fileVersion.filePath === _this2._buffer.getPath()) {
           logger.error('Attempting file resync');
@@ -209,8 +208,8 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
             const syncEvent = {
               kind: (_nuclideOpenFilesRpc || _load_nuclideOpenFilesRpc()).FileEventKind.SYNC,
               fileVersion: {
-                notifier: notifier,
-                filePath: filePath,
+                notifier,
+                filePath,
                 version: resyncVersion
               },
               contents: _this3._buffer.getText()
@@ -219,9 +218,9 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
               yield notifier.onFileEvent(syncEvent);
               _this3.updateServerVersion(resyncVersion);
 
-              logger.error(`Successful resync event: ${ eventToString(syncEvent) }`);
+              logger.error(`Successful resync event: ${eventToString(syncEvent)}`);
             } catch (syncError) {
-              logger.error(`Error sending file sync event: ${ eventToString(syncEvent) }`, syncError);
+              logger.error(`Error sending file sync event: ${eventToString(syncEvent)}`, syncError);
 
               // continue trying until either the file is closed,
               // or a resync to a later edit is attempted
@@ -254,9 +253,9 @@ let BufferSubscription = exports.BufferSubscription = class BufferSubscription {
     this._notifier = null;
     this._subscriptions.dispose();
   }
-};
+}
 
-
+exports.BufferSubscription = BufferSubscription;
 function eventToString(event) {
   const jsonable = Object.assign({}, event);
   jsonable.fileVersion = Object.assign({}, event.fileVersion);

@@ -1,18 +1,11 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DebuggerInstance = exports.default = undefined;
+exports.DebuggerInstance = undefined;
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _atom = require('atom');
 
@@ -54,7 +47,19 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SESSION_END_EVENT = 'session-end-event';let DebuggerInstanceBase = class DebuggerInstanceBase {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const SESSION_END_EVENT = 'session-end-event';
+
+class DebuggerInstanceBase {
 
   constructor(processInfo) {
     this._processInfo = processInfo;
@@ -79,9 +84,10 @@ const SESSION_END_EVENT = 'session-end-event';let DebuggerInstanceBase = class D
   getWebsocketAddress() {
     throw new Error('abstract method');
   }
-};
+}
+
 exports.default = DebuggerInstanceBase;
-let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends DebuggerInstanceBase {
+class DebuggerInstance extends DebuggerInstanceBase {
 
   constructor(processInfo, rpcService, subscriptions) {
     super(processInfo);
@@ -91,7 +97,7 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
       this._disposables.add(subscriptions);
     }
     this._disposables.add(rpcService);
-    this._logger = (0, (_nuclideLogging || _load_nuclideLogging()).getCategoryLogger)(`nuclide-debugger-${ this.getProviderName() }`);
+    this._logger = (0, (_nuclideLogging || _load_nuclideLogging()).getCategoryLogger)(`nuclide-debugger-${this.getProviderName()}`);
     this._chromeWebSocketServer = new (_WebSocketServer || _load_WebSocketServer()).WebSocketServer();
     this._chromeWebSocket = null;
     this._emitter = new _atom.Emitter();
@@ -104,7 +110,16 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
   }
 
   _registerServerHandlers() {
-    this._disposables.add(new (_UniversalDisposable || _load_UniversalDisposable()).default(this._rpcService.getServerMessageObservable().refCount().subscribe(this._handleServerMessage.bind(this), this._handleServerError.bind(this), this._handleSessionEnd.bind(this))));
+    const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._rpcService.getServerMessageObservable().refCount().subscribe(this._handleServerMessage.bind(this), this._handleServerError.bind(this), this._handleSessionEnd.bind(this)));
+    if (rpcServiceSupportsAtomNotifications(this._rpcService)) {
+      disposables.add(this._rpcService.getAtomNotificationObservable().refCount().subscribe(this._handleAtomNotification.bind(this)));
+    }
+    this._disposables.add(disposables);
+  }
+
+  _handleAtomNotification(notification) {
+    const { type, message } = notification;
+    atom.notifications.add(type, message);
   }
 
   getWebsocketAddress() {
@@ -121,9 +136,9 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
   }
 
   _handleWebSocketServerError(error) {
-    let errorMessage = `Server error: ${ JSON.stringify(error) }`;
+    let errorMessage = `Server error: ${JSON.stringify(error)}`;
     if (error.code === 'EADDRINUSE') {
-      errorMessage = `The debug port ${ error.port } is in use.
+      errorMessage = `The debug port ${error.port} is in use.
       Please choose a different port in the debugger config settings.`;
     }
     atom.notifications.addError(errorMessage);
@@ -169,9 +184,10 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
   _handleServerMessage(message_) {
     let message = message_;
     this.getLogger().log('Recieved server message: ' + message);
+    const processedMessage = this.preProcessServerMessage(message);
     const webSocket = this._chromeWebSocket;
     if (webSocket) {
-      message = this._translateMessageIfNeeded(message);
+      message = this._translateMessageIfNeeded(processedMessage);
       webSocket.send(message);
     } else {
       this.getLogger().logError('Why isn\'t chrome websocket available?');
@@ -189,8 +205,23 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
   }
 
   _handleChromeSocketMessage(message) {
-    this.getLogger().log('Recieved Chrome message: ' + message);
-    this._rpcService.sendCommand((0, (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageToServer)(message));
+    var _this = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      _this.getLogger().log('Recieved Chrome message: ' + message);
+      const processedMessage = yield _this.preProcessClientMessage(message);
+      _this._rpcService.sendCommand((0, (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageToServer)(processedMessage));
+    })();
+  }
+
+  // Preprocessing hook for client messsages before sending to server.
+  preProcessClientMessage(message) {
+    return Promise.resolve(message);
+  }
+
+  // Preprocessing hook for server messages before sending to client UI.
+  preProcessServerMessage(message) {
+    return message;
   }
 
   _handleChromeSocketError(error) {
@@ -199,11 +230,16 @@ let DebuggerInstance = exports.DebuggerInstance = class DebuggerInstance extends
   }
 
   _handleChromeSocketClose(code) {
-    this.getLogger().log(`Chrome webSocket closed: ${ code }`);
+    this.getLogger().log(`Chrome webSocket closed: ${code}`);
     this.dispose();
   }
 
   dispose() {
     this._disposables.dispose();
   }
-};
+}
+
+exports.DebuggerInstance = DebuggerInstance;
+function rpcServiceSupportsAtomNotifications(service) {
+  return typeof service.getAtomNotificationObservable === 'function';
+}

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,17 +7,33 @@ exports.default = observeGrammarForTextEditors;
 
 var _atom = require('atom');
 
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('./text-editor');
+}
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const GRAMMAR_CHANGE_EVENT = 'grammar-change';
 
 /**
  * A singleton that listens to grammar changes in all text editors.
  */
-let GrammarForTextEditorsListener = class GrammarForTextEditorsListener {
+class GrammarForTextEditorsListener {
 
   constructor() {
     this._emitter = new _atom.Emitter();
     this._subscriptions = new _atom.CompositeDisposable();
-    this._subscriptions.add(this._emitter, atom.workspace.observeTextEditors(textEditor => {
+    this._subscriptions.add(this._emitter, (0, (_textEditor || _load_textEditor()).observeTextEditors)(textEditor => {
       const grammarSubscription = textEditor.observeGrammar(grammar => {
         this._emitter.emit(GRAMMAR_CHANGE_EVENT, textEditor);
       });
@@ -52,8 +59,7 @@ let GrammarForTextEditorsListener = class GrammarForTextEditorsListener {
   dispose() {
     this._subscriptions.dispose();
   }
-};
-
+}
 
 let grammarForTextEditorsListener;
 
@@ -78,4 +84,3 @@ if (atom.inSpecMode()) {
     }
   };
 }
-module.exports = exports['default'];

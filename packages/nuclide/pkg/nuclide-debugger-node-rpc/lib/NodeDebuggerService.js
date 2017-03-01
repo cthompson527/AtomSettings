@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.NodeDebuggerService = exports.getAttachTargetInfoList = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let getAttachTargetInfoList = exports.getAttachTargetInfoList = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* () {
@@ -48,19 +37,11 @@ let getAttachTargetInfoList = exports.getAttachTargetInfoList = (() => {
     // Filter out processes that have died in between ps calls and zombiue processes.
     // Place pid, process, and command info into AttachTargetInfo objects and return in an array.
     return Array.from(pidToName.entries()).filter(function (arr) {
-      var _arr = _slicedToArray(arr, 2);
-
-      const pid = _arr[0],
-            name = _arr[1];
+      const [pid, name] = arr;
       // Filter out current process and only return node processes.
-
       return pidToCommand.has(pid) && pid !== process.pid && name === 'node';
     }).map(function (arr) {
-      var _arr2 = _slicedToArray(arr, 2);
-
-      const pid = _arr2[0],
-            name = _arr2[1];
-
+      const [pid, name] = arr;
       const commandName = pidToCommand.get(pid);
 
       if (!(commandName != null)) {
@@ -68,9 +49,9 @@ let getAttachTargetInfoList = exports.getAttachTargetInfoList = (() => {
       }
 
       return {
-        pid: pid,
-        name: name,
-        commandName: commandName
+        pid,
+        name,
+        commandName
       };
     });
   });
@@ -120,9 +101,17 @@ function _load_NodeDebuggerHost() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logInfo = (_utils || _load_utils()).default.logInfo;
+const { logInfo } = (_utils || _load_utils()).default; /**
+                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                        * All rights reserved.
+                                                        *
+                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                        * the root directory of this source tree.
+                                                        *
+                                                        * 
+                                                        */
 
-let NodeDebuggerService = exports.NodeDebuggerService = class NodeDebuggerService {
+class NodeDebuggerService {
 
   constructor() {
     this._clientCallback = new (_nuclideDebuggerCommon || _load_nuclideDebuggerCommon()).ClientCallback();
@@ -141,10 +130,10 @@ let NodeDebuggerService = exports.NodeDebuggerService = class NodeDebuggerServic
     return (0, _asyncToGenerator.default)(function* () {
       const nodeWebSocket = _this._webSocketClientToNode;
       if (nodeWebSocket != null) {
-        logInfo(`forward client message to node debugger: ${ message }`);
+        logInfo(`forward client message to node debugger: ${message}`);
         nodeWebSocket.send(message);
       } else {
-        logInfo(`Nuclide sent message to node debugger after socket closed: ${ message }`);
+        logInfo(`Nuclide sent message to node debugger after socket closed: ${message}`);
       }
     })();
   }
@@ -167,10 +156,10 @@ let NodeDebuggerService = exports.NodeDebuggerService = class NodeDebuggerServic
     var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      logInfo(`Connecting debugger host with address: ${ serverAddress }`);
+      logInfo(`Connecting debugger host with address: ${serverAddress}`);
       const ws = new (_ws || _load_ws()).default(serverAddress);
       _this3._subscriptions.add(new (_eventKit || _load_eventKit()).Disposable(function () {
-        return ws.terminate();
+        return ws.close();
       }));
       return new Promise(function (resolve, reject) {
         ws.on('open', function () {
@@ -185,7 +174,7 @@ let NodeDebuggerService = exports.NodeDebuggerService = class NodeDebuggerServic
   }
 
   _handleNodeDebuggerMessage(message) {
-    logInfo(`Node debugger message: ${ message }`);
+    logInfo(`Node debugger message: ${message}`);
     this._clientCallback.sendChromeMessage(message);
   }
 
@@ -200,4 +189,5 @@ let NodeDebuggerService = exports.NodeDebuggerService = class NodeDebuggerServic
       _this4._subscriptions.dispose();
     })();
   }
-};
+}
+exports.NodeDebuggerService = NodeDebuggerService;

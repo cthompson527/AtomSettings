@@ -1,53 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.loadBufferForUri = undefined;
-
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-let loadBufferForUri = exports.loadBufferForUri = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (uri) {
-    let buffer = existingBufferForUri(uri);
-    if (buffer == null) {
-      buffer = createBufferForUri(uri);
-    }
-    if (buffer.loaded) {
-      return buffer;
-    }
-    try {
-      yield buffer.load();
-      return buffer;
-    } catch (error) {
-      atom.project.removeBuffer(buffer);
-      throw error;
-    }
-  });
-
-  return function loadBufferForUri(_x) {
-    return _ref.apply(this, arguments);
-  };
-})();
-
-/**
- * Returns an existing buffer for that uri, or create one if not existing.
- */
-
-
 exports.existingEditorForUri = existingEditorForUri;
 exports.existingEditorForBuffer = existingEditorForBuffer;
-exports.bufferForUri = bufferForUri;
-exports.existingBufferForUri = existingBufferForUri;
 exports.getViewOfEditor = getViewOfEditor;
 exports.getScrollTop = getScrollTop;
 exports.setScrollTop = setScrollTop;
@@ -55,27 +12,22 @@ exports.setPositionAndScroll = setPositionAndScroll;
 exports.getCursorPositions = getCursorPositions;
 exports.observeEditorDestroy = observeEditorDestroy;
 exports.enforceReadOnly = enforceReadOnly;
-
-var _atom = require('atom');
+exports.enforceSoftWrap = enforceSoftWrap;
+exports.observeTextEditors = observeTextEditors;
+exports.isValidTextEditor = isValidTextEditor;
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _nuclideUri;
-
-function _load_nuclideUri() {
-  return _nuclideUri = _interopRequireDefault(require('../commons-node/nuclideUri'));
-}
-
-var _nuclideRemoteConnection;
-
-function _load_nuclideRemoteConnection() {
-  return _nuclideRemoteConnection = require('../nuclide-remote-connection');
-}
 
 var _event;
 
 function _load_event() {
   return _event = require('../commons-node/event');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../commons-node/nuclideUri'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -100,6 +52,16 @@ function existingEditorForUri(path) {
  * Returns a text editor that has the given buffer open, or null if none exists. If there are
  * multiple text editors for this buffer, one is chosen arbitrarily.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function existingEditorForBuffer(buffer) {
   // This isn't ideal but realistically iterating through even a few hundred editors shouldn't be a
   // real problem. And if you have more than a few hundred you probably have bigger problems.
@@ -110,41 +72,6 @@ function existingEditorForBuffer(buffer) {
   }
 
   return null;
-}
-
-function bufferForUri(uri) {
-  const buffer = existingBufferForUri(uri);
-  if (buffer != null) {
-    return buffer;
-  }
-  return createBufferForUri(uri);
-}
-
-function createBufferForUri(uri) {
-  let buffer;
-  if ((_nuclideUri || _load_nuclideUri()).default.isLocal(uri)) {
-    buffer = new _atom.TextBuffer({ filePath: uri });
-  } else {
-    const connection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getForUri(uri);
-    if (connection == null) {
-      throw new Error(`ServerConnection cannot be found for uri: ${ uri }`);
-    }
-    buffer = new (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).NuclideTextBuffer(connection, { filePath: uri });
-  }
-  atom.project.addBuffer(buffer);
-
-  if (!buffer) {
-    throw new Error('Invariant violation: "buffer"');
-  }
-
-  return buffer;
-}
-
-/**
- * Returns an exsting buffer for that uri, or null if not existing.
- */
-function existingBufferForUri(uri) {
-  return atom.project.findBufferForPath(uri);
 }
 
 function getViewOfEditor(editor) {
@@ -221,4 +148,46 @@ function enforceReadOnly(textEditor) {
       return result;
     };
   }
+}
+
+// Turn off soft wrap setting for these editors so diffs properly align.
+// Some text editor register sometimes override the set soft wrapping
+// after mounting an editor to the workspace - here, that's watched and reset to `false`.
+function enforceSoftWrap(editor, enforcedSoftWrap) {
+  editor.setSoftWrapped(enforcedSoftWrap);
+  return editor.onDidChangeSoftWrapped(softWrapped => {
+    if (softWrapped !== enforcedSoftWrap) {
+      // Reset the overridden softWrap to `false` once the operation completes.
+      process.nextTick(() => {
+        if (!editor.isDestroyed()) {
+          editor.setSoftWrapped(enforcedSoftWrap);
+        }
+      });
+    }
+  });
+}
+
+/**
+ * Small wrapper around `atom.workspace.observeTextEditors` that filters out
+ * uninitialized remote editors. Most callers should use this one instead.
+ */
+function observeTextEditors(callback) {
+  // The one place where atom.workspace.observeTextEditors needs to be used.
+  // eslint-disable-next-line nuclide-internal/atom-apis
+  return atom.workspace.observeTextEditors(editor => {
+    if (isValidTextEditor(editor)) {
+      callback(editor);
+    }
+  });
+}
+
+/**
+ * Checks if an object (typically an Atom pane) is a TextEditor with a non-broken path.
+ */
+function isValidTextEditor(item) {
+  // eslint-disable-next-line nuclide-internal/atom-apis
+  if (atom.workspace.isTextEditor(item)) {
+    return !(_nuclideUri || _load_nuclideUri()).default.isBrokenDeserializedUri(item.getPath());
+  }
+  return false;
 }

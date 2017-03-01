@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -20,12 +10,6 @@ var _classnames;
 
 function _load_classnames() {
   return _classnames = _interopRequireDefault(require('classnames'));
-}
-
-var _FilePreview;
-
-function _load_FilePreview() {
-  return _FilePreview = _interopRequireDefault(require('./FilePreview'));
 }
 
 var _nuclideUri;
@@ -40,9 +24,15 @@ function _load_goToLocation() {
   return _goToLocation = require('../../../commons-atom/go-to-location');
 }
 
+var _CodeSnippet;
+
+function _load_CodeSnippet() {
+  return _CodeSnippet = require('../../../nuclide-ui/CodeSnippet');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let FileReferencesView = class FileReferencesView extends _reactForAtom.React.Component {
+class FileReferencesView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -108,13 +98,15 @@ let FileReferencesView = class FileReferencesView extends _reactForAtom.React.Co
           endRange.column + 1,
           caller
         ),
-        _reactForAtom.React.createElement((_FilePreview || _load_FilePreview()).default, Object.assign({
+        _reactForAtom.React.createElement((_CodeSnippet || _load_CodeSnippet()).CodeSnippet, {
           grammar: this.props.grammar,
-          text: this.props.previewText[i]
-        }, group, {
+          text: this.props.previewText[i],
+          highlights: group.references.map(ref => ref.range),
+          startLine: group.startLine,
+          endLine: group.endLine,
           onClick: evt => this._onRefClick(evt, firstRef),
           onLineClick: this._onFileNameClick
-        }))
+        })
       );
     });
     const outerClassName = (0, (_classnames || _load_classnames()).default)('nuclide-find-references-file list-nested-item', {
@@ -125,7 +117,7 @@ let FileReferencesView = class FileReferencesView extends _reactForAtom.React.Co
 
     return _reactForAtom.React.createElement(
       'li',
-      { className: `${ outerClassName }` },
+      { className: `${outerClassName}` },
       _reactForAtom.React.createElement(
         'div',
         {
@@ -150,6 +142,13 @@ let FileReferencesView = class FileReferencesView extends _reactForAtom.React.Co
       )
     );
   }
-};
-exports.default = FileReferencesView;
-module.exports = exports['default'];
+}
+exports.default = FileReferencesView; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */

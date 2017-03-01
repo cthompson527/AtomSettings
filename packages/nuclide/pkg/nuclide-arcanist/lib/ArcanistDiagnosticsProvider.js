@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,11 +7,9 @@ exports.ArcanistDiagnosticsProvider = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _dec, _desc, _value, _class;
-
 var _atom = require('atom');
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _nuclideDiagnosticsProviderBase;
 
@@ -40,28 +29,10 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
-var _onWillDestroyTextBuffer;
-
-function _load_onWillDestroyTextBuffer() {
-  return _onWillDestroyTextBuffer = _interopRequireDefault(require('../../commons-atom/on-will-destroy-text-buffer'));
-}
-
-var _promise;
-
-function _load_promise() {
-  return _promise = require('../../commons-node/promise');
-}
-
 var _string;
 
 function _load_string() {
   return _string = require('../../commons-node/string');
-}
-
-var _aggregateFindDiagnostics;
-
-function _load_aggregateFindDiagnostics() {
-  return _aggregateFindDiagnostics = _interopRequireDefault(require('./aggregateFindDiagnostics'));
 }
 
 var _nuclideLogging;
@@ -70,40 +41,25 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _nuclideRemoteConnection;
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
+function _load_nuclideRemoteConnection() {
+  return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-arcanist:lint'), (_class = class ArcanistDiagnosticsProvider {
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
+class ArcanistDiagnosticsProvider {
 
   constructor(busySignalProvider) {
     this._busySignalProvider = busySignalProvider;
@@ -115,18 +71,13 @@ let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = 
     };
     this._providerBase = new (_nuclideDiagnosticsProviderBase || _load_nuclideDiagnosticsProviderBase()).DiagnosticsProviderBase(baseOptions);
     this._subscriptions.add(this._providerBase);
-    this._requestSerializer = new (_promise || _load_promise()).RequestSerializer();
-    this._subscriptions.add((0, (_onWillDestroyTextBuffer || _load_onWillDestroyTextBuffer()).default)(buffer => {
-      const path = buffer.getPath();
-      if (!path) {
-        return;
-      }
-      this._providerBase.publishMessageInvalidation({ scope: 'file', filePaths: [path] });
-    }));
+    this._runningProcess = new Map();
+    this._bufferSubs = new Map();
   }
 
   dispose() {
     this._subscriptions.dispose();
+    this._bufferSubs.forEach((sub, path, _) => sub.dispose());
   }
 
   /** The returned Promise will resolve when results have been published. */
@@ -135,12 +86,44 @@ let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = 
     if (path == null) {
       return Promise.resolve();
     }
-    return this._busySignalProvider.reportBusy(`Waiting for arc lint results for \`${ textEditor.getTitle() }\``, () => this._runLint(textEditor), { onlyForFile: path });
+
+    const textBuffer = textEditor.getBuffer();
+    this._subscribeToBuffer(textBuffer);
+
+    return this._busySignalProvider.reportBusy(`Waiting for arc lint results for \`${textEditor.getTitle()}\``, () => this._runLint(textEditor), { onlyForFile: path });
+  }
+
+  _subscribeToBuffer(textBuffer) {
+    const path = textBuffer.getPath();
+    if (path != null && !this._bufferSubs.has(path)) {
+      this._bufferSubs.set(path, textBuffer.onDidDestroy(() => this._handleBufferDidDestroy(path)));
+    }
+  }
+
+  _handleBufferDidDestroy(path) {
+    const sub = this._bufferSubs.get(path);
+
+    if (!(sub != null)) {
+      throw new Error('Missing TextBufffer subscription for ' + path);
+    }
+
+    sub.dispose();
+    this._bufferSubs.delete(path);
+
+    const runningProcess = this._runningProcess.get(path);
+    if (runningProcess != null) {
+      runningProcess.complete();
+    }
+
+    this._providerBase.publishMessageInvalidation({ scope: 'file', filePaths: [path] });
   }
 
   /** Do not call this directly -- call _runLintWithBusyMessage */
-
   _runLint(textEditor) {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-arcanist:lint', () => this.__runLint(textEditor));
+  }
+
+  __runLint(textEditor) {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -150,52 +133,71 @@ let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = 
         throw new Error('Invariant violation: "filePath"');
       }
 
+      let diagnostics;
       try {
-        const blacklistedLinters = (_featureConfig || _load_featureConfig()).default.get('nuclide-arcanist.blacklistedLinters');
-        const result = yield _this._requestSerializer.run((0, (_aggregateFindDiagnostics || _load_aggregateFindDiagnostics()).default)([filePath], blacklistedLinters));
-        if (result.status === 'outdated') {
-          return;
-        }
-        const diagnostics = result.result;
-        const fileDiagnostics = diagnostics.map(function (diagnostic) {
-          const range = new _atom.Range([diagnostic.row, diagnostic.col], [diagnostic.row, textEditor.getBuffer().lineLengthForRow(diagnostic.row)]);
-          let text;
-          if (Array.isArray(diagnostic.text)) {
-            // Sometimes `arc lint` returns an array of strings for the text, rather than just a
-            // string :(.
-            text = diagnostic.text.join(' ');
-          } else {
-            text = diagnostic.text;
-          }
-          const maybeProperties = {};
-          if (diagnostic.original != null && diagnostic.replacement != null &&
-          // Sometimes linters set original and replacement to the same value. Obviously that won't
-          // fix anything.
-          diagnostic.original !== diagnostic.replacement) {
-            // Copy the object so the type refinements hold...
-            maybeProperties.fix = _this._getFix(Object.assign({}, diagnostic));
-          }
-          return Object.assign({
-            scope: 'file',
-            providerName: 'Arc' + (diagnostic.code ? `: ${ diagnostic.code }` : ''),
-            type: diagnostic.type,
-            text: text,
-            filePath: diagnostic.filePath,
-            range: range
-          }, maybeProperties);
-        });
-        const diagnosticsUpdate = {
-          filePathToMessages: new Map([[filePath, fileDiagnostics]])
-        };
-        // If the editor has been closed since we made the request, we don't want to display the
-        // errors. This ties in with the fact that we invalidate errors for a file when it is closed.
-        if (!textEditor.isDestroyed()) {
-          _this._providerBase.publishMessageUpdate(diagnosticsUpdate);
-        }
-      } catch (error) {
-        logger.error(error);
+        diagnostics = yield _this._findDiagnostics(filePath);
+      } catch (err) {
+        logger.error(`_findDiagnostics error: ${err}`);
+      }
+
+      // If the editor has been closed since we made the request, we don't want to display the
+      // errors. This ties in with the fact that we invalidate errors for a file when it is closed.
+      if (diagnostics == null || textEditor.isDestroyed()) {
         return;
       }
+
+      const fileDiagnostics = diagnostics.map(function (diagnostic) {
+        const range = new _atom.Range([diagnostic.row, diagnostic.col], [diagnostic.row, textEditor.getBuffer().lineLengthForRow(diagnostic.row)]);
+        let text;
+        if (Array.isArray(diagnostic.text)) {
+          // Sometimes `arc lint` returns an array of strings for the text, rather than just a
+          // string :(.
+          text = diagnostic.text.join(' ');
+        } else {
+          text = diagnostic.text;
+        }
+        const maybeProperties = {};
+        if (diagnostic.original != null && diagnostic.replacement != null &&
+        // Sometimes linters set original and replacement to the same value. Obviously that won't
+        // fix anything.
+        diagnostic.original !== diagnostic.replacement) {
+          // Copy the object so the type refinements hold...
+          maybeProperties.fix = _this._getFix(Object.assign({}, diagnostic));
+        }
+        return Object.assign({
+          scope: 'file',
+          providerName: 'Arc' + (diagnostic.code ? `: ${diagnostic.code}` : ''),
+          type: diagnostic.type,
+          text,
+          filePath: diagnostic.filePath,
+          range
+        }, maybeProperties);
+      });
+      const diagnosticsUpdate = {
+        filePathToMessages: new Map([[filePath, fileDiagnostics]])
+      };
+      _this._providerBase.publishMessageUpdate(diagnosticsUpdate);
+    })();
+  }
+
+  _findDiagnostics(filePath) {
+    var _this2 = this;
+
+    return (0, _asyncToGenerator.default)(function* () {
+      const blacklistedLinters = (_featureConfig || _load_featureConfig()).default.get('nuclide-arcanist.blacklistedLinters');
+      const runningProcess = _this2._runningProcess.get(filePath);
+      if (runningProcess != null) {
+        // This will cause the previous lint run to resolve with `undefined`.
+        runningProcess.complete();
+      }
+      const arcService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getArcanistServiceByNuclideUri)(filePath);
+      const subject = new _rxjsBundlesRxMinJs.Subject();
+      _this2._runningProcess.set(filePath, subject);
+      const subscription = arcService.findDiagnostics(filePath, blacklistedLinters).refCount().toArray().timeout((_featureConfig || _load_featureConfig()).default.get('nuclide-arcanist.lintTimeout')).subscribe(subject);
+      return subject.finally(function () {
+        subscription.unsubscribe();
+        _this2._runningProcess.delete(filePath);
+      }).toPromise();
     })();
   }
 
@@ -203,12 +205,7 @@ let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = 
   // mandatory.
   _getFix(diagnostic) {
     // For now just remove the suffix. The prefix would be nice too but it's a bit harder since we
-    var _removeCommonSuffix = (0, (_string || _load_string()).removeCommonSuffix)(diagnostic.original, diagnostic.replacement),
-        _removeCommonSuffix2 = _slicedToArray(_removeCommonSuffix, 2);
-
-    const original = _removeCommonSuffix2[0],
-          replacement = _removeCommonSuffix2[1];
-
+    const [original, replacement] = (0, (_string || _load_string()).removeCommonSuffix)(diagnostic.original, diagnostic.replacement);
     return {
       oldRange: this._getRangeForFix(diagnostic.row, diagnostic.col, original),
       newText: replacement,
@@ -242,4 +239,5 @@ let ArcanistDiagnosticsProvider = exports.ArcanistDiagnosticsProvider = (_dec = 
   onMessageInvalidation(callback) {
     return this._providerBase.onMessageInvalidation(callback);
   }
-}, (_applyDecoratedDescriptor(_class.prototype, '_runLint', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, '_runLint'), _class.prototype)), _class));
+}
+exports.ArcanistDiagnosticsProvider = ArcanistDiagnosticsProvider;

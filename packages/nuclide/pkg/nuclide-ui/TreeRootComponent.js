@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.TreeRootComponent = undefined;
-
-var _class, _temp;
 
 var _atom = require('atom');
 
@@ -50,6 +39,16 @@ var _reactForAtom = require('react-for-atom');
  * @returns `true` if the value was added to the set, otherwise `false`. If
  *     `forceHas` is defined, the return value will be equal to `forceHas`.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function toggleSetHas(set, value, forceHas) {
   let added;
 
@@ -69,7 +68,7 @@ const FIRST_SELECTED_DESCENDANT_REF = 'firstSelectedDescendant';
 /**
  * Generic tree component that operates on LazyTreeNodes.
  */
-let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class TreeRootComponent extends _reactForAtom.React.Component {
+class TreeRootComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -135,7 +134,7 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
       selectedKeys.delete(node.getKey());
     });
 
-    this.setState({ selectedKeys: selectedKeys });
+    this.setState({ selectedKeys });
   }
 
   _isNodeExpanded(node) {
@@ -156,13 +155,13 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
       this._deselectDescendants(node);
     }
 
-    this.setState({ expandedKeys: expandedKeys });
+    this.setState({ expandedKeys });
   }
 
   _toggleNodeSelected(node, forceSelected) {
     const selectedKeys = this.state.selectedKeys;
     toggleSetHas(selectedKeys, node.getKey(), forceSelected);
-    this.setState({ selectedKeys: selectedKeys });
+    this.setState({ selectedKeys });
   }
 
   _onClickNode(event, node) {
@@ -299,7 +298,7 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
           // they are popped off the stack, they are iterated in the original
           // order.
           cachedChildren.reverse().forEach(childNode => {
-            stack.push({ node: childNode, depth: depth });
+            stack.push({ node: childNode, depth });
           });
         }
       }
@@ -397,8 +396,8 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
     });
 
     this.setState({
-      roots: roots,
-      expandedKeys: expandedKeys
+      roots,
+      expandedKeys
     });
 
     return promise;
@@ -426,7 +425,7 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
         this._rejectDidUpdateListenerPromise = null;
       }
       this._rejectDidUpdateListenerPromise = () => {
-        reject(undefined);
+        reject(new Error());
         didUpdateDisposable.dispose();
       };
     });
@@ -443,8 +442,8 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
     });
 
     this.setState({
-      expandedKeys: expandedKeys,
-      selectedKeys: selectedKeys
+      expandedKeys,
+      selectedKeys
     });
   }
 
@@ -506,7 +505,7 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
    */
   selectNodeKey(nodeKey) {
     if (!this.getNodeForKey(nodeKey)) {
-      return Promise.reject();
+      return Promise.reject(new Error());
     }
 
     // We have to create the listener before setting the state so it can pick
@@ -637,10 +636,12 @@ let TreeRootComponent = exports.TreeRootComponent = (_temp = _class = class Tree
       this.props.onConfirmSelection(node);
     }
   }
-}, _class.defaultProps = {
+}
+exports.TreeRootComponent = TreeRootComponent;
+TreeRootComponent.defaultProps = {
   elementToRenderWhenEmpty: null,
-  onConfirmSelection: function (node) {},
-  rowClassNameForNode: function (node) {
+  onConfirmSelection(node) {},
+  rowClassNameForNode(node) {
     return '';
   }
-}, _temp);
+};

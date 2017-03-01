@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -38,7 +29,19 @@ function _load_uuid() {
   return _uuid = _interopRequireDefault(require('uuid'));
 }
 
+var _os = _interopRequireDefault(require('os'));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const METHOD_CONNECT = 'connect';
 const METHOD_EXIT = 'exit';
@@ -52,7 +55,7 @@ const PARAM_METHOD = 'method';
 function launchDebugger(commander, initialBreakpoints, pathToPythonExecutable, pythonArgs) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     function log(message) {
-      observer.next({ event: 'log', message: message });
+      observer.next({ event: 'log', message });
     }
 
     const server = _net.default.createServer(connection => {
@@ -69,17 +72,15 @@ function launchDebugger(commander, initialBreakpoints, pathToPythonExecutable, p
           write({ [PARAM_METHOD]: METHOD_INIT, [PARAM_BREAKPOINTS]: initialBreakpoints });
           observer.next({ event: 'connected' });
         } else if (method === METHOD_STOP) {
-          const file = args.file,
-                line = args.line;
-
-          observer.next({ event: 'stop', file: file, line: line });
+          const { file, line } = args;
+          observer.next({ event: 'stop', file, line });
         } else if (method === METHOD_EXIT) {
           observer.next({ event: 'exit' });
           connection.end();
         } else if (method === METHOD_START) {
           observer.next({ event: 'start' });
         } else {
-          const error = new Error(`Unrecognized message: ${ JSON.stringify(args) }`);
+          const error = new Error(`Unrecognized message: ${JSON.stringify(args)}`);
           observer.error(error);
         }
       });
@@ -87,7 +88,7 @@ function launchDebugger(commander, initialBreakpoints, pathToPythonExecutable, p
       // Take requests from the input commander and pass them through to the Python debugger.
       // TODO(mbolin): If a `quit` message comes in, we should tear down everything from here
       // because the Python code may be locked up such that it won't get the message.
-      commander.subscribe(write, error => log(`Unexpected error from commander: ${ String(error) }`), () => log('Apparently the commander is done.'));
+      commander.subscribe(write, error => log(`Unexpected error from commander: ${String(error)}`), () => log('Apparently the commander is done.'));
 
       connection.on('end', () => {
         // In the current design, we only expect there to be one connection ever, so when it
@@ -104,7 +105,7 @@ function launchDebugger(commander, initialBreakpoints, pathToPythonExecutable, p
 
     const socketPath = createSocketPath();
     server.listen({ path: socketPath }, () => {
-      log(`listening for connections on ${ socketPath }. About to run python.`);
+      log(`listening for connections on ${socketPath}. About to run python.`);
 
       // The connection is set up, so now we can launch our Python program.
       const pythonDebugger = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, 'main.py');
@@ -114,13 +115,13 @@ function launchDebugger(commander, initialBreakpoints, pathToPythonExecutable, p
       /* eslint-disable no-console */
       // TODO(mbolin): These do not seem to be fired until the debugger finishes.
       // Probably need to handle things differently in debugger.py.
-      python.stdout.on('data', data => console.log(`python stdout: ${ data }`));
-      python.stderr.on('data', data => console.log(`python stderr: ${ data }`));
+      python.stdout.on('data', data => console.log(`python stdout: ${data}`));
+      python.stderr.on('data', data => console.log(`python stderr: ${data}`));
       /* eslint-enable no-console */
     });
   });
 }
 
 function createSocketPath() {
-  return (_nuclideUri || _load_nuclideUri()).default.join(require('os').tmpdir(), `${ (_uuid || _load_uuid()).default.v4() }.sock`);
+  return (_nuclideUri || _load_nuclideUri()).default.join(_os.default.tmpdir(), `${(_uuid || _load_uuid()).default.v4()}.sock`);
 }

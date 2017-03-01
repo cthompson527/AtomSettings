@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,7 +18,16 @@ function _load_SwiftPMTaskRunner() {
   return _SwiftPMTaskRunner = require('./taskrunner/SwiftPMTaskRunner');
 }
 
-let _disposables = null;
+let _disposables = null; /**
+                          * Copyright (c) 2015-present, Facebook, Inc.
+                          * All rights reserved.
+                          *
+                          * This source code is licensed under the license found in the LICENSE file in
+                          * the root directory of this source tree.
+                          *
+                          * 
+                          */
+
 let _taskRunner = null;
 let _initialState = null;
 
@@ -83,7 +83,7 @@ function createAutocompleteProvider() {
     selector: '.source.swift',
     inclusionPriority: 1,
     disableForSelector: '.source.swift .comment',
-    getSuggestions: function (request) {
+    getSuggestions(request) {
       return _getTaskRunner().getAutocompletionProvider().getAutocompleteSuggestions(request);
     }
   };

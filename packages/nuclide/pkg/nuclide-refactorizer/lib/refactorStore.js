@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -50,7 +41,15 @@ function _load_refactorEpics() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // TODO create this lazily
-const errors = new _rxjsBundlesRxMinJs.Subject();
+const errors = new _rxjsBundlesRxMinJs.Subject(); /**
+                                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                                   * All rights reserved.
+                                                   *
+                                                   * This source code is licensed under the license found in the LICENSE file in
+                                                   * the root directory of this source tree.
+                                                   *
+                                                   * 
+                                                   */
 
 function handleError(error) {
   (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error('Uncaught exception in refactoring:', error);

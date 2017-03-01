@@ -1,41 +1,35 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.createMessage = createMessage;
 
-var _parseMessageText2;
+var _parseMessageText;
 
 function _load_parseMessageText() {
-  return _parseMessageText2 = require('./parseMessageText');
+  return _parseMessageText = require('./parseMessageText');
 }
 
 /**
  * Convert a structured logcat entry into the format that nuclide-console wants.
  */
 function createMessage(record) {
-  var _parseMessageText = (0, (_parseMessageText2 || _load_parseMessageText()).parseMessageText)(record.Message);
-
-  const text = _parseMessageText.text,
-        level = _parseMessageText.level,
-        tags = _parseMessageText.tags;
-
+  const { text, level, tags } = (0, (_parseMessageText || _load_parseMessageText()).parseMessageText)(record.Message);
   return {
-    text: text,
+    text,
     level: level == null ? getLevel(record.Level) : level,
     tags: tags == null ? undefined : tags
   };
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function getLevel(level) {
   switch (level) {
@@ -58,6 +52,6 @@ function getLevel(level) {
       // Debug
       return 'debug';
     default:
-      throw new Error(`Invalid ASL level: ${ level }`);
+      throw new Error(`Invalid ASL level: ${level}`);
   }
 }

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,44 +6,16 @@ Object.defineProperty(exports, "__esModule", {
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-let createRemoteConnection = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (remoteProjectConfig) {
-    const host = remoteProjectConfig.host,
-          cwd = remoteProjectConfig.cwd,
-          displayTitle = remoteProjectConfig.displayTitle;
-
-    let connection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.getByHostnameAndPath(host, cwd);
-    if (connection != null) {
-      return connection;
-    }
-
-    connection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.createConnectionBySavedConfig(host, cwd, displayTitle);
-    if (connection != null) {
-      return connection;
-    }
-
-    // If connection fails using saved config, open connect dialog.
-    return (0, (_openConnection || _load_openConnection()).openConnectionDialog)({
-      initialServer: remoteProjectConfig.host,
-      initialCwd: remoteProjectConfig.cwd
-    });
-  });
-
-  return function createRemoteConnection(_x) {
-    return _ref.apply(this, arguments);
-  };
-})();
-
 /**
  * The same TextEditor must be returned to prevent Atom from creating multiple tabs
  * for the same file, because Atom doesn't cache pending opener promises.
  */
 let createEditorForNuclide = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (uri) {
+  var _ref = (0, _asyncToGenerator.default)(function* (uri) {
     try {
       let buffer;
       try {
-        buffer = yield (0, (_loadingNotification || _load_loadingNotification()).default)((0, (_textEditor || _load_textEditor()).loadBufferForUri)(uri), `Opening ${ (_nuclideUri || _load_nuclideUri()).default.nuclideUriToDisplayString(uri) }...`, 1000);
+        buffer = yield (0, (_loadingNotification || _load_loadingNotification()).default)((0, (_textBuffer || _load_textBuffer()).loadBufferForUri)(uri), `Opening \`${(_nuclideUri || _load_nuclideUri()).default.nuclideUriToDisplayString(uri)}\`...`, 1000);
       } catch (err) {
         // Suppress ENOENT errors which occur if the file doesn't exist.
         // This is the same thing Atom does when opening a file (given a URI) that doesn't exist.
@@ -65,7 +28,7 @@ let createEditorForNuclide = (() => {
         // as `loaded` and the proper events are fired. The effect of all of this
         // is that files that don't exist remotely anymore are shown as empty
         // unsaved text editors.
-        buffer = (0, (_textEditor || _load_textEditor()).bufferForUri)(uri);
+        buffer = (0, (_textBuffer || _load_textBuffer()).bufferForUri)(uri);
         buffer.finishLoading();
       }
       // When in "large file mode", syntax highlighting and line wrapping are
@@ -82,10 +45,10 @@ let createEditorForNuclide = (() => {
       // So when a pane is closed, the call to a non-existent `dispose` throws.
       if (typeof atom.textEditors.build === 'function') {
         // https://github.com/atom/atom/blob/v1.11.0-beta5/src/workspace.coffee#L564
-        const editor = atom.textEditors.build({ buffer: buffer, largeFileMode: largeFileMode, autoHeight: false });
+        const editor = atom.textEditors.build({ buffer, largeFileMode, autoHeight: false });
         return editor;
       } else {
-        const editor = atom.workspace.buildTextEditor({ buffer: buffer, largeFileMode: largeFileMode });
+        const editor = atom.workspace.buildTextEditor({ buffer, largeFileMode });
         if (!atom.textEditors.editors.has(editor)) {
           // https://github.com/atom/atom/blob/v1.9.8/src/workspace.coffee#L559-L562
           const disposable = atom.textEditors.add(editor);
@@ -97,13 +60,13 @@ let createEditorForNuclide = (() => {
       }
     } catch (err) {
       logger.warn('buffer load issue:', err);
-      atom.notifications.addError(`Failed to open ${ uri }: ${ err.message }`);
+      atom.notifications.addError(`Failed to open ${uri}: ${err.message}`);
       throw err;
     }
   });
 
-  return function createEditorForNuclide(_x2) {
-    return _ref2.apply(this, arguments);
+  return function createEditorForNuclide(_x) {
+    return _ref.apply(this, arguments);
   };
 })();
 
@@ -114,16 +77,20 @@ let createEditorForNuclide = (() => {
 
 
 let reloadRemoteProjects = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (remoteProjects) {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (remoteProjects) {
     // This is intentionally serial.
     // The 90% use case is to have multiple remote projects for a single connection;
-    // after the first one succeeds the rest should require no user action.
+    const reloadedProjects = [];
     for (const config of remoteProjects) {
-      // eslint-disable-next-line babel/no-await-in-loop
-      const connection = yield createRemoteConnection(config);
+      if (!remoteProjectsService) {
+        throw new Error('Invariant violation: "remoteProjectsService"');
+      }
+      // eslint-disable-next-line no-await-in-loop
+
+
+      const connection = yield remoteProjectsService.createRemoteConnection(config);
       if (!connection) {
         logger.info('No RemoteConnection returned on restore state trial:', config.host, config.cwd);
-        atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:force-refresh-roots');
 
         // Atom restores remote files with a malformed URIs, which somewhat resemble local paths.
         // If after an unsuccessful connection user modifies and saves them he's presented
@@ -142,27 +109,32 @@ let reloadRemoteProjects = (() => {
             return;
           }
 
-          if (path.startsWith(`nuclide:/${ config.host }`)) {
+          if (path.startsWith(`nuclide:/${config.host}`)) {
             textEditor.destroy();
           }
         });
       } else {
         // It's fine the user connected to a different project on the same host:
         // we should still be able to restore this using the new connection.
-        const cwd = config.cwd,
-              host = config.host,
-              displayTitle = config.displayTitle;
-
+        const { cwd, host, displayTitle } = config;
         if (connection.getPathForInitialWorkingDirectory() !== cwd && connection.getRemoteHostname() === host) {
-          // eslint-disable-next-line babel/no-await-in-loop
-          yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.createConnectionBySavedConfig(host, cwd, displayTitle);
+          // eslint-disable-next-line no-await-in-loop
+          const subConnection = yield (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.createConnectionBySavedConfig(host, cwd, displayTitle);
+          if (subConnection != null) {
+            reloadedProjects.push(subConnection.getUriForInitialWorkingDirectory());
+          }
+        } else {
+          reloadedProjects.push(connection.getUriForInitialWorkingDirectory());
         }
       }
     }
+    if (remoteProjectsService != null) {
+      remoteProjectsService._reloadFinished(reloadedProjects);
+    }
   });
 
-  return function reloadRemoteProjects(_x3) {
-    return _ref3.apply(this, arguments);
+  return function reloadRemoteProjects(_x2) {
+    return _ref2.apply(this, arguments);
   };
 })();
 
@@ -173,11 +145,12 @@ exports.deactivate = deactivate;
 exports.createRemoteDirectoryProvider = createRemoteDirectoryProvider;
 exports.createRemoteDirectorySearcher = createRemoteDirectorySearcher;
 exports.getHomeFragments = getHomeFragments;
+exports.provideRemoteProjectsService = provideRemoteProjectsService;
 
-var _textEditor;
+var _textBuffer;
 
-function _load_textEditor() {
-  return _textEditor = require('../../commons-atom/text-editor');
+function _load_textBuffer() {
+  return _textBuffer = require('../../commons-atom/text-buffer');
 }
 
 var _nuclideLogging;
@@ -248,6 +221,18 @@ function _load_RemoteProjectsController() {
   return _RemoteProjectsController = _interopRequireDefault(require('./RemoteProjectsController'));
 }
 
+var _RemoteProjectsService;
+
+function _load_RemoteProjectsService() {
+  return _RemoteProjectsService = _interopRequireDefault(require('./RemoteProjectsService'));
+}
+
+var _patchAtomWorkspaceReplace;
+
+function _load_patchAtomWorkspaceReplace() {
+  return _patchAtomWorkspaceReplace = _interopRequireDefault(require('./patchAtomWorkspaceReplace'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
@@ -255,10 +240,19 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 /**
  * Stores the host and cwd of a remote connection.
  */
-
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 let packageSubscriptions = null;
 let controller = null;
+let remoteProjectsService = null;
 
 const CLOSE_PROJECT_DELAY_MS = 100;
 const pendingFiles = {};
@@ -280,8 +274,18 @@ function addRemoteFolderToProject(connection) {
 
   atom.project.addPath(workingDirectoryUri);
 
-  const subscription = atom.project.onDidChangePaths(() => {
-    // When removing a project in an integration test, skip the cleanup.
+  const subscription = atom.project.onDidChangePaths(paths => {
+    if (paths.indexOf(workingDirectoryUri) !== -1) {
+      return;
+    }
+
+    // The project was removed from the tree.
+    subscription.dispose();
+    if (connection.isOnlyConnection()) {
+      closeOpenFilesForRemoteProject(connection);
+    }
+
+    // Integration tests close the connection manually, so skip the rest.
     if (atom.inSpecMode()) {
       return;
     }
@@ -289,21 +293,10 @@ function addRemoteFolderToProject(connection) {
     // Delay closing the underlying socket connection until registered subscriptions have closed.
     // We should never depend on the order of registration of the `onDidChangePaths` event,
     // which also dispose consumed service's resources.
-    setTimeout(checkClosedProject, CLOSE_PROJECT_DELAY_MS);
+    setTimeout(closeRemoteConnection, CLOSE_PROJECT_DELAY_MS);
   });
 
-  function checkClosedProject() {
-    // The project paths may have changed during the delay time.
-    // Hence, the latest project paths are fetched here.
-    const paths = atom.project.getPaths();
-    if (paths.indexOf(workingDirectoryUri) !== -1) {
-      return;
-    }
-    // The project was removed from the tree.
-    subscription.dispose();
-
-    closeOpenFilesForRemoteProject(connection);
-
+  function closeRemoteConnection() {
     const hostname = connection.getRemoteHostname();
     const closeConnection = shutdownIfLast => {
       connection.close(shutdownIfLast);
@@ -345,10 +338,14 @@ function addRemoteFolderToProject(connection) {
       buttons.reverse();
     }
 
-    const choice = global.atom.confirm({
+    const choice = atom.confirm({
       message: 'No more remote projects on the host: \'' + hostname + '\'. Would you like to shutdown Nuclide server there?',
-      buttons: buttons
+      buttons
     });
+
+    if (!(choice != null)) {
+      throw new Error('Invariant violation: "choice != null"');
+    }
 
     const action = buttonToActions.get(buttons[choice]);
 
@@ -358,18 +355,17 @@ function addRemoteFolderToProject(connection) {
 
     action();
   }
+
+  return subscription;
 }
 
 function closeOpenFilesForRemoteProject(connection) {
   const remoteProjectConfig = connection.getConfig();
   const openInstances = (0, (_utils || _load_utils()).getOpenFileEditorForRemoteProject)(remoteProjectConfig);
   for (const openInstance of openInstances) {
-    const uri = openInstance.uri,
-          editor = openInstance.editor,
-          pane = openInstance.pane;
+    const { uri, editor, pane } = openInstance;
     // It's possible to open files outside of the root of the connection.
     // Only clean up these files if we're the only connection left.
-
     if (connection.isOnlyConnection() || (_nuclideUri || _load_nuclideUri()).default.contains(connection.getUriForInitialWorkingDirectory(), uri)) {
       pane.removeItem(editor);
       editor.destroy();
@@ -405,7 +401,7 @@ function shutdownServersAndRestartNuclide() {
     message: 'This will shutdown your Nuclide servers and restart Atom, ' + 'discarding all unsaved changes. Continue?',
     buttons: {
       'Shutdown & Restart': (() => {
-        var _ref4 = (0, _asyncToGenerator.default)(function* () {
+        var _ref3 = (0, _asyncToGenerator.default)(function* () {
           try {
             yield (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackImmediate)('nuclide-remote-projects:kill-and-restart');
           } finally {
@@ -417,7 +413,7 @@ function shutdownServersAndRestartNuclide() {
         });
 
         return function ShutdownRestart() {
-          return _ref4.apply(this, arguments);
+          return _ref3.apply(this, arguments);
         };
       })(),
       'Cancel': () => {}
@@ -429,9 +425,10 @@ function activate(state) {
   const subscriptions = new _atom.CompositeDisposable();
 
   controller = new (_RemoteProjectsController || _load_RemoteProjectsController()).default();
+  remoteProjectsService = new (_RemoteProjectsService || _load_RemoteProjectsService()).default();
 
   subscriptions.add((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).RemoteConnection.onDidAddRemoteConnection(connection => {
-    addRemoteFolderToProject(connection);
+    subscriptions.add(addRemoteFolderToProject(connection));
 
     // On Atom restart, it tries to open uri paths as local `TextEditor` pane items.
     // Here, Nuclide reloads the remote project files that have empty text editors open.
@@ -440,13 +437,9 @@ function activate(state) {
     for (const openInstance of openInstances) {
       // Keep the original open editor item with a unique name until the remote buffer is loaded,
       // Then, we are ready to replace it with the remote tab in the same pane.
-      const pane = openInstance.pane,
-            editor = openInstance.editor,
-            uri = openInstance.uri,
-            filePath = openInstance.filePath;
+      const { pane, editor, uri, filePath } = openInstance;
 
       // Skip restoring the editer who has remote content loaded.
-
       if (isRemoteBufferInitialized(editor)) {
         continue;
       }
@@ -477,9 +470,7 @@ function activate(state) {
   subscriptions.add(atom.commands.add('atom-workspace', 'nuclide-remote-projects:kill-and-restart', () => shutdownServersAndRestartNuclide()));
 
   // Subscribe opener before restoring the remote projects.
-  subscriptions.add(atom.workspace.addOpener(function () {
-    let uri = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-
+  subscriptions.add(atom.workspace.addOpener((uri = '') => {
     if (uri.startsWith('nuclide:')) {
       const serverConnection = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.getForUri(uri);
       if (serverConnection == null) {
@@ -511,6 +502,8 @@ function activate(state) {
     }
   }));
 
+  subscriptions.add((0, (_patchAtomWorkspaceReplace || _load_patchAtomWorkspaceReplace()).default)());
+
   // If RemoteDirectoryProvider is called before this, and it failed
   // to provide a RemoteDirectory for a
   // given URI, Atom will create a generic Directory to wrap that. We want
@@ -521,9 +514,7 @@ function activate(state) {
 
   // Attempt to reload previously open projects.
   const remoteProjectsConfig = state && state.remoteProjectsConfig;
-  if (remoteProjectsConfig != null) {
-    reloadRemoteProjects(remoteProjectsConfig);
-  }
+  reloadRemoteProjects(remoteProjectsConfig || []);
   packageSubscriptions = subscriptions;
 }
 
@@ -541,7 +532,7 @@ function serialize() {
     return connection ? createSerializableRemoteConnectionConfiguration(connection.getConfig()) : null;
   }).filter(config => config != null);
   return {
-    remoteProjectsConfig: remoteProjectsConfig
+    remoteProjectsConfig
   };
 }
 
@@ -555,6 +546,15 @@ function deactivate() {
     controller.destroy();
     controller = null;
   }
+
+  if (remoteProjectsService != null) {
+    remoteProjectsService.dispose();
+    remoteProjectsService = null;
+  }
+
+  // Gracefully shutdown all server connections and leave servers running.
+  const shutdown = false;
+  (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.closeAll(shutdown);
 }
 
 function createRemoteDirectoryProvider() {
@@ -563,13 +563,7 @@ function createRemoteDirectoryProvider() {
 
 function createRemoteDirectorySearcher() {
   return new (_RemoteDirectorySearcher || _load_RemoteDirectorySearcher()).default(dir => {
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('GrepService', dir.getPath());
-
-    if (!service) {
-      throw new Error('Invariant violation: "service"');
-    }
-
-    return service;
+    return (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getGrepServiceByNuclideUri)(dir.getPath());
   });
 }
 
@@ -583,4 +577,12 @@ function getHomeFragments() {
     },
     priority: 8
   };
+}
+
+function provideRemoteProjectsService() {
+  if (!(remoteProjectsService != null)) {
+    throw new Error('Invariant violation: "remoteProjectsService != null"');
+  }
+
+  return remoteProjectsService;
 }

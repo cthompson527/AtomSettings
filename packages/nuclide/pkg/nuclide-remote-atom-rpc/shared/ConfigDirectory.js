@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getServer = exports.createNewEntry = undefined;
+exports.getServer = exports.createNewEntry = exports.RPC_PROTOCOL = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -43,30 +34,31 @@ let createConfigDirectory = (() => {
 })();
 
 let createNewEntry = exports.createNewEntry = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (port, commandPort, family) {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (commandPort, family) {
     const clearDirectory = true;
     const configDirectory = yield createConfigDirectory(clearDirectory);
     if (configDirectory == null) {
       throw new Error('Could\'t create config directory');
     }
 
-    const subdir = (_nuclideUri || _load_nuclideUri()).default.join(configDirectory, String(port));
+    // TODO: Instead of using this dummy '0' port, will need to figure out
+    // a directory structure which can handle multiple registered servers on the client side.
+    const subdir = (_nuclideUri || _load_nuclideUri()).default.join(configDirectory, String(0));
     yield (_fsPromise || _load_fsPromise()).default.rmdir(subdir);
     if (yield (_fsPromise || _load_fsPromise()).default.exists(subdir)) {
       throw new Error('createNewEntry: Failed to delete: ' + subdir);
     }
     const info = {
-      commandPort: commandPort,
-      port: port,
-      family: family
+      commandPort,
+      family
     };
     yield (_fsPromise || _load_fsPromise()).default.mkdir(subdir);
     yield (_fsPromise || _load_fsPromise()).default.writeFile((_nuclideUri || _load_nuclideUri()).default.join(subdir, SERVER_INFO_FILE), JSON.stringify(info));
 
-    logger.debug(`Created new remote atom config at ${ subdir } for port ${ commandPort } family ${ family }`);
+    logger.debug(`Created new remote atom config at ${subdir} for port ${commandPort} family ${family}`);
   });
 
-  return function createNewEntry(_x2, _x3, _x4) {
+  return function createNewEntry(_x2, _x3) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -85,11 +77,8 @@ let getServer = exports.getServer = (() => {
     // In the future, we may use the serverMetadata to determine which server
     // to use.
     if (serverInfos.length > 0) {
-      var _serverInfos$ = serverInfos[0];
-      const commandPort = _serverInfos$.commandPort,
-            family = _serverInfos$.family;
-
-      logger.debug(`Read remote atom config at ${ configDirectory } for port ${ commandPort } family ${ family }`);
+      const { commandPort, family } = serverInfos[0];
+      logger.debug(`Read remote atom config at ${configDirectory} for port ${commandPort} family ${family}`);
       return serverInfos[0];
     } else {
       return null;
@@ -115,13 +104,13 @@ let getServerInfos = (() => {
         }
       });
 
-      return function (_x6) {
+      return function (_x5) {
         return _ref5.apply(this, arguments);
       };
     })()))));
   });
 
-  return function getServerInfos(_x5) {
+  return function getServerInfos(_x4) {
     return _ref4.apply(this, arguments);
   };
 })();
@@ -136,12 +125,6 @@ var _fsPromise;
 
 function _load_fsPromise() {
   return _fsPromise = _interopRequireDefault(require('../../commons-node/fsPromise'));
-}
-
-var _userInfo2;
-
-function _load_userInfo() {
-  return _userInfo2 = _interopRequireDefault(require('../../commons-node/userInfo'));
 }
 
 var _nuclideUri;
@@ -166,7 +149,17 @@ var _os = _interopRequireDefault(require('os'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
+const RPC_PROTOCOL = exports.RPC_PROTOCOL = 'atom_rpc_protocol';
 
 const NUCLIDE_DIR = '.nuclide';
 const NUCLIDE_SERVER_INFO_DIR = 'command-server';
@@ -177,11 +170,7 @@ function findPathToConfigDirectory(clearDirectory) {
   // because nuclide-server is local, so it should only write out its state to
   // a local directory.
 
-  var _userInfo = (0, (_userInfo2 || _load_userInfo()).default)();
-
-  const homedir = _userInfo.homedir,
-        username = _userInfo.username;
-
+  const { homedir, username } = _os.default.userInfo();
 
   const candidateDirectories = [
   // Start with the tmpdir
@@ -191,7 +180,7 @@ function findPathToConfigDirectory(clearDirectory) {
   homedir,
 
   // If the user's home directory is on NFS, we try /data/users/$USER as a backup.
-  `/data/users/${ username }`];
+  `/data/users/${username}`];
 
   return (0, (_promise || _load_promise()).asyncFind)(candidateDirectories, (() => {
     var _ref6 = (0, _asyncToGenerator.default)(function* (directory) {
@@ -212,7 +201,7 @@ function findPathToConfigDirectory(clearDirectory) {
       }
     });
 
-    return function (_x7) {
+    return function (_x6) {
       return _ref6.apply(this, arguments);
     };
   })());

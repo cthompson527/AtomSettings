@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.WORKSPACE_VIEW_URI = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -22,7 +13,17 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../../nuclide-analytics');
 }
 
-let DiffViewNavigatorGadget = class DiffViewNavigatorGadget extends _reactForAtom.React.Component {
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/diff-view-navigator'; /**
+                                                                                               * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                               * All rights reserved.
+                                                                                               *
+                                                                                               * This source code is licensed under the license found in the LICENSE file in
+                                                                                               * the root directory of this source tree.
+                                                                                               *
+                                                                                               * 
+                                                                                               */
+
+class DiffViewNavigatorGadget extends _reactForAtom.React.Component {
 
   getTitle() {
     return 'Source Control Navigator';
@@ -36,14 +37,21 @@ let DiffViewNavigatorGadget = class DiffViewNavigatorGadget extends _reactForAto
     return 300;
   }
 
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getDefaultLocation() {
+    return 'bottom-panel';
+  }
+
   didChangeVisibility(visible) {
-    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-navigator-toggle', { visible: visible });
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diff-view-navigator-toggle', { visible });
     this.props.actionCreators.updateDiffNavigatorVisibility(visible);
   }
 
   render() {
-    const Component = this.props.component;
-
+    const { component: Component } = this.props;
     return _reactForAtom.React.createElement(Component, null);
   }
 
@@ -52,6 +60,5 @@ let DiffViewNavigatorGadget = class DiffViewNavigatorGadget extends _reactForAto
       deserializer: 'nuclide.DiffViewNavigator'
     };
   }
-};
+}
 exports.default = DiffViewNavigatorGadget;
-module.exports = exports['default'];

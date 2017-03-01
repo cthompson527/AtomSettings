@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -35,7 +26,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Shows a modal dialog when rendered, using Atom's APIs (atom.workspace.addModalPanel).
  */
-let Modal = exports.Modal = class Modal extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Modal extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -80,17 +81,20 @@ let Modal = exports.Modal = class Modal extends _reactForAtom.React.Component {
   }
 
   render() {
+    const props = Object.assign({}, this.props);
+    delete props.onDismiss;
     return _reactForAtom.React.createElement(
       (_Portal || _load_Portal()).Portal,
       { container: this._container },
       _reactForAtom.React.createElement(
         'div',
-        {
-          tabIndex: '0',
-          ref: this._handleContainerInnerElement },
+        Object.assign({
+          tabIndex: '0'
+        }, props, {
+          ref: this._handleContainerInnerElement }),
         this.props.children
       )
     );
   }
-
-};
+}
+exports.Modal = Modal;

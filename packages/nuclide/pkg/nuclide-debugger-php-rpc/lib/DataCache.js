@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -57,7 +48,17 @@ const EVAL_IDENTIFIER = '$__unique_xdebug_variable_name__';
  * RemoteObjects are only valid while the debuggee is paused.
  * Once the debuggee resumes, all RemoteObjects become invalid.
  */
-let DataCache = exports.DataCache = class DataCache {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class DataCache {
 
   constructor(socket) {
     this._socket = socket;
@@ -69,13 +70,13 @@ let DataCache = exports.DataCache = class DataCache {
 
   _onStatusChanged(status) {
     switch (status) {
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break:
         this._enable();
         break;
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STARTING:
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STOPPING:
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STOPPED:
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.RUNNING:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Starting:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Stopping:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Stopped:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Running:
         this._disable();
         break;
     }
@@ -117,8 +118,8 @@ let DataCache = exports.DataCache = class DataCache {
     return (0, _asyncToGenerator.default)(function* () {
       // Every evaluation we perform with xdebug's eval command is saved in a unique variable
       // for later lookup.
-      const newIdentifier = `${ EVAL_IDENTIFIER }${ ++_this2._evalIdentifierId }`;
-      const evaluatedResult = yield _this2._socket.runtimeEvaluate(`${ newIdentifier } = ${ expression }`);
+      const newIdentifier = `${EVAL_IDENTIFIER}${++_this2._evalIdentifierId}`;
+      const evaluatedResult = yield _this2._socket.runtimeEvaluate(`${newIdentifier} = ${expression}`);
       if (evaluatedResult.wasThrown) {
         return evaluatedResult;
       }
@@ -136,7 +137,7 @@ let DataCache = exports.DataCache = class DataCache {
       evaluatedResult.result.$.fullname = newIdentifier;
       const result = (0, (_values || _load_values()).convertValue)(id, evaluatedResult.result);
       return {
-        result: result,
+        result,
         wasThrown: false
       };
     })();
@@ -154,7 +155,7 @@ let DataCache = exports.DataCache = class DataCache {
       // it only supports the current stack frame.  To work around this, we special-case evaluation
       // at the current stack depth.
       if (frameIndex === 0) {
-        return yield _this3.runtimeEvaluate(frameIndex, expression);
+        return _this3.runtimeEvaluate(frameIndex, expression);
       }
 
       const evaluatedResult = yield _this3._socket.evaluateOnCallFrame(frameIndex, expression);
@@ -169,7 +170,7 @@ let DataCache = exports.DataCache = class DataCache {
 
       const result = (0, (_values || _load_values()).convertValue)(id, evaluatedResult.result);
       return {
-        result: result,
+        result,
         wasThrown: false
       };
     })();
@@ -191,22 +192,22 @@ let DataCache = exports.DataCache = class DataCache {
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      (_utils || _load_utils()).default.log(`DataCache.getProperties call on ID: ${ remoteId }`);
+      (_utils || _load_utils()).default.log(`DataCache.getProperties call on ID: ${remoteId}`);
       const id = JSON.parse(remoteId);
       if (id.enableCount !== _this4._enableCount) {
-        (_utils || _load_utils()).default.logErrorAndThrow(`Got request for stale RemoteObjectId ${ remoteId }`);
+        (_utils || _load_utils()).default.logErrorAndThrow(`Got request for stale RemoteObjectId ${remoteId}`);
       }
 
       // context and single paged ids require getting children from the debuggee and converting
       // them from dbgp to chrome format.
       if ((0, (_ObjectId || _load_ObjectId()).isContextObjectId)(id)) {
-        return yield _this4._getContextProperties(id);
+        return _this4._getContextProperties(id);
       } else if ((0, (_ObjectId || _load_ObjectId()).isPagedObjectId)(id)) {
         // Paged id's children are constructed directly in chrome format from the contents of the
         // object id. Does not require going to the debuggee.
         return (0, (_properties || _load_properties()).getPagedProperties)(id);
       } else {
-        return yield _this4._getSinglePageOfProperties(id);
+        return _this4._getSinglePageOfProperties(id);
       }
     })();
   }
@@ -216,8 +217,7 @@ let DataCache = exports.DataCache = class DataCache {
 
     return (0, _asyncToGenerator.default)(function* () {
       let properties = null;
-      const fullname = id.fullname,
-            page = id.page;
+      const { fullname, page } = id;
 
       if (!(fullname != null)) {
         throw new Error('Invariant violation: "fullname != null"');
@@ -252,9 +252,9 @@ let DataCache = exports.DataCache = class DataCache {
       return (0, (_properties || _load_properties()).convertProperties)(id, filteredProperties);
     })();
   }
-};
+}
 
-
+exports.DataCache = DataCache;
 function contextNameToScopeType(name) {
   switch (name) {
     case 'Locals':
@@ -265,7 +265,7 @@ function contextNameToScopeType(name) {
       return 'global';
     // TODO: Verify this ...
     default:
-      (_utils || _load_utils()).default.log(`Unexpected context name: ${ name }`);
+      (_utils || _load_utils()).default.log(`Unexpected context name: ${name}`);
       return 'closure';
   }
 }

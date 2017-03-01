@@ -1,22 +1,11 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.psTree = exports.getChildrenOfProcess = exports.checkOutput = exports.ProcessExitError = exports.ProcessSystemError = undefined;
+exports.psTree = exports.getChildrenOfProcess = exports.getOriginalEnvironment = exports.checkOutput = exports.killUnixProcessTree = exports.ProcessExitError = exports.ProcessSystemError = exports.loggedCalls = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let _killProcess = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (childProcess, killTree) {
@@ -32,21 +21,21 @@ let _killProcess = (() => {
     }
   });
 
-  return function _killProcess(_x9, _x10) {
+  return function _killProcess(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 })();
 
-let killUnixProcessTree = (() => {
+let killUnixProcessTree = exports.killUnixProcessTree = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (childProcess) {
-    const children = yield getChildrenOfProcess(childProcess.pid);
-    for (const child of children) {
-      process.kill(child.pid, 'SIGTERM');
+    const descendants = yield getDescendantsOfProcess(childProcess.pid);
+    // Kill the processes, starting with those of greatest depth.
+    for (const info of descendants.reverse()) {
+      killPid(info.pid);
     }
-    childProcess.kill();
   });
 
-  return function killUnixProcessTree(_x11) {
+  return function killUnixProcessTree(_x3) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -55,18 +44,16 @@ let killUnixProcessTree = (() => {
  * Simple wrapper around asyncExecute that throws if the exitCode is non-zero.
  */
 let checkOutput = exports.checkOutput = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (command, args) {
-    let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
-    const result = yield asyncExecute(command, args, options);
+  var _ref3 = (0, _asyncToGenerator.default)(function* (command, args, options = {}) {
+    const result = yield asyncExecute((_nuclideUri || _load_nuclideUri()).default.expandHomeDir(command), args, options);
     if (result.exitCode !== 0) {
-      const reason = result.exitCode != null ? `exitCode: ${ result.exitCode }` : `error: ${ (0, (_string || _load_string()).maybeToString)(result.errorMessage) }`;
-      throw new Error(`asyncExecute "${ command }" failed with ${ reason }, ` + `stderr: ${ result.stderr }, stdout: ${ result.stdout }.`);
+      const reason = result.exitCode != null ? `exitCode: ${result.exitCode}` : `error: ${(0, (_string || _load_string()).maybeToString)(result.errorMessage)}`;
+      throw new Error(`asyncExecute "${command}" failed with ${reason}, ` + `stderr: ${result.stderr}, stdout: ${result.stdout}.`);
     }
     return result;
   });
 
-  return function checkOutput(_x18, _x19) {
+  return function checkOutput(_x4, _x5) {
     return _ref3.apply(this, arguments);
   };
 })();
@@ -77,8 +64,41 @@ let checkOutput = exports.checkOutput = (() => {
  */
 
 
+let getOriginalEnvironment = exports.getOriginalEnvironment = (() => {
+  var _ref4 = (0, _asyncToGenerator.default)(function* () {
+    yield loadedShellPromise;
+
+    if (cachedOriginalEnvironment != null) {
+      return cachedOriginalEnvironment;
+    }
+
+    const { NUCLIDE_ORIGINAL_ENV } = process.env;
+    if (NUCLIDE_ORIGINAL_ENV != null && NUCLIDE_ORIGINAL_ENV.trim() !== '') {
+      const envString = new Buffer(NUCLIDE_ORIGINAL_ENV, 'base64').toString();
+      cachedOriginalEnvironment = {};
+      for (const envVar of envString.split('\0')) {
+        // envVar should look like A=value_of_A
+        const equalIndex = envVar.indexOf('=');
+        if (equalIndex !== -1) {
+          cachedOriginalEnvironment[envVar.substring(0, equalIndex)] = envVar.substring(equalIndex + 1);
+        }
+      }
+    } else {
+      cachedOriginalEnvironment = process.env;
+    }
+    return cachedOriginalEnvironment;
+  });
+
+  return function getOriginalEnvironment() {
+    return _ref4.apply(this, arguments);
+  };
+})();
+
+// Returns a string suitable for including in displayed error messages.
+
+
 let getChildrenOfProcess = exports.getChildrenOfProcess = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (processId) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (processId) {
     const processes = yield psTree();
 
     return processes.filter(function (processInfo) {
@@ -86,50 +106,93 @@ let getChildrenOfProcess = exports.getChildrenOfProcess = (() => {
     });
   });
 
-  return function getChildrenOfProcess(_x23) {
-    return _ref4.apply(this, arguments);
+  return function getChildrenOfProcess(_x6) {
+    return _ref5.apply(this, arguments);
+  };
+})();
+
+/**
+ * Get a list of descendants, sorted by increasing depth (including the one with the provided pid).
+ */
+
+
+let getDescendantsOfProcess = (() => {
+  var _ref6 = (0, _asyncToGenerator.default)(function* (pid) {
+    const processes = yield psTree();
+    let rootProcessInfo;
+    const pidToChildren = new (_collection || _load_collection()).MultiMap();
+    processes.forEach(function (info) {
+      if (info.pid === pid) {
+        rootProcessInfo = info;
+      }
+      pidToChildren.add(info.parentPid, info);
+    });
+    const descendants = rootProcessInfo == null ? [] : [rootProcessInfo];
+    // Walk through the array, adding the children of the current element to the end. This
+    // breadth-first traversal means that the elements will be sorted by depth.
+    for (let i = 0; i < descendants.length; i++) {
+      const info = descendants[i];
+      const children = pidToChildren.get(info.pid);
+      descendants.push(...Array.from(children));
+    }
+    return descendants;
+  });
+
+  return function getDescendantsOfProcess(_x7) {
+    return _ref6.apply(this, arguments);
   };
 })();
 
 let psTree = exports.psTree = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* () {
+  var _ref7 = (0, _asyncToGenerator.default)(function* () {
     let psPromise;
-    const isWindows = /^win/.test(process.platform);
+    const isWindows = isWindowsPlatform();
     if (isWindows) {
       // See also: https://github.com/nodejs/node-v0.x-archive/issues/2318
       psPromise = checkOutput('wmic.exe', ['PROCESS', 'GET', 'ParentProcessId,ProcessId,Name']);
     } else {
       psPromise = checkOutput('ps', ['-A', '-o', 'ppid,pid,comm']);
     }
-
-    var _ref6 = yield psPromise;
-
-    const stdout = _ref6.stdout;
-
+    const { stdout } = yield psPromise;
     return parsePsOutput(stdout);
   });
 
   return function psTree() {
-    return _ref5.apply(this, arguments);
+    return _ref7.apply(this, arguments);
   };
 })();
 
 exports.safeSpawn = safeSpawn;
+exports.safeFork = safeFork;
 exports.createArgsForScriptCommand = createArgsForScriptCommand;
 exports.scriptSafeSpawn = scriptSafeSpawn;
 exports.scriptSafeSpawnAndObserveOutput = scriptSafeSpawnAndObserveOutput;
 exports.killProcess = killProcess;
+exports.killPid = killPid;
 exports.createProcessStream = createProcessStream;
 exports.observeProcessExit = observeProcessExit;
 exports.getOutputStream = getOutputStream;
 exports.observeProcess = observeProcess;
+exports.observeProcessRaw = observeProcessRaw;
 exports.asyncExecute = asyncExecute;
 exports.runCommand = runCommand;
-exports.getOriginalEnvironment = getOriginalEnvironment;
+exports.loadedShellEnvironment = loadedShellEnvironment;
 exports.exitEventToMessage = exitEventToMessage;
 exports.parsePsOutput = parsePsOutput;
 
 var _child_process = _interopRequireDefault(require('child_process'));
+
+var _collection;
+
+function _load_collection() {
+  return _collection = require('./collection');
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('./nuclideUri'));
+}
 
 var _observable;
 
@@ -157,15 +220,48 @@ function _load_shellQuote() {
   return _shellQuote = require('shell-quote');
 }
 
+var _performanceNow;
+
+function _load_performanceNow() {
+  return _performanceNow = _interopRequireDefault(require('./performanceNow'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Node crashes if we allow buffers that are too large.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DEFAULT_MAX_BUFFER = 100 * 1024 * 1024;
 
-let ProcessSystemError = exports.ProcessSystemError = class ProcessSystemError extends Error {
+const MAX_LOGGED_CALLS = 100;
+const PREVERVED_HISTORY_CALLS = 50;
+
+const loggedCalls = exports.loggedCalls = [];
+function logCall(duration, command, args) {
+  // Trim the history once in a while, to avoid doing expensive array
+  // manipulation all the time after we reached the end of the history
+  if (loggedCalls.length > MAX_LOGGED_CALLS) {
+    loggedCalls.splice(0, loggedCalls.length - PREVERVED_HISTORY_CALLS, { time: new Date(), duration: 0, command: '... history stripped ...' });
+  }
+  loggedCalls.push({
+    duration,
+    command: [command, ...args].join(' '),
+    time: new Date()
+  });
+}
+
+class ProcessSystemError extends Error {
 
   constructor(opts) {
-    super(`"${ opts.command }" failed with code ${ opts.code }`);
+    super(`"${opts.command}" failed with code ${opts.code}`);
     this.name = 'ProcessSystemError';
     this.command = opts.command;
     this.args = opts.args;
@@ -173,11 +269,13 @@ let ProcessSystemError = exports.ProcessSystemError = class ProcessSystemError e
     this.code = opts.code;
     this.originalError = opts.originalError;
   }
-};
-let ProcessExitError = exports.ProcessExitError = class ProcessExitError extends Error {
+}
+
+exports.ProcessSystemError = ProcessSystemError;
+class ProcessExitError extends Error {
 
   constructor(opts) {
-    super(`"${ opts.command }" failed with ${ exitEventToMessage(opts.exitMessage) }\n\n${ opts.stderr }`);
+    super(`"${opts.command}" failed with ${exitEventToMessage(opts.exitMessage)}\n\n${opts.stderr}`);
     this.name = 'ProcessExitError';
     this.command = opts.command;
     this.args = opts.args;
@@ -187,21 +285,23 @@ let ProcessExitError = exports.ProcessExitError = class ProcessExitError extends
     this.stdout = opts.stdout;
     this.stderr = opts.stderr;
   }
-};
+}
+
+exports.ProcessExitError = ProcessExitError;
 
 
 const STREAM_NAMES = ['stdin', 'stdout', 'stderr'];
 
-function logError() {
+function logError(...args) {
   // Can't use nuclide-logging here to not cause cycle dependency.
   // eslint-disable-next-line no-console
-  console.error(...arguments);
+  console.error(...args);
 }
 
-function log() {
+function log(...args) {
   // Can't use nuclide-logging here to not cause cycle dependency.
   // eslint-disable-next-line no-console
-  console.log(...arguments);
+  console.log(...args);
 }
 
 function monitorStreamErrors(process, command, args, options) {
@@ -214,25 +314,41 @@ function monitorStreamErrors(process, command, args, options) {
     stream.on('error', error => {
       // This can happen without the full execution of the command to fail,
       // but we want to learn about it.
-      logError(`stream error on stream ${ streamName } with command:`, command, args, options, 'error:', error);
+      logError(`stream error on stream ${streamName} with command:`, command, args, options, 'error:', error);
     });
   });
 }
 
 /**
- * Basically like spawn, except it handles and logs errors instead of crashing
- * the process. This is much lower-level than asyncExecute. Unless you have a
- * specific reason you should use asyncExecute instead.
+ * Basically like spawn/fork, except it handles and logs errors instead of
+ * crashing the process. This is much lower-level than asyncExecute. Unless
+ * you have a specific reason you should use asyncExecute instead.
  */
-function safeSpawn(command) {
-  let args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+function safeSpawn(command, args = [], options = {}) {
+  return _makeChildProcess('spawn', command, args, options);
+}
 
-  const child = _child_process.default.spawn(command, args, options);
+function safeFork(command, args = [], options = {}) {
+  return _makeChildProcess('fork', command, args, options);
+}
+
+/**
+ * Helper type/function to create child_process by spawning/forking the process.
+ */
+
+
+function _makeChildProcess(type = 'spawn', command, args = [], options = {}) {
+  const now = (0, (_performanceNow || _load_performanceNow()).default)();
+  const child = _child_process.default[type]((_nuclideUri || _load_nuclideUri()).default.expandHomeDir(command), args, prepareProcessOptions(options));
   monitorStreamErrors(child, command, args, options);
   child.on('error', error => {
     logError('error with command:', command, args, options, 'error:', error);
   });
+  if (!options || !options.dontLogInNuclide) {
+    child.on('close', () => {
+      logCall(Math.round((0, (_performanceNow || _load_performanceNow()).default)() - now), command, args);
+    });
+  }
   writeToStdin(child, options);
   return child;
 }
@@ -242,9 +358,7 @@ function safeSpawn(command) {
  * that you should call it with `spawn('script', newArgs)` to run the original command/args pair
  * under `script`.
  */
-function createArgsForScriptCommand(command) {
-  let args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
+function createArgsForScriptCommand(command, args = []) {
   if (process.platform === 'darwin') {
     // On OS X, script takes the program to run and its arguments as varargs at the end.
     return ['-q', '/dev/null', command].concat(args);
@@ -259,10 +373,7 @@ function createArgsForScriptCommand(command) {
  * Basically like safeSpawn, but runs the command with the `script` command.
  * `script` ensures terminal-like environment and commands we run give colored output.
  */
-function scriptSafeSpawn(command) {
-  let args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
+function scriptSafeSpawn(command, args = [], options = {}) {
   const newArgs = createArgsForScriptCommand(command, args);
   return safeSpawn('script', newArgs, options);
 }
@@ -271,11 +382,7 @@ function scriptSafeSpawn(command) {
  * Wraps scriptSafeSpawn with an Observable that lets you listen to the stdout and
  * stderr of the spawned process.
  */
-function scriptSafeSpawnAndObserveOutput(command) {
-  let args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  let killTreeOnComplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
+function scriptSafeSpawnAndObserveOutput(command, args = [], options = {}, killTreeOnComplete = false) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     let childProcess = scriptSafeSpawn(command, args, options);
 
@@ -358,15 +465,15 @@ function _createProcessStream(createProcess, throwOnError, killTreeOnComplete) {
 }
 
 function killProcess(childProcess, killTree) {
-  log(`Ending process stream. Killing process ${ childProcess.pid }`);
+  log(`Ending process stream. Killing process ${childProcess.pid}`);
   _killProcess(childProcess, killTree).then(() => {}, error => {
-    logError(`Killing process ${ childProcess.pid } failed`, error);
+    logError(`Killing process ${childProcess.pid} failed`, error);
   });
 }
 
 function killWindowsProcessTree(pid) {
   return new Promise((resolve, reject) => {
-    _child_process.default.exec(`taskkill /pid ${ pid } /T /F`, error => {
+    _child_process.default.exec(`taskkill /pid ${pid} /T /F`, error => {
       if (error == null) {
         reject(error);
       } else {
@@ -376,14 +483,22 @@ function killWindowsProcessTree(pid) {
   });
 }
 
-function createProcessStream(createProcess) {
-  let killTreeOnComplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+function killPid(pid) {
+  try {
+    process.kill(pid);
+  } catch (err) {
+    if (err.code !== 'ESRCH') {
+      throw err;
+    }
+  }
+}
 
+function createProcessStream(createProcess, killTreeOnComplete = false) {
   return _createProcessStream(createProcess, true, killTreeOnComplete);
 }
 
 function observeProcessExitMessage(process) {
-  return _rxjsBundlesRxMinJs.Observable.fromEvent(process, 'exit', (exitCode, signal) => ({ kind: 'exit', exitCode: exitCode, signal: signal }))
+  return _rxjsBundlesRxMinJs.Observable.fromEvent(process, 'exit', (exitCode, signal) => ({ kind: 'exit', exitCode, signal }))
   // An exit signal from SIGUSR1 doesn't actually exit the process, so skip that.
   .filter(message => message.signal !== 'SIGUSR1').take(1);
 }
@@ -392,15 +507,12 @@ function observeProcessExitMessage(process) {
  * Observe the stdout, stderr and exit code of a process.
  * stdout and stderr are split by newlines.
  */
-function observeProcessExit(createProcess) {
-  let killTreeOnComplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+function observeProcessExit(createProcess, killTreeOnComplete = false) {
   return _createProcessStream(createProcess, false, killTreeOnComplete).flatMap(observeProcessExitMessage);
 }
 
-function getOutputStream(process) {
-  let killTreeOnComplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+function getOutputStream(process, killTreeOnComplete = false, splitByLines = true) {
+  const chunk = splitByLines ? (_observable || _load_observable()).splitStream : x => x;
   return _rxjsBundlesRxMinJs.Observable.defer(() => {
     // We need to start listening for the exit event immediately, but defer emitting it until the
     // (buffered) output streams end.
@@ -412,8 +524,8 @@ function getOutputStream(process) {
     // This utility, however, treats the exit event as stream-ending, which helps us to avoid easy
     // bugs. We give a short (100ms) timeout for the stdout and stderr streams to close.
     const close = exit.delay(100);
-    const stdout = (0, (_observable || _load_observable()).splitStream)((0, (_stream || _load_stream()).observeStream)(process.stdout).takeUntil(close)).map(data => ({ kind: 'stdout', data: data }));
-    const stderr = (0, (_observable || _load_observable()).splitStream)((0, (_stream || _load_stream()).observeStream)(process.stderr).takeUntil(close)).map(data => ({ kind: 'stderr', data: data }));
+    const stdout = chunk((0, (_stream || _load_stream()).observeStream)(process.stdout).takeUntil(close)).map(data => ({ kind: 'stdout', data }));
+    const stderr = chunk((0, (_stream || _load_stream()).observeStream)(process.stderr).takeUntil(close)).map(data => ({ kind: 'stderr', data }));
 
     return (0, (_observable || _load_observable()).takeWhileInclusive)(_rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.merge(stdout, stderr).concat(exit), error), event => event.kind !== 'error' && event.kind !== 'exit').finally(() => {
       exitSub.unsubscribe();
@@ -424,10 +536,42 @@ function getOutputStream(process) {
 /**
  * Observe the stdout, stderr and exit code of a process.
  */
-function observeProcess(createProcess) {
-  let killTreeOnComplete = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+function observeProcess(createProcess, killTreeOnComplete = false) {
   return _createProcessStream(createProcess, false, killTreeOnComplete).flatMap(getOutputStream);
+}
+
+/**
+ * Observe the stdout, stderr and exit code of a process.
+ */
+function observeProcessRaw(createProcess, killTreeOnComplete = false) {
+  return _createProcessStream(createProcess, false, killTreeOnComplete).flatMap(process => getOutputStream(process, false, false));
+}
+
+let FB_INCLUDE_PATHS;
+try {
+  // $FlowFB
+  FB_INCLUDE_PATHS = require('./fb-config').FB_INCLUDE_PATHS;
+} catch (error) {
+  FB_INCLUDE_PATHS = [];
+}
+
+let DEFAULT_PATH_INCLUDE = [...FB_INCLUDE_PATHS, '/usr/local/bin'];
+
+function prepareProcessOptions(options) {
+  return Object.assign({}, options, {
+    env: preparePathEnvironment(options.env)
+  });
+}
+
+function preparePathEnvironment(env) {
+  const originalEnv = Object.assign({}, process.env, env);
+  if (isWindowsPlatform()) {
+    return originalEnv;
+  }
+  const existingPath = originalEnv.PATH || '';
+  return Object.assign({}, originalEnv, {
+    PATH: (_nuclideUri || _load_nuclideUri()).default.joinPathList([existingPath, ...DEFAULT_PATH_INCLUDE])
+  });
 }
 
 /**
@@ -439,33 +583,35 @@ function observeProcess(createProcess) {
  *     Supports the options listed here: http://nodejs.org/api/child_process.html
  *     in addition to the custom options listed in AsyncExecuteOptions.
  */
-function asyncExecute(command, args) {
-  let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-
+function asyncExecute(command, args, options = {}) {
+  const now = (0, (_performanceNow || _load_performanceNow()).default)();
   return new Promise((resolve, reject) => {
-    const process = _child_process.default.execFile(command, args, Object.assign({
+    const process = _child_process.default.execFile((_nuclideUri || _load_nuclideUri()).default.expandHomeDir(command), args, prepareProcessOptions(Object.assign({
       maxBuffer: DEFAULT_MAX_BUFFER
-    }, options),
+    }, options)),
     // Node embeds various properties like code/errno in the Error object.
     (err, /* Error */stdoutBuf, stderrBuf) => {
+      if (!options || !options.dontLogInNuclide) {
+        logCall(Math.round((0, (_performanceNow || _load_performanceNow()).default)() - now), command, args);
+      }
       const stdout = stdoutBuf.toString('utf8');
       const stderr = stderrBuf.toString('utf8');
       if (err == null) {
         resolve({
-          stdout: stdout,
-          stderr: stderr,
+          stdout,
+          stderr,
           exitCode: 0
         });
       } else if (Number.isInteger(err.code)) {
         resolve({
-          stdout: stdout,
-          stderr: stderr,
+          stdout,
+          stderr,
           exitCode: err.code
         });
       } else {
         resolve({
-          stdout: stdout,
-          stderr: stderr,
+          stdout,
+          stderr,
           errorCode: err.errno || 'EUNKNOWN',
           errorMessage: err.message
         });
@@ -487,52 +633,46 @@ function writeToStdin(childProcess, options) {
     childProcess.stdin.write(options.stdin);
     childProcess.stdin.end();
   }
-}function runCommand(command) {
-  let args = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-  let options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  let killTreeOnComplete = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
-
+}function runCommand(command, args = [], options = {}, killTreeOnComplete = false) {
+  const seed = {
+    error: null,
+    stdout: [],
+    stderr: [],
+    exitMessage: null
+  };
   return observeProcess(() => safeSpawn(command, args, options), killTreeOnComplete).reduce((acc, event) => {
     switch (event.kind) {
       case 'stdout':
-        acc.stdout += event.data;
-        break;
+        return Object.assign({}, acc, { stdout: acc.stdout.concat(event.data) });
       case 'stderr':
-        acc.stderr += event.data;
-        break;
+        return Object.assign({}, acc, { stderr: acc.stderr.concat(event.data) });
       case 'error':
-        acc.error = event.error;
-        break;
+        return Object.assign({}, acc, { error: event.error });
       case 'exit':
-        acc.exitMessage = event;
-        break;
+        return Object.assign({}, acc, { exitMessage: event });
     }
     return acc;
-  }, {
-    error: null,
-    stdout: '',
-    stderr: '',
-    exitMessage: null
-  }).map(acc => {
+  }, seed).map(acc => {
     if (acc.error != null) {
       throw new ProcessSystemError({
-        command: command,
-        args: args,
-        options: options,
+        command,
+        args,
+        options,
         code: acc.error.code, // Alias of errno
         originalError: acc.error });
     }
+    const stdout = acc.stdout.join('');
     if (acc.exitMessage != null && acc.exitMessage.exitCode !== 0) {
       throw new ProcessExitError({
-        command: command,
-        args: args,
-        options: options,
+        command,
+        args,
+        options,
         exitMessage: acc.exitMessage,
-        stdout: acc.stdout,
-        stderr: acc.stderr
+        stdout,
+        stderr: acc.stderr.join('')
       });
     }
-    return acc.stdout;
+    return stdout;
   });
 }
 
@@ -540,40 +680,43 @@ function writeToStdin(childProcess, options) {
 // This should contain the base64-encoded output of `env -0`.
 let cachedOriginalEnvironment = null;
 
-function getOriginalEnvironment() {
-  if (cachedOriginalEnvironment != null) {
-    return cachedOriginalEnvironment;
-  }
+let loadedShellResolve;
+const loadedShellPromise = new Promise(resolve => {
+  loadedShellResolve = resolve;
+}).then(() => {
+  // No need to include default paths now that the environment is loaded.
+  DEFAULT_PATH_INCLUDE = [];
+  cachedOriginalEnvironment = null;
+});
 
-  const NUCLIDE_ORIGINAL_ENV = process.env.NUCLIDE_ORIGINAL_ENV;
-
-  if (NUCLIDE_ORIGINAL_ENV != null && NUCLIDE_ORIGINAL_ENV.trim() !== '') {
-    const envString = new Buffer(NUCLIDE_ORIGINAL_ENV, 'base64').toString();
-    cachedOriginalEnvironment = {};
-    for (const envVar of envString.split('\0')) {
-      // envVar should look like A=value_of_A
-      const equalIndex = envVar.indexOf('=');
-      if (equalIndex !== -1) {
-        cachedOriginalEnvironment[envVar.substring(0, equalIndex)] = envVar.substring(equalIndex + 1);
-      }
-    }
-  } else {
-    cachedOriginalEnvironment = process.env;
-  }
-  return cachedOriginalEnvironment;
+if (!loadedShellResolve) {
+  throw new Error('Invariant violation: "loadedShellResolve"');
 }
 
-// Returns a string suitable for including in displayed error messages.
+if (typeof atom === 'undefined' || atom.inSpecMode()) {
+  // This doesn't apply server-side or in tests, so just immediately resolve.
+  loadedShellResolve();
+}
+
+function loadedShellEnvironment() {
+  loadedShellResolve();
+}
+
 function exitEventToMessage(event) {
   if (event.exitCode != null) {
-    return `exit code ${ event.exitCode }`;
+    return `exit code ${event.exitCode}`;
   } else {
     if (!(event.signal != null)) {
       throw new Error('Invariant violation: "event.signal != null"');
     }
 
-    return `signal ${ event.signal }`;
+    return `signal ${event.signal}`;
   }
+}
+
+function isWindowsPlatform() {
+  return (/^win/.test(process.platform)
+  );
 }
 
 function parsePsOutput(psOutput) {
@@ -582,16 +725,11 @@ function parsePsOutput(psOutput) {
 
   return lines.map(line => {
     const columns = line.trim().split(/\s+/);
-
-    var _columns = _slicedToArray(columns, 2);
-
-    const parentPid = _columns[0],
-          pid = _columns[1];
-
+    const [parentPid, pid] = columns;
     const command = columns.slice(2).join(' ');
 
     return {
-      command: command,
+      command,
       parentPid: parseInt(parentPid, 10),
       pid: parseInt(pid, 10)
     };

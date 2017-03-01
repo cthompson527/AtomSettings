@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,12 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.LaunchAttachActions = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _UniversalDisposable;
-
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
-}
 
 var _LaunchAttachDispatcher;
 
@@ -46,55 +31,24 @@ function _load_consumeFirstProvider() {
   return _consumeFirstProvider = _interopRequireDefault(require('../../commons-atom/consumeFirstProvider'));
 }
 
+var _nuclideDebuggerBase;
+
+function _load_nuclideDebuggerBase() {
+  return _nuclideDebuggerBase = require('../../nuclide-debugger-base');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ATTACH_TARGET_LIST_REFRESH_INTERVAL = 2000;let LaunchAttachActions = exports.LaunchAttachActions = class LaunchAttachActions {
+class LaunchAttachActions extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).LaunchAttachActionsBase {
 
   constructor(dispatcher, targetUri) {
+    super(targetUri);
     this._dispatcher = dispatcher;
-    this._targetUri = targetUri;
-    this._refreshTimerId = null;
-    this._dialogVisible = true; // visible by default.
-    this.updateAttachTargetList = this.updateAttachTargetList.bind(this);
-    this._handleLaunchAttachDialogToggle = this._handleLaunchAttachDialogToggle.bind(this);
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.commands.add('atom-workspace', {
-      // eslint-disable-next-line nuclide-internal/atom-commands
-      'nuclide-debugger:toggle-launch-attach': this._handleLaunchAttachDialogToggle
-    }), () => {
-      if (this._refreshTimerId != null) {
-        clearTimeout(this._refreshTimerId);
-        this._refreshTimerId = null;
-      }
-    });
-    this._setTimerEnabledState(true);
-  }
-
-  _handleLaunchAttachDialogToggle() {
-    this._dialogVisible = !this._dialogVisible;
-    this._setTimerEnabledState(this._dialogVisible);
-    // Fire and forget.
-    this.updateAttachTargetList();
-  }
-
-  _setTimerEnabledState(enabled) {
-    if (enabled) {
-      this._refreshTimerId = setInterval(this.updateAttachTargetList, ATTACH_TARGET_LIST_REFRESH_INTERVAL);
-    } else if (this._refreshTimerId != null) {
-      clearTimeout(this._refreshTimerId);
-    }
   }
 
   attachDebugger(attachTarget) {
-    const attachInfo = new (_NodeAttachProcessInfo || _load_NodeAttachProcessInfo()).NodeAttachProcessInfo(this._targetUri, attachTarget);
+    const attachInfo = new (_NodeAttachProcessInfo || _load_NodeAttachProcessInfo()).NodeAttachProcessInfo(this.getTargetUri(), attachTarget);
     return this._startDebugging(attachInfo);
-  }
-
-  toggleLaunchAttachDialog() {
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:toggle-launch-attach');
-  }
-
-  showDebuggerPanel() {
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:show');
   }
 
   _startDebugging(processInfo) {
@@ -108,7 +62,7 @@ const ATTACH_TARGET_LIST_REFRESH_INTERVAL = 2000;let LaunchAttachActions = expor
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const rpcService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getNodeDebuggerServiceByNuclideUri)(_this._targetUri);
+      const rpcService = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getNodeDebuggerServiceByNuclideUri)(_this.getTargetUri());
       const attachTargetList = yield rpcService.getAttachTargetInfoList();
       _this._dispatcher.dispatch({
         actionType: (_LaunchAttachDispatcher || _load_LaunchAttachDispatcher()).ActionTypes.UPDATE_ATTACH_TARGET_LIST,
@@ -116,8 +70,13 @@ const ATTACH_TARGET_LIST_REFRESH_INTERVAL = 2000;let LaunchAttachActions = expor
       });
     })();
   }
-
-  dispose() {
-    this._subscriptions.dispose();
-  }
-};
+}
+exports.LaunchAttachActions = LaunchAttachActions; /**
+                                                    * Copyright (c) 2015-present, Facebook, Inc.
+                                                    * All rights reserved.
+                                                    *
+                                                    * This source code is licensed under the license found in the LICENSE file in
+                                                    * the root directory of this source tree.
+                                                    *
+                                                    * 
+                                                    */

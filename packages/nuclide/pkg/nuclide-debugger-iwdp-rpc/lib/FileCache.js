@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,23 +7,17 @@ exports.FileCache = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 let createFileData = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (url) {
     // Handle the bundle file.
-    log(`FileCache got url: ${ url.toString() }`);
-    const fileResponse = yield (0, (_xfetch || _load_xfetch()).default)(url.toString(), {});
+    log(`FileCache got url: ${url.toString()}`);
+    const localhostedUrl = url.toString().replace(EMULATOR_LOCALHOST_ADDR, 'localhost');
+    log(`Converted to: ${localhostedUrl}`);
+    const fileResponse = yield (0, (_xfetch || _load_xfetch()).default)(localhostedUrl, {});
     const basename = (_nuclideUri || _load_nuclideUri()).default.basename(url.pathname);
-
-    var _ref2 = yield Promise.all([fileResponse.text(), (_fsPromise || _load_fsPromise()).default.tempfile({ prefix: basename, suffix: '.js' })]),
-        _ref3 = _slicedToArray(_ref2, 2);
-
-    const fileText = _ref3[0],
-          filePath = _ref3[1];
-
+    const [fileText, filePath] = yield Promise.all([fileResponse.text(), (_fsPromise || _load_fsPromise()).default.tempfile({ prefix: basename, suffix: '.js' })]);
     yield (_fsPromise || _load_fsPromise()).default.writeFile(filePath, fileText);
-    const fileSystemUrl = `file://${ filePath }`;
+    const fileSystemUrl = `file://${filePath}`;
 
     const matches = SOURCE_MAP_REGEX.exec(fileText);
     if (matches == null) {
@@ -43,14 +28,14 @@ let createFileData = (() => {
     }
 
     // Handle source maps for the bundle.
-    const sourceMapUrl = `${ url.origin }${ matches[1] }`;
-    const sourceMapResponse = yield (0, (_xfetch || _load_xfetch()).default)(sourceMapUrl, {});
+    const sourceMapUrl = `${url.origin}${matches[1]}`;
+    const sourceMapResponse = yield (0, (_xfetch || _load_xfetch()).default)(sourceMapUrl.replace(EMULATOR_LOCALHOST_ADDR, 'localhost'), {});
     const sourceMap = yield sourceMapResponse.text();
     const base64SourceMap = new Buffer(sourceMap).toString('base64');
     return {
       filePath: fileSystemUrl,
       url: url.toString(),
-      sourceMapUrl: `${ SOURCE_MAP_PREFIX }${ base64SourceMap }`
+      sourceMapUrl: `${SOURCE_MAP_PREFIX}${base64SourceMap}`
     };
   });
 
@@ -91,12 +76,24 @@ function _load_logger() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const log = (_logger || _load_logger()).logger.log;
+const { log } = (_logger || _load_logger()).logger;
+// Android's stock emulator and other emulators such as genymotion use a standard localhost alias.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const EMULATOR_LOCALHOST_ADDR = /10\.0\.2\.2|10\.0\.3\.2/;
 
 const SOURCE_MAP_REGEX = /\/\/# sourceMappingURL=(.+)$/;
 const SOURCE_MAP_PREFIX = 'data:application/json;base64,';
 
-let FileCache = exports.FileCache = class FileCache {
+class FileCache {
 
   constructor() {
     this._filePathToFileData = new Map();
@@ -108,13 +105,11 @@ let FileCache = exports.FileCache = class FileCache {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const params = obj.params;
-
+      const { params } = obj;
       if (params == null) {
         return obj;
       }
-      const urlString = params.url;
-
+      const { url: urlString } = params;
       if (urlString == null || urlString === '') {
         return obj;
       }
@@ -150,7 +145,9 @@ let FileCache = exports.FileCache = class FileCache {
       _this2._disposables.dispose();
     })();
   }
-};
+}
+
+exports.FileCache = FileCache;
 
 
 function updateMessageObjWithFileData(obj, fileData) {

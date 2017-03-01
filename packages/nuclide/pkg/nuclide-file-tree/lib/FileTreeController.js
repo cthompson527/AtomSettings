@@ -1,15 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-var _atom = require('atom');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _FileTreeConstants;
 
@@ -65,53 +58,85 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
+var _goToLocation;
+
+function _load_goToLocation() {
+  return _goToLocation = require('../../commons-atom/go-to-location');
+}
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
+var _atom = require('atom');
+
 var _os = _interopRequireDefault(require('os'));
 
 var _electron = require('electron');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const VALID_FILTER_CHARS = '!#./0123456789-:;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '_abcdefghijklmnopqrstuvwxyz~';
+const VALID_FILTER_CHARS = '!#./0123456789-:;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ' + '_abcdefghijklmnopqrstuvwxyz~'; /**
+                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                              * All rights reserved.
+                                                                                                              *
+                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                              * the root directory of this source tree.
+                                                                                                              *
+                                                                                                              * 
+                                                                                                              */
 
-let FileTreeController = class FileTreeController {
+class ProjectSelectionManager {
+
+  constructor() {
+    this._actions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance();
+    this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
+  }
+
+  addExtraContent(content) {
+    this._actions.addExtraProjectSelectionContent(content);
+    return new _atom.Disposable(() => this._actions.removeExtraProjectSelectionContent(content));
+  }
+
+  getExtraContent() {
+    return this._store.getExtraProjectSelectionContent();
+  }
+}
+
+class FileTreeController {
 
   constructor(state) {
     this._actions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance();
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
+    this._projectSelectionManager = new ProjectSelectionManager();
     this._repositories = new (_immutable || _load_immutable()).default.Set();
-    this._subscriptionForRepository = new (_immutable || _load_immutable()).default.Map();
-    this._subscriptions = new _atom.CompositeDisposable(new _atom.Disposable(() => {
+    this._disposableForRepository = new (_immutable || _load_immutable()).default.Map();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
       if (this._cwdApiSubscription != null) {
         this._cwdApiSubscription.dispose();
       }
-    }));
+    });
     // Initial root directories
     this._updateRootDirectories();
     // Subsequent root directories updated on change
-    this._subscriptions.add(atom.project.onDidChangePaths(() => this._updateRootDirectories()));
-
-    this._subscriptions.add(atom.commands.add('atom-workspace', {
+    this._disposables.add(atom.project.onDidChangePaths(() => this._updateRootDirectories()), atom.commands.add('atom-text-editor', {
+      // eslint-disable-next-line nuclide-internal/atom-commands
+      'nuclide-file-tree:reveal-text-editor': this._revealTextEditor.bind(this)
+    }), atom.commands.add('atom-workspace', {
       // Pass undefined so the default parameter gets used.
-      // NOTE: This is specifically for use in Diff View, so don't expose a menu item.
-      // eslint-disable-next-line nuclide-internal/atom-commands
-      'nuclide-file-tree:reveal-text-editor': this._revealTextEditor.bind(this),
-      // This command is to workaround the initialization order problem between the
-      // nuclide-remote-projects and nuclide-file-tree packages.
-      // The file-tree starts up and restores its state, which can have a (remote) project root.
-      // But at this point it's not a real directory. It is not present in
-      // atom.project.getDirectories() and essentially it's a fake, but a useful one, as it has
-      // the state (open folders, selection etc.) serialized in it. So we don't want to discard
-      // it. In most cases, after a successful reconnect the real directory instance will be
-      // added to the atom.project.directories and the previously fake root would become real.
-      // The problem happens when the connection fails, or is canceled.
-      // The fake root just stays in the file tree. To workaround that, this command can be used
-      // to force the file-tree reflect the actual state of the projects.
-      // Ideally, we'd like a service dependency between the two packages, but I (advinskyt) don't
-      // see it happening any time soon.
-      // eslint-disable-next-line nuclide-internal/atom-commands
-      'nuclide-file-tree:force-refresh-roots': this._updateRootDirectories.bind(this),
       'nuclide-file-tree:reveal-active-file': this.revealActiveFile.bind(this, undefined),
-      'nuclide-file-tree:recursive-collapse-all': this._collapseAll.bind(this)
+      'nuclide-file-tree:recursive-collapse-all': this._collapseAll.bind(this),
+      'nuclide-file-tree:add-file-relative': () => {
+        (_FileSystemActions || _load_FileSystemActions()).default.openAddFileDialogRelative(this._openAndRevealFilePath.bind(this));
+      }
     }));
     const letterKeyBindings = {
       'nuclide-file-tree:remove-letter': this._handleRemoveLetterKeypress.bind(this),
@@ -119,9 +144,9 @@ let FileTreeController = class FileTreeController {
     };
     for (let i = 0, c = VALID_FILTER_CHARS.charCodeAt(0); i < VALID_FILTER_CHARS.length; i++, c = VALID_FILTER_CHARS.charCodeAt(i)) {
       const char = String.fromCharCode(c);
-      letterKeyBindings[`nuclide-file-tree:go-to-letter-${ char }`] = this._handlePrefixKeypress.bind(this, char);
+      letterKeyBindings[`nuclide-file-tree:go-to-letter-${char}`] = this._handlePrefixKeypress.bind(this, char);
     }
-    this._subscriptions.add(atom.commands.add((_FileTreeConstants || _load_FileTreeConstants()).EVENT_HANDLER_SELECTOR, Object.assign({
+    this._disposables.add(atom.commands.add((_FileTreeConstants || _load_FileTreeConstants()).EVENT_HANDLER_SELECTOR, Object.assign({
       'core:move-down': this._moveDown.bind(this),
       'core:move-up': this._moveUp.bind(this),
       'core:move-to-top': this._moveToTop.bind(this),
@@ -153,12 +178,11 @@ let FileTreeController = class FileTreeController {
       'nuclide-file-tree:search-in-directory': this._searchInDirectory.bind(this),
       'nuclide-file-tree:show-in-file-manager': this._showInFileManager.bind(this),
       'nuclide-file-tree:set-current-working-root': this._setCwdToSelection.bind(this)
-    }, letterKeyBindings)));
-    this._subscriptions.add(atom.commands.add('[is="tabs-tab"]', {
+    }, letterKeyBindings)), atom.commands.add('[is="tabs-tab"]', {
       'nuclide-file-tree:reveal-tab-file': this._revealTabFileOnClick.bind(this)
     }));
-    if (state && state.tree) {
-      this._store.loadData(state.tree);
+    if (state != null) {
+      this._store.loadData(state);
     }
     this._contextMenu = new (_FileTreeContextMenu || _load_FileTreeContextMenu()).default();
   }
@@ -191,6 +215,10 @@ let FileTreeController = class FileTreeController {
     return this._contextMenu;
   }
 
+  getProjectSelectionManager() {
+    return this._projectSelectionManager;
+  }
+
   _handleClearFilter() {
     this._store.clearFilter();
   }
@@ -212,7 +240,7 @@ let FileTreeController = class FileTreeController {
 
   _openAndRevealFilePath(filePath) {
     if (filePath != null) {
-      atom.workspace.open(filePath);
+      (0, (_goToLocation || _load_goToLocation()).goToLocation)(filePath);
       this.revealNodeKey(filePath);
     }
   }
@@ -233,8 +261,8 @@ let FileTreeController = class FileTreeController {
   }
 
   _revealTextEditor(event) {
-    const editorElement = event.target;
-    if (editorElement == null || typeof editorElement.getModel !== 'function' || !atom.workspace.isTextEditor(editorElement.getModel())) {
+    const editorElement = event.currentTarget;
+    if (editorElement == null || typeof editorElement.getModel !== 'function' || !(0, (_textEditor || _load_textEditor()).isValidTextEditor)(editorElement.getModel())) {
       return;
     }
 
@@ -246,21 +274,17 @@ let FileTreeController = class FileTreeController {
    * Reveal the file that currently has focus in the file tree. If showIfHidden is false,
    * this will enqueue a pending reveal to be executed when the file tree is shown again.
    */
-  revealActiveFile() {
-    let showIfHidden = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
+  revealActiveFile(showIfHidden = true) {
     const editor = atom.workspace.getActiveTextEditor();
     const filePath = editor != null ? editor.getPath() : null;
     this._revealFilePath(filePath, showIfHidden);
   }
 
-  _revealFilePath(filePath) {
-    let showIfHidden = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-
+  _revealFilePath(filePath, showIfHidden = true) {
     if (showIfHidden) {
       // Ensure the file tree is visible before trying to reveal a file in it. Even if the currently
       // active pane is not an ordinary editor, we still at least want to show the tree.
-      atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:toggle', { display: true });
+      atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:toggle', { visible: true });
     }
 
     if (!filePath) {
@@ -283,7 +307,7 @@ let FileTreeController = class FileTreeController {
     }
 
     const filePath = title.dataset.path;
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:toggle', { display: true });
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:toggle', { visible: true });
     this.revealNodeKey(filePath);
   }
 
@@ -325,6 +349,24 @@ let FileTreeController = class FileTreeController {
     this._cwdApi = cwdApi;
   }
 
+  setRemoteProjectsService(service) {
+    if (service != null) {
+      // This is to workaround the initialization order problem between the
+      // nuclide-remote-projects and nuclide-file-tree packages.
+      // The file-tree starts up and restores its state, which can have a (remote) project root.
+      // But at this point it's not a real directory. It is not present in
+      // atom.project.getDirectories() and essentially it's a fake, but a useful one, as it has
+      // the state (open folders, selection etc.) serialized in it. So we don't want to discard
+      // it. In most cases, after a successful reconnect the real directory instance will be
+      // added to the atom.project.directories and the previously fake root would become real.
+      // The problem happens when the connection fails, or is canceled.
+      // The fake root just stays in the file tree.
+      // After remote projects have been reloaded, force a refresh to clear out the fake roots.
+      this._disposables.add(service.waitForRemoteProjectReload(this._updateRootDirectories.bind(this)));
+    }
+    this._remoteProjectsService = service;
+  }
+
   setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths) {
     this._actions.setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths);
   }
@@ -361,9 +403,7 @@ let FileTreeController = class FileTreeController {
    * Collapses all selected directory nodes. If the selection is a single file or a single collapsed
    * directory, the selection is set to the directory's parent.
    */
-  _collapseSelection() {
-    let deep = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
+  _collapseSelection(deep = false) {
     const selectedNodes = this._store.getSelectedNodes();
     const firstSelectedNode = selectedNodes.first();
     if (selectedNodes.size === 1 && !firstSelectedNode.isRoot && !(firstSelectedNode.isContainer && firstSelectedNode.isExpanded)) {
@@ -423,21 +463,21 @@ let FileTreeController = class FileTreeController {
           },
           Cancel: () => {}
         },
-        detailedMessage: `You are deleting:${ _os.default.EOL }${ selectedPaths.join(_os.default.EOL) }`,
-        message: message
+        detailedMessage: `You are deleting:${_os.default.EOL}${selectedPaths.join(_os.default.EOL)}`,
+        message
       });
     } else {
       let message;
       if (rootPaths.size === 1) {
-        message = `The root directory '${ rootPaths.first().nodeName }' can't be removed.`;
+        message = `The root directory '${rootPaths.first().nodeName}' can't be removed.`;
       } else {
-        const rootPathNames = rootPaths.map(node => `'${ node.nodeName }'`).join(', ');
-        message = `The root directories ${ rootPathNames } can't be removed.`;
+        const rootPathNames = rootPaths.map(node => `'${node.nodeName}'`).join(', ');
+        message = `The root directories ${rootPathNames} can't be removed.`;
       }
 
       atom.confirm({
         buttons: ['OK'],
-        message: message
+        message
       });
     }
   }
@@ -491,8 +531,8 @@ let FileTreeController = class FileTreeController {
     if (singleSelectedNode != null && !singleSelectedNode.isContainer) {
       // for: is this feature used enough to justify uncollapsing?
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-split-file', {
-        orientation: orientation,
-        side: side
+        orientation,
+        side
       });
       this._actions.openSelectedEntrySplit(singleSelectedNode.uri, orientation, side);
     }
@@ -600,8 +640,8 @@ let FileTreeController = class FileTreeController {
   }
 
   destroy() {
-    this._subscriptions.dispose();
-    for (const disposable of this._subscriptionForRepository.values()) {
+    this._disposables.dispose();
+    for (const disposable of this._disposableForRepository.values()) {
       disposable.dispose();
     }
     this._store.reset();
@@ -609,11 +649,7 @@ let FileTreeController = class FileTreeController {
   }
 
   serialize() {
-    return {
-      tree: this._store.exportData()
-    };
+    return this._store.exportData();
   }
-};
-
-
-module.exports = FileTreeController;
+}
+exports.default = FileTreeController;

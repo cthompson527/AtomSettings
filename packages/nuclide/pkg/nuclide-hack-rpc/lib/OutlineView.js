@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -31,7 +22,15 @@ function outlineFromHackIdeOutline(hackOutline) {
   return {
     outlineTrees: hackOutline.map(outlineFromHackIdeItem)
   };
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function outlineFromHackIdeItem(hackItem) {
   const tokenizedText = [];
@@ -91,7 +90,7 @@ function outlineFromHackIdeItem(hackItem) {
   }
 
   return {
-    tokenizedText: tokenizedText,
+    tokenizedText,
     representativeName: hackItem.name,
     startPosition: pointFromHack(hackItem.position.line, hackItem.position.char_start),
     endPosition: pointFromHack(hackItem.span.line_end, hackItem.span.char_end),

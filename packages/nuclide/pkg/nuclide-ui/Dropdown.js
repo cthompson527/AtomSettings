@@ -1,21 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.ButtonSizes = exports.Dropdown = undefined;
-
-var _class, _temp;
-
 exports.DropdownButton = DropdownButton;
 
 var _Button;
@@ -42,7 +30,17 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const remote = _electron.default.remote;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const { remote } = _electron.default;
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
@@ -51,7 +49,7 @@ if (!(remote != null)) {
 // For backwards compat, we have to do some conversion here.
 
 
-let Dropdown = exports.Dropdown = (_temp = _class = class Dropdown extends _reactForAtom.React.Component {
+class Dropdown extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -59,7 +57,18 @@ let Dropdown = exports.Dropdown = (_temp = _class = class Dropdown extends _reac
   }
 
   render() {
-    const selectedOption = this.props.options.find(option => option.type !== 'separator' && option.value === this.props.value) || this.props.options[0];
+    const selectedOption = this._findSelectedOption(this.props.options);
+
+    let selectedLabel;
+    if (selectedOption == null) {
+      if (this.props.placeholder != null) {
+        selectedLabel = this.props.placeholder;
+      } else {
+        selectedLabel = this._renderSelectedLabel(this.props.options[0]);
+      }
+    } else {
+      selectedLabel = this._renderSelectedLabel(selectedOption);
+    }
 
     return _reactForAtom.React.createElement(
       DropdownButton,
@@ -72,7 +81,7 @@ let Dropdown = exports.Dropdown = (_temp = _class = class Dropdown extends _reac
         onExpand: this._handleDropdownClick,
         size: this.props.size,
         tooltip: this.props.tooltip },
-      this._renderSelectedLabel(selectedOption)
+      selectedLabel
     );
   }
 
@@ -94,35 +103,73 @@ let Dropdown = exports.Dropdown = (_temp = _class = class Dropdown extends _reac
 
   _handleDropdownClick(event) {
     const currentWindow = remote.getCurrentWindow();
-    const menu = new remote.Menu();
-    this.props.options.forEach(option => {
-      if (option.type === 'separator') {
-        menu.append(new remote.MenuItem({ type: 'separator' }));
-        return;
-      }
-      menu.append(new remote.MenuItem({
-        type: 'checkbox',
-        checked: this.props.value === option.value,
-        label: option.label,
-        enabled: option.disabled !== true,
-        click: () => {
-          if (this.props.onChange != null) {
-            this.props.onChange(option.value);
-          }
-        }
-      }));
-    });
+    const menu = this._menuFromOptions(this.props.options);
     menu.popup(currentWindow, event.clientX, event.clientY);
   }
 
-}, _class.defaultProps = {
+  _menuFromOptions(options) {
+    const menu = new remote.Menu();
+    options.forEach(option => {
+      if (option.type === 'separator') {
+        menu.append(new remote.MenuItem({ type: 'separator' }));
+      } else if (option.type === 'submenu') {
+        const submenu = option.submenu;
+        menu.append(new remote.MenuItem({
+          type: 'submenu',
+          label: option.label,
+          enabled: option.disabled !== true,
+          submenu: this._menuFromOptions(submenu)
+        }));
+      } else {
+        menu.append(new remote.MenuItem({
+          type: 'checkbox',
+          checked: this._optionIsSelected(this.props.value, option.value),
+          label: option.label,
+          enabled: option.disabled !== true,
+          click: () => {
+            if (this.props.onChange != null) {
+              this.props.onChange(option.value);
+            }
+          }
+        }));
+      }
+    });
+    return menu;
+  }
+
+  _optionIsSelected(dropdownValue, optionValue) {
+    return this.props.selectionComparator ? this.props.selectionComparator(dropdownValue, optionValue) : dropdownValue === optionValue;
+  }
+
+  _findSelectedOption(options) {
+    let result = null;
+    for (const option of options) {
+      if (option.type === 'separator') {
+        continue;
+      } else if (option.type === 'submenu') {
+        const submenu = option.submenu;
+        result = this._findSelectedOption(submenu);
+      } else if (this._optionIsSelected(this.props.value, option.value)) {
+        result = option;
+      }
+
+      if (result) {
+        break;
+      }
+    }
+    return result;
+  }
+}
+
+exports.Dropdown = Dropdown;
+Dropdown.defaultProps = {
   className: '',
   disabled: false,
   isFlat: false,
   options: [],
   value: null,
   title: ''
-}, _temp);
+};
 
 
 const noop = () => {};

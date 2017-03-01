@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,7 +13,15 @@ function _load_string() {
   return _string = require('../../commons-node/string');
 }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
+                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                              */
 
 const DATATIP_ACTIONS = exports.DATATIP_ACTIONS = Object.freeze({
   PIN: 'PIN',
@@ -34,7 +33,7 @@ const IconsForAction = {
   [DATATIP_ACTIONS.CLOSE]: 'x'
 };
 
-let DatatipComponent = exports.DatatipComponent = class DatatipComponent extends _reactForAtom.React.Component {
+class DatatipComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -46,20 +45,20 @@ let DatatipComponent = exports.DatatipComponent = class DatatipComponent extends
   }
 
   render() {
-    var _props = this.props;
-
-    const className = _props.className,
-          children = _props.children,
-          action = _props.action,
-          actionTitle = _props.actionTitle,
+    const _props = this.props,
+          {
+      className,
+      children,
+      action,
+      actionTitle
+    } = _props,
           props = _objectWithoutProperties(_props, ['className', 'children', 'action', 'actionTitle']);
-
     delete props.onActionClick;
     let actionButton;
     if (action != null && IconsForAction[action] != null) {
       const actionIcon = IconsForAction[action];
       actionButton = _reactForAtom.React.createElement('div', {
-        className: `nuclide-datatip-pin-button icon-${ actionIcon }`,
+        className: `nuclide-datatip-pin-button icon-${actionIcon}`,
         onClick: this.handleActionClick,
         title: actionTitle
       });
@@ -67,7 +66,7 @@ let DatatipComponent = exports.DatatipComponent = class DatatipComponent extends
     return _reactForAtom.React.createElement(
       'div',
       Object.assign({
-        className: `${ (0, (_string || _load_string()).maybeToString)(className) } nuclide-datatip-container`
+        className: `${(0, (_string || _load_string()).maybeToString)(className)} nuclide-datatip-container`
       }, props),
       _reactForAtom.React.createElement(
         'div',
@@ -77,4 +76,5 @@ let DatatipComponent = exports.DatatipComponent = class DatatipComponent extends
       actionButton
     );
   }
-};
+}
+exports.DatatipComponent = DatatipComponent;

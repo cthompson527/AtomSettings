@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,6 +34,16 @@ function _load_hackConfig() {
  * with which the usage disagrees. Note that these could occur in different
  * files.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function extractRange(message) {
   // It's unclear why the 1-based to 0-based indexing works the way that it
   // does, but this has the desired effect in the UI, in practice.
@@ -60,6 +61,7 @@ function hackMessageToTrace(traceError) {
 }
 
 function hackMessageToDiagnosticMessage(hackMessages) {
+  // This is verified to be non-empty string by the caller in HackService
   const causeMessage = hackMessages[0];
 
   if (!(causeMessage.path != null)) {
@@ -68,7 +70,7 @@ function hackMessageToDiagnosticMessage(hackMessages) {
 
   const diagnosticMessage = {
     scope: 'file',
-    providerName: `Hack: ${ hackMessages[0].code }`,
+    providerName: `Hack: ${hackMessages[0].code}`,
     type: 'Error',
     text: causeMessage.descr,
     filePath: causeMessage.path,
@@ -78,7 +80,12 @@ function hackMessageToDiagnosticMessage(hackMessages) {
   // When the message is an array with multiple elements, the second element
   // onwards comprise the trace for the error.
   if (hackMessages.length > 1) {
-    diagnosticMessage.trace = hackMessages.slice(1).map(hackMessageToTrace);
+    diagnosticMessage.trace = hackMessages.slice(1)
+    // Skip traces without position since they are not useful, and would crash
+    // the RPC connection. See comment in HackService.
+    .filter(x => {
+      return x.path !== '';
+    }).map(hackMessageToTrace);
   }
 
   return diagnosticMessage;
@@ -90,7 +97,7 @@ function convertDiagnostics(result) {
   // Prevent too many diagnostics from killing the Atom process.
   const diagnostics = result.errors.slice(0, DIAGNOSTICS_LIMIT);
   if (diagnostics.length !== result.errors.length) {
-    (_hackConfig || _load_hackConfig()).logger.logError(`Too many Hack Errors. Found ${ result.errors.length }. Truncating.`);
+    (_hackConfig || _load_hackConfig()).logger.logError(`Too many Hack Errors. Found ${result.errors.length}. Truncating.`);
   }
 
   // Convert array messages to Error Objects with Traces.
@@ -107,5 +114,5 @@ function convertDiagnostics(result) {
     diagnosticArray.push(diagnostic);
   }
 
-  return { filePathToMessages: filePathToMessages };
+  return { filePathToMessages };
 }

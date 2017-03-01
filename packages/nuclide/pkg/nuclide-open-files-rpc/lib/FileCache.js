@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.FileCache = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _simpleTextBuffer;
 
@@ -38,6 +27,12 @@ function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
+}
+
 var _constants;
 
 function _load_constants() {
@@ -46,7 +41,17 @@ function _load_constants() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let FileCache = exports.FileCache = class FileCache {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class FileCache {
 
   constructor() {
     this._buffers = new Map();
@@ -111,7 +116,7 @@ let FileCache = exports.FileCache = class FileCache {
         }
         break;
       default:
-        throw new Error(`Unexpected FileEvent.kind: ${ event.kind }`);
+        throw new Error(`Unexpected FileEvent.kind: ${event.kind}`);
     }
     return Promise.resolve(undefined);
   }
@@ -148,12 +153,7 @@ let FileCache = exports.FileCache = class FileCache {
   }
 
   dispose() {
-    for (const _ref of this._buffers.entries()) {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      const filePath = _ref2[0];
-      const buffer = _ref2[1];
-
+    for (const [filePath, buffer] of this._buffers.entries()) {
       this._emitClose(filePath, buffer);
       buffer.destroy();
     }
@@ -183,17 +183,25 @@ let FileCache = exports.FileCache = class FileCache {
     return this._directoryEvents.getValue();
   }
 
+  // Returns directory which contains this path if any.
+  // Remote equivalent of atom.project.relativizePath()[1]
+  // TODO: Return the most nested open directory.
+  //       Note that Atom doesn't do this, though it should.
+  getContainingDirectory(filePath) {
+    for (const dir of this.getOpenDirectories()) {
+      if ((_nuclideUri || _load_nuclideUri()).default.contains(dir, filePath)) {
+        return dir;
+      }
+    }
+    return null;
+  }
+
   getOpenFiles() {
     return this._buffers.keys();
   }
 
   observeFileEvents() {
-    return _rxjsBundlesRxMinJs.Observable.from(Array.from(this._buffers.entries()).map((_ref3) => {
-      var _ref4 = _slicedToArray(_ref3, 2);
-
-      let filePath = _ref4[0],
-          buffer = _ref4[1];
-
+    return _rxjsBundlesRxMinJs.Observable.from(Array.from(this._buffers.entries()).map(([filePath, buffer]) => {
       if (!(buffer != null)) {
         throw new Error('Invariant violation: "buffer != null"');
       }
@@ -213,35 +221,35 @@ let FileCache = exports.FileCache = class FileCache {
   createFileVersion(filePath, version) {
     return {
       notifier: this,
-      filePath: filePath,
-      version: version
+      filePath,
+      version
     };
   }
-};
+}
 
-
+exports.FileCache = FileCache;
 function createOpenEvent(fileVersion, contents) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.OPEN,
-    fileVersion: fileVersion,
-    contents: contents
+    fileVersion,
+    contents
   };
 }
 
 function createCloseEvent(fileVersion) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.CLOSE,
-    fileVersion: fileVersion
+    fileVersion
   };
 }
 
 function createEditEvent(fileVersion, oldRange, oldText, newRange, newText) {
   return {
     kind: (_constants || _load_constants()).FileEventKind.EDIT,
-    fileVersion: fileVersion,
-    oldRange: oldRange,
-    oldText: oldText,
-    newRange: newRange,
-    newText: newText
+    fileVersion,
+    oldRange,
+    oldText,
+    newRange,
+    newText
   };
 }

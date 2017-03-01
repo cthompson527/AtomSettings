@@ -1,15 +1,13 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setUseLocalRpc = setUseLocalRpc;
+exports.getlocalService = getlocalService;
+exports.getServiceByNuclideUri = getServiceByNuclideUri;
+exports.getServiceByConnection = getServiceByConnection;
+exports.getService = getService;
 
 var _ServerConnection;
 
@@ -55,7 +53,16 @@ function _load_nuclideMarshalersAtom() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let localRpcClient = null;
+let localRpcClient = null; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            */
+
 let knownLocalRpc = false;
 
 // Creates a local RPC client that we can use to ensure that
@@ -92,13 +99,10 @@ function getlocalService(serviceName) {
   if (localRpcClient != null) {
     return localRpcClient.getService(serviceName);
   } else {
-    var _servicesConfig$filte = (_servicesConfig || _load_servicesConfig()).default.filter(config => config.name === serviceName),
-        _servicesConfig$filte2 = _slicedToArray(_servicesConfig$filte, 1);
-
-    const serviceConfig = _servicesConfig$filte2[0];
+    const [serviceConfig] = (_servicesConfig || _load_servicesConfig()).default.filter(config => config.name === serviceName);
 
     if (!serviceConfig) {
-      throw new Error(`No config found for service ${ serviceName }`);
+      throw new Error(`No config found for service ${serviceName}`);
     }
     // $FlowIgnore
 
@@ -113,9 +117,7 @@ function getlocalService(serviceName) {
  *    `nuclide://$host/$path`. The function will use the $host from remote path to
  *    create a remote service or create a local service if the uri is local path.
  */
-function getServiceByNuclideUri(serviceName) {
-  let uri = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
+function getServiceByNuclideUri(serviceName, uri = null) {
   const hostname = (_nuclideUri || _load_nuclideUri()).default.getHostnameOpt(uri);
   return getService(serviceName, hostname);
 }
@@ -147,11 +149,3 @@ function getService(serviceName, hostname) {
     return getlocalService(serviceName);
   }
 }
-
-module.exports = {
-  getService: getService,
-  getServiceByConnection: getServiceByConnection,
-  getServiceByNuclideUri: getServiceByNuclideUri,
-  setUseLocalRpc: setUseLocalRpc,
-  getlocalService: getlocalService
-};

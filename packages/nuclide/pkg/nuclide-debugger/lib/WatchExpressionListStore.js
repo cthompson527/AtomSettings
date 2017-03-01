@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,7 +21,17 @@ function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
-let WatchExpressionListStore = exports.WatchExpressionListStore = class WatchExpressionListStore {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class WatchExpressionListStore {
 
   constructor(watchExpressionStore, dispatcher) {
     this._watchExpressionStore = watchExpressionStore;
@@ -68,7 +69,7 @@ let WatchExpressionListStore = exports.WatchExpressionListStore = class WatchExp
 
   _getExpressionEvaluationFor(expression) {
     return {
-      expression: expression,
+      expression,
       value: this._watchExpressionStore.evaluateWatchExpression(expression)
     };
   }
@@ -95,9 +96,7 @@ let WatchExpressionListStore = exports.WatchExpressionListStore = class WatchExp
 
   _refetchWatchSubscriptions() {
     const watchExpressions = this._watchExpressions.getValue().slice();
-    const refetchedWatchExpressions = watchExpressions.map((_ref) => {
-      let expression = _ref.expression;
-
+    const refetchedWatchExpressions = watchExpressions.map(({ expression }) => {
       return this._getExpressionEvaluationFor(expression);
     });
     this._watchExpressions.next(refetchedWatchExpressions);
@@ -106,4 +105,5 @@ let WatchExpressionListStore = exports.WatchExpressionListStore = class WatchExp
   dispose() {
     this._disposables.dispose();
   }
-};
+}
+exports.WatchExpressionListStore = WatchExpressionListStore;

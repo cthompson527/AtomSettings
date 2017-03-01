@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -57,17 +48,42 @@ Object.defineProperty(exports, 'DebuggerLaunchAttachEventTypes', {
     return (_DebuggerLaunchAttachProvider || _load_DebuggerLaunchAttachProvider()).DebuggerLaunchAttachEventTypes;
   }
 });
-
-var _DebuggerInstance2;
-
-function _load_DebuggerInstance2() {
-  return _DebuggerInstance2 = require('./DebuggerInstance.js');
-}
-
 Object.defineProperty(exports, 'DebuggerInstance', {
   enumerable: true,
   get: function () {
-    return (_DebuggerInstance2 || _load_DebuggerInstance2()).DebuggerInstance;
+    return (_DebuggerInstance || _load_DebuggerInstance()).DebuggerInstance;
+  }
+});
+
+var _ChromeMessageRemoting;
+
+function _load_ChromeMessageRemoting() {
+  return _ChromeMessageRemoting = require('./ChromeMessageRemoting');
+}
+
+Object.defineProperty(exports, 'translateMessageFromServer', {
+  enumerable: true,
+  get: function () {
+    return (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageFromServer;
+  }
+});
+Object.defineProperty(exports, 'translateMessageToServer', {
+  enumerable: true,
+  get: function () {
+    return (_ChromeMessageRemoting || _load_ChromeMessageRemoting()).translateMessageToServer;
+  }
+});
+
+var _LaunchAttachActionsBase;
+
+function _load_LaunchAttachActionsBase() {
+  return _LaunchAttachActionsBase = require('./LaunchAttachActionsBase');
+}
+
+Object.defineProperty(exports, 'LaunchAttachActionsBase', {
+  enumerable: true,
+  get: function () {
+    return (_LaunchAttachActionsBase || _load_LaunchAttachActionsBase()).LaunchAttachActionsBase;
   }
 });
 

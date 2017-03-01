@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,10 +23,10 @@ function _load_event() {
   return _event = require('../../commons-node/event');
 }
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
@@ -56,7 +47,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
-const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMARK, (_ActionType || _load_ActionType()).DELETE_BOOKMARK, (_ActionType || _load_ActionType()).FETCH_PROJECT_REPOSITORIES, (_ActionType || _load_ActionType()).RENAME_BOOKMARK, (_ActionType || _load_ActionType()).UPDATE_TO_BOOKMARK];function applyActionMiddleware(actions, getState) {
+const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMARK, (_ActionType || _load_ActionType()).DELETE_BOOKMARK, (_ActionType || _load_ActionType()).FETCH_PROJECT_REPOSITORIES, (_ActionType || _load_ActionType()).RENAME_BOOKMARK, (_ActionType || _load_ActionType()).UPDATE_TO_BOOKMARK]; /**
+                                                                                                                                                                                                                                                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                                                                                                                       * All rights reserved.
+                                                                                                                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                                                                                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                                                                                                                       * the root directory of this source tree.
+                                                                                                                                                                                                                                                                                                                       *
+                                                                                                                                                                                                                                                                                                                       * 
+                                                                                                                                                                                                                                                                                                                       */
+
+function applyActionMiddleware(actions, getState) {
   const output = _rxjsBundlesRxMinJs.Observable.merge(
   // Skip unhandled ActionTypes.
   actions.filter(action => HANDLED_ACTION_TYPES.indexOf(action.type) === -1), actions.filter(action => action.type === (_ActionType || _load_ActionType()).CREATE_BOOKMARK).switchMap(action => {
@@ -64,10 +65,7 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
       throw new Error('Invariant violation: "action.type === ActionType.CREATE_BOOKMARK"');
     }
 
-    var _action$payload = action.payload;
-    const name = _action$payload.name,
-          repository = _action$payload.repository;
-
+    const { name, repository } = action.payload;
     if (repository.getType() !== 'hg') {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }
@@ -97,50 +95,60 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
 
   // Fetch and subscribe to repositories and their bookmarks.
   actions.filter(action => action.type === (_ActionType || _load_ActionType()).FETCH_PROJECT_REPOSITORIES).switchMap(action => {
-    var _getState = getState();
-
-    const projectDirectories = _getState.projectDirectories;
-
+    const { projectDirectories } = getState();
 
     return _rxjsBundlesRxMinJs.Observable.from(projectDirectories).flatMap(directory => {
-      const repository = (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).repositoryForPath)(directory.getPath());
+      const repository = (0, (_vcs || _load_vcs()).repositoryForPath)(directory.getPath());
       if (repository == null) {
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
 
-      let observable = _rxjsBundlesRxMinJs.Observable.of({
+      const setDirectoryAction = {
         payload: {
-          directory: directory,
-          repository: repository
+          directory,
+          repository
         },
         type: (_ActionType || _load_ActionType()).SET_DIRECTORY_REPOSITORY
-      });
+      };
 
-      if (repository.getType() === 'hg') {
-        // Type was checked with `getType`. Downcast to safely access members with Flow.
-        if (!(repository instanceof (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient)) {
-          throw new Error('Invariant violation: "repository instanceof HgRepositoryClient"');
-        }
-
-        observable = observable.concat(_rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(
-        // Re-fetch when the list of bookmarks changes.
-        repository.onDidChangeBookmarks.bind(repository)), (0, (_event || _load_event()).observableFromSubscribeFunction)(
-        // Re-fetch when the active bookmark changes (called "short head" to match
-        // Atom's Git API).
-        repository.onDidChangeShortHead.bind(repository))).startWith(null) // Kick it off the first time
-        .switchMap(() => {
-          return _rxjsBundlesRxMinJs.Observable.fromPromise(repository.getBookmarks());
-        }).map(bookmarks => ({
-          type: (_ActionType || _load_ActionType()).SET_REPOSITORY_BOOKMARKS,
-          payload: {
-            bookmarks: bookmarks,
-            // TODO(most): figure out flow type incompatability.
-            repository: repository
-          }
-        })));
+      if (repository.getType() !== 'hg') {
+        return _rxjsBundlesRxMinJs.Observable.of(setDirectoryAction);
       }
 
-      return observable;
+      // Type was checked with `getType`. Downcast to safely access members with Flow.
+
+      if (!(repository instanceof (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient)) {
+        throw new Error('Invariant violation: "repository instanceof HgRepositoryClient"');
+      }
+
+      const bookmarkUpdates = _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(
+      // Re-fetch when the list of bookmarks changes.
+      repository.onDidChangeBookmarks.bind(repository)), (0, (_event || _load_event()).observableFromSubscribeFunction)(
+      // Re-fetch when the active bookmark changes (called "short head" to match
+      // Atom's Git API).
+      repository.onDidChangeShortHead.bind(repository))).startWith(null) // Kick it off the first time
+      .switchMap(() => {
+        return _rxjsBundlesRxMinJs.Observable.fromPromise(repository.getBookmarks());
+      }).map(bookmarks => ({
+        type: (_ActionType || _load_ActionType()).SET_REPOSITORY_BOOKMARKS,
+        payload: {
+          bookmarks,
+          // TODO(most): figure out flow type incompatability.
+          repository: repository
+        }
+      }));
+
+      const statusUpdates = _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(repository.onDidChangeStatuses.bind(repository)), (0, (_event || _load_event()).observableFromSubscribeFunction)(repository.onDidChangeStatus.bind(repository))).startWith(null).switchMap(() => {
+        return _rxjsBundlesRxMinJs.Observable.of({
+          payload: {
+            directory,
+            repository
+          },
+          type: (_ActionType || _load_ActionType()).UPDATE_UNCOMMITTED_CHANGES
+        });
+      });
+
+      return _rxjsBundlesRxMinJs.Observable.of(setDirectoryAction).concat(_rxjsBundlesRxMinJs.Observable.merge(bookmarkUpdates, statusUpdates));
     });
   }), actions.filter(action => action.type === (_ActionType || _load_ActionType()).UPDATE_TO_BOOKMARK).switchMap(action => {
     // Action was filtered, invariant check to downcast in Flow.
@@ -148,10 +156,7 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
       throw new Error('Invariant violation: "action.type === ActionType.UPDATE_TO_BOOKMARK"');
     }
 
-    var _action$payload2 = action.payload;
-    const bookmark = _action$payload2.bookmark,
-          repository = _action$payload2.repository;
-
+    const { bookmark, repository } = action.payload;
     return _rxjsBundlesRxMinJs.Observable.fromPromise(repository.checkoutReference(bookmark.bookmark, false)).ignoreElements().catch(error => {
       atom.notifications.addWarning('Failed Updating to Bookmark', {
         description: 'Revert or commit uncommitted changes before changing bookmarks.',
@@ -175,25 +180,24 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
         throw new Error('Invariant violation: "action.type === ActionType.RENAME_BOOKMARK"');
       }
 
-      const repository = action.payload.repository;
-
+      const { repository } = action.payload;
 
       if (!(repository instanceof (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient)) {
         atom.notifications.addWarning('Failed Renaming Bookmark', {
-          detail: `Expected repository type 'hg' but found ${ repository.getType() }`,
+          detail: `Expected repository type 'hg' but found ${repository.getType()}`,
           dismissable: true
         });
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
-      var _action$payload3 = action.payload;
-      const bookmark = _action$payload3.bookmark,
-            nextName = _action$payload3.nextName;
-
+      const {
+        bookmark,
+        nextName
+      } = action.payload;
 
       return _rxjsBundlesRxMinJs.Observable.of({
         payload: {
-          bookmark: bookmark,
-          repository: repository
+          bookmark,
+          repository
         },
         type: (_ActionType || _load_ActionType()).SET_BOOKMARK_IS_LOADING
       }).concat(_rxjsBundlesRxMinJs.Observable.fromPromise(repository.renameBookmark(bookmark.bookmark, nextName)).ignoreElements().catch(error => {
@@ -204,8 +208,8 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
 
         return _rxjsBundlesRxMinJs.Observable.of({
           payload: {
-            bookmark: bookmark,
-            repository: repository
+            bookmark,
+            repository
           },
           type: (_ActionType || _load_ActionType()).UNSET_BOOKMARK_IS_LOADING
         });
@@ -225,23 +229,21 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
         throw new Error('Invariant violation: "action.type === ActionType.DELETE_BOOKMARK"');
       }
 
-      const repository = action.payload.repository;
-
+      const { repository } = action.payload;
 
       if (!(repository instanceof (_nuclideHgRepositoryClient || _load_nuclideHgRepositoryClient()).HgRepositoryClient)) {
         atom.notifications.addWarning('Failed Deleting Bookmark', {
-          detail: `Expected repository type 'hg' but found ${ repository.getType() }`,
+          detail: `Expected repository type 'hg' but found ${repository.getType()}`,
           dismissable: true
         });
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
-      const bookmark = action.payload.bookmark;
-
+      const { bookmark } = action.payload;
 
       return _rxjsBundlesRxMinJs.Observable.of({
         payload: {
-          bookmark: bookmark,
-          repository: repository
+          bookmark,
+          repository
         },
         type: (_ActionType || _load_ActionType()).SET_BOOKMARK_IS_LOADING
       }).concat(_rxjsBundlesRxMinJs.Observable.fromPromise(repository.deleteBookmark(bookmark.bookmark)).ignoreElements().catch(error => {
@@ -252,8 +254,8 @@ const HANDLED_ACTION_TYPES = [(_ActionType || _load_ActionType()).CREATE_BOOKMAR
 
         return _rxjsBundlesRxMinJs.Observable.of({
           payload: {
-            bookmark: bookmark,
-            repository: repository
+            bookmark,
+            repository
           },
           type: (_ActionType || _load_ActionType()).UNSET_BOOKMARK_IS_LOADING
         });

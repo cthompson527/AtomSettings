@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -42,7 +33,7 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+class LaunchProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
 
   constructor(targetUri, launchTargetInfo) {
     super('lldb', targetUri);
@@ -63,7 +54,7 @@ let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo exte
       }
 
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('C++ Debugger', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         yield rpcService.launch(_this._launchTargetInfo).refCount().toPromise();
         // Start websocket server with Chrome after launch completed.
@@ -87,12 +78,18 @@ let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo exte
     return true;
   }
 
-  _getRpcService() {
-    const debuggerConfig = {
+  getDebuggerConfig() {
+    return {
       logLevel: (0, (_utils || _load_utils()).getConfig)().serverLogLevel,
       pythonBinaryPath: (0, (_utils || _load_utils()).getConfig)().pythonBinaryPath,
-      buckConfigRootFile: (0, (_utils || _load_utils()).getConfig)().buckConfigRootFile
+      buckConfigRootFile: (0, (_utils || _load_utils()).getConfig)().buckConfigRootFile,
+      lldbPythonPath: this._launchTargetInfo.lldbPythonPath || (0, (_utils || _load_utils()).getConfig)().lldbPythonPath,
+      envPythonPath: ''
     };
+  }
+
+  _getRpcService() {
+    const debuggerConfig = this.getDebuggerConfig();
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('NativeDebuggerService', this.getTargetUri());
 
     if (!service) {
@@ -101,4 +98,13 @@ let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo exte
 
     return new service.NativeDebuggerService(debuggerConfig);
   }
-};
+}
+exports.LaunchProcessInfo = LaunchProcessInfo; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */

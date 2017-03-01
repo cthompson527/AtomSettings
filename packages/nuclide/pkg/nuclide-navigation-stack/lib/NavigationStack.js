@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,6 +6,16 @@ Object.defineProperty(exports, "__esModule", {
 exports.NavigationStack = undefined;
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const MAX_STACK_DEPTH = 100;
 
@@ -43,7 +44,7 @@ const MAX_STACK_DEPTH = 100;
 //
 // filter can be used to remove entries from the stack. This is done when
 // closing unnamed editors and when closing remote directories.
-let NavigationStack = exports.NavigationStack = class NavigationStack {
+class NavigationStack {
 
   constructor() {
     this._elements = [];
@@ -154,7 +155,7 @@ let NavigationStack = exports.NavigationStack = class NavigationStack {
       if (location.type === 'uri' && location.uri === uri) {
         this._elements[index] = {
           type: 'editor',
-          editor: editor,
+          editor,
           scrollTop: location.scrollTop,
           bufferPosition: location.bufferPosition
         };
@@ -172,7 +173,7 @@ let NavigationStack = exports.NavigationStack = class NavigationStack {
         if (location.type === 'editor' && editor === location.editor) {
           this._elements[index] = {
             type: 'uri',
-            uri: uri,
+            uri,
             scrollTop: location.scrollTop,
             bufferPosition: location.bufferPosition
           };
@@ -210,4 +211,5 @@ let NavigationStack = exports.NavigationStack = class NavigationStack {
   getIndex() {
     return this._index;
   }
-};
+}
+exports.NavigationStack = NavigationStack;

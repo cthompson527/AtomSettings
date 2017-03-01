@@ -4,7 +4,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Exposes features from nuclide-clang in Atom",
-  "atomTestRunner": "../../lib/test-runner.js",
+  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "packageType": "Atom",
     "testRunner": "apm",
@@ -52,7 +52,19 @@
     "language-c:grammar-used",
     "language-objective-c:grammar-used"
   ],
+  "consumedServices": {
+    "nuclide.clang.compilation-database": {
+      "versions": {
+        "0.0.0": "consumeCompilationDatabase"
+      }
+    }
+  },
   "providedServices": {
+    "nuclide.related-files.provider": {
+      "versions": {
+        "0.0.0": "provideRelatedFiles"
+      }
+    },
     "autocomplete.provider": {
       "versions": {
         "2.0.0": "createAutocompleteProvider"

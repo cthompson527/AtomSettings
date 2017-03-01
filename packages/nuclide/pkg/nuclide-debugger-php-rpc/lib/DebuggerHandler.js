@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -83,7 +74,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const SESSION_END_EVENT = 'session-end-event';
 
 // Handles all 'Debug.*' Chrome dev tools messages
-let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_Handler || _load_Handler()).default {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class DebuggerHandler extends (_Handler || _load_Handler()).default {
 
   constructor(clientCallback, connectionMultiplexer) {
     super('Debugger', clientCallback);
@@ -104,9 +105,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-
       switch (method) {
-
         // TODO: Add Console (aka logging) support
         case 'enable':
           _this._debuggerEnable(id);
@@ -180,8 +179,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const threadId = params.threadId;
-
+      const { threadId } = params;
       yield _this2._connectionMultiplexer.selectThread(threadId);
       _this2._sendPausedMessage();
     })();
@@ -191,8 +189,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     var _this3 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const state = params.state;
-
+      const { state } = params;
       yield _this3._connectionMultiplexer.getBreakpointStore().setPauseOnExceptions(String(id), state);
       _this3.replyToCommand(id, {});
     })();
@@ -202,11 +199,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     var _this4 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const lineNumber = params.lineNumber,
-            url = params.url,
-            columnNumber = params.columnNumber,
-            condition = params.condition;
-
+      const { lineNumber, url, columnNumber, condition } = params;
       if (!url || columnNumber !== 0) {
         _this4.replyWithError(id, 'Invalid arguments to Debugger.setBreakpointByUrl: ' + JSON.stringify(params));
         return;
@@ -224,7 +217,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
       }
 
       _this4.replyToCommand(id, {
-        breakpointId: breakpointId,
+        breakpointId,
         resolved: breakpoint.resolved,
         locations: [(0, (_helpers || _load_helpers()).getBreakpointLocation)(breakpoint)]
       });
@@ -235,8 +228,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     var _this5 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const breakpointId = params.breakpointId;
-
+      const { breakpointId } = params;
       yield _this5._connectionMultiplexer.removeBreakpoint(breakpointId);
       _this5.replyToCommand(id, { id: breakpointId });
     })();
@@ -252,7 +244,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
 
     return (0, _asyncToGenerator.default)(function* () {
       const frames = yield _this6._connectionMultiplexer.getStackFrames();
-      return yield Promise.all(frames.stack.map(function (frame, frameIndex) {
+      return Promise.all(frames.stack.map(function (frame, frameIndex) {
         return _this6._convertFrame(frame, frameIndex);
       }));
     })();
@@ -263,7 +255,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
 
     return (0, _asyncToGenerator.default)(function* () {
       const frames = yield _this7._connectionMultiplexer.getConnectionStackFrames(id);
-      return yield _this7._convertFrame(frames.stack[0], 0);
+      return _this7._convertFrame(frames.stack[0], 0);
     })();
   }
 
@@ -281,7 +273,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
       return {
         callFrameId: (0, (_frame || _load_frame()).idOfFrame)(frame),
         functionName: (0, (_frame || _load_frame()).functionOfFrame)(frame),
-        location: location,
+        location,
         scopeChain: yield _this8._connectionMultiplexer.getScopesForFrame(frameIndex)
       };
     })();
@@ -312,14 +304,14 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     return (0, _asyncToGenerator.default)(function* () {
       (_utils2 || _load_utils2()).default.log('Sending status: ' + status);
       switch (status) {
-        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).MULTIPLEXER_STATUS.ALL_CONNECTIONS_BREAK:
-        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).MULTIPLEXER_STATUS.BREAK:
+        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).ConnectionMultiplexerStatus.AllConnectionsPaused:
+        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).ConnectionMultiplexerStatus.SingleConnectionPaused:
           yield _this9._sendPausedMessage();
           break;
-        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).MULTIPLEXER_STATUS.RUNNING:
+        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).ConnectionMultiplexerStatus.Running:
           _this9.sendMethod('Debugger.resumed');
           break;
-        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).MULTIPLEXER_STATUS.END:
+        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).ConnectionMultiplexerStatus.End:
           _this9._endSession();
           break;
         default:
@@ -344,12 +336,12 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
             location: (0, (_helpers || _load_helpers()).getBreakpointLocation)(breakpoint)
           });
           break;
-        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).CONNECTION_MUX_NOTIFICATION.REQUEST_UPDATE:
+        case (_ConnectionMultiplexer || _load_ConnectionMultiplexer()).ConnectionMultiplexerNotification.RequestUpdate:
           if (!params) {
             throw new Error('Invariant violation: "params"');
           }
 
-          const frame = params.status === (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK ? yield _this10._getTopFrameForConnection(params.id) : null;
+          const frame = params.status === (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break ? yield _this10._getTopFrameForConnection(params.id) : null;
           _this10.sendMethod('Debugger.threadUpdated', {
             thread: {
               id: String(params.id),
@@ -363,7 +355,7 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
           });
           break;
         default:
-          (_utils2 || _load_utils2()).default.logErrorAndThrow(`Unexpected notification: ${ notifyName }`);
+          (_utils2 || _load_utils2()).default.logErrorAndThrow(`Unexpected notification: ${notifyName}`);
       }
     })();
   }
@@ -404,4 +396,5 @@ let DebuggerHandler = exports.DebuggerHandler = class DebuggerHandler extends (_
     this._subscriptions.dispose();
     this._emitter.emit(SESSION_END_EVENT);
   }
-};
+}
+exports.DebuggerHandler = DebuggerHandler;

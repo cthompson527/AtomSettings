@@ -1,18 +1,15 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.astToOutline = astToOutline;
+
+var _simpleTextBuffer;
+
+function _load_simpleTextBuffer() {
+  return _simpleTextBuffer = require('simple-text-buffer');
+}
 
 var _collection;
 
@@ -26,8 +23,20 @@ function _load_tokenizedText() {
   return _tokenizedText = require('../../commons-node/tokenizedText');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function astToOutline(ast) {
-  return itemsToTrees(ast.body);
+  return {
+    outlineTrees: itemsToTrees(ast.body)
+  };
 }
 
 function itemsToTrees(items) {
@@ -51,8 +60,8 @@ function itemToTree(item) {
         representativeName = item.id.name;
       }
       return Object.assign({
-        tokenizedText: tokenizedText,
-        representativeName: representativeName,
+        tokenizedText,
+        representativeName,
         children: itemsToTrees(item.body.body)
       }, extent);
     case 'ClassProperty':
@@ -96,9 +105,15 @@ function exportDeclaration(item, extent, isDefault) {
   if (isDefault) {
     tokenizedText.push((0, (_tokenizedText || _load_tokenizedText()).keyword)('default'), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '));
   }
+  // Flow always has tokenizedText
+
+  if (!(tree.tokenizedText != null)) {
+    throw new Error('Invariant violation: "tree.tokenizedText != null"');
+  }
+
   tokenizedText.push(...tree.tokenizedText);
   return Object.assign({
-    tokenizedText: tokenizedText,
+    tokenizedText,
     representativeName: tree.representativeName,
     children: tree.children
   }, extent);
@@ -125,7 +140,7 @@ function declarationReducer(textElements, p, index, declarations) {
       textElements.push((0, (_tokenizedText || _load_tokenizedText()).plain)('...'));
       return declarationReducer(textElements, p.argument, index, declarations);
     default:
-      throw new Error(`encountered unexpected argument type ${ p.type }`);
+      throw new Error(`encountered unexpected argument type ${p.type}`);
   }
   if (index < declarations.length - 1) {
     textElements.push((0, (_tokenizedText || _load_tokenizedText()).plain)(','));
@@ -140,16 +155,11 @@ function declarationsTokenizedText(declarations) {
 
 function getExtent(item) {
   return {
-    startPosition: {
-      // It definitely makes sense that the lines we get are 1-based and the columns are
-      // 0-based... convert to 0-based all around.
-      line: item.loc.start.line - 1,
-      column: item.loc.start.column
-    },
-    endPosition: {
-      line: item.loc.end.line - 1,
-      column: item.loc.end.column
-    }
+    startPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(
+    // It definitely makes sense that the lines we get are 1-based and the columns are
+    // 0-based... convert to 0-based all around.
+    item.loc.start.line - 1, item.loc.start.column),
+    endPosition: new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(item.loc.end.line - 1, item.loc.end.column)
   };
 }
 
@@ -244,9 +254,7 @@ function moduleExportsPropertyOutline(property) {
   }, getExtent(property));
 }
 
-function specOutline(expressionStatement) {
-  let describeOnly = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+function specOutline(expressionStatement, describeOnly = false) {
   const expression = expressionStatement.expression;
   if (expression.type !== 'CallExpression') {
     return null;
@@ -274,7 +282,7 @@ function specOutline(expressionStatement) {
   return Object.assign({
     tokenizedText: [(0, (_tokenizedText || _load_tokenizedText()).method)(functionName), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), (0, (_tokenizedText || _load_tokenizedText()).string)(description)],
     representativeName: description,
-    children: children
+    children
   }, getExtent(expressionStatement));
 }
 
@@ -288,7 +296,7 @@ function getFunctionName(callee) {
       if (callee.object.type !== 'Identifier' || callee.property.type !== 'Identifier') {
         return null;
       }
-      return `${ callee.object.name }.${ callee.property.name }`;
+      return `${callee.object.name}.${callee.property.name}`;
     default:
       return null;
   }
@@ -358,14 +366,13 @@ function variableDeclaratorOutline(declarator, kind, extent) {
     return functionOutline(declarator.id.name, declarator.init.params, extent);
   }
 
-  const id = declarator.id;
-
+  const { id } = declarator;
 
   const tokenizedText = [(0, (_tokenizedText || _load_tokenizedText()).keyword)(kind), (0, (_tokenizedText || _load_tokenizedText()).whitespace)(' '), ...declarationsTokenizedText([id])];
   const representativeName = id.type === 'Identifier' ? id.name : undefined;
   return Object.assign({
-    tokenizedText: tokenizedText,
-    representativeName: representativeName,
+    tokenizedText,
+    representativeName,
     children: []
   }, extent);
 }

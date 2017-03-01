@@ -1,17 +1,24 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _reactForAtom = require('react-for-atom');
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _Constants;
+
+function _load_Constants() {
+  return _Constants = require('../lib/Constants');
+}
+
+var _vcs;
+
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
+}
 
 var _FileTree;
 
@@ -91,27 +98,45 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
+var _goToLocation;
+
+function _load_goToLocation() {
+  return _goToLocation = require('../../commons-atom/go-to-location');
+}
+
 var _nuclideAnalytics;
 
 function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
+var _electron = require('electron');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SHOW_OPEN_FILE_CONFIG_KEY = 'nuclide-file-tree.showOpenFiles';
+const SHOW_OPEN_FILE_CONFIG_KEY = 'nuclide-file-tree.showOpenFiles'; /**
+                                                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                                                      * All rights reserved.
+                                                                      *
+                                                                      * This source code is licensed under the license found in the LICENSE file in
+                                                                      * the root directory of this source tree.
+                                                                      *
+                                                                      * 
+                                                                      */
+
 const SHOW_UNCOMMITTED_CHANGES_CONFIG_KEY = 'nuclide-file-tree.showUncommittedChanges';
 
-let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForAtom.React.Component {
+class FileTreeSidebarComponent extends _reactForAtom.React.Component {
 
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
 
     this._actions = (_FileTreeActions || _load_FileTreeActions()).default.getInstance();
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
     this.state = {
+      hidden: false,
       shouldRenderToolbar: false,
-      scrollerHeight: 0,
+      scrollerHeight: window.innerHeight,
       scrollerScrollTop: 0,
       showOpenFiles: true,
       showUncommittedChanges: true,
@@ -125,11 +150,10 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
     this._showUncommittedConfigValue = (0, (_observable || _load_observable()).cacheWhileSubscribed)((_featureConfig || _load_featureConfig()).default.observeAsStream(SHOW_UNCOMMITTED_CHANGES_CONFIG_KEY));
 
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
-    this._afRequestId = null;
     this._scrollWasTriggeredProgrammatically = false;
     this._handleFocus = this._handleFocus.bind(this);
-    this._onViewChange = this._onViewChange.bind(this);
-    this._onScroll = this._onScroll.bind(this);
+    this._updateScrollerHeight = this._updateScrollerHeight.bind(this);
+    this._handleScroll = this._handleScroll.bind(this);
     this._scrollToPosition = this._scrollToPosition.bind(this);
     this._processExternalUpdate = this._processExternalUpdate.bind(this);
     this._handleOpenFilesExpandedChange = this._handleOpenFilesExpandedChange.bind(this);
@@ -139,28 +163,53 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
   componentDidMount() {
     this._processExternalUpdate();
 
-    window.addEventListener('resize', this._onViewChange);
-    this._afRequestId = window.requestAnimationFrame(() => {
-      this._onViewChange();
-      this._afRequestId = null;
-    });
+    const remeasureEvents = _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.of(null), _rxjsBundlesRxMinJs.Observable.fromEvent(window, 'resize'), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.commands.onDidDispatch.bind(atom.commands)).filter(event => event.type === 'nuclide-file-tree:toggle'), _rxjsBundlesRxMinJs.Observable.interval(2000));
 
-    this._disposables.add(this._store.subscribe(this._processExternalUpdate), atom.project.onDidChangePaths(this._processExternalUpdate), (0, (_observable || _load_observable()).toggle)(observeAllModifiedStatusChanges(), this._showOpenConfigValues).subscribe(() => this._setModifiedUris()), this._monitorActiveUri(), this._showOpenConfigValues.subscribe(showOpenFiles => this.setState({ showOpenFiles: showOpenFiles })), this._showUncommittedConfigValue.subscribe(showUncommittedChanges => this.setState({ showUncommittedChanges: showUncommittedChanges })), () => {
-      window.removeEventListener('resize', this._onViewChange);
-      if (this._afRequestId != null) {
-        window.cancelAnimationFrame(this._afRequestId);
+    this._disposables.add(this._store.subscribe(this._processExternalUpdate), atom.project.onDidChangePaths(this._processExternalUpdate), (0, (_observable || _load_observable()).toggle)(observeAllModifiedStatusChanges(), this._showOpenConfigValues).subscribe(() => this._setModifiedUris()), this._monitorActiveUri(), this._showOpenConfigValues.subscribe(showOpenFiles => this.setState({ showOpenFiles })), this._showUncommittedConfigValue.subscribe(showUncommittedChanges => this.setState({ showUncommittedChanges })), (0, (_observable || _load_observable()).throttle)(remeasureEvents, () => (_observable || _load_observable()).nextAnimationFrame).subscribe(() => {
+      this._updateScrollerHeight();
+    }),
+
+    // Customize the context menu to remove items that match the 'atom-pane' selector.
+    _rxjsBundlesRxMinJs.Observable.fromEvent(_reactForAtom.ReactDOM.findDOMNode(this), 'contextmenu').switchMap(event => {
+      if (event.button !== 2) {
+        return _rxjsBundlesRxMinJs.Observable.never();
       }
-    });
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      // Find all the item sets that match the 'atom-pane' selector. We're going to remove these
+      // by changing their selector.
+      const paneItemSets = atom.contextMenu.itemSets.filter(itemSet => itemSet.selector === 'atom-pane');
+      // Override the selector while we get the template.
+      paneItemSets.forEach(itemSet => {
+        itemSet.selector = 'do-not-match-anything';
+      });
+      const menuTemplate = atom.contextMenu.templateForEvent(event);
+      paneItemSets.forEach(itemSet => {
+        itemSet.selector = 'atom-pane';
+      });
+      // Wrap the disposable in an observable. This way we don't have to manually track these
+      // disposables, they'll be managed for us.
+      return _rxjsBundlesRxMinJs.Observable.create(() => showMenuForEvent(event, menuTemplate));
+    }).subscribe());
   }
 
   componentWillUnmount() {
     this._disposables.dispose();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.hidden && !this.props.hidden) {
-      this._actions.clearFilter();
-      this._onViewChange();
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.hidden !== prevState.hidden) {
+      if (!this.state.hidden) {
+        // If "Reveal File on Switch" is enabled, ensure the scroll position is synced to where the
+        // user expects when the side bar shows the file tree.
+        if ((_featureConfig || _load_featureConfig()).default.get((_Constants || _load_Constants()).REVEAL_FILE_ON_SWITCH_SETTING)) {
+          atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-file-tree:reveal-active-file');
+        }
+        this._actions.clearFilter();
+        this._updateScrollerHeight();
+      }
     }
   }
 
@@ -176,14 +225,19 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
     const workingSetsStore = this._store.getWorkingSetsStore();
     let toolbar;
     if (this.state.shouldRenderToolbar && workingSetsStore != null) {
-      toolbar = [_reactForAtom.React.createElement((_FileTreeSideBarFilterComponent || _load_FileTreeSideBarFilterComponent()).default, {
-        key: 'filter',
-        filter: this._store.getFilter(),
-        found: this._store.getFilterFound()
-      }), _reactForAtom.React.createElement((_FileTreeToolbarComponent || _load_FileTreeToolbarComponent()).FileTreeToolbarComponent, {
-        key: 'toolbar',
-        workingSetsStore: workingSetsStore
-      })];
+      toolbar = _reactForAtom.React.createElement(
+        'div',
+        { className: 'nuclide-file-tree-fixed' },
+        _reactForAtom.React.createElement((_FileTreeSideBarFilterComponent || _load_FileTreeSideBarFilterComponent()).default, {
+          key: 'filter',
+          filter: this._store.getFilter(),
+          found: this._store.getFilterFound()
+        }),
+        _reactForAtom.React.createElement((_FileTreeToolbarComponent || _load_FileTreeToolbarComponent()).FileTreeToolbarComponent, {
+          key: 'toolbar',
+          workingSetsStore: workingSetsStore
+        })
+      );
     }
 
     let uncommittedChangesSection;
@@ -193,7 +247,7 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
         { className: 'nuclide-file-tree-sidebar-uncommitted-changes' },
         _reactForAtom.React.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
           commandPrefix: 'file-tree-sidebar',
-          fileChanges: this.state.uncommittedFileChanges,
+          fileChanges: (0, (_vcs || _load_vcs()).filterMultiRootFileChanges)(this.state.uncommittedFileChanges),
           selectedFile: this.state.activeUri,
           hideEmptyFolders: true,
           onFileChosen: this._onFileChosen
@@ -251,12 +305,12 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
       uncommittedChangesSection,
       openFilesSection,
       foldersCaption,
+      toolbar,
       _reactForAtom.React.createElement(
         (_PanelComponentScroller || _load_PanelComponentScroller()).PanelComponentScroller,
         {
           ref: 'scroller',
-          onScroll: this._onScroll },
-        toolbar,
+          onScroll: this._handleScroll },
         _reactForAtom.React.createElement((_FileTree || _load_FileTree()).FileTree, {
           ref: 'fileTree',
           containerHeight: this.state.scrollerHeight,
@@ -272,7 +326,7 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
     const openFilesUris = this._store.getOpenFilesWorkingSet().getUris();
 
     if (shouldRenderToolbar !== this.state.shouldRenderToolbar || openFilesUris !== this.state.openFilesUris) {
-      this.setState({ shouldRenderToolbar: shouldRenderToolbar, openFilesUris: openFilesUris });
+      this.setState({ shouldRenderToolbar, openFilesUris });
     } else {
       // Note: It's safe to call forceUpdate here because the change events are de-bounced.
       this.forceUpdate();
@@ -284,12 +338,12 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
     const uncommittedFileChanges = this._store.getFileChanges();
     const hasUncommittedChanges = Array.from(uncommittedFileChanges.values()).some(fileChanges => fileChanges.size > 0);
 
-    this.setState({ uncommittedFileChanges: uncommittedFileChanges, hasUncommittedChanges: hasUncommittedChanges });
+    this.setState({ uncommittedFileChanges, hasUncommittedChanges });
   }
 
   _onFileChosen(filePath) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('filetree-uncommitted-file-changes-file-open');
-    atom.workspace.open(filePath);
+    (0, (_goToLocation || _load_goToLocation()).goToLocation)(filePath);
   }
 
   _handleOpenFilesExpandedChange(isCollapsed) {
@@ -304,7 +358,7 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
   _setModifiedUris() {
     const modifiedUris = getCurrentBuffers().filter(buffer => buffer.isModified()).map(buffer => buffer.getPath() || '').filter(path => path !== '');
 
-    this.setState({ modifiedUris: modifiedUris });
+    this.setState({ modifiedUris });
   }
 
   _monitorActiveUri() {
@@ -320,23 +374,28 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
     }));
   }
 
-  _onViewChange() {
-    const node = _reactForAtom.ReactDOM.findDOMNode(this.refs.scroller);
-    const clientHeight = node.clientHeight,
-          scrollTop = node.scrollTop;
-
-
-    if (clientHeight !== this.state.scrollerHeight || scrollTop !== this.state.scrollerScrollTop) {
-      this.setState({ scrollerHeight: clientHeight, scrollerScrollTop: scrollTop });
+  _updateScrollerHeight() {
+    const component = this.refs.scroller;
+    if (component == null) {
+      return;
     }
+    const el = _reactForAtom.ReactDOM.findDOMNode(component);
+    if (el == null) {
+      return;
+    }
+    this.setState({ scrollerHeight: el.clientHeight });
   }
 
-  _onScroll() {
+  _handleScroll() {
     if (!this._scrollWasTriggeredProgrammatically) {
       this._actions.clearTrackedNode();
     }
     this._scrollWasTriggeredProgrammatically = false;
-    this._onViewChange();
+    const node = _reactForAtom.ReactDOM.findDOMNode(this.refs.scroller);
+    const { scrollTop } = node;
+    if (scrollTop !== this.state.scrollerScrollTop) {
+      this.setState({ scrollerScrollTop: scrollTop });
+    }
   }
 
   _scrollToPosition(top, height) {
@@ -360,9 +419,56 @@ let FileTreeSidebarComponent = class FileTreeSidebarComponent extends _reactForA
       } catch (e) {}
     });
   }
-};
 
+  isFocused() {
+    const el = _reactForAtom.ReactDOM.findDOMNode(this.refs.fileTree);
+    if (el == null) {
+      return false;
+    }
+    return el.contains(document.activeElement);
+  }
 
+  focus() {
+    const el = _reactForAtom.ReactDOM.findDOMNode(this.refs.fileTree);
+    if (el == null) {
+      return;
+    }
+    el.focus();
+  }
+
+  getTitle() {
+    return 'File Tree';
+  }
+
+  getDefaultLocation() {
+    return 'left-panel';
+  }
+
+  getPreferredInitialWidth() {
+    return 300;
+  }
+
+  getURI() {
+    return (_Constants || _load_Constants()).WORKSPACE_VIEW_URI;
+  }
+
+  didChangeVisibility(visible) {
+    this.setState({ hidden: !visible });
+  }
+
+  serialize() {
+    return {
+      deserializer: 'nuclide.FileTreeSidebarComponent'
+    };
+  }
+
+  copy() {
+    // The file tree store wasn't written to support multiple instances, so try to prevent it.
+    return false;
+  }
+}
+
+exports.default = FileTreeSidebarComponent;
 function observeAllModifiedStatusChanges() {
   const paneItemChangeEvents = _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidAddPaneItem.bind(atom.workspace)), (0, (_event || _load_event()).observableFromSubscribeFunction)(atom.workspace.onDidDestroyPaneItem.bind(atom.workspace))).startWith(undefined);
 
@@ -389,4 +495,31 @@ function getCurrentBuffers() {
   return buffers;
 }
 
-module.exports = FileTreeSidebarComponent;
+/**
+ * Shows the provided menu template. This will result in [an extra call to `templateForEvent()`][1],
+ * but it means that we still go through `showMenuForEvent()`, maintaining its behavior wrt
+ * (a)synchronousness. See atom/atom#13398.
+ *
+ * [1]: https://github.com/atom/atom/blob/v1.13.0/src/context-menu-manager.coffee#L200
+ */
+function showMenuForEvent(event, menuTemplate) {
+  if (!(_electron.remote != null)) {
+    throw new Error('Invariant violation: "remote != null"');
+  }
+
+  const win = _electron.remote.getCurrentWindow();
+  const originalEmit = win.emit;
+  const restore = () => {
+    win.emit = originalEmit;
+  };
+  win.emit = (eventType, ...args) => {
+    if (eventType !== 'context-menu') {
+      return originalEmit(eventType, ...args);
+    }
+    const result = originalEmit('context-menu', menuTemplate);
+    restore();
+    return result;
+  };
+  atom.contextMenu.showForEvent(event);
+  return new (_UniversalDisposable || _load_UniversalDisposable()).default(restore);
+}

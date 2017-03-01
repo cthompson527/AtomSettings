@@ -9,6 +9,7 @@
   flex-direction: column;
   flex: 1;
   min-width: 0;
+  padding: @component-padding;
 }
 
 .nuclide-debugger-root select.form-control {
@@ -48,9 +49,39 @@
   flex-basis: 0;
   overflow: auto;
   padding-right: 0.5em;
+  display: flex;
+  flex-direction: column;
+
+  span {
+    -webkit-user-select: initial;
+  }
 }
 
-.nuclide-debugger-webview-hidden {
+.nuclide-debugger-container-new-disabled {
+  opacity: 0.5;
+}
+
+.nuclide-debugger-state-notice {
+  color: @text-color-highlight;
+  font-weight: bold;
+  padding-top: 1.0em;
+  padding-bottom: 0.5em;
+  text-align: center;
+}
+
+.nuclide-debugger-section-header {
+  border-top: 1px @base-border-color solid;
+  padding: 0px 5px;
+}
+
+.nuclide-debugger-controls-section {
+  border: 1px @base-border-color solid;
+  padding-top: 5px;
+}
+
+.nuclide-debugger-webview {
+  // This is only used because we're piggybacking on its state management. It
+  // needs to be in the DOM, but we don't want to see it.
   height: 0;
   overflow: hidden;
 }
@@ -76,7 +107,8 @@ Use flexbox cross-axis stretch to fill the vertical space.
   .nuclide-debugger-vfill-parent();
   .nuclide-debugger-vfill-child(); // child relative to .inspector
 
-  &::shadow object {
+  &::shadow object,
+  object {
     .nuclide-debugger-vfill-child();
     // The object element is generated with inline style height:100%.
     height: auto !important;
@@ -87,6 +119,11 @@ Use flexbox cross-axis stretch to fill the vertical space.
 .nuclide-debugger-section-content {
   max-height: 20em;
   overflow-y: auto;
+  margin-bottom: 5px;
+}
+
+.nuclide-debugger-breakpoint-unresolved {
+  text-decoration: line-through;
 }
 
 /* Watch Expressions */
@@ -111,9 +148,18 @@ Use flexbox cross-axis stretch to fill the vertical space.
   flex-grow: 1;
 }
 
+.nuclide-debugger-watch-expression-value-content {
+  overflow-x: auto;
+}
+
 .nuclide-debugger-watch-expression-xout {
   cursor: pointer;
   opacity: 0;
+}
+
+.nuclide-debugger-watch-expression-xout.icon::before {
+  margin-right: 0px;
+  text-align: center;
 }
 
 .nuclide-debugger-watch-expression-row:hover {
@@ -141,6 +187,16 @@ Use flexbox cross-axis stretch to fill the vertical space.
 .nuclide-debugger-callstack-item {
   display: flex;
   justify-content: space-between;
+  cursor: pointer;
+  &:hover {
+    color: @text-color-highlight;
+  }
+}
+
+.nuclide-debugger-callstack-item-selected {
+  background-color: @background-color-info;
+  color: @text-color-highlight;
+  font-weight: bold;
 }
 
 .nuclide-debugger-callstack-name {

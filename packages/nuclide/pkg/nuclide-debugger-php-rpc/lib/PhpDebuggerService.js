@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -67,6 +58,16 @@ function _load_passesGK() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Connection states
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const INITIAL = 'initial';
 const CONNECTING = 'connecting';
 const CONNECTED = 'connected';
@@ -93,7 +94,7 @@ let lastServiceObjectDispose = null;
 
 const GK_PAUSE_ONE_PAUSE_ALL = 'nuclide_debugger_php_pause_one_pause_all';
 
-let PhpDebuggerService = exports.PhpDebuggerService = class PhpDebuggerService {
+class PhpDebuggerService {
 
   constructor() {
     if (lastServiceObjectDispose != null) {
@@ -193,4 +194,5 @@ let PhpDebuggerService = exports.PhpDebuggerService = class PhpDebuggerService {
     this._disposables.dispose();
     return Promise.resolve();
   }
-};
+}
+exports.PhpDebuggerService = PhpDebuggerService;

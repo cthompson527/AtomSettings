@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _accumulateState;
 
@@ -51,10 +38,10 @@ function _load_utils() {
   return _utils = require('./utils');
 }
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _nuclideLogging;
@@ -93,7 +80,17 @@ function createStateStream(actions, initialState) {
   const states = new _rxjsBundlesRxMinJs.BehaviorSubject(initialState);
   actions.scan((_accumulateState || _load_accumulateState()).accumulateState, initialState).subscribe(states);
   return states;
-}let Activation = class Activation {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+class Activation {
 
   constructor(state) {
     let initialState;
@@ -112,7 +109,8 @@ function createStateStream(actions, initialState) {
     };
     const commands = new (_Commands || _load_Commands()).Commands(dispatch, () => states.getValue());
 
-    const addedRepoSubscription = (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).getHgRepositoryStream)().subscribe(repository => {
+    const addedRepoSubscription = (0, (_vcs || _load_vcs()).getHgRepositoryStream)().subscribe(repository => {
+      // $FlowFixMe wrong repository type
       commands.addProjectRepository(repository);
     });
 
@@ -120,10 +118,7 @@ function createStateStream(actions, initialState) {
       commands.updatePaneItemState();
     });
 
-    const shortHeadChangeSubscription = (0, (_utils || _load_utils()).getShortHeadChangesFromStateStream)(states).switchMap((_ref) => {
-      let repositoryPath = _ref.repositoryPath,
-          activeShortHead = _ref.activeShortHead;
-
+    const shortHeadChangeSubscription = (0, (_utils || _load_utils()).getShortHeadChangesFromStateStream)(states).switchMap(({ repositoryPath, activeShortHead }) => {
       const repository = atom.project.getRepositories().filter(repo => {
         return repo != null && repo.getWorkingDirectory() === repositoryPath;
       })[0];
@@ -167,6 +162,6 @@ function createStateStream(actions, initialState) {
       return null;
     }
   }
-};
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+}
+
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

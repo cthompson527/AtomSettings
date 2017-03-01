@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34,14 +25,22 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
 
 const HEARTBEAT_AWAY_REPORT_COUNT = 3;
 const HEARTBEAT_NOTIFICATION_ERROR = 1;
 const HEARTBEAT_NOTIFICATION_WARNING = 2;
 
 // Provides feedback to the user of the health of a NuclideSocket.
-let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class ConnectionHealthNotifier {
+class ConnectionHealthNotifier {
 
   constructor(host, socket) {
     this._heartbeatNetworkAwayCount = 0;
@@ -55,24 +54,19 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
      * new events.
      */
     const addHeartbeatNotification = (type, errorCode, message, dismissable, askToReload) => {
-      var _ref = this._lastHeartbeatNotification || {};
-
-      const code = _ref.code,
-            existingNotification = _ref.notification;
-
+      const { code, notification: existingNotification } = this._lastHeartbeatNotification || {};
       if (code && code === errorCode && dismissable) {
         // A dismissible heartbeat notification with this code is already active.
         return;
       }
       let notification = null;
-      const options = { dismissable: dismissable, buttons: [] };
+      const options = { dismissable, buttons: [] };
       if (askToReload) {
         options.buttons.push({
           className: 'icon icon-zap',
-          onDidClick: function () {
+          onDidClick() {
             atom.reload();
           },
-
           text: 'Reload Atom'
         });
       }
@@ -95,7 +89,7 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
       }
 
       this._lastHeartbeatNotification = {
-        notification: notification,
+        notification,
         code: errorCode
       };
     };
@@ -105,8 +99,7 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
         // If there has been existing heartbeat error/warning,
         // that means connection has been lost and we shall show a message about connection
         // being restored without a reconnect prompt.
-        const notification = this._lastHeartbeatNotification.notification;
-
+        const { notification } = this._lastHeartbeatNotification;
         notification.dismiss();
         atom.notifications.addSuccess('Connection restored to Nuclide Server at: ' + serverUri);
         this._heartbeatNetworkAwayCount = 0;
@@ -117,23 +110,20 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
     const notifyNetworkAway = code => {
       this._heartbeatNetworkAwayCount++;
       if (this._heartbeatNetworkAwayCount >= HEARTBEAT_AWAY_REPORT_COUNT) {
-        addHeartbeatNotification(HEARTBEAT_NOTIFICATION_WARNING, code, `Nuclide server cannot be reached at "${ serverUri }".<br/>` + 'Nuclide will reconnect when the network is restored.',
+        addHeartbeatNotification(HEARTBEAT_NOTIFICATION_WARNING, code, `Nuclide server cannot be reached at "${serverUri}".<br/>` + 'Nuclide will reconnect when the network is restored.',
         /* dismissable */true,
         /* askToReload */false);
       }
     };
 
     const onHeartbeatError = error => {
-      const code = error.code,
-            message = error.message,
-            originalCode = error.originalCode;
-
+      const { code, message, originalCode } = error;
       (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackEvent)({
         type: 'heartbeat-error',
         data: {
           code: code || '',
           message: message || '',
-          host: host
+          host
         }
       });
       logger.info('Heartbeat network error:', code, originalCode, message);
@@ -155,7 +145,7 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
         case 'PORT_NOT_ACCESSIBLE':
           // Notify never heard a heartbeat from the server.
           const port = socket.getServerPort();
-          addHeartbeatNotification(HEARTBEAT_NOTIFICATION_ERROR, code, '**Nuclide Server Is Not Reachable**<br/>' + `It could be running on a port that is not accessible: ${ String(port) }.`,
+          addHeartbeatNotification(HEARTBEAT_NOTIFICATION_ERROR, code, '**Nuclide Server Is Not Reachable**<br/>' + `It could be running on a port that is not accessible: ${String(port)}.`,
           /* dismissable */true,
           /* askToReload */false);
           break;
@@ -180,4 +170,5 @@ let ConnectionHealthNotifier = exports.ConnectionHealthNotifier = class Connecti
   dispose() {
     this._subscription.dispose();
   }
-};
+}
+exports.ConnectionHealthNotifier = ConnectionHealthNotifier;

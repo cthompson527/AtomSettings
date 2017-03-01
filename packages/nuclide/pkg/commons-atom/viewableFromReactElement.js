@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -44,6 +35,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *    const item = viewableFromReactElement(<UsageStats />);
  *    atom.workspace.getPanes()[0].addItem(item); // Or anywhere else Atom uses model "items."
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function viewableFromReactElement(reactElement) {
   const container = new (_ReactMountRootElement || _load_ReactMountRootElement()).default();
   const item = _reactForAtom.ReactDOM.render(reactElement, container);

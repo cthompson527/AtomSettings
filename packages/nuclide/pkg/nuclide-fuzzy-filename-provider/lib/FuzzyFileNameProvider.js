@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,41 +21,25 @@ function _load_utils() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports.default = {
+  providerType: 'DIRECTORY',
+  name: 'FuzzyFileNameProvider',
+  debounceDelay: 0,
+  display: {
+    title: 'Filenames',
+    prompt: 'Fuzzy filename search...',
+    action: 'nuclide-fuzzy-filename-provider:toggle-provider'
+  },
   // Give preference to filename results in OmniSearch.
-  getPriority: () => 1,
+  priority: 1,
 
-  getName: function () {
-    return 'FuzzyFileNameProvider';
-  },
-  getProviderType: function () {
-    return 'DIRECTORY';
-  },
-  isRenderable: function () {
-    return true;
-  },
-  getDebounceDelay: function () {
-    return 0;
-  },
-  getAction: function () {
-    return 'nuclide-fuzzy-filename-provider:toggle-provider';
-  },
-  getPromptText: function () {
-    return 'Fuzzy File Name Search';
-  },
-  getTabTitle: function () {
-    return 'Filenames';
-  },
-  isEligibleForDirectory: function (directory) {
+  isEligibleForDirectory(directory) {
     return directory.exists();
   },
-  executeQuery: (() => {
-    var _ref = (0, _asyncToGenerator.default)(function* (query, directory) {
+
+  executeQuery(query, directory) {
+    return (0, _asyncToGenerator.default)(function* () {
       if (query.length === 0) {
         return [];
-      }
-
-      if (directory == null) {
-        throw new Error('FuzzyFileNameProvider is a directory-specific provider but its executeQuery method was' + ' called without a directory argument.');
       }
 
       const directoryPath = directory.getPath();
@@ -83,11 +58,14 @@ exports.default = {
       }
 
       return results;
-    });
-
-    return function executeQuery(_x, _x2) {
-      return _ref.apply(this, arguments);
-    };
-  })()
-};
-module.exports = exports['default'];
+    })();
+  }
+}; /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */

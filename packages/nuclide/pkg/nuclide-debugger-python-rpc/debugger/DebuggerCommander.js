@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,7 +14,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
  * Exposing the DebuggerCommander as an Observable makes it easier to use with Nuclide's RPC
  * framework.
  */
-let DebuggerCommander = exports.DebuggerCommander = class DebuggerCommander {
+class DebuggerCommander {
 
   constructor() {
     this._subject = new _rxjsBundlesRxMinJs.Subject();
@@ -35,11 +26,11 @@ let DebuggerCommander = exports.DebuggerCommander = class DebuggerCommander {
   }
 
   addBreakpoint(breakpoint) {
-    this._subject.next({ method: 'add_breakpoint', breakpoint: breakpoint });
+    this._subject.next({ method: 'add_breakpoint', breakpoint });
   }
 
   clearBreakpoint(breakpoint) {
-    this._subject.next({ method: 'clear_breakpoint', breakpoint: breakpoint });
+    this._subject.next({ method: 'clear_breakpoint', breakpoint });
   }
 
   continue() {
@@ -47,7 +38,7 @@ let DebuggerCommander = exports.DebuggerCommander = class DebuggerCommander {
   }
 
   jump(line) {
-    this._subject.next({ method: 'jump', line: line });
+    this._subject.next({ method: 'jump', line });
   }
 
   next() {
@@ -65,4 +56,13 @@ let DebuggerCommander = exports.DebuggerCommander = class DebuggerCommander {
   step() {
     this._subject.next({ method: 'step' });
   }
-};
+}
+exports.DebuggerCommander = DebuggerCommander; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */

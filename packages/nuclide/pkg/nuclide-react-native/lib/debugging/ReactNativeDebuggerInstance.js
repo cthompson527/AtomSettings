@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,10 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.ReactNativeDebuggerInstance = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-
 
 var _UniversalDisposable;
 
@@ -70,7 +57,19 @@ const PORT = 38913;
  *    DebuggerProxyClient.
  * 2. Debugging the node process.
  */
-let ReactNativeDebuggerInstance = exports.ReactNativeDebuggerInstance = class ReactNativeDebuggerInstance extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstanceBase {
+
+// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class ReactNativeDebuggerInstance extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerInstanceBase {
 
   constructor(processInfo, debugPort) {
     super(processInfo);
@@ -80,19 +79,13 @@ let ReactNativeDebuggerInstance = exports.ReactNativeDebuggerInstance = class Re
       didConnect = resolve;
     });
 
-    const session$ = uiConnection$.combineLatest(pid$).switchMap((_ref) => {
-      var _ref2 = _slicedToArray(_ref, 2);
-
-      let ws = _ref2[0],
-          pid = _ref2[1];
-      return createSessionStream(ws, debugPort);
-    }).publish();
+    const session$ = uiConnection$.combineLatest(pid$).switchMap(([ws, pid]) => createSessionStream(ws, debugPort)).publish();
 
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(
     // Tell the user if we can't connect to the debugger UI.
     uiConnection$.subscribe(null, err => {
       atom.notifications.addError('Error connecting to debugger UI.', {
-        detail: `Make sure that port ${ PORT } is open.`,
+        detail: `Make sure that port ${PORT} is open.`,
         stack: err.stack,
         dismissable: true
       });
@@ -117,54 +110,45 @@ let ReactNativeDebuggerInstance = exports.ReactNativeDebuggerInstance = class Re
       yield _this._connected;
 
       // TODO(natthu): Assign random port instead.
-      return `ws=localhost:${ PORT }/`;
+      return `ws=localhost:${PORT}/`;
     })();
   }
+}
 
-};
-
-/**
- * A stream of PIDs to debug, obtained by connecting to the packager via the DebuggerProxyClient.
- * This stream is shared so that only one client is created when there is more than one subscriber.
- */
-// $FlowFixMe(matthewwithanm): Type this.
+exports.ReactNativeDebuggerInstance = ReactNativeDebuggerInstance; /**
+                                                                    * A stream of PIDs to debug, obtained by connecting to the packager via the DebuggerProxyClient.
+                                                                    * This stream is shared so that only one client is created when there is more than one subscriber.
+                                                                    */
 
 const pid$ = _rxjsBundlesRxMinJs.Observable.using(() => {
   const client = new (_DebuggerProxyClient || _load_DebuggerProxyClient()).DebuggerProxyClient();
   client.connect();
   return {
-    client: client,
+    client,
     unsubscribe: () => {
       client.disconnect();
     }
   };
-}, (_ref3) => {
-  let client = _ref3.client;
-  return (0, (_event || _load_event()).observableFromSubscribeFunction)(client.onDidEvalApplicationScript.bind(client));
-}).publish();
+}, ({ client }) => (0, (_event || _load_event()).observableFromSubscribeFunction)(client.onDidEvalApplicationScript.bind(client))).publish();
 
 /**
  * Connections from the Chrome UI. There will only be one connection at a time. This stream won't
  * complete unless the connection closes.
  */
-// $FlowFixMe(matthewwithanm): Type this.
 const uiConnection$ = _rxjsBundlesRxMinJs.Observable.using(() => {
   // TODO(natthu): Assign random port instead.
   const server = new (_ws || _load_ws()).default.Server({ port: PORT });
   return {
-    server: server,
+    server,
     unsubscribe: () => {
       server.close();
     }
   };
-}, (_ref4) => {
-  let server = _ref4.server;
-  return _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(server, 'error').flatMap(_rxjsBundlesRxMinJs.Observable.throw), _rxjsBundlesRxMinJs.Observable.fromEvent(server, 'connection')).takeUntil(_rxjsBundlesRxMinJs.Observable.fromEvent(server, 'close'));
-}).publish();
+}, ({ server }) => _rxjsBundlesRxMinJs.Observable.merge(_rxjsBundlesRxMinJs.Observable.fromEvent(server, 'error').flatMap(_rxjsBundlesRxMinJs.Observable.throw), _rxjsBundlesRxMinJs.Observable.fromEvent(server, 'connection')).takeUntil(_rxjsBundlesRxMinJs.Observable.fromEvent(server, 'close'))).publish();
 
 function createSessionStream(ws, debugPort) {
   const config = {
-    debugPort: debugPort,
+    debugPort,
     // This makes the node inspector not load all the source files on startup:
     preload: false
   };

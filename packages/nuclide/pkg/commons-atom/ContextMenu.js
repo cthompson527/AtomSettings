@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
@@ -31,7 +21,7 @@ var _atom = require('atom');
  * Note that this class also provides support for submenu items. This requires Atom 1.6 or later
  * because it relies on this fix: https://github.com/atom/atom/pull/10486.
  */
-let ContextMenu = class ContextMenu {
+class ContextMenu {
 
   /**
    * List of items that have been added to this context menu in the order they were added.
@@ -71,7 +61,7 @@ let ContextMenu = class ContextMenu {
    * @return object whose dispose() method can be used to remove the menu item from this object.
    */
   addItem(item, priority) {
-    const value = { type: 'item', item: item, priority: priority };
+    const value = { type: 'item', item, priority };
     return this._addItemToList(value);
   }
 
@@ -84,7 +74,7 @@ let ContextMenu = class ContextMenu {
    * @return object whose dispose() method can be used to remove the submenu from this object.
    */
   addSubmenu(contextMenu, priority) {
-    const value = { type: 'menu', menu: contextMenu, priority: priority };
+    const value = { type: 'menu', menu: contextMenu, priority };
     return this._addItemToList(value);
   }
 
@@ -181,12 +171,19 @@ let ContextMenu = class ContextMenu {
     }
     this._items.length = 0;
   }
-};
+}
 
-/** Comparator used to sort menu items by priority: lower priorities appear earlier. */
+exports.default = ContextMenu; /** Comparator used to sort menu items by priority: lower priorities appear earlier. */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-exports.default = ContextMenu;
 function compareInternalItems(a, b) {
   return a.priority - b.priority;
 }
-module.exports = exports['default'];

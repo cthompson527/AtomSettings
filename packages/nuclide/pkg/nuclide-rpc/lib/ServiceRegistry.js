@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,15 +23,30 @@ function _load_nuclideLogging() {
   return _nuclideLogging = require('../../nuclide-logging');
 }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+var _config;
 
-let ServiceRegistry = exports.ServiceRegistry = class ServiceRegistry {
+function _load_config() {
+  return _config = require('./config');
+}
+
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
+class ServiceRegistry {
 
   /**
    * Store a mapping from function name to a structure holding both the local implementation and
    * the type definition of the function.
    */
-  constructor(predefinedTypes, services) {
+  constructor(predefinedTypes, services, protocol = (_config || _load_config()).SERVICE_FRAMEWORK3_PROTOCOL) {
+    this._protocol = protocol;
     this._typeRegistry = new (_TypeRegistry || _load_TypeRegistry()).TypeRegistry(predefinedTypes);
     this._predefinedTypes = predefinedTypes.map(predefinedType => predefinedType.typeName);
     this._functionsByName = new Map();
@@ -56,6 +62,10 @@ let ServiceRegistry = exports.ServiceRegistry = class ServiceRegistry {
    */
 
 
+  getProtocol() {
+    return this._protocol;
+  }
+
   addServices(services) {
     services.forEach(this.addService, this);
   }
@@ -68,11 +78,13 @@ let ServiceRegistry = exports.ServiceRegistry = class ServiceRegistry {
       const localImpl = require(service.implementation);
       this._services.set(service.name, {
         name: service.name,
-        factory: factory
+        factory
       });
 
       // Register type aliases.
-      factory.defs.forEach(definition => {
+      const defs = factory.defs;
+      Object.keys(defs).forEach(defName => {
+        const definition = defs[defName];
         const name = definition.name;
         switch (definition.kind) {
           case 'alias':
@@ -82,38 +94,39 @@ let ServiceRegistry = exports.ServiceRegistry = class ServiceRegistry {
             break;
           case 'function':
             // Register module-level functions.
-            const functionName = service.preserveFunctionNames ? name : `${ service.name }/${ name }`;
+            const functionName = service.preserveFunctionNames ? name : `${service.name}/${name}`;
             this._registerFunction(functionName, localImpl[name], definition.type);
             break;
           case 'interface':
             // Register interfaces.
             this._classesByName.set(name, {
               localImplementation: localImpl[name],
-              definition: definition
+              definition
             });
 
             this._typeRegistry.registerType(name, definition.location, (object, context) => context.marshal(name, object), (objectId, context) => context.unmarshal(objectId, name, context.getService(service.name)[name]));
 
             // Register all of the static methods as remote functions.
-            definition.staticMethods.forEach((funcType, funcName) => {
-              this._registerFunction(`${ name }/${ funcName }`, localImpl[name][funcName], funcType);
+            Object.keys(definition.staticMethods).forEach(funcName => {
+              const funcType = definition.staticMethods[funcName];
+              this._registerFunction(`${name}/${funcName}`, localImpl[name][funcName], funcType);
             });
             break;
         }
       });
     } catch (e) {
-      logger.error(`Failed to load service ${ service.name }. Stack Trace:\n${ e.stack }`);
+      logger.error(`Failed to load service ${service.name}. Stack Trace:\n${e.stack}`);
       throw e;
     }
   }
 
   _registerFunction(name, localImpl, type) {
     if (this._functionsByName.has(name)) {
-      throw new Error(`Duplicate RPC function: ${ name }`);
+      throw new Error(`Duplicate RPC function: ${name}`);
     }
     this._functionsByName.set(name, {
       localImplementation: localImpl,
-      type: type
+      type
     });
   }
 
@@ -158,4 +171,5 @@ let ServiceRegistry = exports.ServiceRegistry = class ServiceRegistry {
 
     return result;
   }
-};
+}
+exports.ServiceRegistry = ServiceRegistry;

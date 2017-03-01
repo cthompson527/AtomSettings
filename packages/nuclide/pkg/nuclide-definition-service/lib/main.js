@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,7 +27,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // Provides definitions for a set of language grammars.
-let Service = exports.Service = class Service {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Service {
 
   constructor() {
     this._providers = new (_ProviderRegistry || _load_ProviderRegistry()).default();
@@ -49,7 +50,7 @@ let Service = exports.Service = class Service {
 
     return (0, _asyncToGenerator.default)(function* () {
       const provider = _this._providers.getProviderForEditor(editor);
-      return provider == null ? null : yield provider.getDefinition(editor, position);
+      return provider == null ? null : provider.getDefinition(editor, position);
     })();
   }
 
@@ -59,9 +60,9 @@ let Service = exports.Service = class Service {
       this._providers.removeProvider(provider);
     });
   }
-};
+}
 
-
+exports.Service = Service;
 let activation = null;
 
 function activate(state) {

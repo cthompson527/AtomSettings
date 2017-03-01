@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,7 +27,15 @@ function _load_addTooltip() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
+function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; } /**
+                                                                                                                                                                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                                                                              * All rights reserved.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                                                                              * the root directory of this source tree.
+                                                                                                                                                                                                                              *
+                                                                                                                                                                                                                              * 
+                                                                                                                                                                                                                              */
 
 const ButtonSizes = exports.ButtonSizes = Object.freeze({
   EXTRA_SMALL: 'EXTRA_SMALL',
@@ -69,30 +68,44 @@ const ButtonTypeClassnames = Object.freeze({
 /**
  * Generic Button wrapper.
  */
-const Button = exports.Button = props => {
-  const icon = props.icon,
-        buttonType = props.buttonType,
-        selected = props.selected,
-        size = props.size,
-        children = props.children,
-        className = props.className,
-        wrapperElement = props.wrapperElement,
-        tooltip = props.tooltip,
-        remainingProps = _objectWithoutProperties(props, ['icon', 'buttonType', 'selected', 'size', 'children', 'className', 'wrapperElement', 'tooltip']);
+class Button extends _reactForAtom.React.Component {
 
-  const sizeClassname = size == null ? '' : ButtonSizeClassnames[size] || '';
-  const buttonTypeClassname = buttonType == null ? '' : ButtonTypeClassnames[buttonType] || '';
-  const ref = tooltip ? (0, (_addTooltip || _load_addTooltip()).default)(tooltip) : null;
-  const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'btn', {
-    [`icon icon-${ (0, (_string || _load_string()).maybeToString)(icon) }`]: icon != null,
-    [sizeClassname]: size != null,
-    selected: selected,
-    [buttonTypeClassname]: buttonType != null
-  });
-  const Wrapper = wrapperElement == null ? 'button' : wrapperElement;
-  return _reactForAtom.React.createElement(
-    Wrapper,
-    Object.assign({ className: newClassName, ref: ref }, remainingProps),
-    children
-  );
-};
+  focus() {
+    const node = _reactForAtom.ReactDOM.findDOMNode(this);
+    if (node == null) {
+      return;
+    }
+    node.focus();
+  }
+
+  render() {
+    const _props = this.props,
+          {
+      icon,
+      buttonType,
+      selected,
+      size,
+      children,
+      className,
+      wrapperElement,
+      tooltip
+    } = _props,
+          remainingProps = _objectWithoutProperties(_props, ['icon', 'buttonType', 'selected', 'size', 'children', 'className', 'wrapperElement', 'tooltip']);
+    const sizeClassname = size == null ? '' : ButtonSizeClassnames[size] || '';
+    const buttonTypeClassname = buttonType == null ? '' : ButtonTypeClassnames[buttonType] || '';
+    const ref = tooltip ? (0, (_addTooltip || _load_addTooltip()).default)(tooltip) : null;
+    const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'btn', {
+      [`icon icon-${(0, (_string || _load_string()).maybeToString)(icon)}`]: icon != null,
+      [sizeClassname]: size != null,
+      selected,
+      [buttonTypeClassname]: buttonType != null
+    });
+    const Wrapper = wrapperElement == null ? 'button' : wrapperElement;
+    return _reactForAtom.React.createElement(
+      Wrapper,
+      Object.assign({ className: newClassName, ref: ref }, remainingProps),
+      children
+    );
+  }
+}
+exports.Button = Button;

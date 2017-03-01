@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40,7 +31,17 @@ function _load_parseMessages() {
 
 var _atom = require('atom');
 
+var _electron = _interopRequireDefault(require('electron'));
+
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _shellQuote;
+
+function _load_shellQuote() {
+  return _shellQuote = require('shell-quote');
+}
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 /**
  * Runs the server in the appropriate place. This class encapsulates all the state of the packager
@@ -49,7 +50,7 @@ var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
+class PackagerActivation {
 
   constructor() {
     const packagerEvents = _rxjsBundlesRxMinJs.Observable.defer(() => getPackagerObservable(this._projectRootPath)).share();
@@ -63,9 +64,9 @@ let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
     const ready = packagerEvents.filter(message => message.kind === 'ready').mapTo(undefined);
     this._logTailer = new (_LogTailer || _load_LogTailer()).LogTailer({
       name: 'React Native Packager',
-      messages: messages,
-      ready: ready,
-      handleError: function (err) {
+      messages,
+      ready,
+      handleError(err) {
         switch (err.name) {
           case 'NoReactNativeProjectError':
             // If a React Native project hasn't been found, notify the user and complete normally.
@@ -79,7 +80,7 @@ let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
               throw new Error('Invariant violation: "err instanceof PackagerError"');
             }
 
-            atom.notifications.addError(`Packager exited with ${ err.exitMessage }`, {
+            atom.notifications.addError(`Packager exited with ${err.exitMessage}`, {
               dismissable: true,
               detail: err.stderr.trim() === '' ? undefined : err.stderr
             });
@@ -87,7 +88,6 @@ let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
         }
         throw err;
       },
-
       trackingEvents: {
         start: 'react-native-packager:start',
         stop: 'react-native-packager:stop',
@@ -99,8 +99,8 @@ let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
       this._logTailer.stop();
     }), atom.commands.add('atom-workspace', {
       'nuclide-react-native:start-packager': event => {
-        // $FlowFixMe
         const detail = event.detail != null && typeof event.detail === 'object' ? event.detail : undefined;
+        // $FlowFixMe
         this._logTailer.start(detail);
       },
       'nuclide-react-native:stop-packager': () => this._logTailer.stop(),
@@ -131,45 +131,61 @@ let PackagerActivation = exports.PackagerActivation = class PackagerActivation {
       }
     }));
   }
+}
 
-};
-let NoReactNativeProjectError = class NoReactNativeProjectError extends Error {
+exports.PackagerActivation = PackagerActivation; /**
+                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                  * All rights reserved.
+                                                  *
+                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                  * the root directory of this source tree.
+                                                  *
+                                                  * 
+                                                  */
+
+class NoReactNativeProjectError extends Error {
   constructor() {
     super('No React Native Project found');
     this.name = 'NoReactNativeProjectError';
   }
-};
-let PackagerError = class PackagerError extends Error {
+}
+
+class PackagerError extends Error {
   constructor(exitMessage, stderr) {
     super('An error occurred while running the packager');
     this.name = 'PackagerError';
     this.exitMessage = exitMessage;
     this.stderr = stderr;
   }
-};
+}
 
 /**
  * Create an observable that runs the packager and and collects its output.
  */
-
 function getPackagerObservable(projectRootPath) {
   const stdout = _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_nuclideReactNativeBase || _load_nuclideReactNativeBase()).getCommandInfo)(projectRootPath)).switchMap(commandInfo => commandInfo == null ? _rxjsBundlesRxMinJs.Observable.throw(new NoReactNativeProjectError()) : _rxjsBundlesRxMinJs.Observable.of(commandInfo)).switchMap(commandInfo => {
-    const command = commandInfo.command,
-          cwd = commandInfo.cwd,
-          args = commandInfo.args;
+    const { command, cwd, args } = commandInfo;
+    const remote = _electron.default.remote;
 
-    return (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(command, args, { cwd: cwd }));
+    if (!(remote != null)) {
+      throw new Error('Invariant violation: "remote != null"');
+    }
+    // Tell the packager to use this Atom to edit the files.
+
+
+    const editor = [remote.app.getPath('exe')];
+    if (atom.devMode) {
+      editor.push('--dev');
+    }
+    return (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(command, args, { cwd, env: Object.assign({}, process.env, { REACT_EDITOR: (0, (_shellQuote || _load_shellQuote()).quote)(editor) }) }), true);
   })
   // Accumulate the stderr so that we can show it to the user if something goes wrong.
   .scan((acc, event) => {
     return {
       stderr: event.kind === 'stderr' ? acc.stderr + event.data : acc.stderr,
-      event: event
+      event
     };
-  }, { stderr: '', event: null }).switchMap((_ref) => {
-    let stderr = _ref.stderr,
-        event = _ref.event;
-
+  }, { stderr: '', event: null }).switchMap(({ stderr, event }) => {
     if (event == null) {
       return _rxjsBundlesRxMinJs.Observable.empty();
     }

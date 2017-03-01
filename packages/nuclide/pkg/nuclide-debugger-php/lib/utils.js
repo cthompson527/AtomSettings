@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,6 +21,16 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DEBUGGER_LOGGER_CATEGORY = 'nuclide-debugger-php';
 exports.default = (0, (_nuclideLogging || _load_nuclideLogging()).getCategoryLogger)(DEBUGGER_LOGGER_CATEGORY);
 function getConfig() {
@@ -50,12 +51,13 @@ function isValidRegex(value) {
 }
 
 function validateConfig(config) {
-  if (!isValidRegex(config.scriptRegex)) {
-    if (!(config.scriptRegex != null)) {
-      throw new Error('Invariant violation: "config.scriptRegex != null"');
+  const { attachScriptRegex } = config;
+  if (!isValidRegex(attachScriptRegex)) {
+    if (!(attachScriptRegex != null)) {
+      throw new Error('Invariant violation: "attachScriptRegex != null"');
     }
 
-    throw Error(`config scriptRegex is not a valid regular expression: ${ config.scriptRegex }`);
+    throw Error(`config scriptRegex is not a valid regular expression: ${attachScriptRegex}`);
   }
 
   if (!isValidRegex(config.idekeyRegex)) {
@@ -63,7 +65,7 @@ function validateConfig(config) {
       throw new Error('Invariant violation: "config.idekeyRegex != null"');
     }
 
-    throw Error(`config idekeyRegex is not a valid regular expression: ${ config.idekeyRegex }`);
+    throw Error(`config idekeyRegex is not a valid regular expression: ${config.idekeyRegex}`);
   }
 }
 
@@ -73,16 +75,15 @@ function getSessionConfig(targetUri, isLaunch) {
   const sessionConfig = {
     xdebugAttachPort: config.xdebugAttachPort,
     xdebugLaunchingPort: config.xdebugLaunchingPort,
-    targetUri: targetUri,
+    targetUri,
     logLevel: config.logLevel,
     endDebugWhenNoRequests: false,
     phpRuntimePath: config.phpRuntimePath,
     phpRuntimeArgs: config.phpRuntimeArgs,
     dummyRequestFilePath: 'php_only_xdebug_request.php',
     stopOneStopAll: config.stopOneStopAll,
-    scriptRegex: config.scriptRegex,
+    attachScriptRegex: config.attachScriptRegex,
     idekeyRegex: config.idekeyRegex
-
   };
   if (isLaunch) {
     sessionConfig.xdebugAttachPort = config.xdebugLaunchingPort;

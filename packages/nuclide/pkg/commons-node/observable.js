@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
+exports.nextAnimationFrame = exports.nextTick = undefined;
 exports.splitStream = splitStream;
 exports.bufferUntil = bufferUntil;
 exports.cacheWhileSubscribed = cacheWhileSubscribed;
@@ -25,6 +14,7 @@ exports.toggle = toggle;
 exports.compact = compact;
 exports.takeWhileInclusive = takeWhileInclusive;
 exports.concatLatest = concatLatest;
+exports.throttle = throttle;
 
 var _UniversalDisposable;
 
@@ -71,8 +61,27 @@ function splitStream(input) {
   });
 }
 
-// TODO: We used to use `stream.buffer(stream.filter(...))` for this but it doesn't work in RxJS 5.
-//  See https://github.com/ReactiveX/rxjs/issues/1610
+/**
+ * Buffers until the predicate matches an element, then opens a new buffer.
+ *
+ * @param stream - The observable to buffer
+ * @param predicate - A function that will be called every time an element is emitted from the
+ *     source. The predicate is passed the current element as well as the buffer at that point
+ *     (which includes the element). IMPORTANT: DO NOT MUTATE THE BUFFER. It returns a boolean
+ *     specifying whether to complete the buffer (and begin a new one).
+ */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/* global requestAnimationFrame, cancelAnimationFrame */
+
 function bufferUntil(stream, condition) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     let buffer = null;
@@ -87,7 +96,7 @@ function bufferUntil(stream, condition) {
         buffer = [];
       }
       buffer.push(x);
-      if (condition(x)) {
+      if (condition(x, buffer)) {
         flush();
       }
     }, err => {
@@ -118,16 +127,10 @@ function cacheWhileSubscribed(input) {
  */
 function diffSets(sets, hash) {
   return _rxjsBundlesRxMinJs.Observable.concat(_rxjsBundlesRxMinJs.Observable.of(new Set()), // Always start with no items with an empty set
-  sets).pairwise().map((_ref) => {
-    var _ref2 = _slicedToArray(_ref, 2);
-
-    let previous = _ref2[0],
-        next = _ref2[1];
-    return {
-      added: (0, (_collection || _load_collection()).setDifference)(next, previous, hash),
-      removed: (0, (_collection || _load_collection()).setDifference)(previous, next, hash)
-    };
-  }).filter(diff => diff.added.size > 0 || diff.removed.size > 0);
+  sets).pairwise().map(([previous, next]) => ({
+    added: (0, (_collection || _load_collection()).setDifference)(next, previous, hash),
+    removed: (0, (_collection || _load_collection()).setDifference)(previous, next, hash)
+  })).filter(diff => diff.added.size > 0 || diff.removed.size > 0);
 }
 
 /**
@@ -225,20 +228,61 @@ function takeWhileInclusive(source, predicate) {
 
 // Concatenate the latest values from each input observable into one big list.
 // Observables who have not emitted a value yet are treated as empty.
-function concatLatest() {
-  for (var _len = arguments.length, observables = Array(_len), _key = 0; _key < _len; _key++) {
-    observables[_key] = arguments[_key];
-  }
-
+function concatLatest(...observables) {
   // First, tag all input observables with their index.
   const tagged = observables.map((observable, index) => observable.map(list => [list, index]));
-  return _rxjsBundlesRxMinJs.Observable.merge(...tagged).scan((accumulator, _ref3) => {
-    var _ref4 = _slicedToArray(_ref3, 2);
-
-    let list = _ref4[0],
-        index = _ref4[1];
-
+  return _rxjsBundlesRxMinJs.Observable.merge(...tagged).scan((accumulator, [list, index]) => {
     accumulator[index] = list;
     return accumulator;
   }, observables.map(x => [])).map(accumulator => [].concat(...accumulator));
 }
+
+/**
+ * A more sensible alternative to RxJS's throttle/audit/sample operators.
+ */
+function throttle(source, duration, options_) {
+  const options = options_ || {};
+  const leading = options.leading !== false;
+  let audit;
+  switch (typeof duration) {
+    case 'number':
+      // $FlowFixMe: Add `auditTime()` to Flow defs
+      audit = obs => obs.auditTime(duration);
+      break;
+    case 'function':
+      audit = obs => obs.audit(duration);
+      break;
+    default:
+      audit = obs => obs.audit(() => duration);
+  }
+
+  if (!leading) {
+    return audit(source);
+  }
+
+  return _rxjsBundlesRxMinJs.Observable.create(observer => {
+    const connectableSource = source.publish();
+    const throttled = _rxjsBundlesRxMinJs.Observable.merge(connectableSource.take(1), audit(connectableSource.skip(1)));
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(throttled.subscribe(observer), connectableSource.connect());
+  });
+}
+
+const nextTick = exports.nextTick = _rxjsBundlesRxMinJs.Observable.create(observer => {
+  process.nextTick(() => {
+    observer.next();
+    observer.complete();
+  });
+});
+
+const nextAnimationFrame = exports.nextAnimationFrame = _rxjsBundlesRxMinJs.Observable.create(observer => {
+  if (typeof requestAnimationFrame === 'undefined') {
+    throw new Error('This util can only be used in Atom');
+  }
+  const id = requestAnimationFrame(() => {
+    observer.next();
+    observer.complete();
+  });
+  return () => {
+    cancelAnimationFrame(id);
+  };
+});

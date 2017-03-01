@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,9 +45,19 @@ function _load_shallowequal() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const METHOD_DROPDOWN_OPTIONS = [{ label: 'GET', value: 'GET' }, { label: 'POST', value: 'POST' }];
 
-let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog extends _reactForAtom.React.Component {
+class RequestEditDialog extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -66,12 +67,7 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
   }
 
   shouldComponentUpdate(nextProps) {
-    var _props = this.props;
-    const uri = _props.uri,
-          method = _props.method,
-          headers = _props.headers,
-          body = _props.body;
-
+    const { uri, method, headers, body } = this.props;
     return nextProps.uri !== uri || nextProps.method !== method || nextProps.body !== body || !(0, (_shallowequal || _load_shallowequal()).default)(nextProps.headers, headers);
   }
 
@@ -130,7 +126,7 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
     } catch (_) {
       return; // Do not store illegal JSON.
     }
-    this.props.actionCreators.updateState({ headers: headers });
+    this.props.actionCreators.updateState({ headers });
   }
 
   render() {
@@ -149,7 +145,7 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
           tabIndex: '1',
           placeholderText: 'https://www.facebook.com',
           value: this.props.uri,
-          onDidChange: uri => this.props.actionCreators.updateState({ uri: uri })
+          onDidChange: uri => this.props.actionCreators.updateState({ uri })
         }),
         _reactForAtom.React.createElement(
           'label',
@@ -159,7 +155,7 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
         _reactForAtom.React.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
           value: this.props.method,
           options: METHOD_DROPDOWN_OPTIONS,
-          onChange: method => this.props.actionCreators.updateState({ method: method })
+          onChange: method => this.props.actionCreators.updateState({ method })
         }),
         this.props.method !== 'POST' ? null : _reactForAtom.React.createElement(
           'div',
@@ -171,7 +167,7 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
           ),
           _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
             tabIndex: '2',
-            onDidChange: body => this.props.actionCreators.updateState({ body: body })
+            onDidChange: body => this.props.actionCreators.updateState({ body })
           })
         ),
         _reactForAtom.React.createElement(
@@ -214,4 +210,5 @@ let RequestEditDialog = exports.RequestEditDialog = class RequestEditDialog exte
       )
     );
   }
-};
+}
+exports.RequestEditDialog = RequestEditDialog;

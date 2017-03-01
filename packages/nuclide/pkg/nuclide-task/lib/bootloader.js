@@ -1,43 +1,55 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _child_process = _interopRequireDefault(require('child_process'));
 
 var _events = _interopRequireDefault(require('events'));
 
+var _env;
+
+function _load_env() {
+  return _env = require('../../nuclide-node-transpiler/lib/env');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const BOOTSTRAP_PATH = require.resolve('./bootstrap');
+const BOOTSTRAP_PATH = require.resolve('./bootstrap'); /**
+                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                        * All rights reserved.
+                                                        *
+                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                        * the root directory of this source tree.
+                                                        *
+                                                        * 
+                                                        */
+
 const TRANSPILER_PATH = require.resolve('../../nuclide-node-transpiler');
 
 /**
  * Task creates and manages communication with another Node process. In addition
  * to executing ordinary .js files, the other Node process can also run .js files
- * under the Babel transpiler, so long as they have the `'use babel'` pragma
- * used in Atom.
+ * under the Babel transpiler, so long as they have the  pragma.
  */
-let Task = class Task {
+class Task {
 
   constructor() {
     this._id = 0;
     this._emitter = new _events.default();
-    const child = this._child = _child_process.default.fork('--require', [TRANSPILER_PATH, BOOTSTRAP_PATH], { silent: true });
+    this._child = null;
+  }
+
+  _initialize() {
+    if (!(this._child == null)) {
+      throw new Error('Invariant violation: "this._child == null"');
+    }
+
+    const child = this._child = this._fork();
     // eslint-disable-next-line no-console
     const log = buffer => {
-      console.log(`TASK(${ child.pid }): ${ buffer }`);
+      console.log(`TASK(${child.pid}): ${buffer}`);
     };
     child.stdout.on('data', log);
     child.stderr.on('data', log);
@@ -49,6 +61,7 @@ let Task = class Task {
       log(buffer);
       child.kill();
       this._emitter.emit('error', buffer.toString());
+      this._emitter.emit('child-process-error', buffer);
     });
 
     const onExitCallback = () => {
@@ -56,8 +69,18 @@ let Task = class Task {
     };
     process.on('exit', onExitCallback);
     child.on('exit', () => {
+      this._emitter.emit('exit');
       process.removeListener('exit', onExitCallback);
     });
+  }
+
+  _fork() {
+    // The transpiler is only loaded in development.
+    if ((_env || _load_env()).__DEV__) {
+      return _child_process.default.fork('--require', [TRANSPILER_PATH, BOOTSTRAP_PATH], { silent: true });
+    } else {
+      return _child_process.default.fork(BOOTSTRAP_PATH, [], { silent: true });
+    }
   }
 
   /**
@@ -84,6 +107,10 @@ let Task = class Task {
    *     instead.
    */
   invokeRemoteMethod(params) {
+    if (this._child == null) {
+      this._initialize();
+    }
+
     const requestId = (++this._id).toString(16);
     const request = {
       id: requestId,
@@ -108,20 +135,28 @@ let Task = class Task {
         }
       });
       this._emitter.once('error', reject);
+
+      if (!(this._child != null)) {
+        throw new Error('Invariant violation: "this._child != null"');
+      }
+
       this._child.send(request);
     });
   }
 
   onError(callback) {
-    this._child.on('error', callback);
+    this._emitter.on('child-process-error', callback);
+  }
+
+  onExit(callback) {
+    this._emitter.on('exit', callback);
   }
 
   dispose() {
-    if (this._child.connected) {
+    if (this._child != null && this._child.connected) {
       this._child.kill();
     }
     this._emitter.removeAllListeners();
   }
-};
+}
 exports.default = Task;
-module.exports = exports['default'];

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -20,12 +10,6 @@ var _BreakpointStore;
 
 function _load_BreakpointStore() {
   return _BreakpointStore = _interopRequireDefault(require('./BreakpointStore.js'));
-}
-
-var _DebuggerActions;
-
-function _load_DebuggerActions() {
-  return _DebuggerActions = _interopRequireDefault(require('./DebuggerActions'));
 }
 
 var _DebuggerInspector;
@@ -54,11 +38,23 @@ function _load_Button() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function getStateFromStore(store) {
   return {
     processSocket: store.getProcessSocket()
   };
-}let DebuggerControllerView = class DebuggerControllerView extends _reactForAtom.React.Component {
+}
+
+class DebuggerControllerView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -96,12 +92,9 @@ function getStateFromStore(store) {
   render() {
     if (this.state.processSocket) {
       return _reactForAtom.React.createElement((_DebuggerInspector || _load_DebuggerInspector()).default, {
-        actions: this.props.actions,
-        bridge: this.props.bridge,
         breakpointStore: this.props.breakpointStore,
-        socket: this.state.processSocket,
-        showOldView: this.props.showOldView,
-        toggleOldView: this.props.toggleOldView
+        openDevTools: this.props.openDevTools,
+        stopDebugging: this.props.stopDebugging
       });
     }
     if (this.props.store.getDebuggerMode() === 'starting') {
@@ -126,7 +119,7 @@ function getStateFromStore(store) {
   }
 
   _handleClickClose() {
-    this.props.actions.stopDebugging();
+    this.props.stopDebugging();
   }
 
   _updateStateFromStore(store) {
@@ -136,6 +129,5 @@ function getStateFromStore(store) {
       this.setState(getStateFromStore(this.props.store));
     }
   }
-};
+}
 exports.default = DebuggerControllerView;
-module.exports = exports['default'];

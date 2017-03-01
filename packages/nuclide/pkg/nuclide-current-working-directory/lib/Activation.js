@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,12 +19,11 @@ function _load_projects() {
   return _projects = require('../../commons-atom/projects');
 }
 
-let Activation = exports.Activation = class Activation {
+class Activation {
 
   constructor(rawState) {
     const state = rawState || {};
-    const initialCwdPath = state.initialCwdPath;
-
+    const { initialCwdPath } = state;
     this._cwdApi = new (_CwdApi || _load_CwdApi()).CwdApi(initialCwdPath);
     this._disposables = new _atom.CompositeDisposable(this._cwdApi, atom.commands.add('atom-workspace', 'nuclide-current-working-root:set-from-active-file', this._setFromActiveFile.bind(this)));
   }
@@ -74,5 +64,13 @@ let Activation = exports.Activation = class Activation {
 
     this._cwdApi.setCwd(projectRoot);
   }
-
-};
+}
+exports.Activation = Activation; /**
+                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                  * All rights reserved.
+                                  *
+                                  * This source code is licensed under the license found in the LICENSE file in
+                                  * the root directory of this source tree.
+                                  *
+                                  * 
+                                  */

@@ -1,20 +1,14 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
-var _reactForAtom = require('react-for-atom');
+var _ResizableFlexContainer;
+
+function _load_ResizableFlexContainer() {
+  return _ResizableFlexContainer = require('../../../nuclide-ui/ResizableFlexContainer');
+}
 
 var _constants;
 
@@ -22,10 +16,18 @@ function _load_constants() {
   return _constants = require('../constants');
 }
 
+var _reactForAtom = require('react-for-atom');
+
 var _DiffViewComponent;
 
 function _load_DiffViewComponent() {
   return _DiffViewComponent = require('../DiffViewComponent');
+}
+
+var _Modal;
+
+function _load_Modal() {
+  return _Modal = require('../../../nuclide-ui/Modal');
 }
 
 var _SectionDirectionNavigator;
@@ -42,21 +44,45 @@ function _load_notifications() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DiffViewNavigatorComponent = class DiffViewNavigatorComponent extends _reactForAtom.React.Component {
+class DiffViewNavigatorComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handleNavigateToSection = this._handleNavigateToSection.bind(this);
   }
 
-  render() {
-    var _props = this.props,
-        _props$fileDiff = _props.fileDiff;
-    const activeSectionIndex = _props$fileDiff.activeSectionIndex,
-          filePath = _props$fileDiff.filePath,
-          navigationSections = _props$fileDiff.navigationSections,
-          isLoadingFileDiff = _props.isLoadingFileDiff;
+  componentDidMount() {
+    this.props.tryTriggerNux();
+  }
 
+  render() {
+    return _reactForAtom.React.createElement(
+      (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexContainer,
+      {
+        className: 'nuclide-diff-view-navigator-root',
+        direction: (_ResizableFlexContainer || _load_ResizableFlexContainer()).FlexDirections.HORIZONTAL },
+      _reactForAtom.React.createElement(
+        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
+        { initialFlexScale: 1 },
+        _reactForAtom.React.createElement(
+          'div',
+          { className: 'nuclide-diff-view-navigator-timeline-container' },
+          this._renderNavigationState()
+        )
+      ),
+      _reactForAtom.React.createElement(
+        (_ResizableFlexContainer || _load_ResizableFlexContainer()).ResizableFlexItem,
+        { initialFlexScale: 0.5 },
+        this._renderFileChanges()
+      )
+    );
+  }
+
+  _renderFileChanges() {
+    const {
+      fileDiff: { activeSectionIndex, filePath, navigationSections },
+      isLoadingFileDiff
+    } = this.props;
 
     let sectionNavigator;
     if (isLoadingFileDiff) {
@@ -74,14 +100,14 @@ let DiffViewNavigatorComponent = class DiffViewNavigatorComponent extends _react
     } else {
       sectionNavigator = _reactForAtom.React.createElement(
         'div',
-        { className: 'nuclide-diff-view-section-navigator-container' },
+        { className: 'padded' },
         _reactForAtom.React.createElement(
           'span',
           null,
           'Changed Sections: '
         ),
         _reactForAtom.React.createElement((_SectionDirectionNavigator || _load_SectionDirectionNavigator()).default, {
-          commandTarget: `.${ (_constants || _load_constants()).DIFF_EDITOR_MARKER_CLASS }`,
+          commandTarget: `.${(_constants || _load_constants()).DIFF_EDITOR_MARKER_CLASS}`,
           filePath: filePath,
           navigationSections: navigationSections,
           selectedNavigationSectionIndex: activeSectionIndex,
@@ -92,62 +118,82 @@ let DiffViewNavigatorComponent = class DiffViewNavigatorComponent extends _react
 
     return _reactForAtom.React.createElement(
       'div',
-      { className: 'nuclide-diff-view-navigator-root' },
+      { className: 'nuclide-diff-view-navigator-file-changes-container' },
       _reactForAtom.React.createElement(
         'div',
-        { className: 'nuclide-diff-view-navigator-timeline-container' },
-        this._renderNavigationState()
+        null,
+        sectionNavigator
       ),
-      _reactForAtom.React.createElement('div', { className: 'nuclide-diff-view-navigator-vertical-selector' }),
-      _reactForAtom.React.createElement(
-        'div',
-        { className: 'nuclide-diff-view-navigator-file-changes-container' },
-        sectionNavigator,
-        _reactForAtom.React.createElement('div', { className: 'nuclide-diff-view-navigator-horizontal-selector' }),
-        _reactForAtom.React.createElement(
-          'div',
-          null,
-          _reactForAtom.React.createElement(
-            'div',
-            { className: 'padded' },
-            'File Changes'
-          ),
-          (0, (_DiffViewComponent || _load_DiffViewComponent()).renderFileChanges)(this.props.diffModel)
-        )
-      )
+      (0, (_DiffViewComponent || _load_DiffViewComponent()).renderFileChanges)(this.props.diffModel)
     );
   }
 
   _handleNavigateToSection(status, lineNumber) {
-    const diffEditors = this.props.diffEditors;
-
+    const { diffEditors } = this.props;
     if (diffEditors == null) {
       (0, (_notifications || _load_notifications()).notifyInternalError)(new Error('diffEditors cannot be null while navigating!'));
       return;
     }
-    const newDiffEditor = diffEditors.newDiffEditor,
-          oldDiffEditor = diffEditors.oldDiffEditor;
-
+    const { newDiffEditor, oldDiffEditor } = diffEditors;
     const textEditorElement = (0, (_DiffViewComponent || _load_DiffViewComponent()).navigationSectionStatusToEditorElement)(oldDiffEditor.getEditorDomElement(), newDiffEditor.getEditorDomElement(), status);
     (0, (_DiffViewComponent || _load_DiffViewComponent()).centerScrollToBufferLine)(textEditorElement, lineNumber);
   }
 
   _renderNavigationState() {
-    var _props2 = this.props;
-    const diffModel = _props2.diffModel,
-          viewMode = _props2.viewMode;
-
+    const { diffModel, viewMode } = this.props;
     switch (viewMode) {
       case (_constants || _load_constants()).DiffMode.BROWSE_MODE:
         return (0, (_DiffViewComponent || _load_DiffViewComponent()).renderTimelineView)(diffModel);
       case (_constants || _load_constants()).DiffMode.COMMIT_MODE:
         return (0, (_DiffViewComponent || _load_DiffViewComponent()).renderCommitView)(diffModel);
       case (_constants || _load_constants()).DiffMode.PUBLISH_MODE:
-        return (0, (_DiffViewComponent || _load_DiffViewComponent()).renderPublishView)(diffModel);
+        return this._renderPublishView();
       default:
-        throw new Error(`Invalid Diff Mode: ${ viewMode }`);
+        throw new Error(`Invalid Diff Mode: ${viewMode}`);
     }
   }
-};
-exports.default = DiffViewNavigatorComponent;
-module.exports = exports['default'];
+
+  _renderPublishView() {
+    const { actionCreators, diffModel, shouldDockPublishView } = this.props;
+
+    const publishViewElement = (0, (_DiffViewComponent || _load_DiffViewComponent()).renderPublishView)(diffModel);
+    if (shouldDockPublishView) {
+      return publishViewElement;
+    } else {
+      const dismissHandler = () => {
+        actionCreators.setViewMode((_constants || _load_constants()).DiffMode.BROWSE_MODE);
+      };
+
+      if (!(document.body != null)) {
+        throw new Error('Invariant violation: "document.body != null"');
+      }
+
+      const modalMaxHeight = document.body.clientHeight - 100;
+      return _reactForAtom.React.createElement(
+        'div',
+        null,
+        (0, (_DiffViewComponent || _load_DiffViewComponent()).renderTimelineView)(diffModel),
+        _reactForAtom.React.createElement(
+          (_Modal || _load_Modal()).Modal,
+          { onDismiss: dismissHandler },
+          _reactForAtom.React.createElement(
+            'div',
+            {
+              style: { maxHeight: modalMaxHeight },
+              className: 'nuclide-diff-view-modal-diff-mode' },
+            publishViewElement
+          )
+        )
+      );
+    }
+  }
+}
+exports.default = DiffViewNavigatorComponent; /**
+                                               * Copyright (c) 2015-present, Facebook, Inc.
+                                               * All rights reserved.
+                                               *
+                                               * This source code is licensed under the license found in the LICENSE file in
+                                               * the root directory of this source tree.
+                                               *
+                                               * 
+                                               */

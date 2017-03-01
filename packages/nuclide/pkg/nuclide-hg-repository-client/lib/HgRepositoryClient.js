@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.HgRepositoryClient = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _atom = require('atom');
 
@@ -46,10 +35,10 @@ function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
-var _buffer;
+var _textBuffer;
 
-function _load_buffer() {
-  return _buffer = require('../../commons-atom/buffer');
+function _load_textBuffer() {
+  return _textBuffer = require('../../commons-atom/text-buffer');
 }
 
 var _nuclideLogging;
@@ -78,7 +67,16 @@ function _load_collection() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const STATUS_DEBOUNCE_DELAY_MS = 300;
+const STATUS_DEBOUNCE_DELAY_MS = 300; /**
+                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                       * All rights reserved.
+                                       *
+                                       * This source code is licensed under the license found in the LICENSE file in
+                                       * the root directory of this source tree.
+                                       *
+                                       * 
+                                       */
+
 const REVISION_DEBOUNCE_DELAY = 300;
 
 /**
@@ -92,16 +90,17 @@ const DID_CHANGE_CONFLICT_STATE = 'did-change-conflict-state';
 function getRevisionStatusCache(revisionsCache, workingDirectoryPath) {
   try {
     // $FlowFB
-    const FbRevisionStatusCache = require('./fb/RevisionStatusCache');
+    const FbRevisionStatusCache = require('./fb/RevisionStatusCache').default;
     return new FbRevisionStatusCache(revisionsCache, workingDirectoryPath);
   } catch (e) {
     return {
-      getCachedRevisionStatuses: function () {
+      getCachedRevisionStatuses() {
         return new Map();
       },
-      observeRevisionStatusesChanges: function () {
+      observeRevisionStatusesChanges() {
         return _rxjsBundlesRxMinJs.Observable.empty();
-      }
+      },
+      refresh() {}
     };
   }
 }
@@ -120,7 +119,7 @@ function getRevisionStatusCache(revisionsCache, workingDirectoryPath) {
  * in addition to providing asynchronous methods for some getters.
  */
 
-let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
+class HgRepositoryClient {
 
   constructor(repoPath, hgService, options) {
     this._path = repoPath;
@@ -152,7 +151,7 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
         return _rxjsBundlesRxMinJs.Observable.empty();
       }
 
-      return (0, (_buffer || _load_buffer()).observeBufferOpen)().filter(buffer => {
+      return (0, (_textBuffer || _load_textBuffer()).observeBufferOpen)().filter(buffer => {
         const filePath = buffer.getPath();
         return filePath != null && filePath.length !== 0 && this.isPathRelevant(filePath);
       }).flatMap(buffer => {
@@ -162,7 +161,7 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
           throw new Error('already filtered empty and non-relevant file paths');
         }
 
-        return (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidSave.bind(buffer)).map(() => filePath).startWith(filePath).takeUntil((0, (_buffer || _load_buffer()).observeBufferCloseOrRename)(buffer).do(() => {
+        return (0, (_event || _load_event()).observableFromSubscribeFunction)(buffer.onDidSave.bind(buffer)).map(() => filePath).startWith(filePath).takeUntil((0, (_textBuffer || _load_textBuffer()).observeBufferCloseOrRename)(buffer).do(() => {
           // TODO(most): rewrite to be simpler and avoid side effects.
           // Remove the file from the diff stats cache when the buffer is closed.
           this._hgDiffCacheFilesToClear.add(filePath);
@@ -566,12 +565,7 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
       // Call the HgService and update our cache with the results.
       const pathsToDiffInfo = yield _this._service.fetchDiffInfo(pathsToFetch);
       if (pathsToDiffInfo) {
-        for (const _ref of pathsToDiffInfo) {
-          var _ref2 = _slicedToArray(_ref, 2);
-
-          const filePath = _ref2[0];
-          const diffInfo = _ref2[1];
-
+        for (const [filePath, diffInfo] of pathsToDiffInfo) {
           _this._hgDiffCache[filePath] = diffInfo;
         }
       }
@@ -631,8 +625,20 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
     return this._service.revert(filePaths);
   }
 
-  checkoutReference(reference, create) {
-    return this._service.checkout(reference, create);
+  checkoutReference(reference, create, options) {
+    return this._service.checkout(reference, create, options);
+  }
+
+  show(revision) {
+    return this._service.show(revision).refCount();
+  }
+
+  purge() {
+    return this._service.purge();
+  }
+
+  stripReference(reference) {
+    return this._service.strip(reference);
   }
 
   checkoutForkBase() {
@@ -725,6 +731,16 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
     }
   }
 
+  fetchFilesChangedSinceRevision(revision) {
+    return this._service.fetchStatuses(revision).refCount().map(fileStatuses => {
+      const statusesWithCodeIds = new Map();
+      for (const [filePath, code] of fileStatuses) {
+        statusesWithCodeIds.set(filePath, (_hgConstants || _load_hgConstants()).StatusCodeIdToNumber[code]);
+      }
+      return statusesWithCodeIds;
+    });
+  }
+
   fetchRevisionInfoBetweenHeadAndBase() {
     return this._service.fetchRevisionInfoBetweenHeadAndBase();
   }
@@ -735,6 +751,10 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
 
   refreshRevisions() {
     this._revisionsCache.refreshRevisions();
+  }
+
+  refreshRevisionsStatuses() {
+    this._revisionStatusCache.refresh();
   }
 
   getCachedRevisions() {
@@ -791,21 +811,15 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
     return this._service.getSmartlog(ttyOutput, concise);
   }
 
-  copy(filePaths, destPath) {
-    let after = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+  copy(filePaths, destPath, after = false) {
     return this._service.copy(filePaths, destPath, after);
   }
 
-  rename(filePaths, destPath) {
-    let after = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+  rename(filePaths, destPath, after = false) {
     return this._service.rename(filePaths, destPath, after);
   }
 
-  remove(filePaths) {
-    let after = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
+  remove(filePaths, after = false) {
     return this._service.remove(filePaths, after);
   }
 
@@ -813,16 +827,22 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
     return this._service.add(filePaths);
   }
 
-  commit(message) {
-    return this._service.commit(message).refCount().finally(this._clearClientCache.bind(this));
+  commit(message, isInteractive = false) {
+    return this._service.commit(message, isInteractive).refCount().do(this._clearOnSuccessExit.bind(this, isInteractive));
   }
 
-  amend(message, amendMode) {
-    return this._service.amend(message, amendMode).refCount().finally(this._clearClientCache.bind(this));
+  amend(message, amendMode, isInteractive = false) {
+    return this._service.amend(message, amendMode, isInteractive).refCount().do(this._clearOnSuccessExit.bind(this, isInteractive));
   }
 
-  revert(filePaths) {
-    return this._service.revert(filePaths);
+  _clearOnSuccessExit(isInteractive, message) {
+    if (!isInteractive && message.kind === 'exit' && message.exitCode === 0) {
+      this._clearClientCache();
+    }
+  }
+
+  revert(filePaths, toRevision) {
+    return this._service.revert(filePaths, toRevision);
   }
 
   log(filePaths, limit) {
@@ -844,9 +864,14 @@ let HgRepositoryClient = exports.HgRepositoryClient = class HgRepositoryClient {
     return this._service.rebase(destination, source).refCount();
   }
 
+  pull(options = []) {
+    return this._service.pull(options).refCount();
+  }
+
   _clearClientCache() {
     this._hgDiffCache = {};
     this._hgStatusCache = {};
     this._emitter.emit('did-change-statuses');
   }
-};
+}
+exports.HgRepositoryClient = HgRepositoryClient;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -43,6 +34,13 @@ exports.getBreakpointLocation = getBreakpointLocation;
 exports.launchScriptForDummyConnection = launchScriptForDummyConnection;
 exports.launchScriptToDebug = launchScriptToDebug;
 exports.launchPhpScriptWithXDebugEnabled = launchPhpScriptWithXDebugEnabled;
+exports.getMode = getMode;
+
+var _dedent;
+
+function _load_dedent() {
+  return _dedent = _interopRequireDefault(require('dedent'));
+}
 
 var _child_process = _interopRequireDefault(require('child_process'));
 
@@ -74,7 +72,17 @@ function _load_process() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const DUMMY_FRAME_ID = exports.DUMMY_FRAME_ID = 'Frame.0';function isContinuationCommand(command) {
+const DUMMY_FRAME_ID = exports.DUMMY_FRAME_ID = 'Frame.0'; /**
+                                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                                            * All rights reserved.
+                                                            *
+                                                            * This source code is licensed under the license found in the LICENSE file in
+                                                            * the root directory of this source tree.
+                                                            *
+                                                            * 
+                                                            */
+
+function isContinuationCommand(command) {
   return ['run', 'step_into', 'step_over', 'step_out', 'stop', 'detach'].some(continuationCommand => continuationCommand === command);
 }
 
@@ -111,16 +119,13 @@ function uriToPath(uri) {
   const components = _url.default.parse(uri);
   // Some filename returned from hhvm does not have protocol.
   if (components.protocol !== 'file:' && components.protocol != null) {
-    (_utils || _load_utils()).default.logErrorAndThrow(`unexpected file protocol. Got: ${ components.protocol }`);
+    (_utils || _load_utils()).default.logErrorAndThrow(`unexpected file protocol. Got: ${components.protocol}`);
   }
   return components.pathname || '';
 }
 
 function getBreakpointLocation(breakpoint) {
-  var _breakpoint$breakpoin = breakpoint.breakpointInfo;
-  const filename = _breakpoint$breakpoin.filename,
-        lineNumber = _breakpoint$breakpoin.lineNumber;
-
+  const { filename, lineNumber } = breakpoint.breakpointInfo;
   return {
     // chrome lineNumber is 0-based while xdebug is 1-based.
     lineNumber: lineNumber - 1,
@@ -149,33 +154,38 @@ function launchScriptToDebug(scriptPath, sendToOutputWindow) {
 }
 
 function launchPhpScriptWithXDebugEnabled(scriptPath, sendToOutputWindowAndResolve) {
-  var _getConfig = (0, (_config || _load_config()).getConfig)();
-
-  const phpRuntimePath = _getConfig.phpRuntimePath,
-        phpRuntimeArgs = _getConfig.phpRuntimeArgs;
-
+  const { phpRuntimePath, phpRuntimeArgs } = (0, (_config || _load_config()).getConfig)();
   const runtimeArgs = (0, (_string || _load_string()).shellParse)(phpRuntimeArgs);
   const scriptArgs = (0, (_string || _load_string()).shellParse)(scriptPath);
-  const proc = _child_process.default.spawn(phpRuntimePath, [...runtimeArgs, ...scriptArgs]);
-  (_utils || _load_utils()).default.log(`child_process(${ proc.pid }) spawned with xdebug enabled for: ${ scriptPath }`);
+  const args = [...runtimeArgs, ...scriptArgs];
+  const proc = _child_process.default.spawn(phpRuntimePath, args);
+  (_utils || _load_utils()).default.log((_dedent || _load_dedent()).default`
+    child_process(${proc.pid}) spawned with xdebug enabled.
+    $ ${phpRuntimePath} ${args.join(' ')}
+  `);
 
   proc.stdout.on('data', chunk => {
     // stdout should hopefully be set to line-buffering, in which case the
     const block = chunk.toString();
-    const output = `child_process(${ proc.pid }) stdout: ${ block }`;
+    const output = `child_process(${proc.pid}) stdout: ${block}`;
     (_utils || _load_utils()).default.log(output);
   });
   proc.on('error', err => {
-    (_utils || _load_utils()).default.log(`child_process(${ proc.pid }) error: ${ err }`);
+    (_utils || _load_utils()).default.log(`child_process(${proc.pid}) error: ${err}`);
     if (sendToOutputWindowAndResolve != null) {
-      sendToOutputWindowAndResolve(`The process running script: ${ scriptPath } encountered an error: ${ err }`);
+      sendToOutputWindowAndResolve(`The process running script: ${scriptPath} encountered an error: ${err}`);
     }
   });
   proc.on('exit', code => {
-    (_utils || _load_utils()).default.log(`child_process(${ proc.pid }) exit: ${ code }`);
+    (_utils || _load_utils()).default.log(`child_process(${proc.pid}) exit: ${code}`);
     if (code != null && sendToOutputWindowAndResolve != null) {
-      sendToOutputWindowAndResolve(`Script: ${ scriptPath } exited with code: ${ code }`);
+      sendToOutputWindowAndResolve(`Script: ${scriptPath} exited with code: ${code}`);
     }
   });
   return proc;
+}
+
+function getMode() {
+  const { launchScriptPath } = (0, (_config || _load_config()).getConfig)();
+  return launchScriptPath == null ? 'attach' : 'launch';
 }

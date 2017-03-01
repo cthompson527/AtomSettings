@@ -1,12 +1,16 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
 
 /**
@@ -28,11 +32,7 @@
  *      }
  *    }
  */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-let Hasher = class Hasher {
+class Hasher {
 
   constructor() {
     this._hashes = new WeakMap();
@@ -49,7 +49,7 @@ let Hasher = class Hasher {
         {
           let hash = this._hashes.get(item);
           if (hash == null) {
-            hash = `${ type }:${ this._objectCount }`;
+            hash = `${type}:${this._objectCount}`;
             this._hashes.set(item, hash);
             this._objectCount = this._objectCount + 1 === Number.MAX_SAFE_INTEGER ? Number.MIN_SAFE_INTEGER : this._objectCount + 1;
           }
@@ -59,13 +59,12 @@ let Hasher = class Hasher {
         return 'undefined';
       case 'string':
       case 'boolean':
-        return `${ type }:${ item.toString() }`;
+        return `${type}:${item.toString()}`;
       case 'number':
         return item;
       default:
         throw new Error('Unhashable object');
     }
   }
-};
+}
 exports.default = Hasher;
-module.exports = exports['default'];

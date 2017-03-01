@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _atom = require('atom');
 
@@ -29,7 +16,17 @@ function _load_event() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = class Activation {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Activation {
 
   constructor() {
     this._disposables = new _atom.CompositeDisposable();
@@ -43,14 +40,13 @@ let Activation = class Activation {
       level: getLevel(notification.getType())
     }));
 
-    this._disposables.add(api.registerOutputProvider({ id: 'Atom', messages: messages }));
+    this._disposables.add(api.registerOutputProvider({ id: 'Atom', messages }));
   }
 
   dispose() {
     this._disposables.dispose();
   }
-};
-
+}
 
 function getLevel(atomNotificationType) {
   switch (atomNotificationType) {
@@ -68,5 +64,4 @@ function getLevel(atomNotificationType) {
   }
 }
 
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

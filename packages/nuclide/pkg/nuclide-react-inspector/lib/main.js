@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,20 +13,40 @@ function _load_viewableFromReactElement() {
   return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
 var _Inspector;
 
 function _load_Inspector() {
   return _Inspector = _interopRequireDefault(require('./ui/Inspector'));
 }
 
-var _atom = require('atom');
+var _Inspector2;
+
+function _load_Inspector2() {
+  return _Inspector2 = require('./ui/Inspector');
+}
 
 var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let disposables = null;function activate() {
-  disposables = new _atom.CompositeDisposable();
+let disposables = null; /**
+                         * Copyright (c) 2015-present, Facebook, Inc.
+                         * All rights reserved.
+                         *
+                         * This source code is licensed under the license found in the LICENSE file in
+                         * the root directory of this source tree.
+                         *
+                         * 
+                         */
+
+function activate() {
+  disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 }
 
 function deactivate() {
@@ -52,12 +63,11 @@ function consumeWorkspaceViewsService(api) {
     throw new Error('Invariant violation: "disposables != null"');
   }
 
-  disposables.add(api.registerFactory({
-    id: 'nuclide-react-inspector',
-    name: 'React Inspector',
-    toggleCommand: 'nuclide-react-inspector:toggle',
-    defaultLocation: 'pane',
-    create: () => (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_Inspector || _load_Inspector()).default, null)),
-    isInstance: item => item instanceof (_Inspector || _load_Inspector()).default
+  disposables.add(api.addOpener(uri => {
+    if (uri === (_Inspector2 || _load_Inspector2()).WORKSPACE_VIEW_URI) {
+      return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_Inspector || _load_Inspector()).default, null));
+    }
+  }), () => api.destroyWhere(item => item instanceof (_Inspector || _load_Inspector()).default), atom.commands.add('atom-workspace', 'nuclide-react-inspector:toggle', event => {
+    api.toggle((_Inspector2 || _load_Inspector2()).WORKSPACE_VIEW_URI, event.detail);
   }));
 }

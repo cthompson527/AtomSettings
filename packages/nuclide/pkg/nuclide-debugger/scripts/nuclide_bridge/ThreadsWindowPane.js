@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _NuclideBridge;
 
@@ -35,7 +30,7 @@ function _load_WebInspector() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let ThreadsWindowComponent = class ThreadsWindowComponent extends (_react || _load_react()).default.Component {
+class ThreadsWindowComponent extends (_react || _load_react()).default.Component {
 
   constructor(props) {
     super(props);
@@ -70,7 +65,7 @@ let ThreadsWindowComponent = class ThreadsWindowComponent extends (_react || _lo
     if (mainTarget != null) {
       threadData = mainTarget.debuggerModel.threadStore.getData();
     }
-    return { threadData: threadData };
+    return { threadData };
   }
 
   _registerUpdate() {
@@ -114,8 +109,7 @@ let ThreadsWindowComponent = class ThreadsWindowComponent extends (_react || _lo
 
   render() {
     const children = [];
-    const threadData = this.state.threadData;
-
+    const { threadData } = this.state;
     if (threadData && threadData.threadMap) {
       for (const thread of threadData.threadMap.values()) {
         const indicator = this._getIndicator(thread, threadData.stopThreadId, threadData.selectedThreadId);
@@ -233,8 +227,17 @@ let ThreadsWindowComponent = class ThreadsWindowComponent extends (_react || _lo
       );
     }
   }
-};
-let ThreadsWindowPane = class ThreadsWindowPane extends (_WebInspector || _load_WebInspector()).default.SidebarPane {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+class ThreadsWindowPane extends (_WebInspector || _load_WebInspector()).default.SidebarPane {
   constructor() {
     // WebInspector classes are not es6 classes, but babel forces a super call.
     super();
@@ -253,7 +256,5 @@ let ThreadsWindowPane = class ThreadsWindowPane extends (_WebInspector || _load_
   // an official interface. There's callers to various `reset` functions, so
   // it's probably safer to have this.
   reset() {}
-};
-
-
-module.exports = ThreadsWindowPane;
+}
+exports.default = ThreadsWindowPane;

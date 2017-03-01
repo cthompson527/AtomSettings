@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -32,7 +19,7 @@ function _load_createPackage() {
 var _scheduleIdleCallback;
 
 function _load_scheduleIdleCallback() {
-  return _scheduleIdleCallback = _interopRequireDefault(require('../../commons-atom/scheduleIdleCallback'));
+  return _scheduleIdleCallback = _interopRequireDefault(require('../../commons-node/scheduleIdleCallback'));
 }
 
 var _nuclideRemoteConnection;
@@ -61,57 +48,87 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 // eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-let Activation = class Activation {
+
+
+class Activation {
 
   constructor() {
     this._busySignalProvider = new (_nuclideBusySignal || _load_nuclideBusySignal()).BusySignalProviderBase();
-    this._disposables = new _atom.CompositeDisposable();
-    this._projectRoots = new Set();
+    this._subscriptions = new _atom.CompositeDisposable();
+    this._subscriptionsByRoot = new Map();
+
     this._readySearch = this._readySearch.bind(this);
 
     // Do search preprocessing for all existing and future root directories.
     this._readySearch(atom.project.getPaths());
-    this._disposables.add(atom.project.onDidChangePaths(this._readySearch));
+    this._subscriptions.add(atom.project.onDidChangePaths(this._readySearch));
   }
 
   _readySearch(projectPaths) {
-    const newProjectPaths = new Set(projectPaths);
     // Add new project roots.
-    for (const newProjectPath of newProjectPaths) {
-      if (!this._projectRoots.has(newProjectPath)) {
-        this._projectRoots.add(newProjectPath);
+    for (const projectPath of projectPaths) {
+      if (!this._subscriptionsByRoot.has(projectPath)) {
+        const disposables = new _atom.CompositeDisposable(
         // Wait a bit before starting the initial search, since it's a heavy op.
-        const disposable = (0, (_scheduleIdleCallback || _load_scheduleIdleCallback()).default)(() => {
-          this._disposables.remove(disposable);
-          this._busySignalProvider.reportBusy(`File search: indexing files for project ${ newProjectPath }`, () => this._initialSearch(newProjectPath)).catch(err => {
-            logger.error(`Error starting fuzzy filename search for ${ newProjectPath }`, err);
-            this._disposeSearch(newProjectPath);
+        (0, (_scheduleIdleCallback || _load_scheduleIdleCallback()).default)(() => {
+          this._initialSearch(projectPath).catch(err => {
+            logger.error(`Error starting fuzzy filename search for ${projectPath}: ${err}`);
+            this._disposeSearch(projectPath);
           });
-        });
-        this._disposables.add(disposable);
+        }, { timeout: 5000 }));
+        this._subscriptionsByRoot.set(projectPath, disposables);
       }
     }
+
     // Clean up removed project roots.
-    for (const existingProjectPath of this._projectRoots) {
-      if (!newProjectPaths.has(existingProjectPath)) {
-        this._disposeSearch(existingProjectPath);
+    for (const [projectPath] of this._subscriptionsByRoot) {
+      if (!projectPaths.includes(projectPath)) {
+        this._disposeSearch(projectPath);
       }
     }
   }
 
   _initialSearch(projectPath) {
+    var _this = this;
+
     return (0, _asyncToGenerator.default)(function* () {
       const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFuzzyFileSearchServiceByNuclideUri)(projectPath);
       const isAvailable = yield service.isFuzzySearchAvailableFor(projectPath);
-      if (isAvailable) {
-        // It doesn't matter what the search term is. Empirically, doing an initial
-        // search speeds up the next search much more than simply doing the setup
-        // kicked off by 'fileSearchForDirectory'.
-        yield service.queryFuzzyFile(projectPath, 'a', (0, (_utils || _load_utils()).getIgnoredNames)());
-      } else {
+      if (!isAvailable) {
         throw new Error('Nonexistent directory');
+      }
+
+      const disposables = _this._subscriptionsByRoot.get(projectPath);
+
+      if (!(disposables != null)) {
+        throw new Error('Invariant violation: "disposables != null"');
+      }
+
+      const busySignalDisposable = _this._busySignalProvider.displayMessage(`File search: indexing ${projectPath}`);
+      disposables.add(busySignalDisposable);
+
+      // It doesn't matter what the search term is. Empirically, doing an initial
+      // search speeds up the next search much more than simply doing the setup
+      // kicked off by 'fileSearchForDirectory'.
+      try {
+        yield service.queryFuzzyFile(projectPath, 'a', (0, (_utils || _load_utils()).getIgnoredNames)());
+      } catch (err) {
+        throw err;
+      } finally {
+        busySignalDisposable.dispose();
+        disposables.remove(busySignalDisposable);
       }
     })();
   }
@@ -121,9 +138,13 @@ let Activation = class Activation {
       const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFuzzyFileSearchServiceByNuclideUri)(projectPath);
       service.disposeFuzzySearch(projectPath);
     } catch (err) {
-      logger.error(`Error disposing fuzzy filename service for ${ projectPath }`, err);
+      logger.error(`Error disposing fuzzy filename service for ${projectPath}`, err);
     } finally {
-      this._projectRoots.delete(projectPath);
+      const disposables = this._subscriptionsByRoot.get(projectPath);
+      if (disposables != null) {
+        disposables.dispose();
+        this._subscriptionsByRoot.delete(projectPath);
+      }
     }
   }
 
@@ -136,8 +157,10 @@ let Activation = class Activation {
   }
 
   dispose() {
-    this._disposables.dispose();
+    this._subscriptions.dispose();
+    this._subscriptionsByRoot.forEach(disposables => disposables.dispose());
+    this._subscriptionsByRoot.clear();
   }
-};
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+}
+
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

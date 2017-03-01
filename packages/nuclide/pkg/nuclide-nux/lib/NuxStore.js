@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,9 +7,21 @@ exports.NuxStore = exports.NUX_SAVED_STORE = undefined;
 
 var _atom = require('atom');
 
-const NEW_NUX_EVENT = 'newNuxModel';const NUX_SAVED_STORE = exports.NUX_SAVED_STORE = 'nuclide-nux.saved-nux-data-store';
+const NEW_NUX_EVENT = 'newNuxModel'; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      */
 
-let NuxStore = exports.NuxStore = class NuxStore {
+/* global localStorage */
+
+const NUX_SAVED_STORE = exports.NUX_SAVED_STORE = 'nuclide-nux.saved-nux-data-store';
+
+class NuxStore {
 
   constructor() {
     this._nuxMap = new Map();
@@ -48,12 +51,13 @@ let NuxStore = exports.NuxStore = class NuxStore {
       };
     }
 
-    const nuclideNuxState = new Map(JSON.parse(window.localStorage.getItem(NUX_SAVED_STORE)));
+    const nuclideNuxState = new Map(
+    // $FlowIgnore: null is ok here
+    JSON.parse(localStorage.getItem(NUX_SAVED_STORE)));
     const fbNuxState = new NuxBackendCache().getNuxStatus();
 
     // Merge the two maps. If a key exists in both input maps, the value from
     // the latter (backend cache) will be used in the resulting map.
-    // $FlowIgnore - Flow thinks the spread operator is incompatible with Map
     this._nuxMap = new Map([...nuclideNuxState, ...fbNuxState]);
   }
 
@@ -76,9 +80,7 @@ let NuxStore = exports.NuxStore = class NuxStore {
   }
 
   _saveNuxState() {
-    window.localStorage.setItem(NUX_SAVED_STORE,
-    // $FlowIgnore -- Flow thinks the spread operator is incompatible with Maps
-    JSON.stringify([...this._nuxMap]));
+    localStorage.setItem(NUX_SAVED_STORE, JSON.stringify([...this._nuxMap]));
   }
 
   /**
@@ -96,4 +98,5 @@ let NuxStore = exports.NuxStore = class NuxStore {
     /* completed */true);
     this._saveNuxState();
   }
-};
+}
+exports.NuxStore = NuxStore;

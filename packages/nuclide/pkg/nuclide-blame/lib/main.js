@@ -1,21 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _dec2, _desc, _value, _class;
 
 exports.activate = activate;
 exports.deactivate = deactivate;
@@ -42,10 +31,10 @@ function _load_goToLocation() {
   return _goToLocation = require('../../commons-atom/go-to-location');
 }
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _nuclideAnalytics;
@@ -56,39 +45,19 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
+const PACKAGES_MISSING_MESSAGE = 'Could not open blame. Missing at least one blame provider.'; /**
+                                                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                * All rights reserved.
+                                                                                                *
+                                                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                                                * the root directory of this source tree.
+                                                                                                *
+                                                                                                * 
+                                                                                                */
 
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-const PACKAGES_MISSING_MESSAGE = 'Could not open blame. Missing at least one blame provider.';
 const TOGGLE_BLAME_FILE_TREE_CONTEXT_MENU_PRIORITY = 2000;
 
-let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('blame.showBlame'), _dec2 = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('blame.hideBlame'), (_class = class Activation {
+class Activation {
   // Map of a TextEditor to its BlameGutter, if it exists.
   constructor() {
     this._registeredProviders = new Set();
@@ -170,7 +139,7 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
       } else {
         atom.notifications.addInfo('Could not open blame: no blame information currently available for this file.');
 
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().info('nuclide-blame: Could not open blame: no blame provider currently available for this ' + `file: ${ String(editor.getPath()) }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().info('nuclide-blame: Could not open blame: no blame provider currently available for this ' + `file: ${String(editor.getPath())}`);
       }
     }
   }
@@ -189,17 +158,21 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
    */
 
   _showBlame(event) {
-    const editor = atom.workspace.getActiveTextEditor();
-    if (editor != null) {
-      this._showBlameGutterForEditor(editor);
-    }
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('blame.showBlame', () => {
+      const editor = atom.workspace.getActiveTextEditor();
+      if (editor != null) {
+        this._showBlameGutterForEditor(editor);
+      }
+    });
   }
 
   _hideBlame(event) {
-    const editor = atom.workspace.getActiveTextEditor();
-    if (editor != null) {
-      this._removeBlameGutterForEditor(editor);
-    }
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('blame.hideBlame', () => {
+      const editor = atom.workspace.getActiveTextEditor();
+      if (editor != null) {
+        this._removeBlameGutterForEditor(editor);
+      }
+    });
   }
 
   _canShowBlame() {
@@ -228,7 +201,7 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
   addItemsToFileTreeContextMenu(contextMenu) {
     const contextDisposable = contextMenu.addItemToSourceControlMenu({
       label: 'Toggle Blame',
-      callback: function () {
+      callback() {
         findBlameableNodes(contextMenu).forEach((() => {
           var _ref = (0, _asyncToGenerator.default)(function* (node) {
             const editor = yield (0, (_goToLocation || _load_goToLocation()).goToLocation)(node.uri);
@@ -240,7 +213,7 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
           };
         })());
       },
-      shouldDisplay: function () {
+      shouldDisplay() {
         return findBlameableNodes(contextMenu).length > 0;
       }
     }, TOGGLE_BLAME_FILE_TREE_CONTEXT_MENU_PRIORITY);
@@ -251,19 +224,18 @@ let Activation = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tra
     // of the disposables we maintain.
     return new _atom.Disposable(() => this._packageDisposables.remove(contextDisposable));
   }
-}, (_applyDecoratedDescriptor(_class.prototype, '_showBlame', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, '_showBlame'), _class.prototype), _applyDecoratedDescriptor(_class.prototype, '_hideBlame', [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, '_hideBlame'), _class.prototype)), _class));
+}
 
 /**
  * @return list of nodes against which "Toggle Blame" is an appropriate action.
  */
-
 function findBlameableNodes(contextMenu) {
   const nodes = [];
   for (const node of contextMenu.getSelectedNodes()) {
     if (node == null || !node.uri) {
       continue;
     }
-    const repo = (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).repositoryForPath)(node.uri);
+    const repo = (0, (_vcs || _load_vcs()).repositoryForPath)(node.uri);
     if (!node.isContainer && repo != null && repo.getType() === 'hg') {
       nodes.push(node);
     }

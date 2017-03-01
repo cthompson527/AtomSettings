@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _helpers;
 
@@ -32,7 +27,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Handles registering files encountered during debugging with the Chrome debugger
  */
-let FileCache = class FileCache {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class FileCache {
 
   constructor(callback) {
     this._callback = callback;
@@ -43,7 +48,7 @@ let FileCache = class FileCache {
     const filepath = (0, (_helpers || _load_helpers()).uriToPath)(fileUrl);
     if (!this._files.has(filepath)) {
       this._files.set(filepath, new (_File || _load_File()).default(filepath));
-      this._callback.sendMethod(this._callback.getServerMessageObservable(), 'Debugger.scriptParsed', {
+      this._callback.sendServerMethod('Debugger.scriptParsed', {
         scriptId: filepath,
         url: fileUrl,
         startLine: 0,
@@ -64,7 +69,5 @@ let FileCache = class FileCache {
   getFileSource(filepath) {
     return this.registerFile(filepath).getSource();
   }
-};
-
-
-module.exports = FileCache;
+}
+exports.default = FileCache;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,6 +23,16 @@ function _load_Icon() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const DefaultEmptyComponent = () => _reactForAtom.React.createElement(
   'div',
   { className: 'nuclide-ui-table-empty-message' },
@@ -39,7 +40,7 @@ const DefaultEmptyComponent = () => _reactForAtom.React.createElement(
 );
 
 // ColumnKey must be unique within the containing collection.
-let Table = exports.Table = class Table extends _reactForAtom.React.Component {
+class Table extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -59,9 +60,10 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
     let assignedWidth = 0;
     const unresolvedColumns = [];
     columns.forEach(column => {
-      const key = column.key,
-            width = column.width;
-
+      const {
+        key,
+        width
+      } = column;
       if (width != null) {
         columnWidthRatios[key] = width;
         assignedWidth += width;
@@ -78,9 +80,8 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
 
   /* Applies sizing constraints, and returns whether the column width actually changed. */
   _updateWidths(resizedColumn, newColumnSize) {
-    const columnWidthRatios = this.state.columnWidthRatios;
-    const columns = this.props.columns;
-
+    const { columnWidthRatios } = this.state;
+    const { columns } = this.props;
     const originalColumnSize = columnWidthRatios[resizedColumn];
     const columnAfterResizedColumn = columns[columns.findIndex(column => column.key === resizedColumn) + 1].key;
     const followingColumnSize = columnWidthRatios[columnAfterResizedColumn];
@@ -90,8 +91,7 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
     }
     const updatedColumnWidths = {};
     columns.forEach(column => {
-      const key = column.key;
-
+      const { key } = column;
       let width;
       if (column.key === resizedColumn) {
         width = constrainedNewColumnSize;
@@ -147,9 +147,7 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
     if (this._resizeStartX == null || this._tableWidth == null || this._columnBeingResized == null) {
       return;
     }
-    var _ref = event;
-    const pageX = _ref.pageX;
-
+    const { pageX } = event;
     const deltaX = pageX - this._resizeStartX;
     const currentColumnSize = this.state.columnWidthRatios[this._columnBeingResized];
     const didUpdate = this._updateWidths(this._columnBeingResized, (this._tableWidth * currentColumnSize + deltaX) / this._tableWidth);
@@ -167,11 +165,11 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
   }
 
   _handleSortByColumn(sortedBy) {
-    var _props = this.props;
-    const onSort = _props.onSort,
-          sortDescending = _props.sortDescending,
-          sortedColumn = _props.sortedColumn;
-
+    const {
+      onSort,
+      sortDescending,
+      sortedColumn
+    } = this.props;
     if (onSort == null) {
       return;
     }
@@ -179,10 +177,10 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
   }
 
   _handleRowClick(selectedIndex, event) {
-    var _props2 = this.props;
-    const onSelect = _props2.onSelect,
-          rows = _props2.rows;
-
+    const {
+      onSelect,
+      rows
+    } = this.props;
     if (onSelect == null) {
       return;
     }
@@ -195,22 +193,23 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
   }
 
   render() {
-    var _props3 = this.props;
-    const alternateBackground = _props3.alternateBackground,
-          className = _props3.className,
-          columns = _props3.columns,
-          maxBodyHeight = _props3.maxBodyHeight,
-          rows = _props3.rows,
-          selectable = _props3.selectable,
-          selectedIndex = _props3.selectedIndex,
-          sortable = _props3.sortable,
-          sortedColumn = _props3.sortedColumn,
-          sortDescending = _props3.sortDescending;
-
+    const {
+      alternateBackground,
+      className,
+      columns,
+      maxBodyHeight,
+      rows,
+      selectable,
+      selectedIndex,
+      sortable,
+      sortedColumn,
+      sortDescending
+    } = this.props;
     const header = columns.map((column, i) => {
-      const title = column.title,
-            key = column.key;
-
+      const {
+        title,
+        key
+      } = column;
       const resizeHandle = i === columns.length - 1 ? null : _reactForAtom.React.createElement('div', {
         className: 'nuclide-ui-table-header-resize-handle',
         onMouseDown: this._handleResizerMouseDown.bind(this, key),
@@ -256,13 +255,15 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
       );
     });
     let body = rows.map((row, i) => {
-      const rowClassName = row.className,
-            data = row.data;
-
+      const {
+        className: rowClassName,
+        data
+      } = row;
       const renderedRow = columns.map((column, j) => {
-        const key = column.key,
-              Component = column.component;
-
+        const {
+          key,
+          component: Component
+        } = column;
         let datum = data[key];
         if (Component != null) {
           datum = _reactForAtom.React.createElement(Component, { data: datum });
@@ -344,7 +345,9 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
         { style: scrollableBodyStyle },
         _reactForAtom.React.createElement(
           'table',
-          { className: 'nuclide-ui-table nuclide-ui-table-body' },
+          {
+            className: 'nuclide-ui-table nuclide-ui-table-body native-key-bindings',
+            tabIndex: '-1' },
           _reactForAtom.React.createElement(
             'tbody',
             null,
@@ -354,4 +357,5 @@ let Table = exports.Table = class Table extends _reactForAtom.React.Component {
       )
     );
   }
-};
+}
+exports.Table = Table;

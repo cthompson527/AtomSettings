@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -36,14 +27,19 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function SettingsControl(props) {
-  const keyPath = props.keyPath,
-        value = props.value,
-        onChange = props.onChange,
-        schema = props.schema;
-  const description = schema.description,
-        title = schema.title;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+function SettingsControl(props) {
+  const { keyPath, value, onChange, schema } = props;
+  const { description, title } = schema;
 
   if (schema) {
     if (schema.enum) {
@@ -121,4 +117,3 @@ function isEditableArray(array) {
   }
   return true;
 }
-module.exports = exports['default'];

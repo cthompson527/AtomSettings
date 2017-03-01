@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -24,6 +15,16 @@ function _load_TextEventDispatcher() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const UPDATE_EVENT = 'update';
 const INVALIDATE_EVENT = 'invalidate';
 
@@ -36,11 +37,9 @@ function getTextEventDispatcher() {
   return _textEventDispatcherInstance;
 }
 
-let DiagnosticsProviderBase = exports.DiagnosticsProviderBase = class DiagnosticsProviderBase {
+class DiagnosticsProviderBase {
 
-  constructor(options) {
-    let textEventDispatcher = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : getTextEventDispatcher();
-
+  constructor(options, textEventDispatcher = getTextEventDispatcher()) {
     this._textEventDispatcher = textEventDispatcher;
     this._emitter = new _atom.Emitter();
     this._disposables = new _atom.CompositeDisposable();
@@ -130,9 +129,9 @@ let DiagnosticsProviderBase = exports.DiagnosticsProviderBase = class Diagnostic
     this._newInvalidateSubscriberCallback(callback);
     return disposable;
   }
-};
+}
 
-
+exports.DiagnosticsProviderBase = DiagnosticsProviderBase;
 function callbackOrNoop(callback) {
   return callback ? callback.bind(undefined) : () => {};
 }

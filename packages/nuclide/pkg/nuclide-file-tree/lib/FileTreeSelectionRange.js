@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -20,7 +11,17 @@ function _load_FileTreeNode() {
   return _FileTreeNode = require('./FileTreeNode');
 }
 
-let RangeKey = exports.RangeKey = class RangeKey {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class RangeKey {
   constructor(rootKey, nodeKey) {
     this._rootKey = rootKey;
     this._nodeKey = nodeKey;
@@ -37,8 +38,10 @@ let RangeKey = exports.RangeKey = class RangeKey {
   equals(other) {
     return this._rootKey === other._rootKey && this._nodeKey === other._nodeKey;
   }
-};
-let SelectionRange = exports.SelectionRange = class SelectionRange {
+}
+
+exports.RangeKey = RangeKey;
+class SelectionRange {
   constructor(anchor, range) {
     this._anchor = anchor;
     this._range = range;
@@ -61,12 +64,12 @@ let SelectionRange = exports.SelectionRange = class SelectionRange {
   equals(other) {
     return this._anchor.equals(other._anchor) && this._range.equals(other._range);
   }
-};
+}
 
-/**
- * Returns the current node if it is shown.
- * Otherwise, returns a nearby node that is shown.
- */
+exports.SelectionRange = SelectionRange; /**
+                                          * Returns the current node if it is shown.
+                                          * Otherwise, returns a nearby node that is shown.
+                                          */
 
 function findShownNode(node) {
   if (node.shouldBeShown) {
@@ -93,8 +96,7 @@ function findShownNode(node) {
   return null;
 }
 
-let RangeUtil = exports.RangeUtil = class RangeUtil {
-
+class RangeUtil {
   /**
    * Returns the current node if it is shown and selected
    * Otherwise, returns a nearby selected node.
@@ -120,4 +122,5 @@ let RangeUtil = exports.RangeUtil = class RangeUtil {
     }
     return selected;
   }
-};
+}
+exports.RangeUtil = RangeUtil;

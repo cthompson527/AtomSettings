@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,8 +17,7 @@ function _load_ReactNativeDebuggerInstance() {
   return _ReactNativeDebuggerInstance = require('./ReactNativeDebuggerInstance');
 }
 
-let ReactNativeProcessInfo = exports.ReactNativeProcessInfo = class ReactNativeProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
-
+class ReactNativeProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
   constructor(targetUri) {
     super('react-native', targetUri);
   }
@@ -37,4 +27,13 @@ let ReactNativeProcessInfo = exports.ReactNativeProcessInfo = class ReactNativeP
     // TODO(matthewwithanm): Provide a way to override this in the UI.
     return Promise.resolve(new (_ReactNativeDebuggerInstance || _load_ReactNativeDebuggerInstance()).ReactNativeDebuggerInstance(this, 5858));
   }
-};
+}
+exports.ReactNativeProcessInfo = ReactNativeProcessInfo; /**
+                                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                                          * All rights reserved.
+                                                          *
+                                                          * This source code is licensed under the license found in the LICENSE file in
+                                                          * the root directory of this source tree.
+                                                          *
+                                                          * 
+                                                          */

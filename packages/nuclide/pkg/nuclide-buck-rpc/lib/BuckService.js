@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.queryWithArgs = exports.query = exports.getHTTPServerPort = exports.buildRuleTypeFor = exports.showOutput = exports.resolveAlias = exports.listAliases = exports.getBuckConfig = exports.getOwners = exports.getBuildFile = undefined;
+exports.getLastCommandInfo = exports.resolveBuildTargetName = exports.queryWithArgs = exports.query = exports.getHTTPServerPort = exports.buildRuleTypeFor = exports.showOutput = exports.resolveAlias = exports.listFlavors = exports.listAliases = exports.getBuckConfig = exports.getOwners = exports.getBuildFile = exports.MULTIPLE_TARGET_RULE_TYPE = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -22,13 +13,13 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 let getBuildFile = exports.getBuildFile = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (rootPath, targetName) {
     try {
-      const result = yield query(rootPath, `buildfile(${ targetName })`);
+      const result = yield query(rootPath, `buildfile(${targetName})`);
       if (result.length === 0) {
         return null;
       }
       return (_nuclideUri || _load_nuclideUri()).default.join(rootPath, result[0]);
     } catch (e) {
-      logger.error(`No build file for target "${ targetName }" ${ e }`);
+      logger.error(`No build file for target "${targetName}" ${e}`);
       return null;
     }
   });
@@ -44,6 +35,45 @@ let getBuildFile = exports.getBuildFile = (() => {
  */
 
 
+let _runBuckCommandFromProjectRoot = (() => {
+  var _ref2 = (0, _asyncToGenerator.default)(function* (rootPath, args, commandOptions, addClientId = true, readOnly = true) {
+    const { pathToBuck, buckCommandOptions: options } = yield _getBuckCommandAndOptions(rootPath, commandOptions);
+
+    const newArgs = addClientId ? args.concat(CLIENT_ID_ARGS) : args;
+    logger.debug('Buck command:', pathToBuck, newArgs, options);
+    return getPool(rootPath, readOnly).submit(function () {
+      return (0, (_process || _load_process()).checkOutput)(pathToBuck, newArgs, options);
+    });
+  });
+
+  return function _runBuckCommandFromProjectRoot(_x3, _x4, _x5) {
+    return _ref2.apply(this, arguments);
+  };
+})();
+
+/**
+ * @return The path to buck and set of options to be used to run a `buck` command.
+ */
+
+
+let _getBuckCommandAndOptions = (() => {
+  var _ref3 = (0, _asyncToGenerator.default)(function* (rootPath, commandOptions = {}) {
+    // $UPFixMe: This should use nuclide-features-config
+    const pathToBuck = global.atom && global.atom.config.get('nuclide.nuclide-buck.pathToBuck') || 'buck';
+    const buckCommandOptions = Object.assign({
+      cwd: rootPath,
+      // Buck restarts itself if the environment changes, so try to preserve
+      // the original environment that Nuclide was started in.
+      env: yield (0, (_process || _load_process()).getOriginalEnvironment)()
+    }, commandOptions);
+    return { pathToBuck, buckCommandOptions };
+  });
+
+  return function _getBuckCommandAndOptions(_x6) {
+    return _ref3.apply(this, arguments);
+  };
+})();
+
 /**
  * Returns an array of strings (that are build targets) by running:
  *
@@ -55,17 +85,19 @@ let getBuildFile = exports.getBuildFile = (() => {
  * @param kindFilter filter for specific build target kinds.
  * @return Promise that resolves to an array of build targets.
  */
+
+
 let getOwners = exports.getOwners = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (rootPath, filePath, kindFilter) {
-    let queryString = `owner(${ (0, (_shellQuote || _load_shellQuote()).quote)([filePath]) })`;
+  var _ref4 = (0, _asyncToGenerator.default)(function* (rootPath, filePath, kindFilter) {
+    let queryString = `owner(${(0, (_shellQuote || _load_shellQuote()).quote)([filePath])})`;
     if (kindFilter != null) {
-      queryString = `kind(${ JSON.stringify(kindFilter) }, ${ queryString })`;
+      queryString = `kind(${JSON.stringify(kindFilter)}, ${queryString})`;
     }
     return query(rootPath, queryString);
   });
 
-  return function getOwners(_x6, _x7, _x8) {
-    return _ref2.apply(this, arguments);
+  return function getOwners(_x7, _x8, _x9) {
+    return _ref4.apply(this, arguments);
   };
 })();
 
@@ -80,7 +112,7 @@ let getOwners = exports.getOwners = (() => {
 
 
 let getBuckConfig = exports.getBuckConfig = (() => {
-  var _ref3 = (0, _asyncToGenerator.default)(function* (rootPath, section, property) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (rootPath, section, property) {
     const buckConfig = yield _loadBuckConfig(rootPath);
     if (!buckConfig.hasOwnProperty(section)) {
       return null;
@@ -92,8 +124,8 @@ let getBuckConfig = exports.getBuckConfig = (() => {
     return sectionConfig[property];
   });
 
-  return function getBuckConfig(_x9, _x10, _x11) {
-    return _ref3.apply(this, arguments);
+  return function getBuckConfig(_x10, _x11, _x12) {
+    return _ref5.apply(this, arguments);
   };
 })();
 
@@ -104,14 +136,14 @@ let getBuckConfig = exports.getBuckConfig = (() => {
 
 
 let _loadBuckConfig = (() => {
-  var _ref4 = (0, _asyncToGenerator.default)(function* (rootPath) {
+  var _ref6 = (0, _asyncToGenerator.default)(function* (rootPath) {
     const header = 'scope = global\n';
     const buckConfigContent = yield (_fsPromise || _load_fsPromise()).default.readFile((_nuclideUri || _load_nuclideUri()).default.join(rootPath, '.buckconfig'), 'utf8');
     return (_ini || _load_ini()).default.parse(header + buckConfigContent);
   });
 
-  return function _loadBuckConfig(_x12) {
-    return _ref4.apply(this, arguments);
+  return function _loadBuckConfig(_x13) {
+    return _ref6.apply(this, arguments);
   };
 })();
 
@@ -127,12 +159,12 @@ let _loadBuckConfig = (() => {
 
 
 let _build = (() => {
-  var _ref5 = (0, _asyncToGenerator.default)(function* (rootPath, buildTargets, options) {
+  var _ref7 = (0, _asyncToGenerator.default)(function* (rootPath, buildTargets, options) {
     const report = yield (_fsPromise || _load_fsPromise()).default.tempfile({ suffix: '.json' });
     const args = _translateOptionsToBuckBuildArgs({
       baseOptions: Object.assign({}, options),
       pathToBuildReport: report,
-      buildTargets: buildTargets
+      buildTargets
     });
 
     try {
@@ -155,15 +187,15 @@ let _build = (() => {
       try {
         return JSON.parse(json);
       } catch (e) {
-        throw Error(`Failed to parse:\n${ json }`);
+        throw Error(`Failed to parse:\n${json}`);
       }
     } finally {
       (_fsPromise || _load_fsPromise()).default.unlink(report);
     }
   });
 
-  return function _build(_x13, _x14, _x15) {
-    return _ref5.apply(this, arguments);
+  return function _build(_x14, _x15, _x16) {
+    return _ref7.apply(this, arguments);
   };
 })();
 
@@ -181,15 +213,31 @@ let _build = (() => {
 
 
 let listAliases = exports.listAliases = (() => {
-  var _ref6 = (0, _asyncToGenerator.default)(function* (rootPath) {
+  var _ref8 = (0, _asyncToGenerator.default)(function* (rootPath) {
     const args = ['audit', 'alias', '--list'];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     const stdout = result.stdout.trim();
     return stdout ? stdout.split('\n') : [];
   });
 
-  return function listAliases(_x16) {
-    return _ref6.apply(this, arguments);
+  return function listAliases(_x17) {
+    return _ref8.apply(this, arguments);
+  };
+})();
+
+let listFlavors = exports.listFlavors = (() => {
+  var _ref9 = (0, _asyncToGenerator.default)(function* (rootPath, targets) {
+    const args = ['audit', 'flavors', '--json'].concat(targets);
+    try {
+      const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
+      return JSON.parse(result.stdout);
+    } catch (e) {
+      return null;
+    }
+  });
+
+  return function listFlavors(_x18, _x19) {
+    return _ref9.apply(this, arguments);
   };
 })();
 
@@ -199,14 +247,14 @@ let listAliases = exports.listAliases = (() => {
 
 
 let resolveAlias = exports.resolveAlias = (() => {
-  var _ref7 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
-    const args = ['targets', '--resolve-alias', aliasOrTarget];
+  var _ref10 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
+    const args = ['query', aliasOrTarget];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     return result.stdout.trim();
   });
 
-  return function resolveAlias(_x17, _x18) {
-    return _ref7.apply(this, arguments);
+  return function resolveAlias(_x20, _x21) {
+    return _ref10.apply(this, arguments);
   };
 })();
 
@@ -220,58 +268,54 @@ let resolveAlias = exports.resolveAlias = (() => {
 
 
 let showOutput = exports.showOutput = (() => {
-  var _ref8 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
+  var _ref11 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
     const args = ['targets', '--json', '--show-output', aliasOrTarget];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     return JSON.parse(result.stdout.trim());
   });
 
-  return function showOutput(_x19, _x20) {
-    return _ref8.apply(this, arguments);
+  return function showOutput(_x22, _x23) {
+    return _ref11.apply(this, arguments);
   };
 })();
 
 let buildRuleTypeFor = exports.buildRuleTypeFor = (() => {
-  var _ref9 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
-    let canonicalName = aliasOrTarget;
-    // The leading "//" can be omitted for build/test/etc, but not for query.
-    // Don't prepend this for aliases though (aliases will not have colons)
-    if (canonicalName.indexOf(':') !== -1 && !canonicalName.startsWith('//')) {
-      canonicalName = '//' + canonicalName;
-    }
-    // Buck query does not support flavors.
-    const flavorIndex = canonicalName.indexOf('#');
-    if (flavorIndex !== -1) {
-      canonicalName = canonicalName.substr(0, flavorIndex);
-    }
+  var _ref12 = (0, _asyncToGenerator.default)(function* (rootPath, aliasOrTarget) {
+    const canonicalName = _normalizeNameForBuckQuery(aliasOrTarget);
     const args = ['query', canonicalName, '--json', '--output-attributes', 'buck.type'];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     const json = JSON.parse(result.stdout);
     // If aliasOrTarget is an alias, targets[0] will be the fully qualified build target.
     const targets = Object.keys(json);
-    // "target:" rules build all rules in that particular BUCK file.
-    // Let's just choose the first one.
-    if (!targets || !canonicalName.endsWith(':') && targets.length !== 1) {
-      throw new Error(`Error determining rule type of '${ aliasOrTarget }'.`);
+    if (targets.length === 0) {
+      throw new Error(`Error determining rule type of '${aliasOrTarget}'.`);
+    }
+    // target: and target/... build a set of targets.
+    // These don't have a single rule type so let's just return something.
+    if (targets.length > 1) {
+      return MULTIPLE_TARGET_RULE_TYPE;
     }
     return json[targets[0]]['buck.type'];
   });
 
-  return function buildRuleTypeFor(_x21, _x22) {
-    return _ref9.apply(this, arguments);
+  return function buildRuleTypeFor(_x24, _x25) {
+    return _ref12.apply(this, arguments);
   };
 })();
 
+// Buck query doesn't allow omitting // or adding # for flavors, this needs to be fixed in buck.
+
+
 let getHTTPServerPort = exports.getHTTPServerPort = (() => {
-  var _ref10 = (0, _asyncToGenerator.default)(function* (rootPath) {
+  var _ref13 = (0, _asyncToGenerator.default)(function* (rootPath) {
     const args = ['server', 'status', '--json', '--http-port'];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     const json = JSON.parse(result.stdout);
     return json['http.port'];
   });
 
-  return function getHTTPServerPort(_x23) {
-    return _ref10.apply(this, arguments);
+  return function getHTTPServerPort(_x26) {
+    return _ref13.apply(this, arguments);
   };
 })();
 
@@ -279,15 +323,15 @@ let getHTTPServerPort = exports.getHTTPServerPort = (() => {
 
 
 let query = exports.query = (() => {
-  var _ref11 = (0, _asyncToGenerator.default)(function* (rootPath, queryString) {
+  var _ref14 = (0, _asyncToGenerator.default)(function* (rootPath, queryString) {
     const args = ['query', '--json', queryString];
     const result = yield _runBuckCommandFromProjectRoot(rootPath, args);
     const json = JSON.parse(result.stdout);
     return json;
   });
 
-  return function query(_x24, _x25) {
-    return _ref11.apply(this, arguments);
+  return function query(_x27, _x28) {
+    return _ref14.apply(this, arguments);
   };
 })();
 
@@ -303,7 +347,7 @@ let query = exports.query = (() => {
 
 
 let queryWithArgs = exports.queryWithArgs = (() => {
-  var _ref12 = (0, _asyncToGenerator.default)(function* (rootPath, queryString, args) {
+  var _ref15 = (0, _asyncToGenerator.default)(function* (rootPath, queryString, args) {
     const completeArgs = ['query', '--json', queryString].concat(args);
     const result = yield _runBuckCommandFromProjectRoot(rootPath, completeArgs);
     const json = JSON.parse(result.stdout);
@@ -318,8 +362,27 @@ let queryWithArgs = exports.queryWithArgs = (() => {
     return json;
   });
 
-  return function queryWithArgs(_x26, _x27, _x28) {
-    return _ref12.apply(this, arguments);
+  return function queryWithArgs(_x29, _x30, _x31) {
+    return _ref15.apply(this, arguments);
+  };
+})();
+
+let resolveBuildTargetName = exports.resolveBuildTargetName = (() => {
+  var _ref16 = (0, _asyncToGenerator.default)(function* (buckRoot, nameOrAlias) {
+    const canonicalName = _normalizeNameForBuckQuery(nameOrAlias);
+    const qualifiedName = yield resolveAlias(buckRoot, canonicalName);
+    let flavors;
+    if (nameOrAlias.includes('#')) {
+      const nameComponents = nameOrAlias.split('#');
+      flavors = nameComponents.length === 2 ? nameComponents[1].split(',') : [];
+    } else {
+      flavors = [];
+    }
+    return { qualifiedName, flavors };
+  });
+
+  return function resolveBuildTargetName(_x32, _x33) {
+    return _ref16.apply(this, arguments);
   };
 })();
 
@@ -327,12 +390,46 @@ let queryWithArgs = exports.queryWithArgs = (() => {
 // all possible message types. For now, we'll manually typecast at the callsite.
 
 
+let getLastCommandInfo = exports.getLastCommandInfo = (() => {
+  var _ref17 = (0, _asyncToGenerator.default)(function* (rootPath) {
+    const logFile = (_nuclideUri || _load_nuclideUri()).default.join(rootPath, LOG_PATH);
+    if (yield (_fsPromise || _load_fsPromise()).default.exists(logFile)) {
+      const result = yield (0, (_process || _load_process()).asyncExecute)('head', ['-n', '1', logFile]);
+      if (result.exitCode === 0) {
+        const line = result.stdout;
+        const matches = line.match(LOG_REGEX);
+        if (matches == null || matches.length < 2) {
+          return null;
+        }
+        // Log lines are of the form:
+        // [time][level][?][?][JavaClass] .... [args]
+        // Parse this to figure out what the last command was.
+        const timestamp = Number(new Date(stripBrackets(matches[0])));
+        if (isNaN(timestamp)) {
+          return null;
+        }
+        const args = stripBrackets(matches[matches.length - 1]).split(', ');
+        if (args.length <= 1) {
+          return null;
+        }
+        return { timestamp, command: args[0], args: args.slice(1) };
+      }
+    }
+    return null;
+  });
+
+  return function getLastCommandInfo(_x34) {
+    return _ref17.apply(this, arguments);
+  };
+})();
+
 exports.getRootForPath = getRootForPath;
 exports.build = build;
 exports.install = install;
 exports.buildWithOutput = buildWithOutput;
 exports.testWithOutput = testWithOutput;
 exports.installWithOutput = installWithOutput;
+exports.runWithOutput = runWithOutput;
 exports.getWebSocketStream = getWebSocketStream;
 
 var _process;
@@ -390,7 +487,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 // Tag these Buck calls as coming from Nuclide for analytics purposes.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const CLIENT_ID_ARGS = ['--config', 'client.id=nuclide'];
+
+const MULTIPLE_TARGET_RULE_TYPE = exports.MULTIPLE_TARGET_RULE_TYPE = 'multiple_targets';
 
 /**
  * As defined in com.facebook.buck.cli.Command, some of Buck's subcommands are
@@ -422,36 +531,6 @@ function getPool(path, readOnly) {
  */
 function getRootForPath(file) {
   return (_fsPromise || _load_fsPromise()).default.findNearestFile('.buckconfig', file);
-}function _runBuckCommandFromProjectRoot(rootPath, args, commandOptions) {
-  let addClientId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
-  let readOnly = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-
-  var _getBuckCommandAndOpt = _getBuckCommandAndOptions(rootPath, commandOptions);
-
-  const pathToBuck = _getBuckCommandAndOpt.pathToBuck,
-        options = _getBuckCommandAndOpt.buckCommandOptions;
-
-
-  const newArgs = addClientId ? args.concat(CLIENT_ID_ARGS) : args;
-  logger.debug('Buck command:', pathToBuck, newArgs, options);
-  return getPool(rootPath, readOnly).submit(() => (0, (_process || _load_process()).checkOutput)(pathToBuck, newArgs, options));
-}
-
-/**
- * @return The path to buck and set of options to be used to run a `buck` command.
- */
-function _getBuckCommandAndOptions(rootPath) {
-  let commandOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  // $UPFixMe: This should use nuclide-features-config
-  const pathToBuck = global.atom && global.atom.config.get('nuclide.nuclide-buck.pathToBuck') || 'buck';
-  const buckCommandOptions = Object.assign({
-    cwd: rootPath,
-    // Buck restarts itself if the environment changes, so try to preserve
-    // the original environment that Nuclide was started in.
-    env: (0, (_process || _load_process()).getOriginalEnvironment)()
-  }, commandOptions);
-  return { pathToBuck: pathToBuck, buckCommandOptions: buckCommandOptions };
 }function build(rootPath, buildTargets, options) {
   return _build(rootPath, buildTargets, options || {});
 }
@@ -467,12 +546,12 @@ function _getBuckCommandAndOptions(rootPath) {
  * @param simulator The UDID of the simulator to install the binary on.
  * @return Promise that resolves to a build report.
  */
-function install(rootPath, buildTargets, simulator, runOptions) {
-  return _build(rootPath, buildTargets, { install: true, simulator: simulator, runOptions: runOptions });
+function install(rootPath, buildTargets, simulator, run, debug) {
+  return _build(rootPath, buildTargets, { install: true, simulator, run, debug });
 }
 
 function buildWithOutput(rootPath, buildTargets, extraArguments) {
-  return _buildWithOutput(rootPath, buildTargets, { extraArguments: extraArguments }).publish();
+  return _buildWithOutput(rootPath, buildTargets, { extraArguments }).publish();
 }
 
 /**
@@ -486,8 +565,8 @@ function buildWithOutput(rootPath, buildTargets, extraArguments) {
  *     from stderr.
  *   onCompleted: Only called if the build completes successfully.
  */
-function testWithOutput(rootPath, buildTargets, extraArguments) {
-  return _buildWithOutput(rootPath, buildTargets, { test: true, extraArguments: extraArguments }).publish();
+function testWithOutput(rootPath, buildTargets, extraArguments, debug) {
+  return _buildWithOutput(rootPath, buildTargets, { test: true, extraArguments, debug }).publish();
 }
 
 /**
@@ -501,12 +580,21 @@ function testWithOutput(rootPath, buildTargets, extraArguments) {
  *     from stderr.
  *   onCompleted: Only called if the install completes successfully.
  */
-function installWithOutput(rootPath, buildTargets, extraArguments, simulator, runOptions) {
+function installWithOutput(rootPath, buildTargets, extraArguments, simulator, run, debug) {
   return _buildWithOutput(rootPath, buildTargets, {
     install: true,
-    simulator: simulator,
-    runOptions: runOptions,
-    extraArguments: extraArguments
+    simulator,
+    run,
+    debug,
+    extraArguments
+  }).publish();
+}
+
+function runWithOutput(rootPath, buildTargets, extraArguments, simulator) {
+  return _buildWithOutput(rootPath, buildTargets, {
+    run: true,
+    simulator,
+    extraArguments
   }).publish();
 }
 
@@ -518,16 +606,17 @@ function installWithOutput(rootPath, buildTargets, extraArguments, simulator, ru
 function _buildWithOutput(rootPath, buildTargets, options) {
   const args = _translateOptionsToBuckBuildArgs({
     baseOptions: Object.assign({}, options),
-    buildTargets: buildTargets
+    buildTargets
   });
+  return _rxjsBundlesRxMinJs.Observable.fromPromise(_getBuckCommandAndOptions(rootPath)).switchMap(({ pathToBuck, buckCommandOptions }) => (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(pathToBuck, args, buckCommandOptions)).startWith({
+    kind: 'stdout',
+    data: `Starting "${pathToBuck} ${_getArgsStringSkipClientId(args)}"`
+  }));
+}
 
-  var _getBuckCommandAndOpt2 = _getBuckCommandAndOptions(rootPath);
-
-  const pathToBuck = _getBuckCommandAndOpt2.pathToBuck,
-        buckCommandOptions = _getBuckCommandAndOpt2.buckCommandOptions;
-
-
-  return (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(pathToBuck, args, buckCommandOptions));
+function _getArgsStringSkipClientId(args) {
+  const skipped = args.findIndex(arg => arg === 'client.id=nuclide');
+  return args.filter((arg, index) => index !== skipped && index !== skipped - 1).join(' ');
 }
 
 /**
@@ -536,20 +625,26 @@ function _buildWithOutput(rootPath, buildTargets, options) {
  *   process to run the `buck` command.
  */
 function _translateOptionsToBuckBuildArgs(options) {
-  const baseOptions = options.baseOptions,
-        pathToBuildReport = options.pathToBuildReport,
-        buildTargets = options.buildTargets;
-  const doInstall = baseOptions.install,
-        simulator = baseOptions.simulator,
-        test = baseOptions.test,
-        extraArguments = baseOptions.extraArguments;
+  const {
+    baseOptions,
+    pathToBuildReport,
+    buildTargets
+  } = options;
+  const {
+    install: doInstall,
+    run,
+    simulator,
+    test,
+    debug,
+    extraArguments
+  } = baseOptions;
 
-  const runOptions = baseOptions.runOptions || { run: false };
-
-  let args = [test ? 'test' : doInstall ? 'install' : 'build'];
+  let args = [test ? 'test' : doInstall ? 'install' : run ? 'run' : 'build'];
   args = args.concat(buildTargets, CLIENT_ID_ARGS);
 
-  args.push('--keep-going');
+  if (!run) {
+    args.push('--keep-going');
+  }
   if (pathToBuildReport) {
     args = args.concat(['--build-report', pathToBuildReport]);
   }
@@ -559,11 +654,15 @@ function _translateOptionsToBuckBuildArgs(options) {
       args.push(simulator);
     }
 
-    if (runOptions.run) {
+    if (run) {
       args.push('--run');
-      if (runOptions.debug) {
+      if (debug) {
         args.push('--wait-for-debugger');
       }
+    }
+  } else if (test) {
+    if (debug) {
+      args.push('--debug');
     }
   }
   if (extraArguments != null) {
@@ -572,6 +671,27 @@ function _translateOptionsToBuckBuildArgs(options) {
   return args;
 }
 
+function _normalizeNameForBuckQuery(aliasOrTarget) {
+  let canonicalName = aliasOrTarget;
+  // Don't prepend // for aliases (aliases will not have colons or .)
+  if ((canonicalName.indexOf(':') !== -1 || canonicalName.indexOf('.') !== -1) && !canonicalName.startsWith('//')) {
+    canonicalName = '//' + canonicalName;
+  }
+  // Strip flavor string
+  const flavorIndex = canonicalName.indexOf('#');
+  if (flavorIndex !== -1) {
+    canonicalName = canonicalName.substr(0, flavorIndex);
+  }
+  return canonicalName;
+}
+
 function getWebSocketStream(rootPath, httpPort) {
   return (0, (_createBuckWebSocket || _load_createBuckWebSocket()).default)(httpPort).publish();
+}
+
+const LOG_PATH = 'buck-out/log/buck-0.log';
+const LOG_REGEX = /\[([^\]]+)]/g;
+
+function stripBrackets(str) {
+  return str.substring(1, str.length - 1);
 }

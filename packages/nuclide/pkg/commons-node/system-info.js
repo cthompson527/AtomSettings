@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isRunningInTest = exports.isDevelopment = exports.OS_TYPE = undefined;
+exports.isRunningInTest = exports.OS_TYPE = undefined;
 exports.isRunningInClient = isRunningInClient;
 exports.getAtomNuclideDir = getAtomNuclideDir;
 exports.getAtomVersion = getAtomVersion;
@@ -41,6 +32,16 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NUCLIDE_PACKAGE_JSON_PATH = require.resolve('../../package.json');
 const NUCLIDE_BASEDIR = (_nuclideUri || _load_nuclideUri()).default.dirname(NUCLIDE_PACKAGE_JSON_PATH);
 
@@ -52,18 +53,6 @@ const OS_TYPE = exports.OS_TYPE = {
   LINUX: 'linux',
   OSX: 'darwin'
 };
-
-// "Development" is defined as working from source - not packaged code.
-// apm/npm and internal releases don't package the base `.flowconfig`, so
-// we use this to figure if we're packaged or not.
-const isDevelopment = exports.isDevelopment = (0, (_once || _load_once()).default)(() => {
-  try {
-    _fs.default.statSync((_nuclideUri || _load_nuclideUri()).default.join(NUCLIDE_BASEDIR, '.flowconfig'));
-    return true;
-  } catch (err) {
-    return false;
-  }
-});
 
 // Prior to Atom v1.7.0, `atom.inSpecMode` had a chance of performing an IPC call that could be
 // expensive depending on how much work the other process was doing. Because this value will not

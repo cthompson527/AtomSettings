@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34,14 +25,22 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 /* Mostly implements https://atom.io/docs/api/latest/File */
-let RemoteFile = exports.RemoteFile = class RemoteFile {
+class RemoteFile {
 
-  constructor(server, remotePath) {
-    let symlink = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+  constructor(server, remotePath, symlink = false) {
     this._server = server;
     this.setPath(remotePath);
     this._emitter = new _atom.Emitter();
@@ -101,7 +100,7 @@ let RemoteFile = exports.RemoteFile = class RemoteFile {
       this._watchSubscription = null;
     }, () => {
       // Nothing needs to be done if the root directory watch has ended.
-      logger.debug(`watchFile ended: ${ this._path }`);
+      logger.debug(`watchFile ended: ${this._path}`);
       this._watchSubscription = null;
     });
   }
@@ -215,10 +214,7 @@ let RemoteFile = exports.RemoteFile = class RemoteFile {
   }
 
   setPath(remotePath) {
-    var _nuclideUri$parse = (_nuclideUri || _load_nuclideUri()).default.parse(remotePath);
-
-    const localPath = _nuclideUri$parse.path;
-
+    const { path: localPath } = (_nuclideUri || _load_nuclideUri()).default.parse(remotePath);
     this._localPath = localPath;
     this._path = remotePath;
   }
@@ -321,21 +317,7 @@ let RemoteFile = exports.RemoteFile = class RemoteFile {
   }
 
   getParent() {
-    var _nuclideUri$parse2 = (_nuclideUri || _load_nuclideUri()).default.parse(this._path);
-
-    const localPath = _nuclideUri$parse2.path,
-          protocol = _nuclideUri$parse2.protocol,
-          host = _nuclideUri$parse2.host;
-
-    if (!protocol) {
-      throw new Error('Invariant violation: "protocol"');
-    }
-
-    if (!host) {
-      throw new Error('Invariant violation: "host"');
-    }
-
-    const directoryPath = protocol + '//' + host + (_nuclideUri || _load_nuclideUri()).default.dirname(localPath);
+    const directoryPath = (_nuclideUri || _load_nuclideUri()).default.dirname(this._path);
     const remoteConnection = this._server.getRemoteConnectionForUri(this._path);
     const hgRepositoryDescription = remoteConnection != null ? remoteConnection.getHgRepositoryDescription() : null;
     return this._server.createDirectory(directoryPath, hgRepositoryDescription);
@@ -352,4 +334,5 @@ let RemoteFile = exports.RemoteFile = class RemoteFile {
   _getService(serviceName) {
     return this._server.getService(serviceName);
   }
-};
+}
+exports.RemoteFile = RemoteFile;

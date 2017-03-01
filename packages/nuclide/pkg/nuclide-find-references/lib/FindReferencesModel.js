@@ -1,17 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let readFileContents = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (uri) {
@@ -20,7 +13,7 @@ let readFileContents = (() => {
     try {
       contents = (yield (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(uri).readFile(localPath)).toString('utf8');
     } catch (e) {
-      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`find-references: could not load file ${ uri }`, e);
+      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`find-references: could not load file ${uri}`, e);
       return null;
     }
     return contents;
@@ -60,7 +53,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const FRAGMENT_GRAMMARS = {
   'text.html.hack': 'source.hackfragment',
   'text.html.php': 'source.hackfragment'
-};
+}; /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */
 
 function compareReference(x, y) {
   return x.range.compare(y.range);
@@ -68,11 +69,11 @@ function compareReference(x, y) {
 
 function addReferenceGroup(groups, references, startLine, endLine) {
   if (references.length) {
-    groups.push({ references: references, startLine: startLine, endLine: endLine });
+    groups.push({ references, startLine, endLine });
   }
 }
 
-let FindReferencesModel = class FindReferencesModel {
+class FindReferencesModel {
 
   /**
    * @param basePath    Base path of the project. Used to display paths in a friendly way.
@@ -138,11 +139,7 @@ let FindReferencesModel = class FindReferencesModel {
     // 2. Group references within each file.
     this._references = [];
     for (const entry of refsByFile) {
-      var _entry = _slicedToArray(entry, 2);
-
-      const fileUri = _entry[0],
-            entryReferences = _entry[1];
-
+      const [fileUri, entryReferences] = entry;
       entryReferences.sort(compareReference);
       // Group references that are <= 1 line apart together.
       const groups = [];
@@ -190,11 +187,9 @@ let FindReferencesModel = class FindReferencesModel {
       const fileLines = fileContents.split('\n');
       const previewText = [];
       refGroups = refGroups.map(function (group) {
-        const references = group.references;
-        let startLine = group.startLine,
-            endLine = group.endLine;
+        const { references } = group;
+        let { startLine, endLine } = group;
         // Expand start/end lines with context.
-
         startLine = Math.max(startLine - _this2.getPreviewContext(), 0);
         endLine = Math.min(endLine + _this2.getPreviewContext(), fileLines.length - 1);
         // However, don't include blank lines.
@@ -206,7 +201,7 @@ let FindReferencesModel = class FindReferencesModel {
         }
 
         previewText.push(fileLines.slice(startLine, endLine + 1).join('\n'));
-        return { references: references, startLine: startLine, endLine: endLine };
+        return { references, startLine, endLine };
       });
       let grammar = atom.grammars.selectGrammar(uri, fileContents);
       const fragmentGrammar = FRAGMENT_GRAMMARS[grammar.scopeName];
@@ -214,15 +209,12 @@ let FindReferencesModel = class FindReferencesModel {
         grammar = atom.grammars.grammarForScopeName(fragmentGrammar) || grammar;
       }
       return {
-        uri: uri,
-        grammar: grammar,
-        previewText: previewText,
-        refGroups: refGroups
+        uri,
+        grammar,
+        previewText,
+        refGroups
       };
     })();
   }
-
-};
-
-
-module.exports = FindReferencesModel;
+}
+exports.default = FindReferencesModel;

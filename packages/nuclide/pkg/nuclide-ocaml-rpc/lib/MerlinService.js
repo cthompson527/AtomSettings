@@ -1,20 +1,21 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.runSingleCommand = exports.occurrences = exports.cases = exports.outline = exports.errors = exports.complete = exports.enclosingType = exports.locate = exports.pushNewBuffer = exports.pushDotMerlinPath = undefined;
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.runSingleCommand = exports.cases = exports.outline = exports.errors = exports.complete = exports.enclosingType = exports.locate = exports.pushNewBuffer = exports.pushDotMerlinPath = undefined;
-
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let pushDotMerlinPath = exports.pushDotMerlinPath = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (path) {
@@ -41,7 +42,7 @@ let pushNewBuffer = exports.pushNewBuffer = (() => {
 let locate = exports.locate = (() => {
   var _ref3 = (0, _asyncToGenerator.default)(function* (path, line, col, kind) {
     const instance = yield (0, (_MerlinProcess || _load_MerlinProcess()).getInstance)(path);
-    return instance ? yield instance.locate(path, line, col, kind) : null;
+    return instance ? instance.locate(path, line, col, kind) : null;
   });
 
   return function locate(_x4, _x5, _x6, _x7) {
@@ -58,7 +59,7 @@ let locate = exports.locate = (() => {
 let enclosingType = exports.enclosingType = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* (path, line, col) {
     const instance = yield (0, (_MerlinProcess || _load_MerlinProcess()).getInstance)(path);
-    return instance ? yield instance.enclosingType(path, line, col) : null;
+    return instance ? instance.enclosingType(path, line, col) : null;
   });
 
   return function enclosingType(_x8, _x9, _x10) {
@@ -117,6 +118,20 @@ let cases = exports.cases = (() => {
   };
 })();
 
+// This is currently unused; waiting for the refactoring front-end to finish.
+
+
+let occurrences = exports.occurrences = (() => {
+  var _ref9 = (0, _asyncToGenerator.default)(function* (path, position) {
+    const instance = yield (0, (_MerlinProcess || _load_MerlinProcess()).getInstance)(path);
+    return instance ? instance.occurrences(path, position.row, position.column) : null;
+  });
+
+  return function occurrences(_x19, _x20) {
+    return _ref9.apply(this, arguments);
+  };
+})();
+
 /**
  * Low-level API into merlin service useful for debugging and for prototyping
  * on top of bleeding edge Merlin branches.
@@ -124,13 +139,13 @@ let cases = exports.cases = (() => {
 
 
 let runSingleCommand = exports.runSingleCommand = (() => {
-  var _ref9 = (0, _asyncToGenerator.default)(function* (path, command) {
+  var _ref10 = (0, _asyncToGenerator.default)(function* (path, command) {
     const instance = yield (0, (_MerlinProcess || _load_MerlinProcess()).getInstance)(path);
     return instance ? instance.runSingleCommand(command, path) : null;
   });
 
-  return function runSingleCommand(_x19, _x20) {
-    return _ref9.apply(this, arguments);
+  return function runSingleCommand(_x21, _x22) {
+    return _ref10.apply(this, arguments);
   };
 })();
 

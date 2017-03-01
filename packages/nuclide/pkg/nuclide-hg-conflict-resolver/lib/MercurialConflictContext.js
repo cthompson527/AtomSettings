@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,7 @@ var _atom = require('atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let MercurialConflictContext = exports.MercurialConflictContext = class MercurialConflictContext {
+class MercurialConflictContext {
   // Used in UI buttons (hg-specific).
   constructor() {
     this.resolveText = 'Resolve';
@@ -46,7 +37,6 @@ let MercurialConflictContext = exports.MercurialConflictContext = class Mercuria
 
   /* `merge-conflicts` API */
   // Used to join conflicting file paths (non-nullable).
-
 
   /**
    * The mercurial repository in a conflict state.
@@ -145,7 +135,7 @@ let MercurialConflictContext = exports.MercurialConflictContext = class Mercuria
     }
 
     const repository = this._conflictingRepository;
-    const notification = atom.notifications.addSuccess('All Conflicts Resolved<br/>\n' + 'Click `Continue` to run: `hg rebase --continue`', {
+    const notification = atom.notifications.addSuccess('All Conflicts Resolved\n' + 'Click `Continue` to run: `hg rebase --continue`', {
       buttons: [{
         onDidClick: (() => {
           var _ref = (0, _asyncToGenerator.default)(function* () {
@@ -206,4 +196,13 @@ let MercurialConflictContext = exports.MercurialConflictContext = class Mercuria
       dismissable: true
     });
   }
-};
+}
+exports.MercurialConflictContext = MercurialConflictContext; /**
+                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                              * All rights reserved.
+                                                              *
+                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                              * the root directory of this source tree.
+                                                              *
+                                                              * 
+                                                              */

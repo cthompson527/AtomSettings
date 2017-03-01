@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 41
+          line: 40
         },
         kind: "named",
         name: "NuclideUri"
@@ -23,7 +23,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 41
+          line: 40
         },
         kind: "number"
       }
@@ -33,7 +33,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 41
+          line: 40
         },
         kind: "string"
       }
@@ -49,7 +49,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 48
+          line: 47
         },
         kind: "named",
         name: "NuclideUri"
@@ -60,7 +60,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 49
+          line: 48
         },
         kind: "number"
       }
@@ -70,14 +70,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 50
+          line: 49
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 50
+            line: 49
           },
           kind: "named",
           name: "TextEdit"
@@ -95,7 +95,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 57
+          line: 56
         },
         kind: "named",
         name: "NuclideUri"
@@ -112,14 +112,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 84
+          line: 83
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 84
+            line: 83
           },
           kind: "named",
           name: "FileEvent"
@@ -137,7 +137,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 89
+          line: 88
         },
         kind: "named",
         name: "NuclideUri"
@@ -148,7 +148,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 90
+          line: 89
         },
         kind: "named",
         name: "Position"
@@ -160,14 +160,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 91
+          line: 90
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 91
+            line: 90
           },
           kind: "named",
           name: "HackCompletion"
@@ -184,7 +184,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 103
+          line: 102
         },
         kind: "named",
         name: "HackDiagnosticsMessage"
@@ -207,1260 +207,1290 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["Position", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 17
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    name: "Position",
-    definition: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    Position: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 17
+        line: 16
       },
-      kind: "object",
-      fields: [{
+      name: "Position",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 18
+          line: 16
         },
-        name: "line",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 17
+          },
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 17
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 18
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 19
-        },
-        name: "column",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 19
+          name: "column",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 18
+            },
+            kind: "number"
           },
-          kind: "number"
-        },
-        optional: false
-      }]
-    }
-  }], ["Range", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 24
+          optional: false
+        }]
+      }
     },
-    name: "Range",
-    definition: {
+    Range: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 24
+        line: 23
       },
-      kind: "object",
-      fields: [{
+      name: "Range",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 25
+          line: 23
         },
-        name: "start",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 24
+          },
+          name: "start",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 24
+            },
+            kind: "named",
+            name: "Position"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 25
           },
-          kind: "named",
-          name: "Position"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 26
-        },
-        name: "end",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 26
+          name: "end",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 25
+            },
+            kind: "named",
+            name: "Position"
           },
-          kind: "named",
-          name: "Position"
-        },
-        optional: false
-      }]
-    }
-  }], ["TextEdit", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 33
+          optional: false
+        }]
+      }
     },
-    name: "TextEdit",
-    definition: {
+    TextEdit: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 33
+        line: 32
       },
-      kind: "object",
-      fields: [{
+      name: "TextEdit",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 34
+          line: 32
         },
-        name: "range",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 33
+          },
+          name: "range",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 33
+            },
+            kind: "named",
+            name: "Range"
+          },
+          optional: true
+        }, {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 34
           },
-          kind: "named",
-          name: "Range"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 35
-        },
-        name: "text",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 35
+          name: "text",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 34
+            },
+            kind: "string"
           },
-          kind: "string"
-        },
-        optional: false
-      }]
-    }
-  }], ["didOpenFile", {
-    kind: "function",
-    name: "didOpenFile",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 41
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "HackConnectionService.js",
-        line: 41
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "filename",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 41
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "version",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 41
-          },
-          kind: "number"
-        }
-      }, {
-        name: "contents",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 41
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 41
-        },
-        kind: "void"
+          optional: false
+        }]
       }
-    }
-  }], ["didChangeFile", {
-    kind: "function",
-    name: "didChangeFile",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 47
     },
-    type: {
+    didOpenFile: {
+      kind: "function",
+      name: "didOpenFile",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 47
+        line: 40
       },
+      type: {
+        location: {
+          type: "source",
+          fileName: "HackConnectionService.js",
+          line: 40
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 40
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "version",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 40
+            },
+            kind: "number"
+          }
+        }, {
+          name: "contents",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 40
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 40
+          },
+          kind: "void"
+        }
+      }
+    },
+    didChangeFile: {
       kind: "function",
-      argumentTypes: [{
-        name: "filename",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 48
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "version",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 49
-          },
-          kind: "number"
-        }
-      }, {
-        name: "changes",
-        type: {
+      name: "didChangeFile",
+      location: {
+        type: "source",
+        fileName: "HackConnectionService.js",
+        line: 46
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "HackConnectionService.js",
+          line: 46
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 47
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "version",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 48
+            },
+            kind: "number"
+          }
+        }, {
+          name: "changes",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 49
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "HackConnectionService.js",
+                line: 49
+              },
+              kind: "named",
+              name: "TextEdit"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 50
           },
-          kind: "array",
+          kind: "void"
+        }
+      }
+    },
+    didCloseFile: {
+      kind: "function",
+      name: "didCloseFile",
+      location: {
+        type: "source",
+        fileName: "HackConnectionService.js",
+        line: 56
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "HackConnectionService.js",
+          line: 56
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filename",
           type: {
             location: {
               type: "source",
               fileName: "HackConnectionService.js",
-              line: 50
+              line: 56
             },
             kind: "named",
-            name: "TextEdit"
+            name: "NuclideUri"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 51
-        },
-        kind: "void"
-      }
-    }
-  }], ["didCloseFile", {
-    kind: "function",
-    name: "didCloseFile",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 57
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "HackConnectionService.js",
-        line: 57
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "filename",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 57
+            line: 56
           },
-          kind: "named",
-          name: "NuclideUri"
+          kind: "void"
         }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 57
-        },
-        kind: "void"
       }
-    }
-  }], ["FileEventType", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 70
     },
-    name: "FileEventType",
-    definition: {
+    FileEventType: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 71
+        line: 69
       },
-      kind: "union",
-      types: [{
+      name: "FileEventType",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 71
+          line: 70
         },
-        kind: "string-literal",
-        value: "Created"
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 72
-        },
-        kind: "string-literal",
-        value: "Changed"
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 73
-        },
-        kind: "string-literal",
-        value: "Deleted"
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 74
-        },
-        kind: "string-literal",
-        value: "Saved"
-      }]
-    }
-  }], ["FileEvent", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 76
+        kind: "union",
+        types: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 70
+          },
+          kind: "string-literal",
+          value: "Created"
+        }, {
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 71
+          },
+          kind: "string-literal",
+          value: "Changed"
+        }, {
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 72
+          },
+          kind: "string-literal",
+          value: "Deleted"
+        }, {
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 73
+          },
+          kind: "string-literal",
+          value: "Saved"
+        }]
+      }
     },
-    name: "FileEvent",
-    definition: {
+    FileEvent: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 76
+        line: 75
       },
-      kind: "object",
-      fields: [{
+      name: "FileEvent",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 77
+          line: 75
         },
-        name: "filename",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 76
+          },
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 76
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 77
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 78
-        },
-        name: "type",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 78
-          },
-          kind: "named",
-          name: "FileEventType"
-        },
-        optional: false
-      }]
-    }
-  }], ["didChangeWatchedFiles", {
-    kind: "function",
-    name: "didChangeWatchedFiles",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 84
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "HackConnectionService.js",
-        line: 84
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "changes",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 84
-          },
-          kind: "array",
+          name: "type",
           type: {
             location: {
               type: "source",
               fileName: "HackConnectionService.js",
-              line: 84
+              line: 77
             },
             kind: "named",
-            name: "FileEvent"
-          }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 84
-        },
-        kind: "void"
+            name: "FileEventType"
+          },
+          optional: false
+        }]
       }
-    }
-  }], ["getCompletions", {
-    kind: "function",
-    name: "getCompletions",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 88
     },
-    type: {
+    didChangeWatchedFiles: {
+      kind: "function",
+      name: "didChangeWatchedFiles",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 88
+        line: 83
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "filename",
-        type: {
+      type: {
+        location: {
+          type: "source",
+          fileName: "HackConnectionService.js",
+          line: 83
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "changes",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 83
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "HackConnectionService.js",
+                line: 83
+              },
+              kind: "named",
+              name: "FileEvent"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 89
+            line: 83
           },
-          kind: "named",
-          name: "NuclideUri"
+          kind: "void"
         }
-      }, {
-        name: "position",
-        type: {
+      }
+    },
+    getCompletions: {
+      kind: "function",
+      name: "getCompletions",
+      location: {
+        type: "source",
+        fileName: "HackConnectionService.js",
+        line: 87
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "HackConnectionService.js",
+          line: 87
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 88
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "position",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 89
+            },
+            kind: "named",
+            name: "Position"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 90
           },
-          kind: "named",
-          name: "Position"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 91
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 91
-          },
-          kind: "array",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "HackConnectionService.js",
-              line: 91
+              line: 90
             },
-            kind: "named",
-            name: "HackCompletion"
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "HackConnectionService.js",
+                line: 90
+              },
+              kind: "named",
+              name: "HackCompletion"
+            }
           }
         }
       }
-    }
-  }], ["HackDiagnosticsMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 95
     },
-    name: "HackDiagnosticsMessage",
-    definition: {
+    HackDiagnosticsMessage: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 95
+        line: 94
       },
-      kind: "object",
-      fields: [{
+      name: "HackDiagnosticsMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 96
+          line: 94
         },
-        name: "filename",
-        type: {
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 95
+          },
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 95
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
             line: 96
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "HackConnectionService.js",
-          line: 97
-        },
-        name: "errors",
-        type: {
-          location: {
-            type: "source",
-            fileName: "HackConnectionService.js",
-            line: 97
-          },
-          kind: "array",
+          name: "errors",
           type: {
             location: {
               type: "source",
               fileName: "HackConnectionService.js",
-              line: 97
+              line: 96
             },
-            kind: "object",
-            fields: [{
+            kind: "array",
+            type: {
               location: {
                 type: "source",
                 fileName: "HackConnectionService.js",
-                line: 98
+                line: 96
               },
-              name: "message",
-              type: {
+              kind: "object",
+              fields: [{
                 location: {
                   type: "source",
                   fileName: "HackConnectionService.js",
-                  line: 98
+                  line: 97
                 },
-                kind: "named",
-                name: "HackDiagnostic"
-              },
-              optional: false
-            }]
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["notifyDiagnostics", {
-    kind: "function",
-    name: "notifyDiagnostics",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 102
+                name: "message",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "HackConnectionService.js",
+                    line: 97
+                  },
+                  kind: "named",
+                  name: "HackDiagnostic"
+                },
+                optional: false
+              }]
+            }
+          },
+          optional: false
+        }]
+      }
     },
-    type: {
+    notifyDiagnostics: {
+      kind: "function",
+      name: "notifyDiagnostics",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 102
+        line: 101
       },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 103
+          line: 101
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
           location: {
             type: "source",
             fileName: "HackConnectionService.js",
-            line: 103
+            line: 102
           },
-          kind: "named",
-          name: "HackDiagnosticsMessage"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "HackConnectionService.js",
+              line: 102
+            },
+            kind: "named",
+            name: "HackDiagnosticsMessage"
+          }
         }
       }
-    }
-  }], ["disconnect", {
-    kind: "function",
-    name: "disconnect",
-    location: {
-      type: "source",
-      fileName: "HackConnectionService.js",
-      line: 108
     },
-    type: {
+    disconnect: {
+      kind: "function",
+      name: "disconnect",
       location: {
         type: "source",
         fileName: "HackConnectionService.js",
-        line: 108
+        line: 107
       },
-      kind: "function",
-      argumentTypes: [],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "HackConnectionService.js",
-          line: 108
+          line: 107
         },
-        kind: "void"
+        kind: "function",
+        argumentTypes: [],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "HackConnectionService.js",
+            line: 107
+          },
+          kind: "void"
+        }
       }
-    }
-  }], ["HackParameterDetails", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 11
     },
-    name: "HackParameterDetails",
-    definition: {
+    HackParameterDetails: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 11
       },
-      kind: "object",
-      fields: [{
+      name: "HackParameterDetails",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 12
+          line: 11
         },
-        name: "name",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 12
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 13
-        },
-        name: "type",
-        type: {
+          name: "name",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 12
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 13
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 14
-        },
-        name: "variadic",
-        type: {
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 13
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 14
           },
-          kind: "boolean"
-        },
-        optional: false
-      }]
-    }
-  }], ["HackFunctionDetails", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 17
+          name: "variadic",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 14
+            },
+            kind: "boolean"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "HackFunctionDetails",
-    definition: {
+    HackFunctionDetails: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 17
       },
-      kind: "object",
-      fields: [{
+      name: "HackFunctionDetails",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 18
+          line: 17
         },
-        name: "min_arity",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 18
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 19
-        },
-        name: "return_type",
-        type: {
+          name: "min_arity",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 18
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 19
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 20
-        },
-        name: "params",
-        type: {
+          name: "return_type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 19
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 20
           },
-          kind: "array",
+          name: "params",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 20
             },
-            kind: "named",
-            name: "HackParameterDetails"
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["HackRange", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 24
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 20
+              },
+              kind: "named",
+              name: "HackParameterDetails"
+            }
+          },
+          optional: false
+        }]
+      }
     },
-    name: "HackRange",
-    definition: {
+    HackRange: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 24
       },
-      kind: "object",
-      fields: [{
+      name: "HackRange",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 25
+          line: 24
         },
-        name: "filename",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 25
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 26
-        },
-        name: "line",
-        type: {
+          name: "filename",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 25
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 26
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 27
-        },
-        name: "char_start",
-        type: {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 26
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 27
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 28
-        },
-        name: "char_end",
-        type: {
+          name: "char_start",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 27
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 28
           },
-          kind: "number"
-        },
-        optional: false
-      }]
-    }
-  }], ["HackCompletion", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 31
+          name: "char_end",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 28
+            },
+            kind: "number"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "HackCompletion",
-    definition: {
+    HackCompletion: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 31
       },
-      kind: "object",
-      fields: [{
+      name: "HackCompletion",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 32
+          line: 31
         },
-        name: "name",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 32
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 33
-        },
-        name: "type",
-        type: {
+          name: "name",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 32
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 33
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 34
-        },
-        name: "pos",
-        type: {
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 33
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 34
           },
-          kind: "named",
-          name: "HackRange"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 35
-        },
-        name: "func_details",
-        type: {
+          name: "pos",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 34
+            },
+            kind: "named",
+            name: "HackRange"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 35
           },
-          kind: "nullable",
+          name: "func_details",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 35
             },
-            kind: "named",
-            name: "HackFunctionDetails"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 36
-        },
-        name: "expected_ty",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 35
+              },
+              kind: "named",
+              name: "HackFunctionDetails"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 36
           },
-          kind: "boolean"
-        },
-        optional: false
-      }]
-    }
-  }], ["HackCompletionsResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 39
+          name: "expected_ty",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 36
+            },
+            kind: "boolean"
+          },
+          optional: false
+        }]
+      }
     },
-    name: "HackCompletionsResult",
-    definition: {
+    HackCompletionsResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 39
       },
-      kind: "array",
-      type: {
+      name: "HackCompletionsResult",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
           line: 39
         },
-        kind: "named",
-        name: "HackCompletion"
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 39
+          },
+          kind: "named",
+          name: "HackCompletion"
+        }
       }
-    }
-  }], ["HackDiagnosticsResult", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 41
     },
-    name: "HackDiagnosticsResult",
-    definition: {
+    HackDiagnosticsResult: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 41
       },
-      kind: "object",
-      fields: [{
+      name: "HackDiagnosticsResult",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 42
+          line: 41
         },
-        name: "errors",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 42
           },
-          kind: "array",
+          name: "errors",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 42
             },
-            kind: "object",
-            fields: [{
+            kind: "array",
+            type: {
               location: {
                 type: "source",
                 fileName: "rpc-types.js",
-                line: 43
+                line: 42
               },
-              name: "message",
-              type: {
+              kind: "object",
+              fields: [{
                 location: {
                   type: "source",
                   fileName: "rpc-types.js",
                   line: 43
                 },
-                kind: "named",
-                name: "HackDiagnostic"
-              },
-              optional: false
-            }]
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["HackDiagnostic", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 52
+                name: "message",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "rpc-types.js",
+                    line: 43
+                  },
+                  kind: "named",
+                  name: "HackDiagnostic"
+                },
+                optional: false
+              }]
+            }
+          },
+          optional: false
+        }]
+      }
     },
-    name: "HackDiagnostic",
-    definition: {
+    HackDiagnostic: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 52
       },
-      kind: "array",
-      type: {
+      name: "HackDiagnostic",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
           line: 52
         },
-        kind: "named",
-        name: "SingleHackMessage"
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "rpc-types.js",
+            line: 52
+          },
+          kind: "named",
+          name: "SingleHackMessage"
+        }
       }
-    }
-  }], ["SingleHackMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "rpc-types.js",
-      line: 54
     },
-    name: "SingleHackMessage",
-    definition: {
+    SingleHackMessage: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "rpc-types.js",
         line: 54
       },
-      kind: "object",
-      fields: [{
+      name: "SingleHackMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "rpc-types.js",
-          line: 55
+          line: 54
         },
-        name: "path",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 55
           },
-          kind: "nullable",
+          name: "path",
           type: {
             location: {
               type: "source",
               fileName: "rpc-types.js",
               line: 55
             },
-            kind: "string"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 56
-        },
-        name: "descr",
-        type: {
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "rpc-types.js",
+                line: 55
+              },
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 56
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 57
-        },
-        name: "code",
-        type: {
+          name: "descr",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 56
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 57
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 58
-        },
-        name: "line",
-        type: {
+          name: "code",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 57
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 58
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 59
-        },
-        name: "start",
-        type: {
+          name: "line",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 58
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 59
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "rpc-types.js",
-          line: 60
-        },
-        name: "end",
-        type: {
+          name: "start",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 59
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "rpc-types.js",
             line: 60
           },
-          kind: "number"
-        },
-        optional: false
-      }]
+          name: "end",
+          type: {
+            location: {
+              type: "source",
+              fileName: "rpc-types.js",
+              line: 60
+            },
+            kind: "number"
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

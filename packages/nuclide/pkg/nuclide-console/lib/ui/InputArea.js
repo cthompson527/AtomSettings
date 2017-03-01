@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -24,11 +14,20 @@ function _load_AtomTextEditor() {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-const ENTER_KEY_CODE = 13;
+const ENTER_KEY_CODE = 13; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            */
+
 const UP_KEY_CODE = 38;
 const DOWN_KEY_CODE = 40;
 
-let OutputTable = class OutputTable extends _reactForAtom.React.Component {
+class OutputTable extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -84,9 +83,9 @@ let OutputTable = class OutputTable extends _reactForAtom.React.Component {
       event.stopImmediatePropagation();
       const historyIndex = Math.min(this.state.historyIndex + 1, this.props.history.length - 1);
       if (this.state.historyIndex === -1) {
-        this.setState({ historyIndex: historyIndex, draft: editor.getText() });
+        this.setState({ historyIndex, draft: editor.getText() });
       } else {
-        this.setState({ historyIndex: historyIndex });
+        this.setState({ historyIndex });
       }
       editor.setText(this.props.history[this.props.history.length - historyIndex - 1]);
     } else if (event.which === DOWN_KEY_CODE) {
@@ -96,7 +95,7 @@ let OutputTable = class OutputTable extends _reactForAtom.React.Component {
       event.preventDefault();
       event.stopImmediatePropagation();
       const historyIndex = Math.max(this.state.historyIndex - 1, -1);
-      this.setState({ historyIndex: historyIndex });
+      this.setState({ historyIndex });
       if (historyIndex === -1) {
         editor.setText(this.state.draft);
       } else {
@@ -119,7 +118,5 @@ let OutputTable = class OutputTable extends _reactForAtom.React.Component {
       })
     );
   }
-
-};
+}
 exports.default = OutputTable;
-module.exports = exports['default'];

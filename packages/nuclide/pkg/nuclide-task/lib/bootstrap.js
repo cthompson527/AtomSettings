@@ -1,26 +1,13 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 var _child_process = _interopRequireDefault(require('child_process'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 process.on('message', message => {
-  const id = message.id,
-        file = message.file,
-        method = message.method,
-        args = message.args;
+  const { id, file, method, args } = message;
 
   // $FlowIgnore
-
   const exports = require(file);
   const service = method != null ? exports[method] : exports;
 
@@ -30,8 +17,8 @@ process.on('message', message => {
     }
 
     process.send({
-      id: id,
-      result: result
+      id,
+      result
     });
   };
 
@@ -41,7 +28,7 @@ process.on('message', message => {
     }
 
     process.send({
-      id: id,
+      id,
       error: {
         message: err.message || err,
         stack: err.stack || null
@@ -65,7 +52,15 @@ process.on('message', message => {
   } else {
     sendSuccessResponse(output);
   }
-});
+}); /**
+     * Copyright (c) 2015-present, Facebook, Inc.
+     * All rights reserved.
+     *
+     * This source code is licensed under the license found in the LICENSE file in
+     * the root directory of this source tree.
+     *
+     * 
+     */
 
 process.on('uncaughtException', err => {
   // eslint-disable-next-line no-console

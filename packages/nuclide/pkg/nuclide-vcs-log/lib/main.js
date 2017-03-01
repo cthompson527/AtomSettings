@@ -1,15 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-// TODO: Make it possible to move or split a pane with a VcsLogPaneItem.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -47,10 +36,10 @@ function _load_string() {
 
 var _querystring = _interopRequireDefault(require('querystring'));
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _util;
@@ -69,14 +58,24 @@ var _url = _interopRequireDefault(require('url'));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500;
+const SHOW_LOG_FILE_TREE_CONTEXT_MENU_PRIORITY = 500; /**
+                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                       * All rights reserved.
+                                                       *
+                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                       * the root directory of this source tree.
+                                                       *
+                                                       * 
+                                                       */
+
+// TODO: Make it possible to move or split a pane with a VcsLogPaneItem.
 
 const CONTEXT_MENU_LABEL = 'Show history';
 const MAX_NUM_LOG_RESULTS = 100;
 const VCS_LOG_URI_PREFIX = 'atom://nucide-vcs-log/view';
 const VCS_LOG_URI_PATHS_QUERY_PARAM = 'path';
 
-let Activation = class Activation {
+class Activation {
 
   constructor() {
     this._subscriptions = new _atom.CompositeDisposable();
@@ -89,9 +88,7 @@ let Activation = class Activation {
         return;
       }
 
-      var _url$parse = _url.default.parse(uriToOpen, /* parseQueryString */true);
-
-      const query = _url$parse.query;
+      const { query } = _url.default.parse(uriToOpen, /* parseQueryString */true);
 
       if (!query) {
         throw new Error('Invariant violation: "query"');
@@ -120,7 +117,7 @@ let Activation = class Activation {
         submenu: [{
           label: CONTEXT_MENU_LABEL,
           command: 'nuclide-vcs-log:show-log-for-active-editor',
-          shouldDisplay: function () {
+          shouldDisplay() {
             const uri = getActiveTextEditorURI();
             return getRepositoryWithLogMethodForPath(uri) != null;
           }
@@ -132,14 +129,13 @@ let Activation = class Activation {
   addItemsToFileTreeContextMenu(contextMenu) {
     const contextDisposable = contextMenu.addItemToSourceControlMenu({
       label: CONTEXT_MENU_LABEL,
-      callback: function () {
+      callback() {
         const node = contextMenu.getSingleSelectedNode();
         if (node == null) {
           return;
         }
 
-        const uri = node.uri;
-
+        const { uri } = node;
         const repository = getRepositoryWithLogMethodForPath(uri);
         if (repository == null) {
           return;
@@ -148,7 +144,7 @@ let Activation = class Activation {
         openLogPaneForURI(uri);
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-vcs-log:open-from-file-tree');
       },
-      shouldDisplay: function () {
+      shouldDisplay() {
         const node = contextMenu.getSingleSelectedNode();
         if (node == null) {
           return false;
@@ -169,15 +165,14 @@ let Activation = class Activation {
   dispose() {
     this._subscriptions.dispose();
   }
-};
-
+}
 
 function getRepositoryWithLogMethodForPath(path) {
   if (path == null) {
     return null;
   }
 
-  const repository = (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).repositoryForPath)(path);
+  const repository = (0, (_vcs || _load_vcs()).repositoryForPath)(path);
   // For now, we only expect HgRepository to work. We should also find a way to
   // make this work for Git.
   if (repository != null && repository.getType() === 'hg') {
@@ -206,6 +201,8 @@ function openLogPaneForURI(uri) {
   const openerURI = VCS_LOG_URI_PREFIX + '?' + _querystring.default.stringify({
     [VCS_LOG_URI_PATHS_QUERY_PARAM]: uri
   });
+  // Not a file URI
+  // eslint-disable-next-line nuclide-internal/atom-apis
   atom.workspace.open(openerURI);
 }
 
@@ -220,10 +217,7 @@ function createLogPaneForPath(path) {
   }
 
   const pane = new (_VcsLogPaneItem || _load_VcsLogPaneItem()).default();
-
-  var _ref = (_featureConfig || _load_featureConfig()).default.get('nuclide-vcs-log');
-
-  const showDifferentialRevision = _ref.showDifferentialRevision;
+  const { showDifferentialRevision } = (_featureConfig || _load_featureConfig()).default.get('nuclide-vcs-log');
 
   if (!(typeof showDifferentialRevision === 'boolean')) {
     throw new Error('Invariant violation: "typeof showDifferentialRevision === \'boolean\'"');
@@ -233,9 +227,9 @@ function createLogPaneForPath(path) {
     iconName: 'repo',
     initialProps: {
       files: [path],
-      showDifferentialRevision: showDifferentialRevision
+      showDifferentialRevision
     },
-    title: `${ repository.getType() } log ${ (0, (_string || _load_string()).maybeToString)((0, (_projects || _load_projects()).getAtomProjectRelativePath)(path)) }`
+    title: `${repository.getType()} log ${(0, (_string || _load_string()).maybeToString)((0, (_projects || _load_projects()).getAtomProjectRelativePath)(path))}`
   });
 
   repository.log([path], MAX_NUM_LOG_RESULTS).then(response => pane.updateWithLogEntries(response.entries));

@@ -1,22 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _desc, _value, _class;
 
 var _nuclideAnalytics;
 
@@ -50,45 +38,21 @@ function _load_libclang() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
+const IDENTIFIER_REGEX = /[a-z0-9_]+/gi; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */
 
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
-
-const IDENTIFIER_REGEX = /[a-z0-9_]+/gi;
 const DEFAULT_FLAGS_WARNING = 'Diagnostics are disabled due to lack of compilation flags. ' + 'Build this file with Buck, or create a compile_commands.json file manually.';
 
-function fixSourceRange(editor, clangRange) {
+function isValidRange(clangRange) {
   // Some ranges are unbounded/invalid (end with -1) or empty.
-  // Treat these as point diagnostics.
-  if (clangRange.end.row === -1 || clangRange.start.isEqual(clangRange.end)) {
-    return getRangeFromPoint(editor, clangRange.start);
-  }
-  return clangRange;
+  return clangRange.end.row !== -1 && !clangRange.start.isEqual(clangRange.end);
 }
 
 function getRangeFromPoint(editor, location) {
@@ -103,8 +67,12 @@ function getRangeFromPoint(editor, location) {
   return editor.getBuffer().rangeForRow(location.row);
 }
 
-let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.fetch-diagnostics'), (_class = class ClangLinter {
+class ClangLinter {
   static lint(textEditor) {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-clang-atom.fetch-diagnostics', () => ClangLinter._lint(textEditor));
+  }
+
+  static _lint(textEditor) {
     return (0, _asyncToGenerator.default)(function* () {
       const filePath = textEditor.getPath();
       if (filePath == null) {
@@ -119,13 +87,13 @@ let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tr
         }
 
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-clang-atom.fetch-diagnostics', {
-          filePath: filePath,
+          filePath,
           count: String(diagnostics.diagnostics.length),
           accurateFlags: String(diagnostics.accurateFlags)
         });
         return ClangLinter._processDiagnostics(diagnostics, textEditor);
       } catch (error) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`ClangLinter: error linting ${ filePath }`, error);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`ClangLinter: error linting ${filePath}`, error);
         return [];
       }
     })();
@@ -148,9 +116,9 @@ let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tr
         }
 
         let range;
-        if (diagnostic.ranges) {
+        if (diagnostic.ranges && isValidRange(diagnostic.ranges[0].range)) {
           // Use the first range from the diagnostic as the range for Linter.
-          range = fixSourceRange(editor, diagnostic.ranges[0].range);
+          range = diagnostic.ranges[0].range;
         } else {
           range = getRangeFromPoint(editor, diagnostic.location.point);
         }
@@ -175,7 +143,6 @@ let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tr
           const fixit = diagnostic.fixits[0];
           if (fixit != null) {
             fix = {
-              // Do not use fixSourceRange here, since we need this to be exact.
               range: fixit.range.range,
               newText: fixit.value
             };
@@ -186,11 +153,11 @@ let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tr
           scope: 'file',
           providerName: 'Clang',
           type: diagnostic.severity === 2 ? 'Warning' : 'Error',
-          filePath: filePath,
+          filePath,
           text: diagnostic.spelling,
-          range: range,
-          trace: trace,
-          fix: fix
+          range,
+          trace,
+          fix
         });
       });
     } else {
@@ -206,7 +173,5 @@ let ClangLinter = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).tr
 
     return result;
   }
-
-}, (_applyDecoratedDescriptor(_class, 'lint', [_dec], Object.getOwnPropertyDescriptor(_class, 'lint'), _class)), _class));
+}
 exports.default = ClangLinter;
-module.exports = exports['default'];

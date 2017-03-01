@@ -1,26 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/**
- * This designed for logging on both Nuclide client and Nuclide server. It is based on [log4js]
- * (https://www.npmjs.com/package/log4js) with the ability to lazy initialize and update config
- * after initialized.
- * To make sure we only have one instance of log4js logger initialized globally, we save the logger
- * to `global` object.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getServerLogAppenderConfig = exports.FileAppender = exports.getPathToLogFile = exports.getDefaultConfig = undefined;
+exports.getAdditionalLogFiles = exports.addAdditionalLogFile = exports.getServerLogAppenderConfig = exports.FileAppender = exports.getPathToLogFile = exports.getDefaultConfig = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -57,10 +40,29 @@ function _load_log4js() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/**
+ * This designed for logging on both Nuclide client and Nuclide server. It is based on [log4js]
+ * (https://www.npmjs.com/package/log4js) with the ability to lazy initialize and update config
+ * after initialized.
+ * To make sure we only have one instance of log4js logger initialized globally, we save the logger
+ * to `global` object.
+ */
 exports.getDefaultConfig = (_config || _load_config()).getDefaultConfig;
 exports.getPathToLogFile = (_config || _load_config()).getPathToLogFile;
 exports.FileAppender = (_config || _load_config()).FileAppender;
 exports.getServerLogAppenderConfig = (_config || _load_config()).getServerLogAppenderConfig;
+exports.addAdditionalLogFile = (_config || _load_config()).addAdditionalLogFile;
+exports.getAdditionalLogFiles = (_config || _load_config()).getAdditionalLogFiles;
 
 /* Listed in order of severity. */
 
@@ -98,14 +100,14 @@ function updateConfig(config, options) {
 // during activation without worrying about introducing a significant startup cost.
 function createLazyLogger(category) {
   function createLazyLoggerMethod(level) {
-    return function () {
+    return function (...args) {
       const logger = getLog4jsLogger(category);
 
       if (!logger) {
         throw new Error('Invariant violation: "logger"');
       }
 
-      logger[level](...arguments);
+      logger[level](...args);
     };
   }
 
@@ -201,11 +203,11 @@ function getCategoryLogger(category) {
   }
 
   return {
-    log: log,
-    logTrace: logTrace,
-    logInfo: logInfo,
-    logError: logError,
-    logErrorAndThrow: logErrorAndThrow,
-    setLogLevel: setLogLevel
+    log,
+    logTrace,
+    logInfo,
+    logError,
+    logErrorAndThrow,
+    setLogLevel
   };
 }

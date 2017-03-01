@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _atom = require('atom');
 
@@ -29,13 +24,23 @@ const GRAMMARS = ['source.objc', 'source.objcpp'];
 
 // The indentation amount depends on previous lines. If the user types a colon outside of a method
 // call, it searches the entire buffer. This hard cutoff should work for sane code.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NUMBER_OF_PREVIOUS_LINES_TO_SEARCH_FOR_COLONS = 25;
 
 /**
  * This provides improved Objective-C indentation by aligning colons.
  * Clients must call `disable()` once they're done with an instance.
  */
-let ObjectiveCColonIndenter = class ObjectiveCColonIndenter {
+class ObjectiveCColonIndenter {
 
   enable() {
     if (this._subscriptions) {
@@ -61,15 +66,13 @@ let ObjectiveCColonIndenter = class ObjectiveCColonIndenter {
 
   _enableInTextEditor(textEditor) {
     this._insertTextSubscriptionsMap.set(textEditor, textEditor.onDidInsertText(event => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('objc:indent-colon', () => {
-        const range = event.range,
-              text = event.text;
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('objc:indent-colon', () => {
+        const { range, text } = event;
 
         // Ignore the inserted text if the user is typing in a string or comment.
         //
         // The scope descriptor marks the text with semantic information,
         // generally used for syntax highlighting.
-
         const isNonCodeText = textEditor.scopeDescriptorForBufferPosition(range.start).getScopesArray().some(scope => scope.startsWith('string') || scope.startsWith('comment'));
         if (text !== ':' || isNonCodeText) {
           return;
@@ -127,12 +130,7 @@ let ObjectiveCColonIndenter = class ObjectiveCColonIndenter {
     let numberOfUnclosedBrackets = 0;
     buffer.backwardsScanInRange(
     // Only stop at the key characters: `:[]+-`.
-    /:|\[|]|\+|-/g, _atom.Range.fromObject([startPosition.translate([-NUMBER_OF_PREVIOUS_LINES_TO_SEARCH_FOR_COLONS, 0]), startPosition.translate([0, -1])]), (_ref) => {
-      let match = _ref.match,
-          matchText = _ref.matchText,
-          range = _ref.range,
-          stop = _ref.stop;
-
+    /:|\[|]|\+|-/g, _atom.Range.fromObject([startPosition.translate([-NUMBER_OF_PREVIOUS_LINES_TO_SEARCH_FOR_COLONS, 0]), startPosition.translate([0, -1])]), ({ match, matchText, range, stop }) => {
       const position = range.start;
       // If we find a key character on the starting line, then the user is
       // typing a single-line method (it doesn't need to be indented).
@@ -157,12 +155,10 @@ let ObjectiveCColonIndenter = class ObjectiveCColonIndenter {
 
       // Keep track of the last colon that we see.
       if (matchText === ':') {
-        column = position.column;
+        ({ column } = position);
       }
     });
     return column;
   }
-};
-
-
-module.exports = ObjectiveCColonIndenter;
+}
+exports.default = ObjectiveCColonIndenter;

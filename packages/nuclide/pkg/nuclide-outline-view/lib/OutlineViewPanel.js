@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.OutlineViewPanelState = undefined;
+exports.OutlineViewPanelState = exports.WORKSPACE_VIEW_URI = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -30,7 +21,17 @@ function _load_OutlineView() {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-let OutlineViewPanelState = exports.OutlineViewPanelState = class OutlineViewPanelState {
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/outline-view'; /**
+                                                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                        * All rights reserved.
+                                                                                        *
+                                                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                                                        * the root directory of this source tree.
+                                                                                        *
+                                                                                        * 
+                                                                                        */
+
+class OutlineViewPanelState {
 
   constructor(outlines) {
     this._outlines = outlines;
@@ -49,6 +50,14 @@ let OutlineViewPanelState = exports.OutlineViewPanelState = class OutlineViewPan
     return 300;
   }
 
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
+
+  getDefaultLocation() {
+    return 'right-panel';
+  }
+
   didChangeVisibility(visible) {
     this._visibility.next(visible);
   }
@@ -63,5 +72,5 @@ let OutlineViewPanelState = exports.OutlineViewPanelState = class OutlineViewPan
       deserializer: 'nuclide.OutlineViewPanelState'
     };
   }
-
-};
+}
+exports.OutlineViewPanelState = OutlineViewPanelState;

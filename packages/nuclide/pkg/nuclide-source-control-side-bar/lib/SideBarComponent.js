@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
 
@@ -44,17 +34,25 @@ function _load_RepositorySectionComponent() {
   return _RepositorySectionComponent = _interopRequireDefault(require('./RepositorySectionComponent'));
 }
 
-var _url = _interopRequireDefault(require('url'));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const remote = _electron.default.remote;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const { remote } = _electron.default;
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
 }
 
-let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Component {
+class SideBarComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -68,7 +66,6 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
     this._handleBookmarkClick = this._handleBookmarkClick.bind(this);
     this._handleBookmarkContextMenu = this._handleBookmarkContextMenu.bind(this);
     this._handleRepoGearClick = this._handleRepoGearClick.bind(this);
-    this._handleUncommittedChangesClick = this._handleUncommittedChangesClick.bind(this);
   }
 
   componentDidMount() {
@@ -126,7 +123,7 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
     let panel = this._activeModalPanel;
     if (panel == null) {
       const item = document.createElement('div');
-      panel = this._activeModalPanel = atom.workspace.addModalPanel({ item: item });
+      panel = this._activeModalPanel = atom.workspace.addModalPanel({ item });
     }
 
     _reactForAtom.ReactDOM.render(this.state.activeModalComponent, panel.getItem());
@@ -135,28 +132,24 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
   _handleBookmarkClick(bookmark, repository) {
     this.setState({
       selectedItem: {
-        bookmark: bookmark,
-        repository: repository,
+        bookmark,
+        repository,
         type: 'bookmark'
       }
     });
-    atom.workspace.open(_url.default.format({
-      hostname: 'view',
-      protocol: 'fb-hg-smartlog',
-      query: {
-        repositoryPath: repository.getPath()
-      },
-      slashes: true
-    }));
+    atom.commands.dispatch(atom.views.getView(atom.workspace), 'fb-interactive-smartlog:toggle', { visible: true });
   }
 
   _handleBookmarkContextMenu(bookmark, repository, event) {
+    // Prevent the normal context menu.
+    event.stopPropagation();
+
     const menu = remote.Menu.buildFromTemplate([{
       click: () => {
         this.props.updateToBookmark(bookmark, repository);
       },
       enabled: !bookmark.active,
-      label: `Update to ${ bookmark.bookmark }`
+      label: `Update to ${bookmark.bookmark}`
     }, { type: 'separator' }, {
       click: () => {
         this.setState({
@@ -170,7 +163,7 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
           })
         });
       },
-      label: `Delete ${ bookmark.bookmark }...`
+      label: `Delete ${bookmark.bookmark}...`
     }, {
       click: () => {
         this.setState({
@@ -184,7 +177,7 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
           })
         });
       },
-      label: `Rename ${ bookmark.bookmark }...`
+      label: `Rename ${bookmark.bookmark}...`
     }]);
 
     // Store event position because React cleans up SyntheticEvent objects.
@@ -194,8 +187,8 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
 
     this.setState({
       selectedItem: {
-        bookmark: bookmark,
-        repository: repository,
+        bookmark,
+        repository,
         type: 'bookmark'
       }
     }, () => {
@@ -219,16 +212,6 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
     });
   }
 
-  _handleUncommittedChangesClick(repository) {
-    this.setState({
-      selectedItem: {
-        repository: repository,
-        type: 'uncommitted'
-      }
-    });
-    atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-diff-view:open');
-  }
-
   render() {
     return _reactForAtom.React.createElement(
       'div',
@@ -241,8 +224,10 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
         { className: 'list-unstyled' },
         this.props.projectDirectories.map((directory, index) => {
           const repository = this.props.projectRepositories.get(directory.getPath());
+          const { uncommittedChanges } = this.props;
           const repositoryBookmarksIsLoading = repository == null ? null : this.props.repositoryBookmarksIsLoading.get(repository);
 
+          const uncommittedChangesForDirectory = new Map();
           let bookmarks;
           let selectedItem;
           if (repository != null) {
@@ -250,6 +235,8 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
             if (this.state.selectedItem != null && this.state.selectedItem.repository === repository) {
               selectedItem = this.state.selectedItem;
             }
+
+            uncommittedChangesForDirectory.set(repository.getPath(), uncommittedChanges.get(directory.getPath()) || new Map());
           }
 
           return _reactForAtom.React.createElement((_RepositorySectionComponent || _load_RepositorySectionComponent()).default, {
@@ -260,15 +247,14 @@ let SideBarComponent = class SideBarComponent extends _reactForAtom.React.Compon
             onBookmarkClick: this._handleBookmarkClick,
             onBookmarkContextMenu: this._handleBookmarkContextMenu,
             onRepoGearClick: this._handleRepoGearClick,
-            onUncommittedChangesClick: this._handleUncommittedChangesClick,
             repository: repository,
             selectedItem: selectedItem,
-            title: directory.getBaseName()
+            title: directory.getBaseName(),
+            uncommittedChanges: uncommittedChangesForDirectory
           });
         })
       )
     );
   }
-};
+}
 exports.default = SideBarComponent;
-module.exports = exports['default'];

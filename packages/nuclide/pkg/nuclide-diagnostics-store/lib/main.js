@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -58,7 +49,15 @@ function _load_LinterAdapterFactory() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const legacyLinterSetting = 'nuclide-diagnostics-store.consumeLegacyLinters';
+const legacyLinterSetting = 'nuclide-diagnostics-store.consumeLegacyLinters'; /**
+                                                                               * Copyright (c) 2015-present, Facebook, Inc.
+                                                                               * All rights reserved.
+                                                                               *
+                                                                               * This source code is licensed under the license found in the LICENSE file in
+                                                                               * the root directory of this source tree.
+                                                                               *
+                                                                               * 
+                                                                               */
 
 const legacyLintOnTheFlySetting = 'nuclide-diagnostics-store.legacyLintOnTheFly';
 
@@ -172,7 +171,15 @@ function consumeDiagnosticsProviderV2(provider) {
   const compositeDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   const store = getDiagnosticStore();
 
-  compositeDisposable.add(provider.updates.subscribe(update => store.updateMessages(provider, update)), provider.invalidations.subscribe(invalidation => store.invalidateMessages(provider, invalidation)), () => {
+  compositeDisposable.add(provider.updates.subscribe(update => store.updateMessages(provider, update), error => {
+    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error: updates.subscribe ${error}`);
+  }, () => {
+    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error('updates.subscribe completed');
+  }), provider.invalidations.subscribe(invalidation => store.invalidateMessages(provider, invalidation), error => {
+    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error: invalidations.subscribe ${error}`);
+  }, () => {
+    (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error('invalidations.subscribe completed');
+  }), () => {
     store.invalidateMessages(provider, { scope: 'all' });
   });
 

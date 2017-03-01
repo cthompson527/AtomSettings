@@ -1,12 +1,30 @@
 'use strict';
-'use babel';
 
-/*
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.__test__ = undefined;
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+var _electron = _interopRequireDefault(require('electron'));
+
+var _path = _interopRequireDefault(require('path'));
+
+var _querystring = _interopRequireDefault(require('querystring'));
+
+var _url = _interopRequireDefault(require('url'));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * 
  */
 
 /**
@@ -23,82 +41,9 @@
  * it's possible to directly read the previous application state.
  */
 
-var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+/* global localStorage */
 
-// This function gets called by the Atom package-level URL handler.
-// Normally this is expected to set up the Atom application window.
-let initialize = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* (blobStore) {
-    const currentWindow = remote.getCurrentWindow();
-    try {
-      var _getLoadSettings = getLoadSettings();
-
-      const urlToOpen = _getLoadSettings.urlToOpen;
-
-      var _url$parse = _url.default.parse(urlToOpen);
-
-      const host = _url$parse.host,
-            pathname = _url$parse.pathname,
-            query = _url$parse.query;
-
-      if (!(host === 'nuclide' && pathname != null && pathname !== '')) {
-        throw new Error(`Invalid URL ${ urlToOpen }`);
-      }
-
-      const message = pathname.substr(1);
-      const params = _querystring.default.parse(query || '');
-
-      // Prefer the focused window, but any existing window.
-      const existingWindow = remote.BrowserWindow.getFocusedWindow() || remote.BrowserWindow.getAllWindows().filter(function (x) {
-        return x.id !== currentWindow.id;
-      })[0];
-      if (existingWindow == null) {
-        // Prevent multiple windows from being opened when URIs are opened too quickly.
-        if (!acquireLock()) {
-          throw new Error('Another URI is already being opened.');
-        }
-
-        // Restore the user's previous windows.
-        // The real Atom initialization script will be run in the current window.
-
-
-        restoreWindows(blobStore);
-
-        // Wait for Nuclide to activate (so the event below gets handled).
-        yield new Promise(function (resolve) {
-          atom.packages.onDidActivateInitialPackages(resolve);
-        });
-
-        currentWindow.webContents.send(CHANNEL, { message: message, params: params });
-        releaseLock();
-      } else {
-        existingWindow.webContents.send(CHANNEL, { message: message, params: params });
-        // Atom has various handlers that block window closing.
-        currentWindow.destroy();
-      }
-    } catch (err) {
-      remote.dialog.showErrorBox('Could not open URL', err.stack);
-      releaseLock();
-      currentWindow.destroy();
-    }
-  });
-
-  return function initialize(_x) {
-    return _ref.apply(this, arguments);
-  };
-})();
-
-var _electron = _interopRequireDefault(require('electron'));
-
-var _path = _interopRequireDefault(require('path'));
-
-var _querystring = _interopRequireDefault(require('querystring'));
-
-var _url = _interopRequireDefault(require('url'));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-const remote = _electron.default.remote;
+const { remote } = _electron.default;
 // eslint-disable-next-line nuclide-internal/prefer-nuclide-uri
 
 if (!(remote != null)) {
@@ -107,14 +52,15 @@ if (!(remote != null)) {
 
 const CHANNEL = 'nuclide-url-open';
 
-// https://github.com/atom/atom/blob/master/src/window-load-settings-helpers.coffee
-// We can't use this directly since the resourcePath is specified from loadSettings.
-let loadSettings;
+// See: https://github.com/atom/atom/blob/master/src/get-window-load-settings.js
+let _loadSettings;
 function getLoadSettings() {
-  if (loadSettings === undefined) {
-    loadSettings = JSON.parse(decodeURIComponent(window.location.hash.substr(1)));
+  if (_loadSettings == null) {
+    _loadSettings = remote.getCurrentWindow().loadSettings ||
+    // TODO(hansonw): Remove when Atom 1.15 is deployed.
+    JSON.parse(decodeURIComponent(document.location.hash.substr(1)));
   }
-  return loadSettings;
+  return _loadSettings;
 }
 
 // Contains initialPaths for each previously-running Atom window.
@@ -141,13 +87,15 @@ function restoreWindows(blobStore) {
   const initScript = getAtomInitializerScript();
 
   // Modify some of the load settings to match a real Atom window.
-  window.location.hash = encodeURIComponent(JSON.stringify(Object.assign({}, getLoadSettings(), {
-    // Replace the initialization script so reloading works.
-    windowInitializationScript: initScript,
-    // Inherit the initialPaths from the first state.
-    // We need to set this before initializing Atom to restore the state.
-    initialPaths: windowStates[0] != null && windowStates[0].initialPaths || []
-  })));
+  const loadSettings = getLoadSettings();
+  // Replace the initialization script so reloading works.
+  loadSettings.windowInitializationScript = initScript;
+  // Inherit the initialPaths from the first state.
+  // We need to set this before initializing Atom to restore the state.
+  loadSettings.initialPaths = windowStates[0] != null && windowStates[0].initialPaths || [];
+
+  // TODO(hansonw): Remove when Atom 1.15 is deployed.
+  document.location.hash = encodeURIComponent(JSON.stringify(loadSettings));
 
   // Start up a real Atom instance in the current window.
   // Note that the `atom` global becomes accessible synchronously.
@@ -156,7 +104,7 @@ function restoreWindows(blobStore) {
 
   for (const windowState of windowStates.slice(1)) {
     const initialPaths = windowState.initialPaths || [];
-    atom.open({ initialPaths: initialPaths, pathsToOpen: initialPaths });
+    atom.open({ initialPaths, pathsToOpen: initialPaths, newWindow: true });
   }
 }
 
@@ -166,25 +114,85 @@ const LOCK_TIMEOUT = 10000;
 function acquireLock() {
   // localStorage.set/getItem is not truly atomic, so this is not actually sound.
   // However, it should be fast enough to cover the use case of human clicks.
-  const lockTime = window.localStorage.getItem(LOCK_KEY);
+  const lockTime = localStorage.getItem(LOCK_KEY);
   if (lockTime != null && Date.now() - parseInt(lockTime, 10) < LOCK_TIMEOUT) {
     return false;
   }
-  window.localStorage.setItem(LOCK_KEY, Date.now());
+  localStorage.setItem(LOCK_KEY, String(Date.now()));
   return true;
 }
 
 function releaseLock() {
-  window.localStorage.removeItem(LOCK_KEY);
+  localStorage.removeItem(LOCK_KEY);
 }
 
-module.exports = initialize;
+// This function gets called by the Atom package-level URL handler.
+// Normally this is expected to set up the Atom application window.
+
+exports.default = (() => {
+  var _ref = (0, _asyncToGenerator.default)(function* (blobStore) {
+    const currentWindow = remote.getCurrentWindow();
+    try {
+      const { urlToOpen } = getLoadSettings();
+      const { host, pathname, query } = _url.default.parse(urlToOpen);
+
+      if (!(host === 'nuclide' && pathname != null && pathname !== '')) {
+        throw new Error(`Invalid URL ${urlToOpen}`);
+      }
+
+      const message = pathname.substr(1);
+      const params = _querystring.default.parse(query || '');
+
+      // Prefer the focused window, but any existing window.
+      // The parent window is used for testing only.
+      const existingWindow = currentWindow.getParentWindow() || remote.BrowserWindow.getFocusedWindow() || remote.BrowserWindow.getAllWindows().filter(function (x) {
+        return x.id !== currentWindow.id;
+      })[0];
+      if (existingWindow == null) {
+        // Prevent multiple windows from being opened when URIs are opened too quickly.
+        if (!acquireLock()) {
+          throw new Error('Another URI is already being opened.');
+        }
+
+        // Restore the user's previous windows.
+        // The real Atom initialization script will be run in the current window.
+
+
+        restoreWindows(blobStore);
+
+        // Wait for Nuclide to activate (so the event below gets handled).
+        yield new Promise(function (resolve) {
+          atom.packages.onDidActivateInitialPackages(resolve);
+        });
+
+        currentWindow.webContents.send(CHANNEL, { message, params });
+        releaseLock();
+      } else {
+        existingWindow.webContents.send(CHANNEL, { message, params });
+        // Atom has various handlers that block window closing.
+        currentWindow.destroy();
+      }
+    } catch (err) {
+      remote.dialog.showErrorBox('Could not open URL', err.stack);
+      releaseLock();
+      currentWindow.destroy();
+    }
+  });
+
+  function initialize(_x) {
+    return _ref.apply(this, arguments);
+  }
+
+  return initialize;
+})();
 
 // Exported for testing.
-module.exports.__test__ = {
-  getLoadSettings: getLoadSettings,
-  getApplicationState: getApplicationState,
-  getAtomInitializerScript: getAtomInitializerScript,
-  acquireLock: acquireLock,
-  releaseLock: releaseLock
+
+
+const __test__ = exports.__test__ = {
+  getLoadSettings,
+  getApplicationState,
+  getAtomInitializerScript,
+  acquireLock,
+  releaseLock
 };

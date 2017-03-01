@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -64,7 +55,17 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let LLDBLaunchAttachProvider = exports.LLDBLaunchAttachProvider = class LLDBLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class LLDBLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
 
   constructor(debuggingTypeName, targetUri) {
     super(debuggingTypeName, targetUri);
@@ -76,7 +77,7 @@ let LLDBLaunchAttachProvider = exports.LLDBLaunchAttachProvider = class LLDBLaun
     this._loadAction(_AttachActionUIProvider || _load_AttachActionUIProvider());
     this._loadAction(_LaunchActionUIProvider || _load_LaunchActionUIProvider());
     try {
-      // $FBFlow
+      // $FlowFB
       this._loadAction(require('./actions/fb-omActionUIProvider'));
     } catch (_) {}
   }
@@ -112,4 +113,5 @@ let LLDBLaunchAttachProvider = exports.LLDBLaunchAttachProvider = class LLDBLaun
     this._store.dispose();
     this._actions.dispose();
   }
-};
+}
+exports.LLDBLaunchAttachProvider = LLDBLaunchAttachProvider;

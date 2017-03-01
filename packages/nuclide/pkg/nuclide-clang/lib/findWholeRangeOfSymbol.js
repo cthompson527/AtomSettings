@@ -1,13 +1,9 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = findWholeRangeOfSymbol;
 
 var _atom = require('atom');
 
@@ -31,6 +27,16 @@ const OBJC_SELECTOR_NAME_REGEX = /([^\s:]+:)+$/g;
  * @param extent The 'extent' of the symbol, as returned by libclang's Cursor.extent.
  * @return The true range of the symbol, which may extend beyond the `text` word.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function findWholeRangeOfSymbol(textEditor, text, textRange, spelling, extent) {
   if (!spelling || text === spelling) {
     return [textRange];
@@ -48,13 +54,7 @@ function findWholeRangeOfSymbol(textEditor, text, textRange, spelling, extent) {
     const ranges = [];
 
     const selectorSegments = spelling.split(':');
-    const iterator = (_ref) => {
-      let match = _ref.match,
-          matchText = _ref.matchText,
-          range = _ref.range,
-          stop = _ref.stop,
-          replace = _ref.replace;
-
+    const iterator = ({ match, matchText, range, stop, replace }) => {
       if (!matchText) {
         return;
       }
@@ -81,5 +81,3 @@ function findWholeRangeOfSymbol(textEditor, text, textRange, spelling, extent) {
     return [textRange];
   }
 }
-
-module.exports = findWholeRangeOfSymbol;

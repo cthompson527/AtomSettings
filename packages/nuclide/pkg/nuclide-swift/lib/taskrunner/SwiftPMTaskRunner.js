@@ -1,22 +1,13 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.SwiftPMTaskRunner = undefined;
 
-var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _atom = require('atom');
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 var _reactForAtom = require('react-for-atom');
 
@@ -36,6 +27,12 @@ var _process;
 
 function _load_process() {
   return _process = require('../../../commons-node/process');
+}
+
+var _event;
+
+function _load_event() {
+  return _event = require('../../../commons-node/event');
 }
 
 var _tasks;
@@ -86,10 +83,22 @@ function _load_SwiftPMAutocompletionProvider() {
   return _SwiftPMAutocompletionProvider = _interopRequireDefault(require('./providers/SwiftPMAutocompletionProvider'));
 }
 
-var _SwiftIcon;
+var _Icon;
 
-function _load_SwiftIcon() {
-  return _SwiftIcon = require('../ui/SwiftIcon');
+function _load_Icon() {
+  return _Icon = require('../../../nuclide-ui/Icon');
+}
+
+var _nullthrows;
+
+function _load_nullthrows() {
+  return _nullthrows = _interopRequireDefault(require('nullthrows'));
+}
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../../commons-node/nuclideUri.js'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -112,14 +121,25 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Actions are routed to the store via a Flux.Dispatcher (instantiated by
  * SwiftPMTaskRunner).
  */
-let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class SwiftPMTaskRunner {
 
   constructor(initialState) {
     this.id = 'swiftpm';
     this.name = 'Swift';
     this._initialState = initialState;
     this._outputMessages = new _rxjsBundlesRxMinJs.Subject();
-    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._outputMessages);
+    this._projectRoot = new _rxjsBundlesRxMinJs.Subject();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(this._outputMessages, this._projectRoot.subscribe(path => this._getFlux().actions.updateProjectRoot(path)));
   }
 
   dispose() {
@@ -131,35 +151,24 @@ let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
   }
 
   getExtraUi() {
-    var _getFlux = this._getFlux();
-
-    const store = _getFlux.store,
-          actions = _getFlux.actions;
-
+    const { store, actions } = this._getFlux();
     return class ExtraUi extends _reactForAtom.React.Component {
-
       render() {
         return _reactForAtom.React.createElement((_SwiftPMTaskRunnerToolbar || _load_SwiftPMTaskRunnerToolbar()).default, {
           store: store,
-          actions: actions,
-          activeTaskType: this.props.activeTaskType
+          actions: actions
         });
       }
     };
   }
 
-  observeTaskList(callback) {
-    callback((_SwiftPMTaskRunnerTaskMetadata || _load_SwiftPMTaskRunnerTaskMetadata()).SwiftPMTaskRunnerTaskMetadata);
-    return new _atom.Disposable();
-  }
-
   getIcon() {
-    return (_SwiftIcon || _load_SwiftIcon()).SwiftIcon;
+    return () => _reactForAtom.React.createElement((_Icon || _load_Icon()).Icon, { icon: 'nuclicon-swift', className: 'nuclide-swift-task-runner-icon' });
   }
 
   runTask(taskName) {
     const store = this._getFlux().store;
-    const chdir = store.getChdir();
+    const chdir = (0, (_nullthrows || _load_nullthrows()).default)(store.getProjectRoot());
     const configuration = store.getConfiguration();
     const buildPath = store.getBuildPath();
 
@@ -172,11 +181,11 @@ let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
         command = (0, (_SwiftPMTaskRunnerCommands || _load_SwiftPMTaskRunnerCommands()).testCommand)(chdir, buildPath);
         break;
       default:
-        throw new Error(`Unknown task name: ${ taskName }`);
+        throw new Error(`Unknown task name: ${taskName}`);
     }
 
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-console:toggle', { visible: true });
-    this._logOutput(`${ command.command } ${ command.args.join(' ') }`, 'log');
+    this._logOutput(`${command.command} ${command.args.join(' ')}`, 'log');
 
     const observable = (0, (_process || _load_process()).observeProcess)(() => (0, (_process || _load_process()).safeSpawn)(command.command, command.args)).do(message => {
       switch (message.kind) {
@@ -186,10 +195,10 @@ let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
           break;
         case 'exit':
           if (message.exitCode === 0) {
-            this._logOutput(`${ command.command } exited successfully.`, 'success');
+            this._logOutput(`${command.command} exited successfully.`, 'success');
             this._getFlux().actions.updateCompileCommands(chdir, configuration, buildPath);
           } else {
-            this._logOutput(`${ command.command } failed with ${ (0, (_process || _load_process()).exitEventToMessage)(message) }`, 'error');
+            this._logOutput(`${command.command} failed with ${(0, (_process || _load_process()).exitEventToMessage)(message)}`, 'error');
           }
           break;
         default:
@@ -217,19 +226,35 @@ let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
     return this._outputMessages;
   }
 
-  setProjectRoot(projectRoot) {
-    if (projectRoot) {
-      const path = projectRoot.getPath();
-      (_fsPromise || _load_fsPromise()).default.exists(`${ path }/Package.swift`).then(fileExists => {
-        if (fileExists) {
-          this._getFlux().actions.updateChdir(path);
-        }
-      });
-    }
+  setProjectRoot(projectRoot, callback) {
+    const path = projectRoot == null ? null : projectRoot.getPath();
+
+    const storeReady = (0, (_event || _load_event()).observableFromSubscribeFunction)(this._getFlux().store.subscribe.bind(this._getFlux().store)).map(() => this._getFlux().store).startWith(this._getFlux().store).filter(store => store.getProjectRoot() === path).share();
+
+    const enabledObservable = storeReady.map(store => store.getProjectRoot()).distinctUntilChanged().switchMap(root => {
+      if (!root || (_nuclideUri || _load_nuclideUri()).default.isRemote(root)) {
+        return _rxjsBundlesRxMinJs.Observable.of(false);
+      }
+      return this._packageFileExistsAtPath(root);
+    }).distinctUntilChanged();
+
+    const tasksObservable = storeReady.map(store => (_SwiftPMTaskRunnerTaskMetadata || _load_SwiftPMTaskRunnerTaskMetadata()).SwiftPMTaskRunnerTaskMetadata);
+
+    const subscription = _rxjsBundlesRxMinJs.Observable.combineLatest(enabledObservable, tasksObservable).subscribe(([enabled, tasks]) => callback(enabled, tasks));
+
+    this._projectRoot.next(path);
+
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(subscription);
+  }
+
+  _packageFileExistsAtPath(path) {
+    return (0, _asyncToGenerator.default)(function* () {
+      return (_fsPromise || _load_fsPromise()).default.exists((_nuclideUri || _load_nuclideUri()).default.join(path, 'Package.swift'));
+    })();
   }
 
   _logOutput(text, level) {
-    this._outputMessages.next({ text: text, level: level });
+    this._outputMessages.next({ text, level });
   }
 
   _getFlux() {
@@ -238,8 +263,9 @@ let SwiftPMTaskRunner = exports.SwiftPMTaskRunner = class SwiftPMTaskRunner {
       const store = new (_SwiftPMTaskRunnerStore || _load_SwiftPMTaskRunnerStore()).default(dispatcher, this._initialState);
       this._disposables.add(store);
       const actions = new (_SwiftPMTaskRunnerActions || _load_SwiftPMTaskRunnerActions()).default(dispatcher);
-      this._flux = { store: store, actions: actions };
+      this._flux = { store, actions };
     }
     return this._flux;
   }
-};
+}
+exports.SwiftPMTaskRunner = SwiftPMTaskRunner;

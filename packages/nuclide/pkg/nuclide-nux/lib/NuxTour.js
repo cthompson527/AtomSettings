@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,17 @@ function _load_NuxView() {
   return _NuxView = require('./NuxView');
 }
 
-let NuxTour = exports.NuxTour = class NuxTour {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class NuxTour {
 
   constructor(id, name, nuxList, trigger, gatekeeperID) {
     if (nuxList == null || nuxList.length < 1) {
@@ -70,9 +71,7 @@ let NuxTour = exports.NuxTour = class NuxTour {
    * If marked as completed, it will not be shown again.
    * To be used when the user dismisses the NUX and doesn't want to see it again.
    */
-  forceEnd() {
-    let shouldMarkAsCompleted = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
+  forceEnd(shouldMarkAsCompleted = false) {
     if (shouldMarkAsCompleted) {
       this._track(true, 'NuxTour was dismissed by the user.');
     } else {
@@ -99,24 +98,19 @@ let NuxTour = exports.NuxTour = class NuxTour {
     }
   }
 
-  _onNuxComplete() {
-    let completionSuccesful = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
+  _onNuxComplete(completionSuccesful = true) {
     this._track(completionSuccesful);
     if (this._callback != null) {
       this._callback();
     }
   }
 
-  _track() {
-    let completed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-    let error = arguments[1];
-
+  _track(completed = false, error) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nux-tour-action', {
       tourId: this._id,
       tourName: this._name,
-      step: `${ this._currentStep + 1 }/${ this._nuxList.length + 1 }`,
-      completed: `${ completed.toString() }`,
+      step: `${this._currentStep + 1}/${this._nuxList.length + 1}`,
+      completed: `${completed.toString()}`,
       error: (0, (_string || _load_string()).maybeToString)(error)
     });
   }
@@ -140,4 +134,5 @@ let NuxTour = exports.NuxTour = class NuxTour {
   getName() {
     return this._name;
   }
-};
+}
+exports.NuxTour = NuxTour;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -30,9 +21,8 @@ exports.track = track;
 exports.trackImmediate = trackImmediate;
 exports.trackEvent = trackEvent;
 exports.trackEvents = trackEvents;
-exports.trackTiming = trackTiming;
 exports.startTracking = startTracking;
-exports.trackOperationTiming = trackOperationTiming;
+exports.trackTiming = trackTiming;
 
 var _UniversalDisposable;
 
@@ -46,10 +36,10 @@ function _load_promise() {
   return _promise = require('../../commons-node/promise');
 }
 
-var _string;
+var _performanceNow;
 
-function _load_string() {
-  return _string = require('../../commons-node/string');
+function _load_performanceNow() {
+  return _performanceNow = _interopRequireDefault(require('../../commons-node/performanceNow'));
 }
 
 var _track;
@@ -94,64 +84,13 @@ function trackEvents(events) {
   return new (_UniversalDisposable || _load_UniversalDisposable()).default(events.subscribe(trackEvent));
 }
 
-/**
- * A decorator factory (https://github.com/wycats/javascript-decorators) who measures the execution
- * time of an asynchronous/synchronous function which belongs to either a Class or an Object.
- * Usage:
- *
- * ```
- * Class Test{
- *   @trackTiming()
- *   foo(...) {...}
- *
- *   @trackTiming()
- *   bar(...): Promise {...}
- * }
- *
- * const obj = {
- *   @trackTiming('fooEvent')
- *   foo(...) {...}
- * }
- * ```
- *
- * @param eventName Name of the event to be tracked. It's optional and default value is
- *    `$className.$methodName` for Class method or `Object.$methodName` for Object method.
- * @returns A decorator.
- */
-function trackTiming() {
-  let eventName_ = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-
-  let eventName = eventName_;
-
-  return (target, name, descriptor) => {
-    const originalMethod = descriptor.value;
-
-    // We can't use arrow function here as it will bind `this` to the context of enclosing function
-    // which is trackTiming, whereas what needed is context of originalMethod.
-    descriptor.value = function () {
-      for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-        args[_key] = arguments[_key];
-      }
-
-      if (!eventName) {
-        const constructorName = this.constructor ? this.constructor.name : undefined;
-        eventName = `${ (0, (_string || _load_string()).maybeToString)(constructorName) }.${ name }`;
-      }
-
-      return trackOperationTiming(eventName,
-      // Must use arrow here to get correct 'this'
-      () => originalMethod.apply(this, args));
-    };
-  };
-}
-
 const PERFORMANCE_EVENT = 'performance';
 
-let TimingTracker = exports.TimingTracker = class TimingTracker {
+class TimingTracker {
 
   constructor(eventName) {
     this._eventName = eventName;
-    this._startTime = this._getTimestamp();
+    this._startTime = (0, (_performanceNow || _load_performanceNow()).default)();
   }
 
   onError(error) {
@@ -164,18 +103,15 @@ let TimingTracker = exports.TimingTracker = class TimingTracker {
 
   _trackTimingEvent(exception) {
     track(PERFORMANCE_EVENT, {
-      duration: (this._getTimestamp() - this._startTime).toString(),
+      duration: Math.round((0, (_performanceNow || _load_performanceNow()).default)() - this._startTime).toString(),
       eventName: this._eventName,
       error: exception ? '1' : '0',
       exception: exception ? exception.toString() : ''
     });
   }
+}
 
-  // Obtain a monotonically increasing timestamp in milliseconds.
-  _getTimestamp() {
-    return Math.round(process.uptime() * 1000);
-  }
-};
+exports.TimingTracker = TimingTracker;
 function startTracking(eventName) {
   return new TimingTracker(eventName);
 }
@@ -185,11 +121,11 @@ function startTracking(eventName) {
  *
  * Usage:
  *
- * analytics.trackOperationTiming('my-package-some-long-operation' () => doit());
+ * analytics.trackTiming('my-package-some-long-operation' () => doit());
  *
  * Returns (or throws) the result of the operation.
  */
-function trackOperationTiming(eventName, operation) {
+function trackTiming(eventName, operation) {
   const tracker = startTracking(eventName);
 
   try {

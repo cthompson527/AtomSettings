@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _debounce;
 
@@ -26,10 +16,20 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 
 // TODO use maps
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const MAX_CACHED_QUERIES = 100;
 const CACHE_CLEAN_DEBOUNCE_DELAY = 5000;
 
-let ResultCache = class ResultCache {
+class ResultCache {
   // List of most recently used query strings, used for pruning the result cache.
   // Makes use of `Map`'s insertion ordering, so values are irrelevant and always set to `null`.
   constructor(onResultsChanged) {
@@ -53,15 +53,12 @@ let ResultCache = class ResultCache {
     this._lastCachedQuery.delete(providerName);
   }
 
-  setCacheResult(providerName, directory, query, results) {
-    let loading = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
-    let error = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
-
+  setCacheResult(providerName, directory, query, results, loading = false, error = null) {
     this._ensureCacheEntry(providerName, directory);
     this._cachedResults[providerName][directory][query] = {
-      results: results,
-      loading: loading,
-      error: error
+      results,
+      loading,
+      error
     };
     this._lastCachedQuery.set(providerName, query);
     // Refresh the usage for the current query.
@@ -132,6 +129,5 @@ let ResultCache = class ResultCache {
     }
     this._onResultsChanged();
   }
-};
+}
 exports.default = ResultCache;
-module.exports = exports['default'];

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -32,6 +22,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // TODO: This probably won't work on Windows, but we'll worry about that
 // when Watchman officially supports Windows.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const S_IFDIR = 16384;
 
 /**
@@ -40,7 +40,7 @@ const S_IFDIR = 16384;
  * This class currently relies on the Nuclide WatchmanClient, which requires fb-watchman.
  */
 // TODO (t7298196) Investigate falling back to Node watchers.
-let PathSetUpdater = class PathSetUpdater {
+class PathSetUpdater {
 
   constructor() {
     this._pathSetToSubscription = new Map();
@@ -106,7 +106,7 @@ let PathSetUpdater = class PathSetUpdater {
         throw new Error('Invariant violation: "this._watchmanClient"');
       }
 
-      return yield _this2._watchmanClient.watchDirectoryRecursive(localDirectory);
+      return _this2._watchmanClient.watchDirectoryRecursive(localDirectory);
     })();
   }
 
@@ -161,7 +161,5 @@ let PathSetUpdater = class PathSetUpdater {
       pathSet.removePaths(deletedPaths);
     }
   }
-
-};
+}
 exports.default = PathSetUpdater;
-module.exports = exports['default'];

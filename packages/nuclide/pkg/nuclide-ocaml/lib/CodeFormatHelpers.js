@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -27,10 +18,9 @@ let formatImpl = (() => {
     const syntaxArg = editor.getGrammar().name === 'Reason' ? 're' : 'ml';
     // Pass the flags here rather than in the service, so that we pick no the
     // extra flags in the (client side) refmtFlags
-    const flags = [
     // We pipe the current editor buffer into refmt rather than passing the path
     // because the editor buffer might not have been saved to disk.
-    '-use-stdin', 'true', '-parse', syntaxArg, '-print', syntaxArg, '-is-interface-pp', isInterfaceF(path) ? 'true' : 'false', ...getRefmtFlags()];
+    const flags = ['--parse', syntaxArg, '--print', syntaxArg, '--interface', isInterfaceF(path) ? 'true' : 'false', ...getRefmtFlags()];
     return instance.format(editor.getText(), flags);
   });
 
@@ -87,8 +77,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function isInterfaceF(filePath) {
   const ext = (_nuclideUri || _load_nuclideUri()).default.extname(filePath);
-  return ext === 'rei' || ext === 'mli';
-}
+  return ext === '.rei' || ext === '.mli';
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 function getRefmtFlags() {
   const configVal = (_featureConfig || _load_featureConfig()).default.get('nuclide-ocaml.refmtFlags') || '';

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -34,7 +25,17 @@ function _load_AttachUiComponent() {
   return _AttachUiComponent = require('./AttachUiComponent');
 }
 
-let HhvmLaunchAttachProvider = exports.HhvmLaunchAttachProvider = class HhvmLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class HhvmLaunchAttachProvider extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachProvider {
   constructor(debuggingTypeName, targetUri) {
     super(debuggingTypeName, targetUri);
   }
@@ -62,4 +63,5 @@ let HhvmLaunchAttachProvider = exports.HhvmLaunchAttachProvider = class HhvmLaun
   }
 
   dispose() {}
-};
+}
+exports.HhvmLaunchAttachProvider = HhvmLaunchAttachProvider;

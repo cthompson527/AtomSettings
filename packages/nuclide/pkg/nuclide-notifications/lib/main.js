@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,7 +19,17 @@ function _load_featureConfig() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const remote = _electron.default.remote;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const { remote } = _electron.default;
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
@@ -50,7 +51,7 @@ function proxyToNativeNotification(notification) {
     return;
   }
 
-  raiseNativeNotification(`${ upperCaseFirst(notification.getType()) }: ${ notification.getMessage() }`, options.detail);
+  raiseNativeNotification(`${upperCaseFirst(notification.getType())}: ${notification.getMessage()}`, options.detail);
 }
 
 function raiseNativeNotification(title, body) {
@@ -60,7 +61,7 @@ function raiseNativeNotification(title, body) {
 
   // eslint-disable-next-line no-new, no-undef
   new Notification(title, {
-    body: body,
+    body,
     icon: 'atom://nuclide/pkg/nuclide-notifications/notification.png'
   });
 }
@@ -75,5 +76,5 @@ function deactivate() {
 }
 
 function upperCaseFirst(str) {
-  return `${ str[0].toUpperCase() }${ str.slice(1) }`;
+  return `${str[0].toUpperCase()}${str.slice(1)}`;
 }

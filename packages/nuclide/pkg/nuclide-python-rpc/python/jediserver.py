@@ -53,7 +53,7 @@ class JediServer:
                 self.src.startswith(WORKING_DIR)]
 
     def generate_log_name(self, value):
-        hash = hashlib.md5(value).hexdigest()[:10]
+        hash = hashlib.md5(value.encode('utf-8')).hexdigest()[:10]
         return os.path.basename(value) + '-' + hash + '.log'
 
     def init_logging(self):
@@ -75,7 +75,7 @@ class JediServer:
         req = json.loads(line)
         id, data = req['id'], req['args']
         method = req['method']
-        res = {'type': 'response', 'id': id}
+        res = {'protocol': 'python_language_service', 'type': 'response', 'id': id}
 
         try:
             if method == 'get_completions':

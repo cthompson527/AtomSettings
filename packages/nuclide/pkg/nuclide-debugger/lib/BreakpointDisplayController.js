@@ -1,15 +1,14 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _mouseToPosition;
+
+function _load_mouseToPosition() {
+  return _mouseToPosition = require('../../commons-atom/mouse-to-position');
+}
 
 var _UniversalDisposable;
 
@@ -19,8 +18,11 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const DIFF_VIEW_NAVIGATION_TARGET = 'nuclide-diff-view-navigation-target';
-const DIFF_VIEW_NAVIGATION_BAR = 'nuclide-diff-view-navigation-bar';
+/**
+ * Handles displaying breakpoints and processing events for a single text
+ * editor.
+ */
+
 
 /**
  * A single delegate which handles events from the object.
@@ -29,13 +31,7 @@ const DIFF_VIEW_NAVIGATION_BAR = 'nuclide-diff-view-navigation-bar';
  * there's less messy bookkeeping regarding lifetimes of the unregister
  * Disposable objects.
  */
-
-
-/**
- * Handles displaying breakpoints and processing events for a single text
- * editor.
- */
-let BreakpointDisplayController = class BreakpointDisplayController {
+class BreakpointDisplayController {
 
   constructor(delegate, breakpointStore, editor, debuggerActions) {
     this._delegate = delegate;
@@ -60,6 +56,9 @@ let BreakpointDisplayController = class BreakpointDisplayController {
 
   _registerGutterMouseHandlers(gutter) {
     const gutterView = atom.views.getView(gutter);
+    if (gutter.name !== 'line-number' && gutter.name !== 'nuclide-breakpoint') {
+      return;
+    }
     const boundClickHandler = this._handleGutterClick.bind(this);
     const boundMouseMoveHandler = this._handleGutterMouseMove.bind(this);
     const boundMouseLeaveHandler = this._handleGutterMouseLeave.bind(this);
@@ -125,11 +124,7 @@ let BreakpointDisplayController = class BreakpointDisplayController {
     });
 
     // Add new markers for breakpoints without corresponding markers.
-    for (const _ref of breakpoints) {
-      var _ref2 = _slicedToArray(_ref, 1);
-
-      const line = _ref2[0];
-
+    for (const [line] of breakpoints) {
       if (!unhandledLines.has(line)) {
         // This line has been handled.
         continue;
@@ -166,13 +161,9 @@ let BreakpointDisplayController = class BreakpointDisplayController {
   }
 
   _handleGutterClick(event) {
-    // Filter out clicks to the folding chevron.
-    const FOLDING_CHEVRON_CLASS_NAME = 'icon-right';
-    const BLAME_HASH_CLICKABLE_CLASS_NAME = 'nuclide-blame-hash-clickable';
     // classList isn't in the defs of EventTarget...
     const target = event.target;
-    const ignoreClickClassNames = [FOLDING_CHEVRON_CLASS_NAME, BLAME_HASH_CLICKABLE_CLASS_NAME, DIFF_VIEW_NAVIGATION_TARGET];
-    if (ignoreClickClassNames.some(className => target.classList.contains(className))) {
+    if (target.classList.contains('icon-right')) {
       return;
     }
 
@@ -184,19 +175,14 @@ let BreakpointDisplayController = class BreakpointDisplayController {
   }
 
   _getCurrentMouseEventLine(event) {
-    // Beware, screenPositionForMouseEvent is not a public api and may change in future versions.
     // $FlowIssue
-    const screenPos = atom.views.getView(this._editor).component.screenPositionForMouseEvent(event);
-    const bufferPos = this._editor.bufferPositionForScreenPosition(screenPos);
+    const bufferPos = (0, (_mouseToPosition || _load_mouseToPosition()).bufferPositionForMouseEvent)(event, this._editor);
     return bufferPos.row;
   }
 
   _handleGutterMouseMove(event) {
     const curLine = this._getCurrentMouseEventLine(event);
-    // classList isn't in the defs of EventTarget...
-    const target = event.target;
-    const ignoreMouseMoveClassNames = [DIFF_VIEW_NAVIGATION_TARGET, DIFF_VIEW_NAVIGATION_BAR];
-    if (this._isLineOverLastShadowBreakpoint(curLine) || ignoreMouseMoveClassNames.some(className => target.classList.contains(className))) {
+    if (this._isLineOverLastShadowBreakpoint(curLine)) {
       return;
     }
     // User moves to a new line we need to delete the old shadow breakpoint
@@ -229,7 +215,7 @@ let BreakpointDisplayController = class BreakpointDisplayController {
     const marker = this._editor.markBufferPosition([line, 0], {
       invalidate: 'never'
     });
-    const elem = document.createElement('a');
+    const elem = document.createElement('span');
     elem.className = isShadow ? 'nuclide-debugger-shadow-breakpoint-icon' : 'nuclide-debugger-breakpoint-icon';
 
     if (!(this._gutter != null)) {
@@ -239,7 +225,13 @@ let BreakpointDisplayController = class BreakpointDisplayController {
     this._gutter.decorateMarker(marker, { item: elem });
     return marker;
   }
-};
-
-
-module.exports = BreakpointDisplayController;
+}
+exports.default = BreakpointDisplayController; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */

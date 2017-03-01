@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,18 +9,26 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getHackRoot = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (filePath) {
-    return yield (_fsPromise || _load_fsPromise()).default.findNearestFile('.hhconfig', filePath);
+    return (_fsPromise || _load_fsPromise()).default.findNearestFile('.hhconfig', filePath);
   });
 
   return function getHackRoot(_x) {
     return _ref.apply(this, arguments);
   };
-})();
+})(); /**
+       * Copyright (c) 2015-present, Facebook, Inc.
+       * All rights reserved.
+       *
+       * This source code is licensed under the license found in the LICENSE file in
+       * the root directory of this source tree.
+       *
+       * 
+       */
 
 let setRootDirectoryUri = exports.setRootDirectoryUri = (() => {
   var _ref2 = (0, _asyncToGenerator.default)(function* (directoryUri) {
     const hackRootDirectory = yield getHackRoot(directoryUri);
-    (_utils || _load_utils()).default.log(`setRootDirectoryUri: from ${ directoryUri } to ${ (0, (_string || _load_string()).maybeToString)(hackRootDirectory) }`);
+    (_utils || _load_utils()).default.log(`setRootDirectoryUri: from ${directoryUri} to ${(0, (_string || _load_string()).maybeToString)(hackRootDirectory)}`);
     // TODO: make xdebug_includes.php path configurable from hhconfig.
     const hackDummyRequestFilePath = (_nuclideUri || _load_nuclideUri()).default.join(hackRootDirectory ? hackRootDirectory : '', '/scripts/xdebug_includes.php');
 
@@ -102,20 +101,15 @@ function failConnection(socket, errorMessage) {
   socket.destroy();
 }
 
-function isCorrectConnection(message) {
-  var _getConfig = (0, (_config || _load_config()).getConfig)();
-
-  const pid = _getConfig.pid,
-        idekeyRegex = _getConfig.idekeyRegex,
-        scriptRegex = _getConfig.scriptRegex;
-
+function isCorrectConnection(isAttachConnection, message) {
+  const { pid, idekeyRegex, attachScriptRegex, launchScriptPath } = (0, (_config || _load_config()).getConfig)();
   if (!message || !message.init || !message.init.$) {
     (_utils || _load_utils()).default.logError('Incorrect init');
     return false;
   }
 
   const init = message.init;
-  if (!init.engine || !init.engine || !init.engine[0] || init.engine[0]._ !== 'xdebug') {
+  if (!init.engine || !init.engine || !init.engine[0] || init.engine[0]._.toLowerCase() !== 'xdebug') {
     (_utils || _load_utils()).default.logError('Incorrect engine');
     return false;
   }
@@ -126,5 +120,26 @@ function isCorrectConnection(message) {
     return false;
   }
 
-  return (!pid || attributes.appid === String(pid)) && (!idekeyRegex || new RegExp(idekeyRegex).test(attributes.idekey)) && (!scriptRegex || new RegExp(scriptRegex).test((0, (_helpers || _load_helpers()).uriToPath)(attributes.fileuri)));
+  if (isDummyConnection(message)) {
+    return true;
+  }
+
+  // Reject connections via the launch port when attached.
+  if ((0, (_helpers || _load_helpers()).getMode)() === 'attach' && !isAttachConnection) {
+    return false;
+  }
+
+  const requestScriptPath = (0, (_helpers || _load_helpers()).uriToPath)(attributes.fileuri);
+  if ((0, (_helpers || _load_helpers()).getMode)() === 'launch') {
+    // TODO: Pass arguments separately from script path so this check can be simpler.
+    if (!(launchScriptPath != null)) {
+      throw new Error('Null launchScriptPath in launch mode');
+    }
+
+    return (0, (_string || _load_string()).shellParse)(launchScriptPath)[0] === requestScriptPath;
+  }
+
+  // The regex is only applied to connections coming in during attach mode.  We do not use the
+  // regex for launching.
+  return (!pid || attributes.appid === String(pid)) && (!idekeyRegex || new RegExp(idekeyRegex).test(attributes.idekey)) && (!attachScriptRegex || new RegExp(attachScriptRegex).test(requestScriptPath));
 }

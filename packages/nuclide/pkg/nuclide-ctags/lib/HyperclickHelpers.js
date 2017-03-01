@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -42,6 +32,16 @@ function _load_utils() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const LIMIT = 100;
 const QUALIFYING_FIELDS = ['class', 'namespace', 'struct', 'enum', 'Module'];
 
@@ -64,8 +64,7 @@ function commonPrefixLength(a, b) {
   return i;
 }
 
-let HyperclickHelpers = class HyperclickHelpers {
-
+class HyperclickHelpers {
   static getSuggestionForWord(textEditor, text, range) {
     return (0, _asyncToGenerator.default)(function* () {
       const path = textEditor.getPath();
@@ -73,12 +72,7 @@ let HyperclickHelpers = class HyperclickHelpers {
         return null;
       }
 
-      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('CtagsService', path);
-
-      if (!service) {
-        throw new Error('Invariant violation: "service"');
-      }
-
+      const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getCtagsServiceByNuclideUri)(path);
       const ctagsService = yield service.getCtagsService(path);
 
       if (ctagsService == null) {
@@ -92,14 +86,11 @@ let HyperclickHelpers = class HyperclickHelpers {
         }
 
         if (tags.length === 1) {
-          return { range: range, callback: createCallback(tags[0]) };
+          return { range, callback: createCallback(tags[0]) };
         }
 
         // Favor tags in the nearest directory by sorting by common prefix length.
-        tags.sort(function (_ref2, _ref3) {
-          let a = _ref2.file;
-          let b = _ref3.file;
-
+        tags.sort(function ({ file: a }, { file: b }) {
           const len = commonPrefixLength(path, b) - commonPrefixLength(path, a);
           if (len === 0) {
             return a.localeCompare(b);
@@ -109,14 +100,11 @@ let HyperclickHelpers = class HyperclickHelpers {
 
         const tagsDir = (_nuclideUri || _load_nuclideUri()).default.dirname((yield ctagsService.getTagsPath()));
         return {
-          range: range,
+          range,
           callback: tags.map(function (tag) {
-            const file = tag.file,
-                  fields = tag.fields,
-                  kind = tag.kind;
-
+            const { file, fields, kind } = tag;
             const relpath = (_nuclideUri || _load_nuclideUri()).default.relative(tagsDir, file);
-            let title = `${ tag.name } (${ relpath })`;
+            let title = `${tag.name} (${relpath})`;
             if (fields != null) {
               // Python uses a.b.c; most other langauges use a::b::c.
               // There are definitely other cases, but it's not a big issue.
@@ -133,7 +121,7 @@ let HyperclickHelpers = class HyperclickHelpers {
               title = (_utils || _load_utils()).CTAGS_KIND_NAMES[kind] + ' ' + title;
             }
             return {
-              title: title,
+              title,
               callback: createCallback(tag)
             };
           })
@@ -143,7 +131,5 @@ let HyperclickHelpers = class HyperclickHelpers {
       }
     })();
   }
-
-};
+}
 exports.default = HyperclickHelpers;
-module.exports = exports['default'];

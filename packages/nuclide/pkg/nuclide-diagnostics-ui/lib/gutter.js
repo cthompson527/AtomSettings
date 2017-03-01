@@ -1,21 +1,17 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
 exports.applyUpdateToEditor = applyUpdateToEditor;
+
+var _classnames;
+
+function _load_classnames() {
+  return _classnames = _interopRequireDefault(require('classnames'));
+}
+
+var _atom = require('atom');
 
 var _reactForAtom = require('react-for-atom');
 
@@ -37,9 +33,21 @@ function _load_DiagnosticsPopup() {
   return _DiagnosticsPopup = require('./DiagnosticsPopup');
 }
 
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 const GUTTER_ID = 'nuclide-diagnostics-gutter';
 
 // Needs to be the same as glyph-height in gutter.atom-text-editor.less.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const GLYPH_HEIGHT = 15; // px
 
 const POPUP_DISPOSE_TIMEOUT = 100;
@@ -109,52 +117,66 @@ function applyUpdateToEditor(editor, update, fixer) {
 
   for (const message of update.messages) {
     const range = message.range;
+
+    const highlightCssClass = (0, (_classnames || _load_classnames()).default)(HIGHLIGHT_CSS, message.type === 'Error' ? ERROR_HIGHLIGHT_CSS : WARNING_HIGHLIGHT_CSS);
+
     let highlightMarker;
     if (range) {
       addMessageForRow(message, range.start.row);
-      highlightMarker = editor.markBufferRange(range);
+
+      // There is no API in Atom to say: I want to put an underline on all the
+      // lines in this range. The closest is "highlight" which splits your range
+      // into three boxes: the part of the first line, all the lines in between
+      // and the part of the last line.
+      //
+      // This means that some lines in the middle are going to be dropped and
+      // they are going to extend all the way to the right of the buffer.
+      //
+      // To fix this, we can manually split it line by line and give to atom
+      // those ranges.
+      for (let line = range.start.row; line <= range.end.row; line++) {
+        let start;
+        let end;
+        const lineText = editor.getTextInBufferRange(new _atom.Range([line, 0], [line + 1, 0]));
+
+        if (line === range.start.row) {
+          start = range.start.column;
+        } else {
+          start = (lineText.match(/^\s*/) || [''])[0].length;
+        }
+
+        if (line === range.end.row) {
+          end = range.end.column;
+        } else {
+          // Note: this is technically off by 1 (\n) or 2 (\r\n) but Atom will
+          // not extend the range past the actual characters displayed on the
+          // line
+          end = lineText.length;
+        }
+
+        highlightMarker = editor.markBufferRange(new _atom.Range([line, start], [line, end]));
+        editor.decorateMarker(highlightMarker, {
+          type: 'highlight',
+          class: highlightCssClass
+        });
+        markers.add(highlightMarker);
+      }
     } else {
       addMessageForRow(message, 0);
-    }
-
-    let highlightCssClass;
-    if (message.type === 'Error') {
-      highlightCssClass = HIGHLIGHT_CSS + ' ' + ERROR_HIGHLIGHT_CSS;
-    } else {
-      highlightCssClass = HIGHLIGHT_CSS + ' ' + WARNING_HIGHLIGHT_CSS;
-    }
-
-    // This marker underlines text.
-    if (highlightMarker) {
-      editor.decorateMarker(highlightMarker, {
-        type: 'highlight',
-        class: highlightCssClass
-      });
-      markers.add(highlightMarker);
     }
   }
 
   // Find all of the gutter markers for the same row and combine them into one marker/popup.
-  for (const _ref of rowToMessage.entries()) {
-    var _ref2 = _slicedToArray(_ref, 2);
-
-    const row = _ref2[0];
-    const messages = _ref2[1];
-
+  for (const [row, messages] of rowToMessage.entries()) {
     // If at least one of the diagnostics is an error rather than the warning,
     // display the glyph in the gutter to represent an error rather than a warning.
     const gutterMarkerCssClass = messages.some(msg => msg.type === 'Error') ? ERROR_GUTTER_CSS : WARNING_GUTTER_CSS;
 
     // This marker adds some UI to the gutter.
-
-    var _createGutterItem = createGutterItem(messages, gutterMarkerCssClass, fixer);
-
-    const item = _createGutterItem.item,
-          dispose = _createGutterItem.dispose;
-
+    const { item, dispose } = createGutterItem(messages, gutterMarkerCssClass, fixer);
     itemToEditor.set(item, editor);
     const gutterMarker = editor.markBufferPosition([row, 0]);
-    gutter.decorateMarker(gutterMarker, { item: item });
+    gutter.decorateMarker(gutterMarker, { item });
     gutterMarker.onDidDestroy(dispose);
     markers.add(gutterMarker);
   }
@@ -169,7 +191,7 @@ function applyUpdateToEditor(editor, update, fixer) {
 }
 
 function createGutterItem(messages, gutterMarkerCssClass, fixer) {
-  const item = window.document.createElement('a');
+  const item = document.createElement('a');
   item.className = gutterMarkerCssClass;
   let popupElement = null;
   let paneItemSubscription = null;
@@ -219,7 +241,7 @@ function createGutterItem(messages, gutterMarkerCssClass, fixer) {
     // for one frame you can cause the popup to appear without the mouse ever entering it.
     disposeTimeout = setTimeout(dispose, POPUP_DISPOSE_TIMEOUT);
   });
-  return { item: item, dispose: dispose };
+  return { item, dispose };
 }
 
 /**
@@ -229,20 +251,15 @@ function showPopupFor(messages, item, goToLocation, fixer) {
   // The popup will be an absolutely positioned child element of <atom-workspace> so that it appears
   // on top of everything.
   const workspaceElement = atom.views.getView(atom.workspace);
-  const hostElement = window.document.createElement('div');
+  const hostElement = document.createElement('div');
   // $FlowFixMe check parentNode for null
   workspaceElement.parentNode.appendChild(hostElement);
 
   // Move it down vertically so it does not end up under the mouse pointer.
+  const { top, left } = item.getBoundingClientRect();
 
-  var _item$getBoundingClie = item.getBoundingClientRect();
-
-  const top = _item$getBoundingClie.top,
-        left = _item$getBoundingClie.left;
-
-
-  const trackedFixer = function () {
-    fixer(...arguments);
+  const trackedFixer = (...args) => {
+    fixer(...args);
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diagnostics-gutter-autofix');
   };
   const trackedGoToLocation = (filePath, line) => {
@@ -260,21 +277,22 @@ function showPopupFor(messages, item, goToLocation, fixer) {
   // Check to see whether the popup is within the bounds of the TextEditor. If not, display it above
   // the glyph rather than below it.
   const editor = itemToEditor.get(item);
+
+  if (!(editor != null)) {
+    throw new Error('Invariant violation: "editor != null"');
+  }
+
   const editorElement = atom.views.getView(editor);
+  const { top: editorTop, height: editorHeight } = editorElement.getBoundingClientRect();
+  const { top: itemTop, height: itemHeight } = item.getBoundingClientRect();
+  const popupElement = hostElement.firstElementChild;
 
-  var _editorElement$getBou = editorElement.getBoundingClientRect();
+  if (!(popupElement instanceof HTMLElement)) {
+    throw new Error('Invariant violation: "popupElement instanceof HTMLElement"');
+  }
 
-  const editorTop = _editorElement$getBou.top,
-        editorHeight = _editorElement$getBou.height;
-
-  var _item$getBoundingClie2 = item.getBoundingClientRect();
-
-  const itemTop = _item$getBoundingClie2.top,
-        itemHeight = _item$getBoundingClie2.height;
-
-  const popupHeight = hostElement.firstElementChild.clientHeight;
+  const popupHeight = popupElement.clientHeight;
   if (itemTop + itemHeight + popupHeight > editorTop + editorHeight) {
-    const popupElement = hostElement.firstElementChild;
     // Shift the popup back down by GLYPH_HEIGHT, so that the bottom padding overlaps with the
     // glyph. An additional 4 px is needed to make it look the same way it does when it shows up
     // below. I don't know why.

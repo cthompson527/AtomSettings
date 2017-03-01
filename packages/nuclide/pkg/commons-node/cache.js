@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -17,11 +8,9 @@ exports.DISPOSE_VALUE = exports.Cache = undefined;
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 // A Cache mapping keys to values which creates entries as they are requested.
-let Cache = exports.Cache = class Cache {
+class Cache {
 
-  constructor(factory) {
-    let disposeValue = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : value => {};
-
+  constructor(factory, disposeValue = value => {}) {
     this._values = new Map();
     this._factory = factory;
     this._disposeValue = disposeValue;
@@ -57,6 +46,10 @@ let Cache = exports.Cache = class Cache {
     for (const newKey of newKeys) {
       this.get(newKey);
     }
+  }
+
+  keys() {
+    return this._values.keys();
   }
 
   values() {
@@ -99,10 +92,19 @@ let Cache = exports.Cache = class Cache {
     this.clear();
     this._entriesSubject.complete();
   }
-};
+}
 
-// Useful for optional second parameter to Cache constructor.
+exports.Cache = Cache; // Useful for optional second parameter to Cache constructor.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const DISPOSE_VALUE = exports.DISPOSE_VALUE = value => {
-  value.dispose;
+  value.dispose();
 };

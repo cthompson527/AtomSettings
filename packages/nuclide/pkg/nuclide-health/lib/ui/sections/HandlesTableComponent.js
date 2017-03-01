@@ -1,22 +1,12 @@
-'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
-var _reactForAtom = require('react-for-atom');
+var _reactForAtom = require("react-for-atom");
 
-let HandlesTableComponent = class HandlesTableComponent extends _reactForAtom.React.Component {
+class HandlesTableComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -37,50 +27,50 @@ let HandlesTableComponent = class HandlesTableComponent extends _reactForAtom.Re
 
   render() {
     if (this.props.handles.length === 0) {
-      return _reactForAtom.React.createElement('div', null);
+      return _reactForAtom.React.createElement("div", null);
     }
 
     const handleSummaries = this.getHandleSummaries(this.props.handles);
     const component = _reactForAtom.React.createElement(
-      'div',
+      "div",
       null,
       _reactForAtom.React.createElement(
-        'h3',
+        "h3",
         null,
         this.props.title
       ),
       _reactForAtom.React.createElement(
-        'table',
-        { className: 'table' },
+        "table",
+        { className: "table" },
         _reactForAtom.React.createElement(
-          'thead',
+          "thead",
           null,
           _reactForAtom.React.createElement(
-            'tr',
+            "tr",
             null,
             _reactForAtom.React.createElement(
-              'th',
-              { width: '10%' },
-              'ID'
+              "th",
+              { width: "10%" },
+              "ID"
             ),
             this.props.columns.map((column, c) => _reactForAtom.React.createElement(
-              'th',
-              { key: c, width: `${ column.widthPercentage }%` },
+              "th",
+              { key: c, width: `${column.widthPercentage}%` },
               column.title
             ))
           )
         ),
         _reactForAtom.React.createElement(
-          'tbody',
+          "tbody",
           null,
           Object.keys(handleSummaries).map(key => {
             const handleSummary = handleSummaries[key];
             const previousHandle = this.previousHandleSummaries[key];
             return _reactForAtom.React.createElement(
-              'tr',
+              "tr",
               { key: key, className: previousHandle ? '' : 'nuclide-health-handle-new' },
               _reactForAtom.React.createElement(
-                'th',
+                "th",
                 null,
                 key
               ),
@@ -90,7 +80,7 @@ let HandlesTableComponent = class HandlesTableComponent extends _reactForAtom.Re
                   className = 'nuclide-health-handle-updated';
                 }
                 return _reactForAtom.React.createElement(
-                  'td',
+                  "td",
                   { key: c, className: className },
                   handleSummary[c]
                 );
@@ -103,7 +93,13 @@ let HandlesTableComponent = class HandlesTableComponent extends _reactForAtom.Re
     this.previousHandleSummaries = handleSummaries;
     return component;
   }
-
-};
-exports.default = HandlesTableComponent;
-module.exports = exports['default'];
+}
+exports.default = HandlesTableComponent; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */

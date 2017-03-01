@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _debounce;
 
@@ -60,7 +50,7 @@ function _load_shallowequal() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Console = class Console extends _reactForAtom.React.Component {
+class Console extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -89,8 +79,7 @@ let Console = class Console extends _reactForAtom.React.Component {
       throw new Error('Invariant violation: "this.props.currentExecutor != null"');
     }
 
-    const currentExecutor = this.props.currentExecutor;
-
+    const { currentExecutor } = this.props;
     const options = Array.from(this.props.executors.values()).map(executor => ({
       id: executor.id,
       label: executor.name
@@ -107,11 +96,7 @@ let Console = class Console extends _reactForAtom.React.Component {
     if (this._scrollPane == null) {
       return true;
     }
-    var _scrollPane = this._scrollPane;
-    const scrollTop = _scrollPane.scrollTop,
-          scrollHeight = _scrollPane.scrollHeight,
-          offsetHeight = _scrollPane.offsetHeight;
-
+    const { scrollTop, scrollHeight, offsetHeight } = this._scrollPane;
     return scrollHeight - (offsetHeight + scrollTop) < 5;
   }
 
@@ -185,8 +170,7 @@ let Console = class Console extends _reactForAtom.React.Component {
   }
 
   _renderPrompt() {
-    const currentExecutor = this.props.currentExecutor;
-
+    const { currentExecutor } = this.props;
     if (currentExecutor == null) {
       return;
     }
@@ -227,7 +211,13 @@ let Console = class Console extends _reactForAtom.React.Component {
     this._scrollPane.scrollTop = this._scrollPane.scrollHeight;
     this.setState({ unseenMessages: false });
   }
-
-};
-exports.default = Console;
-module.exports = exports['default'];
+}
+exports.default = Console; /**
+                            * Copyright (c) 2015-present, Facebook, Inc.
+                            * All rights reserved.
+                            *
+                            * This source code is licensed under the license found in the LICENSE file in
+                            * the root directory of this source tree.
+                            *
+                            * 
+                            */

@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 154
+          line: 157
         },
         kind: "named",
         name: "NuclideUri"
@@ -24,14 +24,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 154
+          line: 157
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 154
+            line: 157
           },
           kind: "named",
           name: "NuclideUri"
@@ -47,7 +47,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 161
+          line: 164
         },
         kind: "named",
         name: "NuclideUri"
@@ -58,7 +58,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 161
+          line: 164
         },
         kind: "string"
       }
@@ -69,14 +69,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 161
+          line: 164
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 161
+            line: 164
           },
           kind: "string"
         }
@@ -91,7 +91,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 227
+          line: 230
         },
         kind: "named",
         name: "NuclideUri"
@@ -102,7 +102,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 228
+          line: 231
         },
         kind: "named",
         name: "NuclideUri"
@@ -113,14 +113,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 229
+          line: 232
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 229
+            line: 232
           },
           kind: "string"
         }
@@ -132,14 +132,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 230
+          line: 233
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 230
+            line: 233
           },
           kind: "string"
         }
@@ -154,7 +154,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 247
+          line: 250
         },
         kind: "named",
         name: "NuclideUri"
@@ -165,7 +165,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 248
+          line: 251
         },
         kind: "string"
       }
@@ -175,7 +175,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 249
+          line: 252
         },
         kind: "string"
       }
@@ -186,14 +186,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 250
+          line: 253
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 250
+            line: 253
           },
           kind: "string"
         }
@@ -208,7 +208,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 285
+          line: 288
         },
         kind: "named",
         name: "NuclideUri"
@@ -219,14 +219,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 286
+          line: 289
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 286
+            line: 289
           },
           kind: "string"
         }
@@ -237,14 +237,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 287
+          line: 290
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 287
+            line: 290
           },
           kind: "named",
           name: "BaseBuckBuildOptions"
@@ -257,21 +257,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 288
+          line: 291
         },
         kind: "any"
       });
     });
   };
 
-  remoteModule.install = function (arg0, arg1, arg2, arg3) {
+  remoteModule.install = function (arg0, arg1, arg2, arg3, arg4) {
     return _client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 304
+          line: 307
         },
         kind: "named",
         name: "NuclideUri"
@@ -282,14 +282,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 305
+          line: 308
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 305
+            line: 308
           },
           kind: "string"
         }
@@ -300,36 +300,37 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 306
+          line: 309
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 306
+            line: 309
           },
           kind: "string"
         }
       }
     }, {
-      name: "runOptions",
+      name: "run",
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 307
+          line: 310
         },
-        kind: "nullable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 307
-          },
-          kind: "named",
-          name: "BuckRunOptions"
-        }
+        kind: "boolean"
+      }
+    }, {
+      name: "debug",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 311
+        },
+        kind: "boolean"
       }
     }]).then(args => {
       return _client.callRemoteFunction("BuckService/install", "promise", args);
@@ -338,7 +339,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 308
+          line: 312
         },
         kind: "any"
       });
@@ -352,7 +353,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 366
+          line: 370
         },
         kind: "named",
         name: "NuclideUri"
@@ -363,14 +364,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 367
+          line: 371
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 367
+            line: 371
           },
           kind: "string"
         }
@@ -381,14 +382,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 368
+          line: 372
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 368
+            line: 372
           },
           kind: "string"
         }
@@ -400,7 +401,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 369
+          line: 373
         },
         kind: "named",
         name: "ProcessMessage"
@@ -408,14 +409,14 @@ module.exports = _client => {
     }).publish();
   };
 
-  remoteModule.testWithOutput = function (arg0, arg1, arg2) {
+  remoteModule.testWithOutput = function (arg0, arg1, arg2, arg3) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 385
+          line: 389
         },
         kind: "named",
         name: "NuclideUri"
@@ -426,14 +427,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 386
+          line: 390
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 386
+            line: 390
           },
           kind: "string"
         }
@@ -444,17 +445,27 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 387
+          line: 391
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 387
+            line: 391
           },
           kind: "string"
         }
+      }
+    }, {
+      name: "debug",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 392
+        },
+        kind: "boolean"
       }
     }]).then(args => {
       return _client.callRemoteFunction("BuckService/testWithOutput", "observable", args);
@@ -463,7 +474,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 388
+          line: 393
         },
         kind: "named",
         name: "ProcessMessage"
@@ -471,14 +482,14 @@ module.exports = _client => {
     }).publish();
   };
 
-  remoteModule.installWithOutput = function (arg0, arg1, arg2, arg3, arg4) {
+  remoteModule.installWithOutput = function (arg0, arg1, arg2, arg3, arg4, arg5) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
       name: "rootPath",
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 404
+          line: 409
         },
         kind: "named",
         name: "NuclideUri"
@@ -489,14 +500,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 405
+          line: 410
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 405
+            line: 410
           },
           kind: "string"
         }
@@ -507,14 +518,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 406
+          line: 411
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 406
+            line: 411
           },
           kind: "string"
         }
@@ -525,36 +536,37 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 407
+          line: 412
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 407
+            line: 412
           },
           kind: "string"
         }
       }
     }, {
-      name: "runOptions",
+      name: "run",
       type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 408
+          line: 413
         },
-        kind: "nullable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 408
-          },
-          kind: "named",
-          name: "BuckRunOptions"
-        }
+        kind: "boolean"
+      }
+    }, {
+      name: "debug",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 414
+        },
+        kind: "boolean"
       }
     }]).then(args => {
       return _client.callRemoteFunction("BuckService/installWithOutput", "observable", args);
@@ -563,7 +575,88 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 409
+          line: 415
+        },
+        kind: "named",
+        name: "ProcessMessage"
+      });
+    }).publish();
+  };
+
+  remoteModule.runWithOutput = function (arg0, arg1, arg2, arg3) {
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "rootPath",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 426
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "buildTargets",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 427
+        },
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 427
+          },
+          kind: "string"
+        }
+      }
+    }, {
+      name: "extraArguments",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 428
+        },
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 428
+          },
+          kind: "string"
+        }
+      }
+    }, {
+      name: "simulator",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 429
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 429
+          },
+          kind: "string"
+        }
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/runWithOutput", "observable", args);
+    })).concatMap(id => id).concatMap(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 430
         },
         kind: "named",
         name: "ProcessMessage"
@@ -578,7 +671,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 484
+          line: 521
         },
         kind: "named",
         name: "NuclideUri"
@@ -590,16 +683,69 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 484
+          line: 521
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 484
+            line: 521
           },
           kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.listFlavors = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "rootPath",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 529
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "targets",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 530
+        },
+        kind: "array",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 530
+          },
+          kind: "string"
+        }
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/listFlavors", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 531
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 531
+          },
+          kind: "named",
+          name: "Object"
         }
       });
     });
@@ -612,7 +758,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 494
+          line: 544
         },
         kind: "named",
         name: "NuclideUri"
@@ -623,7 +769,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 494
+          line: 544
         },
         kind: "string"
       }
@@ -634,7 +780,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 494
+          line: 544
         },
         kind: "string"
       });
@@ -648,7 +794,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 508
+          line: 558
         },
         kind: "named",
         name: "NuclideUri"
@@ -659,7 +805,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 509
+          line: 559
         },
         kind: "string"
       }
@@ -670,14 +816,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 510
+          line: 560
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 510
+            line: 560
           },
           kind: "named",
           name: "Object"
@@ -693,7 +839,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 517
+          line: 567
         },
         kind: "named",
         name: "NuclideUri"
@@ -704,7 +850,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 518
+          line: 568
         },
         kind: "string"
       }
@@ -715,7 +861,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 519
+          line: 569
         },
         kind: "string"
       });
@@ -729,7 +875,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 545
+          line: 604
         },
         kind: "named",
         name: "NuclideUri"
@@ -741,7 +887,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 546
+          line: 605
         },
         kind: "number"
       });
@@ -755,7 +901,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 555
+          line: 614
         },
         kind: "named",
         name: "NuclideUri"
@@ -766,7 +912,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 556
+          line: 615
         },
         kind: "string"
       }
@@ -777,14 +923,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 557
+          line: 616
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 557
+            line: 616
           },
           kind: "string"
         }
@@ -799,7 +945,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 574
+          line: 633
         },
         kind: "named",
         name: "NuclideUri"
@@ -810,7 +956,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 575
+          line: 634
         },
         kind: "string"
       }
@@ -820,14 +966,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 576
+          line: 635
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 576
+            line: 635
           },
           kind: "string"
         }
@@ -839,10 +985,47 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 577
+          line: 636
         },
         kind: "object",
         fields: []
+      });
+    });
+  };
+
+  remoteModule.resolveBuildTargetName = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "buckRoot",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 652
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "nameOrAlias",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 653
+        },
+        kind: "string"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/resolveBuildTargetName", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 654
+        },
+        kind: "named",
+        name: "ResolvedBuildTarget"
       });
     });
   };
@@ -854,7 +1037,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 595
+          line: 670
         },
         kind: "named",
         name: "NuclideUri"
@@ -865,7 +1048,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 596
+          line: 671
         },
         kind: "number"
       }
@@ -876,12 +1059,47 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 597
+          line: 672
         },
         kind: "named",
         name: "Object"
       });
     }).publish();
+  };
+
+  remoteModule.getLastCommandInfo = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "rootPath",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 683
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("BuckService/getLastCommandInfo", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 683
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 683
+          },
+          kind: "named",
+          name: "CommandInfo"
+        }
+      });
+    });
   };
 
   return remoteModule;
@@ -893,889 +1111,578 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["dontRunOptions", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 37
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    name: "dontRunOptions",
-    definition: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    BuckWebSocketMessage: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 37
+        line: 39
       },
-      kind: "object",
-      fields: [{
+      name: "BuckWebSocketMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 38
+          line: 39
         },
-        name: "run",
-        type: {
+        kind: "union",
+        types: [{
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 38
+            line: 39
           },
-          kind: "boolean-literal",
-          value: false
-        },
-        optional: false
-      }]
-    }
-  }], ["doRunOptions", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 41
-    },
-    name: "doRunOptions",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 41
-      },
-      kind: "object",
-      fields: [{
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 42
-        },
-        name: "run",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 42
-          },
-          kind: "boolean-literal",
-          value: true
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 43
-        },
-        name: "debug",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 43
-          },
-          kind: "boolean"
-        },
-        optional: false
-      }]
-    }
-  }], ["BuckRunOptions", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 46
-    },
-    name: "BuckRunOptions",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 46
-      },
-      kind: "union",
-      types: [{
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 37
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 38
-          },
-          name: "run",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 38
+              line: 41
             },
-            kind: "boolean-literal",
-            value: false
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 41
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 42
-          },
-          name: "run",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 42
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 41
+              },
+              kind: "string-literal",
+              value: "SocketConnected"
             },
-            kind: "boolean-literal",
-            value: true
-          },
-          optional: false
+            optional: false
+          }]
         }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 43
+            line: 42
           },
-          name: "debug",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 43
             },
-            kind: "boolean"
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 43
+              },
+              kind: "string-literal",
+              value: "BuildProgressUpdated"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 44
+            },
+            name: "progressValue",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 44
+              },
+              kind: "number"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 45
           },
-          optional: false
-        }]
-      }],
-      discriminantField: "run"
-    }
-  }], ["BuckWebSocketMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 48
-    },
-    name: "BuckWebSocketMessage",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 48
-      },
-      kind: "union",
-      types: [{
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 48
-        },
-        kind: "object",
-        fields: [{
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 46
+            },
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 46
+              },
+              kind: "string-literal",
+              value: "BuildFinished"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 47
+            },
+            name: "exitCode",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 47
+              },
+              kind: "number"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 48
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 49
+            },
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 49
+              },
+              kind: "string-literal",
+              value: "BuildStarted"
+            },
+            optional: false
+          }]
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 50
           },
-          name: "type",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 50
+              line: 51
             },
-            kind: "string-literal",
-            value: "SocketConnected"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 51
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 52
-          },
-          name: "type",
-          type: {
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 51
+              },
+              kind: "string-literal",
+              value: "ConsoleEvent"
+            },
+            optional: false
+          }, {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 52
             },
-            kind: "string-literal",
-            value: "BuildProgressUpdated"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 53
-          },
-          name: "progressValue",
-          type: {
+            name: "message",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 52
+              },
+              kind: "string"
+            },
+            optional: false
+          }, {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 53
             },
-            kind: "number"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 54
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 55
-          },
-          name: "type",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 55
+            name: "level",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 53
+              },
+              kind: "object",
+              fields: [{
+                location: {
+                  type: "source",
+                  fileName: "BuckService.js",
+                  line: 54
+                },
+                name: "name",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "BuckService.js",
+                    line: 54
+                  },
+                  kind: "union",
+                  types: [{
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "OFF"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "SEVERE"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "WARNING"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "INFO"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "CONFIG"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "FINE"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "FINER"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "FINEST"
+                  }, {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 54
+                    },
+                    kind: "string-literal",
+                    value: "ALL"
+                  }]
+                },
+                optional: false
+              }]
             },
-            kind: "string-literal",
-            value: "BuildFinished"
-          },
-          optional: false
+            optional: false
+          }]
         }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 56
           },
-          name: "exitCode",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 56
+              line: 57
             },
-            kind: "number"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 57
-        },
-        kind: "object",
-        fields: [{
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 57
+              },
+              kind: "string-literal",
+              value: "ParseStarted"
+            },
+            optional: false
+          }]
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 58
           },
-          name: "type",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 58
+              line: 59
             },
-            kind: "string-literal",
-            value: "BuildStarted"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 59
-        },
-        kind: "object",
-        fields: [{
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 59
+              },
+              kind: "string-literal",
+              value: "ParseFinished"
+            },
+            optional: false
+          }]
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 60
           },
-          name: "type",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 60
-            },
-            kind: "string-literal",
-            value: "ConsoleEvent"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 61
-          },
-          name: "message",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 61
             },
-            kind: "string"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 62
-          },
-          name: "level",
-          type: {
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 61
+              },
+              kind: "string-literal",
+              value: "InstallFinished"
+            },
+            optional: false
+          }, {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 62
             },
-            kind: "object",
-            fields: [{
+            name: "success",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 62
+              },
+              kind: "boolean"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 63
+            },
+            name: "pid",
+            type: {
               location: {
                 type: "source",
                 fileName: "BuckService.js",
                 line: 63
               },
-              name: "name",
-              type: {
-                location: {
-                  type: "source",
-                  fileName: "BuckService.js",
-                  line: 63
-                },
-                kind: "union",
-                types: [{
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "OFF"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "SEVERE"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "WARNING"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "INFO"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "CONFIG"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "FINE"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "FINER"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "FINEST"
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 63
-                  },
-                  kind: "string-literal",
-                  value: "ALL"
-                }]
-              },
-              optional: false
-            }]
+              kind: "number"
+            },
+            optional: true
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 64
           },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 65
-        },
-        kind: "object",
-        fields: [{
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 65
+            },
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 65
+              },
+              kind: "string-literal",
+              value: "RunStarted"
+            },
+            optional: false
+          }]
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 66
           },
-          name: "type",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 66
+              line: 67
             },
-            kind: "string-literal",
-            value: "ParseStarted"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 67
-        },
-        kind: "object",
-        fields: [{
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 67
+              },
+              kind: "string-literal",
+              value: "RunComplete"
+            },
+            optional: false
+          }]
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
             line: 68
           },
-          name: "type",
-          type: {
+          kind: "object",
+          fields: [{
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 68
+              line: 69
             },
-            kind: "string-literal",
-            value: "ParseFinished"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 69
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 70
-          },
-          name: "type",
-          type: {
+            name: "type",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 69
+              },
+              kind: "string-literal",
+              value: "ResultsAvailable"
+            },
+            optional: false
+          }, {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 70
             },
-            kind: "string-literal",
-            value: "InstallFinished"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 71
-          },
-          name: "success",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 71
-            },
-            kind: "boolean"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 72
-          },
-          name: "pid",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 72
-            },
-            kind: "number"
-          },
-          optional: true
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 73
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 74
-          },
-          name: "type",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 74
-            },
-            kind: "string-literal",
-            value: "RunStarted"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 75
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 76
-          },
-          name: "type",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 76
-            },
-            kind: "string-literal",
-            value: "RunComplete"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 77
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 78
-          },
-          name: "type",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 78
-            },
-            kind: "string-literal",
-            value: "ResultsAvailable"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 79
-          },
-          name: "results",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 79
-            },
-            kind: "object",
-            fields: [{
+            name: "results",
+            type: {
               location: {
                 type: "source",
                 fileName: "BuckService.js",
-                line: 80
+                line: 70
               },
-              name: "buildTarget",
-              type: {
+              kind: "object",
+              fields: [{
                 location: {
                   type: "source",
                   fileName: "BuckService.js",
-                  line: 80
+                  line: 71
                 },
-                kind: "object",
-                fields: [{
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 81
-                  },
-                  name: "shortName",
-                  type: {
-                    location: {
-                      type: "source",
-                      fileName: "BuckService.js",
-                      line: 81
-                    },
-                    kind: "string"
-                  },
-                  optional: false
-                }, {
-                  location: {
-                    type: "source",
-                    fileName: "BuckService.js",
-                    line: 82
-                  },
-                  name: "baseName",
-                  type: {
-                    location: {
-                      type: "source",
-                      fileName: "BuckService.js",
-                      line: 82
-                    },
-                    kind: "string"
-                  },
-                  optional: false
-                }]
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "BuckService.js",
-                line: 84
-              },
-              name: "success",
-              type: {
-                location: {
-                  type: "source",
-                  fileName: "BuckService.js",
-                  line: 84
-                },
-                kind: "boolean"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "BuckService.js",
-                line: 85
-              },
-              name: "failureCount",
-              type: {
-                location: {
-                  type: "source",
-                  fileName: "BuckService.js",
-                  line: 85
-                },
-                kind: "number"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "BuckService.js",
-                line: 86
-              },
-              name: "totalNumberOfTests",
-              type: {
-                location: {
-                  type: "source",
-                  fileName: "BuckService.js",
-                  line: 86
-                },
-                kind: "number"
-              },
-              optional: false
-            }, {
-              location: {
-                type: "source",
-                fileName: "BuckService.js",
-                line: 87
-              },
-              name: "testCases",
-              type: {
-                location: {
-                  type: "source",
-                  fileName: "BuckService.js",
-                  line: 87
-                },
-                kind: "array",
+                name: "buildTarget",
                 type: {
                   location: {
                     type: "source",
                     fileName: "BuckService.js",
-                    line: 87
+                    line: 71
                   },
                   kind: "object",
                   fields: [{
                     location: {
                       type: "source",
                       fileName: "BuckService.js",
-                      line: 88
+                      line: 72
                     },
-                    name: "success",
+                    name: "shortName",
                     type: {
                       location: {
                         type: "source",
                         fileName: "BuckService.js",
-                        line: 88
-                      },
-                      kind: "boolean"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "BuckService.js",
-                      line: 89
-                    },
-                    name: "failureCount",
-                    type: {
-                      location: {
-                        type: "source",
-                        fileName: "BuckService.js",
-                        line: 89
-                      },
-                      kind: "number"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "BuckService.js",
-                      line: 90
-                    },
-                    name: "skippedCount",
-                    type: {
-                      location: {
-                        type: "source",
-                        fileName: "BuckService.js",
-                        line: 90
-                      },
-                      kind: "number"
-                    },
-                    optional: false
-                  }, {
-                    location: {
-                      type: "source",
-                      fileName: "BuckService.js",
-                      line: 91
-                    },
-                    name: "testCaseName",
-                    type: {
-                      location: {
-                        type: "source",
-                        fileName: "BuckService.js",
-                        line: 91
+                        line: 72
                       },
                       kind: "string"
                     },
@@ -1784,733 +1691,977 @@ Object.defineProperty(module.exports, "defs", {
                     location: {
                       type: "source",
                       fileName: "BuckService.js",
-                      line: 92
+                      line: 73
                     },
-                    name: "testResults",
+                    name: "baseName",
                     type: {
                       location: {
                         type: "source",
                         fileName: "BuckService.js",
-                        line: 92
+                        line: 73
                       },
-                      kind: "array",
+                      kind: "string"
+                    },
+                    optional: false
+                  }]
+                },
+                optional: false
+              }, {
+                location: {
+                  type: "source",
+                  fileName: "BuckService.js",
+                  line: 75
+                },
+                name: "success",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "BuckService.js",
+                    line: 75
+                  },
+                  kind: "boolean"
+                },
+                optional: false
+              }, {
+                location: {
+                  type: "source",
+                  fileName: "BuckService.js",
+                  line: 76
+                },
+                name: "failureCount",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "BuckService.js",
+                    line: 76
+                  },
+                  kind: "number"
+                },
+                optional: false
+              }, {
+                location: {
+                  type: "source",
+                  fileName: "BuckService.js",
+                  line: 77
+                },
+                name: "totalNumberOfTests",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "BuckService.js",
+                    line: 77
+                  },
+                  kind: "number"
+                },
+                optional: false
+              }, {
+                location: {
+                  type: "source",
+                  fileName: "BuckService.js",
+                  line: 78
+                },
+                name: "testCases",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "BuckService.js",
+                    line: 78
+                  },
+                  kind: "array",
+                  type: {
+                    location: {
+                      type: "source",
+                      fileName: "BuckService.js",
+                      line: 78
+                    },
+                    kind: "object",
+                    fields: [{
+                      location: {
+                        type: "source",
+                        fileName: "BuckService.js",
+                        line: 79
+                      },
+                      name: "success",
                       type: {
                         location: {
                           type: "source",
                           fileName: "BuckService.js",
-                          line: 92
+                          line: 79
                         },
-                        kind: "object",
-                        fields: [{
+                        kind: "boolean"
+                      },
+                      optional: false
+                    }, {
+                      location: {
+                        type: "source",
+                        fileName: "BuckService.js",
+                        line: 80
+                      },
+                      name: "failureCount",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "BuckService.js",
+                          line: 80
+                        },
+                        kind: "number"
+                      },
+                      optional: false
+                    }, {
+                      location: {
+                        type: "source",
+                        fileName: "BuckService.js",
+                        line: 81
+                      },
+                      name: "skippedCount",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "BuckService.js",
+                          line: 81
+                        },
+                        kind: "number"
+                      },
+                      optional: false
+                    }, {
+                      location: {
+                        type: "source",
+                        fileName: "BuckService.js",
+                        line: 82
+                      },
+                      name: "testCaseName",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "BuckService.js",
+                          line: 82
+                        },
+                        kind: "string"
+                      },
+                      optional: false
+                    }, {
+                      location: {
+                        type: "source",
+                        fileName: "BuckService.js",
+                        line: 83
+                      },
+                      name: "testResults",
+                      type: {
+                        location: {
+                          type: "source",
+                          fileName: "BuckService.js",
+                          line: 83
+                        },
+                        kind: "array",
+                        type: {
                           location: {
                             type: "source",
                             fileName: "BuckService.js",
-                            line: 93
+                            line: 83
                           },
-                          name: "testCaseName",
-                          type: {
+                          kind: "object",
+                          fields: [{
                             location: {
                               type: "source",
                               fileName: "BuckService.js",
-                              line: 93
+                              line: 84
                             },
-                            kind: "string"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 94
-                          },
-                          name: "testName",
-                          type: {
-                            location: {
-                              type: "source",
-                              fileName: "BuckService.js",
-                              line: 94
-                            },
-                            kind: "string"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 95
-                          },
-                          name: "type",
-                          type: {
-                            location: {
-                              type: "source",
-                              fileName: "BuckService.js",
-                              line: 95
-                            },
-                            kind: "string"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 96
-                          },
-                          name: "time",
-                          type: {
-                            location: {
-                              type: "source",
-                              fileName: "BuckService.js",
-                              line: 96
-                            },
-                            kind: "number"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 97
-                          },
-                          name: "message",
-                          type: {
-                            location: {
-                              type: "source",
-                              fileName: "BuckService.js",
-                              line: 97
-                            },
-                            kind: "string"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 98
-                          },
-                          name: "stacktrace",
-                          type: {
-                            location: {
-                              type: "source",
-                              fileName: "BuckService.js",
-                              line: 98
-                            },
-                            kind: "nullable",
+                            name: "testCaseName",
                             type: {
                               location: {
                                 type: "source",
                                 fileName: "BuckService.js",
-                                line: 98
+                                line: 84
                               },
                               kind: "string"
-                            }
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 99
-                          },
-                          name: "stdOut",
-                          type: {
+                            },
+                            optional: false
+                          }, {
                             location: {
                               type: "source",
                               fileName: "BuckService.js",
-                              line: 99
+                              line: 85
                             },
-                            kind: "string"
-                          },
-                          optional: false
-                        }, {
-                          location: {
-                            type: "source",
-                            fileName: "BuckService.js",
-                            line: 100
-                          },
-                          name: "stdErr",
-                          type: {
+                            name: "testName",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 85
+                              },
+                              kind: "string"
+                            },
+                            optional: false
+                          }, {
                             location: {
                               type: "source",
                               fileName: "BuckService.js",
-                              line: 100
+                              line: 86
                             },
-                            kind: "string"
-                          },
-                          optional: false
-                        }]
-                      }
-                    },
-                    optional: false
-                  }]
-                }
+                            name: "type",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 86
+                              },
+                              kind: "string"
+                            },
+                            optional: false
+                          }, {
+                            location: {
+                              type: "source",
+                              fileName: "BuckService.js",
+                              line: 87
+                            },
+                            name: "time",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 87
+                              },
+                              kind: "number"
+                            },
+                            optional: false
+                          }, {
+                            location: {
+                              type: "source",
+                              fileName: "BuckService.js",
+                              line: 88
+                            },
+                            name: "message",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 88
+                              },
+                              kind: "string"
+                            },
+                            optional: false
+                          }, {
+                            location: {
+                              type: "source",
+                              fileName: "BuckService.js",
+                              line: 89
+                            },
+                            name: "stacktrace",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 89
+                              },
+                              kind: "nullable",
+                              type: {
+                                location: {
+                                  type: "source",
+                                  fileName: "BuckService.js",
+                                  line: 89
+                                },
+                                kind: "string"
+                              }
+                            },
+                            optional: false
+                          }, {
+                            location: {
+                              type: "source",
+                              fileName: "BuckService.js",
+                              line: 90
+                            },
+                            name: "stdOut",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 90
+                              },
+                              kind: "string"
+                            },
+                            optional: false
+                          }, {
+                            location: {
+                              type: "source",
+                              fileName: "BuckService.js",
+                              line: 91
+                            },
+                            name: "stdErr",
+                            type: {
+                              location: {
+                                type: "source",
+                                fileName: "BuckService.js",
+                                line: 91
+                              },
+                              kind: "string"
+                            },
+                            optional: false
+                          }]
+                        }
+                      },
+                      optional: false
+                    }]
+                  }
+                },
+                optional: false
+              }]
+            },
+            optional: false
+          }]
+        }],
+        discriminantField: "type"
+      }
+    },
+    BaseBuckBuildOptions: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 98
+      },
+      name: "BaseBuckBuildOptions",
+      definition: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 98
+        },
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 99
+          },
+          name: "install",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 99
+            },
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 100
+          },
+          name: "run",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 100
+            },
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 101
+          },
+          name: "test",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 101
+            },
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 102
+          },
+          name: "debug",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 102
+            },
+            kind: "boolean"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 103
+          },
+          name: "simulator",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 103
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 103
               },
-              optional: false
-            }]
+              kind: "string"
+            }
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 105
+          },
+          name: "commandOptions",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 105
+            },
+            kind: "named",
+            name: "Object"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 106
+          },
+          name: "extraArguments",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 106
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 106
+              },
+              kind: "string"
+            }
+          },
+          optional: true
+        }]
+      }
+    },
+    CommandInfo: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 118
+      },
+      name: "CommandInfo",
+      definition: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 118
+        },
+        kind: "object",
+        fields: [{
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 119
+          },
+          name: "timestamp",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 119
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 120
+          },
+          name: "command",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 120
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 121
+          },
+          name: "args",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 121
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 121
+              },
+              kind: "string"
+            }
           },
           optional: false
         }]
-      }],
-      discriminantField: "type"
-    }
-  }], ["BaseBuckBuildOptions", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 107
+      }
     },
-    name: "BaseBuckBuildOptions",
-    definition: {
+    ResolvedBuildTarget: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 107
+        line: 124
       },
-      kind: "object",
-      fields: [{
+      name: "ResolvedBuildTarget",
+      definition: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 108
+          line: 124
         },
-        name: "install",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 108
+            line: 125
           },
-          kind: "boolean"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 109
-        },
-        name: "test",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 109
-          },
-          kind: "boolean"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 110
-        },
-        name: "simulator",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 110
-          },
-          kind: "nullable",
+          name: "qualifiedName",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 110
+              line: 125
             },
             kind: "string"
-          }
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 111
-        },
-        name: "runOptions",
-        type: {
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 111
+            line: 126
           },
-          kind: "nullable",
+          name: "flavors",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 111
+              line: 126
             },
-            kind: "named",
-            name: "BuckRunOptions"
-          }
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 113
-        },
-        name: "commandOptions",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 113
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 126
+              },
+              kind: "string"
+            }
           },
-          kind: "named",
-          name: "Object"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 114
-        },
-        name: "extraArguments",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 114
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 114
-            },
-            kind: "string"
-          }
-        },
-        optional: true
-      }]
-    }
-  }], ["getRootForPath", {
-    kind: "function",
-    name: "getRootForPath",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 154
+          optional: false
+        }]
+      }
     },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 154
-      },
+    getRootForPath: {
       kind: "function",
-      argumentTypes: [{
-        name: "file",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 154
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      name: "getRootForPath",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 157
+      },
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 154
+          line: 157
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 154
-          },
-          kind: "nullable",
+        kind: "function",
+        argumentTypes: [{
+          name: "file",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 154
+              line: 157
             },
             kind: "named",
             name: "NuclideUri"
           }
-        }
-      }
-    }
-  }], ["getBuildFile", {
-    kind: "function",
-    name: "getBuildFile",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 161
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 161
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 161
+            line: 157
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "targetName",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 161
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 161
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 161
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 161
+              line: 157
             },
-            kind: "string"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 157
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
           }
         }
       }
-    }
-  }], ["getOwners", {
-    kind: "function",
-    name: "getOwners",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 226
     },
-    type: {
+    getBuildFile: {
+      kind: "function",
+      name: "getBuildFile",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 226
+        line: 164
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 227
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "filePath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 228
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "kindFilter",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 229
-          },
-          kind: "nullable",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 164
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 229
+              line: 164
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "targetName",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 164
             },
             kind: "string"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 230
-        },
-        kind: "promise",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 230
+            line: 164
           },
-          kind: "array",
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 164
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 164
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    getOwners: {
+      kind: "function",
+      name: "getOwners",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 229
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 229
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 230
             },
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 231
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "kindFilter",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 232
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 232
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 233
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 233
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 233
+              },
+              kind: "string"
+            }
           }
         }
       }
-    }
-  }], ["getBuckConfig", {
-    kind: "function",
-    name: "getBuckConfig",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 246
     },
-    type: {
+    getBuckConfig: {
+      kind: "function",
+      name: "getBuckConfig",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 246
+        line: 249
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 247
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "section",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 248
-          },
-          kind: "string"
-        }
-      }, {
-        name: "property",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 249
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 250
+          line: 249
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 250
-          },
-          kind: "nullable",
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
               line: 250
             },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "section",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 251
+            },
             kind: "string"
+          }
+        }, {
+          name: "property",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 252
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 253
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 253
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 253
+              },
+              kind: "string"
+            }
           }
         }
       }
-    }
-  }], ["build", {
-    kind: "function",
-    name: "build",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 284
     },
-    type: {
+    build: {
+      kind: "function",
+      name: "build",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 284
+        line: 287
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 285
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "buildTargets",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 286
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 286
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "options",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 287
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 287
-            },
-            kind: "named",
-            name: "BaseBuckBuildOptions"
-          }
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 288
+          line: 287
         },
-        kind: "promise",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 288
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "buildTargets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 289
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 289
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "options",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 290
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 290
+              },
+              kind: "named",
+              name: "BaseBuckBuildOptions"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 288
+            line: 291
           },
-          kind: "any"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 291
+            },
+            kind: "any"
+          }
         }
       }
-    }
-  }], ["install", {
-    kind: "function",
-    name: "install",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 303
     },
-    type: {
+    install: {
+      kind: "function",
+      name: "install",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 303
+        line: 306
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 304
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "buildTargets",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 305
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 305
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "simulator",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 306
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 306
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "runOptions",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 307
-          },
-          kind: "nullable",
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 306
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
@@ -2518,944 +2669,1133 @@ Object.defineProperty(module.exports, "defs", {
               line: 307
             },
             kind: "named",
-            name: "BuckRunOptions"
+            name: "NuclideUri"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 308
-        },
-        kind: "promise",
-        type: {
+        }, {
+          name: "buildTargets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 308
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 308
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "simulator",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 309
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 309
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "run",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 310
+            },
+            kind: "boolean"
+          }
+        }, {
+          name: "debug",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 311
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 308
+            line: 312
           },
-          kind: "any"
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 312
+            },
+            kind: "any"
+          }
         }
       }
-    }
-  }], ["buildWithOutput", {
-    kind: "function",
-    name: "buildWithOutput",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 365
     },
-    type: {
+    buildWithOutput: {
+      kind: "function",
+      name: "buildWithOutput",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 365
+        line: 369
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 366
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "buildTargets",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 367
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 367
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "extraArguments",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 368
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 368
-            },
-            kind: "string"
-          }
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
           line: 369
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 370
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "buildTargets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 371
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 371
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "extraArguments",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 372
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 372
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 369
+            line: 373
           },
-          kind: "named",
-          name: "ProcessMessage"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 373
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
         }
       }
-    }
-  }], ["testWithOutput", {
-    kind: "function",
-    name: "testWithOutput",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 384
     },
-    type: {
+    testWithOutput: {
+      kind: "function",
+      name: "testWithOutput",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 384
+        line: 388
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 385
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "buildTargets",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 386
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 386
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "extraArguments",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 387
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 387
-            },
-            kind: "string"
-          }
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
           line: 388
         },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 388
-          },
-          kind: "named",
-          name: "ProcessMessage"
-        }
-      }
-    }
-  }], ["installWithOutput", {
-    kind: "function",
-    name: "installWithOutput",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 403
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 403
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 404
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "buildTargets",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 405
-          },
-          kind: "array",
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 405
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "extraArguments",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 406
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 406
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "simulator",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 407
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 407
-            },
-            kind: "string"
-          }
-        }
-      }, {
-        name: "runOptions",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 408
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "BuckService.js",
-              line: 408
+              line: 389
             },
             kind: "named",
-            name: "BuckRunOptions"
+            name: "NuclideUri"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 409
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 409
-          },
-          kind: "named",
-          name: "ProcessMessage"
-        }
-      }
-    }
-  }], ["listAliases", {
-    kind: "function",
-    name: "listAliases",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 484
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 484
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 484
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 484
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 484
-          },
-          kind: "array",
+        }, {
+          name: "buildTargets",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 484
+              line: 390
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 390
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "extraArguments",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 391
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 391
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "debug",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 392
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 393
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 393
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
+        }
+      }
+    },
+    installWithOutput: {
+      kind: "function",
+      name: "installWithOutput",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 408
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 408
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 409
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "buildTargets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 410
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 410
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "extraArguments",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 411
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 411
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "simulator",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 412
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 412
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "run",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 413
+            },
+            kind: "boolean"
+          }
+        }, {
+          name: "debug",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 414
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 415
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 415
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
+        }
+      }
+    },
+    runWithOutput: {
+      kind: "function",
+      name: "runWithOutput",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 425
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 425
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 426
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "buildTargets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 427
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 427
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "extraArguments",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 428
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 428
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "simulator",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 429
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 429
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 430
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 430
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
+        }
+      }
+    },
+    listAliases: {
+      kind: "function",
+      name: "listAliases",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 521
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 521
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 521
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 521
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 521
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 521
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    listFlavors: {
+      kind: "function",
+      name: "listFlavors",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 528
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 528
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 529
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "targets",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 530
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 530
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 531
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 531
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 531
+              },
+              kind: "named",
+              name: "Object"
+            }
+          }
+        }
+      }
+    },
+    resolveAlias: {
+      kind: "function",
+      name: "resolveAlias",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 544
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 544
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 544
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "aliasOrTarget",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 544
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 544
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 544
             },
             kind: "string"
           }
         }
       }
-    }
-  }], ["resolveAlias", {
-    kind: "function",
-    name: "resolveAlias",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 494
     },
-    type: {
+    showOutput: {
+      kind: "function",
+      name: "showOutput",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 494
+        line: 557
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 494
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "aliasOrTarget",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 494
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 494
+          line: 557
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 494
-          },
-          kind: "string"
-        }
-      }
-    }
-  }], ["showOutput", {
-    kind: "function",
-    name: "showOutput",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 507
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 507
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 508
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "aliasOrTarget",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 509
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 510
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 510
-          },
-          kind: "array",
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 510
+              line: 558
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "aliasOrTarget",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 559
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 560
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 560
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 560
+              },
+              kind: "named",
+              name: "Object"
+            }
+          }
+        }
+      }
+    },
+    buildRuleTypeFor: {
+      kind: "function",
+      name: "buildRuleTypeFor",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 566
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 566
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 567
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "aliasOrTarget",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 568
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 569
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 569
+            },
+            kind: "string"
+          }
+        }
+      }
+    },
+    getHTTPServerPort: {
+      kind: "function",
+      name: "getHTTPServerPort",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 603
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 603
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 604
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 605
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 605
+            },
+            kind: "number"
+          }
+        }
+      }
+    },
+    query: {
+      kind: "function",
+      name: "query",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 613
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 613
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 614
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "queryString",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 615
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 616
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 616
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 616
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    queryWithArgs: {
+      kind: "function",
+      name: "queryWithArgs",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 632
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 632
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 633
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "queryString",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 634
+            },
+            kind: "string"
+          }
+        }, {
+          name: "args",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 635
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 635
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 636
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 636
+            },
+            kind: "object",
+            fields: []
+          }
+        }
+      }
+    },
+    resolveBuildTargetName: {
+      kind: "function",
+      name: "resolveBuildTargetName",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 651
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 651
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "buckRoot",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 652
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "nameOrAlias",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 653
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 654
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 654
+            },
+            kind: "named",
+            name: "ResolvedBuildTarget"
+          }
+        }
+      }
+    },
+    getWebSocketStream: {
+      kind: "function",
+      name: "getWebSocketStream",
+      location: {
+        type: "source",
+        fileName: "BuckService.js",
+        line: 669
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "BuckService.js",
+          line: 669
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 670
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "httpPort",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 671
+            },
+            kind: "number"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "BuckService.js",
+            line: 672
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "BuckService.js",
+              line: 672
             },
             kind: "named",
             name: "Object"
           }
         }
       }
-    }
-  }], ["buildRuleTypeFor", {
-    kind: "function",
-    name: "buildRuleTypeFor",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 516
     },
-    type: {
+    getLastCommandInfo: {
+      kind: "function",
+      name: "getLastCommandInfo",
       location: {
         type: "source",
         fileName: "BuckService.js",
-        line: 516
+        line: 683
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 517
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "aliasOrTarget",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 518
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "BuckService.js",
-          line: 519
+          line: 683
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 519
-          },
-          kind: "string"
-        }
-      }
-    }
-  }], ["getHTTPServerPort", {
-    kind: "function",
-    name: "getHTTPServerPort",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 544
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 544
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 545
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 546
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 546
-          },
-          kind: "number"
-        }
-      }
-    }
-  }], ["query", {
-    kind: "function",
-    name: "query",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 554
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 554
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 555
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "queryString",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 556
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 557
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 557
-          },
-          kind: "array",
+        kind: "function",
+        argumentTypes: [{
+          name: "rootPath",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 557
+              line: 683
             },
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           }
-        }
-      }
-    }
-  }], ["queryWithArgs", {
-    kind: "function",
-    name: "queryWithArgs",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 573
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 573
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "BuckService.js",
-            line: 574
+            line: 683
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "queryString",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 575
-          },
-          kind: "string"
-        }
-      }, {
-        name: "args",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 576
-          },
-          kind: "array",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "BuckService.js",
-              line: 576
+              line: 683
             },
-            kind: "string"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "BuckService.js",
+                line: 683
+              },
+              kind: "named",
+              name: "CommandInfo"
+            }
           }
         }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 577
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 577
-          },
-          kind: "object",
-          fields: []
-        }
       }
-    }
-  }], ["getWebSocketStream", {
-    kind: "function",
-    name: "getWebSocketStream",
-    location: {
-      type: "source",
-      fileName: "BuckService.js",
-      line: 594
     },
-    type: {
-      location: {
-        type: "source",
-        fileName: "BuckService.js",
-        line: 594
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "rootPath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 595
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "httpPort",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 596
-          },
-          kind: "number"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "BuckService.js",
-          line: 597
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "BuckService.js",
-            line: 597
-          },
-          kind: "named",
-          name: "Object"
-        }
-      }
-    }
-  }], ["ProcessExitMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 13
-    },
-    name: "ProcessExitMessage",
-    definition: {
+    ProcessExitMessage: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "process-rpc-types.js",
         line: 13
       },
-      kind: "object",
-      fields: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 14
-        },
-        name: "kind",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 14
-          },
-          kind: "string-literal",
-          value: "exit"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 15
-        },
-        name: "exitCode",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 15
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 15
-            },
-            kind: "number"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 16
-        },
-        name: "signal",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 16
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 16
-            },
-            kind: "string"
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["ProcessMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 20
-    },
-    name: "ProcessMessage",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "process-rpc-types.js",
-        line: 20
-      },
-      kind: "union",
-      types: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 20
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 21
-          },
-          name: "kind",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 21
-            },
-            kind: "string-literal",
-            value: "stdout"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 22
-          },
-          name: "data",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 22
-            },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 23
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 24
-          },
-          name: "kind",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 24
-            },
-            kind: "string-literal",
-            value: "stderr"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 25
-          },
-          name: "data",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 25
-            },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }, {
+      name: "ProcessExitMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "process-rpc-types.js",
@@ -3528,115 +3868,289 @@ Object.defineProperty(module.exports, "defs", {
           },
           optional: false
         }]
-      }, {
+      }
+    },
+    ProcessMessage: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "process-rpc-types.js",
+        line: 20
+      },
+      name: "ProcessMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "process-rpc-types.js",
-          line: 26
+          line: 20
+        },
+        kind: "union",
+        types: [{
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 20
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 21
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 21
+              },
+              kind: "string-literal",
+              value: "stdout"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 22
+            },
+            name: "data",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 22
+              },
+              kind: "string"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 23
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 24
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 24
+              },
+              kind: "string-literal",
+              value: "stderr"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 25
+            },
+            name: "data",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 25
+              },
+              kind: "string"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 13
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 14
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 14
+              },
+              kind: "string-literal",
+              value: "exit"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 15
+            },
+            name: "exitCode",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 15
+              },
+              kind: "nullable",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "process-rpc-types.js",
+                  line: 15
+                },
+                kind: "number"
+              }
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 16
+            },
+            name: "signal",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 16
+              },
+              kind: "nullable",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "process-rpc-types.js",
+                  line: 16
+                },
+                kind: "string"
+              }
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 26
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 27
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 27
+              },
+              kind: "string-literal",
+              value: "error"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 28
+            },
+            name: "error",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 28
+              },
+              kind: "named",
+              name: "Object"
+            },
+            optional: false
+          }]
+        }],
+        discriminantField: "kind"
+      }
+    },
+    ProcessInfo: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "process-rpc-types.js",
+        line: 31
+      },
+      name: "ProcessInfo",
+      definition: {
+        location: {
+          type: "source",
+          fileName: "process-rpc-types.js",
+          line: 31
         },
         kind: "object",
         fields: [{
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
-            line: 27
+            line: 32
           },
-          name: "kind",
+          name: "parentPid",
           type: {
             location: {
               type: "source",
               fileName: "process-rpc-types.js",
-              line: 27
+              line: 32
             },
-            kind: "string-literal",
-            value: "error"
+            kind: "number"
           },
           optional: false
         }, {
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
-            line: 28
+            line: 33
           },
-          name: "error",
+          name: "pid",
           type: {
             location: {
               type: "source",
               fileName: "process-rpc-types.js",
-              line: 28
+              line: 33
             },
-            kind: "named",
-            name: "Object"
+            kind: "number"
           },
           optional: false
-        }]
-      }],
-      discriminantField: "kind"
-    }
-  }], ["ProcessInfo", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 31
-    },
-    name: "ProcessInfo",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "process-rpc-types.js",
-        line: 31
-      },
-      kind: "object",
-      fields: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 32
-        },
-        name: "parentPid",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 32
-          },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 33
-        },
-        name: "pid",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 33
-          },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 34
-        },
-        name: "command",
-        type: {
+        }, {
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
             line: 34
           },
-          kind: "string"
-        },
-        optional: false
-      }]
+          name: "command",
+          type: {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 34
+            },
+            kind: "string"
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -17,7 +12,11 @@ function _load_debounce() {
   return _debounce = _interopRequireDefault(require('../../commons-node/debounce'));
 }
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
 var _FileTreeDispatcher;
 
@@ -49,10 +48,10 @@ function _load_immutable() {
   return _immutable = _interopRequireDefault(require('immutable'));
 }
 
-var _nuclideHgGitBridge;
+var _vcs;
 
-function _load_nuclideHgGitBridge() {
-  return _nuclideHgGitBridge = require('../../nuclide-hg-git-bridge');
+function _load_vcs() {
+  return _vcs = require('../../commons-atom/vcs');
 }
 
 var _nuclideHgRpc;
@@ -75,6 +74,16 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let instance;
 
 /**
@@ -82,7 +91,7 @@ let instance;
  * FileTreeStore and the only way to update the store is through methods on FileTreeActions. The
  * dispatcher is a mechanism through which FileTreeActions interfaces with FileTreeStore.
  */
-let FileTreeActions = class FileTreeActions {
+class FileTreeActions {
 
   static getInstance() {
     if (!instance) {
@@ -94,13 +103,13 @@ let FileTreeActions = class FileTreeActions {
   constructor() {
     this._dispatcher = (_FileTreeDispatcher || _load_FileTreeDispatcher()).default.getInstance();
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
-    this._subscriptionForRepository = new (_immutable || _load_immutable()).default.Map();
+    this._disposableForRepository = new (_immutable || _load_immutable()).default.Map();
   }
 
   setCwd(rootKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_CWD,
-      rootKey: rootKey
+      rootKey
     });
   }
 
@@ -109,7 +118,7 @@ let FileTreeActions = class FileTreeActions {
     const addedRootKeys = new (_immutable || _load_immutable()).default.Set(rootKeys).subtract(existingRootKeySet);
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_ROOT_KEYS,
-      rootKeys: rootKeys
+      rootKeys
     });
     for (const rootKey of addedRootKeys) {
       this.expandNode(rootKey, rootKey);
@@ -122,19 +131,33 @@ let FileTreeActions = class FileTreeActions {
     });
   }
 
+  addExtraProjectSelectionContent(content) {
+    this._dispatcher.dispatch({
+      actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.ADD_EXTRA_PROJECT_SELECTION_CONTENT,
+      content
+    });
+  }
+
+  removeExtraProjectSelectionContent(content) {
+    this._dispatcher.dispatch({
+      actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.REMOVE_EXTRA_PROJECT_SELECTION_CONTENT,
+      content
+    });
+  }
+
   expandNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.EXPAND_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   expandNodeDeep(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.EXPAND_NODE_DEEP,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
@@ -148,52 +171,52 @@ let FileTreeActions = class FileTreeActions {
   ensureChildNode(nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.ENSURE_CHILD_NODE,
-      nodeKey: nodeKey
+      nodeKey
     });
   }
 
   collapseNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.COLLAPSE_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   collapseNodeDeep(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.COLLAPSE_NODE_DEEP,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   setExcludeVcsIgnoredPaths(excludeVcsIgnoredPaths) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_EXCLUDE_VCS_IGNORED_PATHS,
-      excludeVcsIgnoredPaths: excludeVcsIgnoredPaths
+      excludeVcsIgnoredPaths
     });
   }
 
   setHideIgnoredNames(hideIgnoredNames) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_HIDE_IGNORED_NAMES,
-      hideIgnoredNames: hideIgnoredNames
+      hideIgnoredNames
     });
   }
 
   setIgnoredNames(ignoredNames) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_IGNORED_NAMES,
-      ignoredNames: ignoredNames
+      ignoredNames
     });
   }
 
   setTrackedNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_TRACKED_NODE,
-      nodeKey: nodeKey,
-      rootKey: rootKey
+      nodeKey,
+      rootKey
     });
   }
 
@@ -206,28 +229,26 @@ let FileTreeActions = class FileTreeActions {
   moveToNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.MOVE_TO_NODE,
-      nodeKey: nodeKey,
-      rootKey: rootKey
+      nodeKey,
+      rootKey
     });
   }
 
   setUsePreviewTabs(usePreviewTabs) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_USE_PREVIEW_TABS,
-      usePreviewTabs: usePreviewTabs
+      usePreviewTabs
     });
   }
 
   setUsePrefixNav(usePrefixNav) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_USE_PREFIX_NAV,
-      usePrefixNav: usePrefixNav
+      usePrefixNav
     });
   }
 
-  confirmNode(rootKey, nodeKey) {
-    let pending = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+  confirmNode(rootKey, nodeKey, pending = false) {
     const node = this._store.getNode(rootKey, nodeKey);
     if (node == null) {
       return;
@@ -236,17 +257,19 @@ let FileTreeActions = class FileTreeActions {
       if (node.isExpanded) {
         this._dispatcher.dispatch({
           actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.COLLAPSE_NODE,
-          nodeKey: nodeKey,
-          rootKey: rootKey
+          nodeKey,
+          rootKey
         });
       } else {
         this._dispatcher.dispatch({
           actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.EXPAND_NODE,
-          nodeKey: nodeKey,
-          rootKey: rootKey
+          nodeKey,
+          rootKey
         });
       }
     } else {
+      // goToLocation doesn't support pending panes
+      // eslint-disable-next-line nuclide-internal/atom-apis
       atom.workspace.open((_FileTreeHelpers || _load_FileTreeHelpers()).default.keyToPath(nodeKey), {
         activatePane: true,
         searchAllPanes: true,
@@ -270,8 +293,8 @@ let FileTreeActions = class FileTreeActions {
   setVcsStatuses(rootKey, vcsStatuses) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_VCS_STATUSES,
-      rootKey: rootKey,
-      vcsStatuses: vcsStatuses
+      rootKey,
+      vcsStatuses
     });
   }
 
@@ -292,7 +315,7 @@ let FileTreeActions = class FileTreeActions {
         return (_FileTreeHelpers || _load_FileTreeHelpers()).default.dirPathToKey(directory.getPath());
       });
       const rootRepos = yield Promise.all(rootDirectories.map(function (directory) {
-        return (0, (_nuclideHgGitBridge || _load_nuclideHgGitBridge()).repositoryForPath)(directory.getPath());
+        return (0, (_vcs || _load_vcs()).repositoryForPath)(directory.getPath());
       }));
 
       // t7114196: Given the current implementation of HgRepositoryClient, each root directory will
@@ -344,28 +367,28 @@ let FileTreeActions = class FileTreeActions {
   updateWorkingSet(workingSet) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_WORKING_SET,
-      workingSet: workingSet
+      workingSet
     });
   }
 
   updateOpenFilesWorkingSet(openFilesWorkingSet) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_OPEN_FILES_WORKING_SET,
-      openFilesWorkingSet: openFilesWorkingSet
+      openFilesWorkingSet
     });
   }
 
   updateWorkingSetsStore(workingSetsStore) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_WORKING_SETS_STORE,
-      workingSetsStore: workingSetsStore
+      workingSetsStore
     });
   }
 
   startEditingWorkingSet(editedWorkingSet) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.START_EDITING_WORKING_SET,
-      editedWorkingSet: editedWorkingSet
+      editedWorkingSet
     });
   }
 
@@ -378,64 +401,64 @@ let FileTreeActions = class FileTreeActions {
   checkNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.CHECK_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   uncheckNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.UNCHECK_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   setDragHoveredNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_DRAG_HOVERED_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   setSelectedNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_SELECTED_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   setFocusedNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_FOCUSED_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   addSelectedNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.ADD_SELECTED_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   unselectNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.UNSELECT_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
   rangeSelectToNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.RANGE_SELECT_TO_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
@@ -454,8 +477,8 @@ let FileTreeActions = class FileTreeActions {
   unhoverNode(rootKey, nodeKey) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.UNHOVER_NODE,
-      rootKey: rootKey,
-      nodeKey: nodeKey
+      rootKey,
+      nodeKey
     });
   }
 
@@ -486,14 +509,14 @@ let FileTreeActions = class FileTreeActions {
   setOpenFilesExpanded(openFilesExpanded) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_OPEN_FILES_EXPANDED,
-      openFilesExpanded: openFilesExpanded
+      openFilesExpanded
     });
   }
 
   setUncommittedChangesExpanded(uncommittedChangesExpanded) {
     this._dispatcher.dispatch({
       actionType: (_FileTreeDispatcher2 || _load_FileTreeDispatcher2()).ActionTypes.SET_UNCOMMITTED_CHANGES_EXPANDED,
-      uncommittedChangesExpanded: uncommittedChangesExpanded
+      uncommittedChangesExpanded
     });
   }
 
@@ -517,9 +540,8 @@ let FileTreeActions = class FileTreeActions {
       /* immediate */false);
       // Different repo types emit different events at individual and refresh updates.
       // Hence, the need to debounce and listen to both change types.
-      const changeStatusesSubscriptions = new _atom.CompositeDisposable();
-      changeStatusesSubscriptions.add(repo.onDidChangeStatuses(debouncedChangeStatuses), repo.onDidChangeStatus(debouncedChangeStatuses));
-      _this2._subscriptionForRepository = _this2._subscriptionForRepository.set(repo, changeStatusesSubscriptions);
+      const changeStatusesSubscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(repo.onDidChangeStatuses(debouncedChangeStatuses), repo.onDidChangeStatus(debouncedChangeStatuses));
+      _this2._disposableForRepository = _this2._disposableForRepository.set(repo, changeStatusesSubscriptions);
     })();
   }
 
@@ -535,14 +557,11 @@ let FileTreeActions = class FileTreeActions {
       relativeCodePaths = hgRepo.getCachedPathStatuses();
     } else if (repo.getType() === 'git') {
       const gitRepo = repo;
-      const statuses = gitRepo.statuses;
-
+      const { statuses } = gitRepo;
       const internalGitRepo = gitRepo.getRepo();
       relativeCodePaths = {};
       // Transform `git` bit numbers to `StatusCodeNumber` format.
-
-      const StatusCodeNumber = (_nuclideHgRpc || _load_nuclideHgRpc()).hgConstants.StatusCodeNumber;
-
+      const { StatusCodeNumber } = (_nuclideHgRpc || _load_nuclideHgRpc()).hgConstants;
       for (const relativePath in statuses) {
         const gitStatusNumber = statuses[relativePath];
         let statusCode;
@@ -557,13 +576,13 @@ let FileTreeActions = class FileTreeActions {
         } else if (internalGitRepo.isStatusDeleted(gitStatusNumber)) {
           statusCode = StatusCodeNumber.REMOVED;
         } else {
-          (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`Unrecognized git status number ${ gitStatusNumber }`);
+          (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`Unrecognized git status number ${gitStatusNumber}`);
           statusCode = StatusCodeNumber.MODIFIED;
         }
         relativeCodePaths[relativePath] = statusCode;
       }
     } else {
-      throw new Error(`Unsupported repository type: ${ repo.getType() }`);
+      throw new Error(`Unsupported repository type: ${repo.getType()}`);
     }
     const repoRoot = repo.getWorkingDirectory();
     const absoluteCodePaths = {};
@@ -581,20 +600,17 @@ let FileTreeActions = class FileTreeActions {
   }
 
   _repositoryRemoved(repo) {
-    const disposable = this._subscriptionForRepository.get(repo);
+    const disposable = this._disposableForRepository.get(repo);
     if (!disposable) {
       // There is a small chance that the add/remove of the Repository could happen so quickly that
-      // the entry for the repo in _subscriptionForRepository has not been set yet.
+      // the entry for the repo in _disposableForRepository has not been set yet.
       // TODO: Report a soft error for this.
       return;
     }
 
-    this._subscriptionForRepository = this._subscriptionForRepository.delete(repo);
+    this._disposableForRepository = this._disposableForRepository.delete(repo);
     this.invalidateRemovedFolder();
     disposable.dispose();
   }
-
-};
-
-
-module.exports = FileTreeActions;
+}
+exports.default = FileTreeActions;

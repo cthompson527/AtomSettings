@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -52,7 +43,7 @@ let parseTarget = exports.parseTarget = (() => {
     if (!name) {
       return null;
     }
-    return { path: path, name: name };
+    return { path, name };
   });
 
   return function parseTarget(_x, _x2, _x3) {
@@ -131,7 +122,7 @@ let getSuggestion = exports.getSuggestion = (() => {
       const match = hyperclickMatch;
       return {
         range: match.range,
-        callback: function () {
+        callback() {
           (0, (_goToLocation || _load_goToLocation()).goToLocation)(match.path, match.line, match.column);
         }
       };
@@ -154,9 +145,7 @@ let findBuildTarget = (() => {
     if (wordMatchAndRange == null) {
       return null;
     }
-    const wordMatch = wordMatchAndRange.wordMatch,
-          range = wordMatchAndRange.range;
-
+    const { wordMatch, range } = wordMatchAndRange;
 
     const target = yield parseTarget(wordMatch, absolutePath, buckRoot);
     if (target == null) {
@@ -165,7 +154,7 @@ let findBuildTarget = (() => {
 
     const location = yield findTargetLocation(target);
     if (location != null) {
-      return Object.assign({}, location, { range: range });
+      return Object.assign({}, location, { range });
     } else {
       return null;
     }
@@ -186,11 +175,9 @@ let findRelativeFilePath = (() => {
     if (!wordMatchAndRange) {
       return null;
     }
-    const wordMatch = wordMatchAndRange.wordMatch,
-          range = wordMatchAndRange.range;
+    const { wordMatch, range } = wordMatchAndRange;
 
     // Make sure that the quotes match up.
-
     if (wordMatch[1] !== wordMatch[3]) {
       return null;
     }
@@ -209,7 +196,7 @@ let findRelativeFilePath = (() => {
         path: potentialPath,
         line: 0,
         column: 0,
-        range: range
+        range
       };
     } else {
       return null;
@@ -258,6 +245,16 @@ function _load_escapeStringRegexp() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const buildFileNameCache = new Map();
 function getBuildFileName(buckRoot) {

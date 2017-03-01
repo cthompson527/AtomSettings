@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -52,7 +43,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // An RPC server which listens for connections on a localhost socket.
 // TODO: Consider extending with more socket listening options.
-let SocketServer = exports.SocketServer = class SocketServer {
+class SocketServer {
 
   constructor(serviceRegistry) {
     this._emitter = new (_eventKit || _load_eventKit()).Emitter();
@@ -111,4 +102,13 @@ let SocketServer = exports.SocketServer = class SocketServer {
     this._server.close();
     this._emitter.dispose();
   }
-};
+}
+exports.SocketServer = SocketServer; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      */

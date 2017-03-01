@@ -1,23 +1,21 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+
+var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 var _connectionProfileUtils;
 
 function _load_connectionProfileUtils() {
   return _connectionProfileUtils = require('./connection-profile-utils');
+}
+
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('../../nuclide-ui/add-tooltip'));
 }
 
 var _AtomInput;
@@ -27,6 +25,12 @@ function _load_AtomInput() {
 }
 
 var _atom = require('atom');
+
+var _lookupPreferIpV;
+
+function _load_lookupPreferIpV() {
+  return _lookupPreferIpV = _interopRequireDefault(require('../../nuclide-remote-connection/lib/lookup-prefer-ip-v6'));
+}
 
 var _RadioGroup;
 
@@ -44,15 +48,26 @@ function _load_nuclideRemoteConnection() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const SupportedMethods = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake.SupportedMethods;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+const { SupportedMethods } = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).SshHandshake;
 const authMethods = [SupportedMethods.PASSWORD, SupportedMethods.SSL_AGENT, SupportedMethods.PRIVATE_KEY];
 
 /** Component to prompt the user for connection details. */
-let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.React.Component {
+class ConnectionDetailsForm extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
+
+    this._promptChanged = false;
     this.state = {
       username: props.initialUsername,
       server: props.initialServer,
@@ -61,11 +76,14 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
       sshPort: props.initialSshPort,
       pathToPrivateKey: props.initialPathToPrivateKey,
       selectedAuthMethodIndex: authMethods.indexOf(props.initialAuthMethod),
-      displayTitle: props.initialDisplayTitle
+      displayTitle: props.initialDisplayTitle,
+      IPs: null,
+      shouldDisplayTooltipWarning: false
     };
 
     this._handleAuthMethodChange = this._handleAuthMethodChange.bind(this);
     this._handleInputDidChange = this._handleInputDidChange.bind(this);
+    this._handleInputDidChangeForServer = this._handleInputDidChangeForServer.bind(this);
     this._handleKeyFileInputClick = this._handleKeyFileInputClick.bind(this);
     this._handlePasswordInputClick = this._handlePasswordInputClick.bind(this);
   }
@@ -91,6 +109,16 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
     this.props.onDidChange();
   }
 
+  _handleInputDidChangeForServer() {
+    // If the input changed due to a higher level change in the
+    // ConnectionDetailsPrompt, don't check for host collisions
+    if (!this._promptChanged) {
+      this._checkForHostCollisions(this._getText('server'));
+      this.props.onDidChange();
+    }
+    this._promptChanged = false;
+  }
+
   _handleKeyFileInputClick(event) {
     const privateKeyAuthMethodIndex = authMethods.indexOf(SupportedMethods.PRIVATE_KEY);
     this.setState({
@@ -112,9 +140,40 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
     });
   }
 
-  render() {
-    const className = this.props.className;
+  _checkForHostCollisions(hostName) {
+    var _this = this;
 
+    return (0, _asyncToGenerator.default)(function* () {
+      const uniqueHosts = _this.props.profileHosts;
+      if (uniqueHosts == null || _this.state.IPs == null) {
+        return;
+      }
+      const IPs = yield _this.state.IPs;
+      const ip = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(hostName).catch(function () {
+        return;
+      });
+      let shouldDisplayWarning = false;
+      if (ip == null) {
+        if (_this.state.shouldDisplayTooltipWarning) {
+          _this.setState({ shouldDisplayTooltipWarning: false });
+        }
+      } else {
+        for (let i = 0; i < uniqueHosts.length; i++) {
+          if (hostName !== uniqueHosts[i]) {
+            if (ip === IPs[i]) {
+              shouldDisplayWarning = true;
+            }
+          }
+        }
+        if (_this.state.shouldDisplayTooltipWarning !== shouldDisplayWarning) {
+          _this.setState({ shouldDisplayTooltipWarning: shouldDisplayWarning });
+        }
+      }
+    })();
+  }
+
+  render() {
+    const { className } = this.props;
     const activeAuthMethod = authMethods[this.state.selectedAuthMethodIndex];
     // We need native-key-bindings so that delete works and we need
     // _onKeyPress so that escape and enter work
@@ -167,6 +226,26 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
       { className: 'nuclide-auth-method' },
       'Use ssh-agent'
     );
+    let toolTipWarning;
+    if (this.state.shouldDisplayTooltipWarning) {
+      toolTipWarning = _reactForAtom.React.createElement('span', {
+        style: { paddingLeft: 10 },
+        className: 'icon icon-info pull-right nuclide-remote-projects-tooltip-warning',
+        ref: (0, (_addTooltip || _load_addTooltip()).default)({
+          // Intentionally *not* an arrow function so the jQuery
+          // Tooltip plugin can set the context to the Tooltip
+          // instance.
+          placement() {
+            // Atom modals have z indices of 9999. This Tooltip needs
+            // to stack on top of the modal; beat the modal's z-index.
+            this.tip.style.zIndex = 10999;
+            return 'right';
+          },
+          title: 'One of your profiles uses a host name that resolves to the' + ' same IP as this one. Consider using the uniform host ' + 'name to avoid potential collisions.'
+        })
+      });
+    }
+
     return _reactForAtom.React.createElement(
       'div',
       { className: className },
@@ -187,18 +266,19 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
       ),
       _reactForAtom.React.createElement(
         'div',
-        { className: 'form-group row' },
+        { className: 'form-group nuclide-auth-server-group' },
         _reactForAtom.React.createElement(
           'div',
-          { className: 'col-xs-9' },
+          { className: 'nuclide-auth-server' },
           _reactForAtom.React.createElement(
             'label',
             null,
-            'Server:'
+            'Server:',
+            toolTipWarning
           ),
           _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
             initialValue: this.state.server,
-            onDidChange: this._handleInputDidChange,
+            onDidChange: this._handleInputDidChangeForServer,
             ref: 'server',
             unstyled: true
           })
@@ -276,6 +356,9 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
 
     // Hitting escape should cancel the dialog.
     disposables.add(atom.commands.add('atom-workspace', 'core:cancel', event => this.props.onCancel()));
+    if (this.props.profileHosts) {
+      this.setState({ IPs: (0, (_connectionProfileUtils || _load_connectionProfileUtils()).getIPsForHosts)(this.props.profileHosts) });
+    }
   }
 
   componentWillUnmount() {
@@ -355,6 +438,10 @@ let ConnectionDetailsForm = class ConnectionDetailsForm extends _reactForAtom.Re
       passwordInput.value = '';
     }
   }
-};
+
+  promptChanged() {
+    this._promptChanged = true;
+    this.setState({ shouldDisplayTooltipWarning: false });
+  }
+}
 exports.default = ConnectionDetailsForm;
-module.exports = exports['default'];

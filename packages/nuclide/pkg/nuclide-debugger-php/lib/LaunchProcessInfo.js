@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,9 +45,17 @@ function _load_utils2() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logInfo = (_utils || _load_utils()).default.logInfo;
+const { logInfo } = (_utils || _load_utils()).default; /**
+                                                        * Copyright (c) 2015-present, Facebook, Inc.
+                                                        * All rights reserved.
+                                                        *
+                                                        * This source code is licensed under the license found in the LICENSE file in
+                                                        * the root directory of this source tree.
+                                                        *
+                                                        * 
+                                                        */
 
-let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+class LaunchProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
 
   constructor(targetUri, launchTarget) {
     super('hhvm', targetUri);
@@ -74,21 +73,16 @@ let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo exte
       sessionConfig.endDebugWhenNoRequests = true;
       sessionConfig.launchScriptPath = _this._launchTarget;
 
-      logInfo(`Connection session config: ${ JSON.stringify(sessionConfig) }`);
+      logInfo(`Connection session config: ${JSON.stringify(sessionConfig)}`);
 
       const result = yield rpcService.debug(sessionConfig);
-      logInfo(`Launch process result: ${ result }`);
+      logInfo(`Launch process result: ${result}`);
       return new (_PhpDebuggerInstance || _load_PhpDebuggerInstance()).PhpDebuggerInstance(_this, rpcService);
     })();
   }
 
   _getRpcService() {
-    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('PhpDebuggerService', this.getTargetUri());
-
-    if (!service) {
-      throw new Error('Invariant violation: "service"');
-    }
-
+    const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getPhpDebuggerServiceByNuclideUri)(this.getTargetUri());
     return new service.PhpDebuggerService();
   }
 
@@ -103,5 +97,5 @@ let LaunchProcessInfo = exports.LaunchProcessInfo = class LaunchProcessInfo exte
   singleThreadSteppingEnabled() {
     return true;
   }
-
-};
+}
+exports.LaunchProcessInfo = LaunchProcessInfo;

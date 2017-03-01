@@ -1,13 +1,15 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.asyncRequest = asyncRequest;
+exports.sendTextResponse = sendTextResponse;
+exports.sendJsonResponse = sendJsonResponse;
+exports.parseRequestBody = parseRequestBody;
+exports.getQueryParameters = getQueryParameters;
+exports.serializeArgs = serializeArgs;
+exports.deserializeArgs = deserializeArgs;
 
 var _url = _interopRequireDefault(require('url'));
 
@@ -18,6 +20,16 @@ function _load_request() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const MAX_REQUEST_LENGTH = 1e6;
 
@@ -55,7 +67,7 @@ function asyncRequest(options) {
         err.code = errorJson.code || response.statusCode;
         reject(err);
       } else {
-        resolve({ body: body, response: response });
+        resolve({ body, response });
       }
     });
   });
@@ -108,8 +120,7 @@ function getQueryParameters(requestUrl) {
     throw new Error('Invariant violation: "components != null"');
   }
 
-  const query = components.query;
-
+  const { query } = components;
   return query;
 }
 
@@ -137,7 +148,7 @@ function serializeArgs(args) {
   });
   return {
     args: argsOnHttp,
-    argTypes: argTypes
+    argTypes
   };
 }
 
@@ -146,11 +157,7 @@ function serializeArgs(args) {
  * of the original arguments of the same types the client called the function with.
  */
 function deserializeArgs(requestUrl) {
-  var _getQueryParameters = getQueryParameters(requestUrl);
-
-  let args = _getQueryParameters.args,
-      argTypes = _getQueryParameters.argTypes;
-
+  let { args, argTypes } = getQueryParameters(requestUrl);
   args = args || [];
   argTypes = argTypes || [];
   const argsArray = Array.isArray(args) ? args : [args];
@@ -167,13 +174,3 @@ function deserializeArgs(requestUrl) {
     }
   });
 }
-
-module.exports = {
-  asyncRequest: asyncRequest,
-  deserializeArgs: deserializeArgs,
-  getQueryParameters: getQueryParameters,
-  parseRequestBody: parseRequestBody,
-  sendJsonResponse: sendJsonResponse,
-  sendTextResponse: sendTextResponse,
-  serializeArgs: serializeArgs
-};

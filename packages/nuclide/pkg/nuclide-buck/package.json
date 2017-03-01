@@ -4,7 +4,7 @@
   "main": "./lib/main.js",
   "version": "0.0.0",
   "description": "Buck integration for Nuclide.",
-  "atomTestRunner": "../../lib/test-runner.js",
+  "atomTestRunner": "../../lib/test-runner-entry.js",
   "nuclide": {
     "packageType": "Atom",
     "testRunner": "apm",
@@ -26,6 +26,11 @@
         "type": "boolean",
         "default": "true",
         "description": "Attempt to detect and display compile errors in Diagnostics."
+      },
+      "suggestTaskRunner": {
+        "title": "Suggest building with the Task Runner after detecting CLI Buck builds.",
+        "type": "boolean",
+        "default": "true"
       }
     }
   },
@@ -55,6 +60,11 @@
     "nuclide.buck-builder": {
       "versions": {
         "0.0.0": "provideBuckBuilder"
+      }
+    },
+    "nuclide.buck-platforms": {
+      "versions": {
+        "0.0.0": "providePlatformService"
       }
     }
   },

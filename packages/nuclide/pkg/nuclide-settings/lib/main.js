@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,7 +14,11 @@ function _load_viewableFromReactElement() {
   return _viewableFromReactElement = require('../../commons-atom/viewableFromReactElement');
 }
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
 var _reactForAtom = require('react-for-atom');
 
@@ -33,12 +28,28 @@ function _load_SettingsPaneItem() {
   return _SettingsPaneItem = _interopRequireDefault(require('./SettingsPaneItem'));
 }
 
+var _SettingsPaneItem2;
+
+function _load_SettingsPaneItem2() {
+  return _SettingsPaneItem2 = require('./SettingsPaneItem');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 let subscriptions = null;
 
 function activate(state) {
-  subscriptions = new _atom.CompositeDisposable();
+  subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
 }
 
 function deactivate() {
@@ -47,13 +58,12 @@ function deactivate() {
 }
 
 function consumeWorkspaceViewsService(api) {
-  subscriptions.add(api.registerFactory({
-    id: 'nuclide-settings',
-    name: 'Nuclide Settings',
-    toggleCommand: 'nuclide-settings:toggle',
-    defaultLocation: 'pane',
-    create: () => (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_SettingsPaneItem || _load_SettingsPaneItem()).default, null)),
-    isInstance: item => item instanceof (_SettingsPaneItem || _load_SettingsPaneItem()).default
+  subscriptions.add(api.addOpener(uri => {
+    if (uri === (_SettingsPaneItem2 || _load_SettingsPaneItem2()).WORKSPACE_VIEW_URI) {
+      return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_SettingsPaneItem || _load_SettingsPaneItem()).default, null));
+    }
+  }), () => api.destroyWhere(item => item instanceof (_SettingsPaneItem || _load_SettingsPaneItem()).default), atom.commands.add('atom-workspace', 'nuclide-settings:toggle', event => {
+    api.toggle((_SettingsPaneItem2 || _load_SettingsPaneItem2()).WORKSPACE_VIEW_URI, event.detail);
   }));
 }
 
@@ -68,7 +78,7 @@ function consumeToolBar(getToolBar) {
     tooltip: 'Open Nuclide Settings',
     priority: -500
   });
-  const disposable = new _atom.Disposable(() => {
+  const disposable = new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
     toolBar.removeItems();
   });
   subscriptions.add(disposable);

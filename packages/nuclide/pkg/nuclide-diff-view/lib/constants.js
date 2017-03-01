@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -19,6 +10,16 @@ const DiffMode = exports.DiffMode = Object.freeze({
 });
 
 // This is to work around flow's missing support of enums.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 DiffMode;
 
 const DiffOption = exports.DiffOption = Object.freeze({
@@ -80,5 +81,15 @@ NavigationSectionStatus;
 
 const LintErrorMessages = exports.LintErrorMessages = ['Usage Exception: Lint', 'ESLint reported a warning'];
 
-const DIFF_VIEW_NAVIGATOR_TOGGLE_COMMAND = exports.DIFF_VIEW_NAVIGATOR_TOGGLE_COMMAND = 'diff-view-navigator:toggle';
+const DiffViewFeatures = exports.DiffViewFeatures = Object.freeze({
+  INTERACTIVE: 'nuclide_interactive_commit'
+});
+
+const GatedFeatureList = exports.GatedFeatureList = [DiffViewFeatures.INTERACTIVE];
+
 const DIFF_EDITOR_MARKER_CLASS = exports.DIFF_EDITOR_MARKER_CLASS = 'nuclide-diff-editor-marker';
+const DIFF_VIEW_NAVIGATOR_TOGGLE_COMMAND = exports.DIFF_VIEW_NAVIGATOR_TOGGLE_COMMAND = 'diff-view-navigator:toggle';
+const DIFF_VIEW_TEXT_BASED_FORM_CONFIG_KEY = exports.DIFF_VIEW_TEXT_BASED_FORM_CONFIG_KEY = 'nuclide-diff-view.textBasedDiffForm';
+const SHOULD_DOCK_PUBLISH_VIEW_CONFIG_KEY = exports.SHOULD_DOCK_PUBLISH_VIEW_CONFIG_KEY = 'nuclide-diff-view.shouldDockPublishView';
+const TASK_ID_REGEX = exports.TASK_ID_REGEX = /t?(\d+),?/;
+const USER_REGEX = exports.USER_REGEX = /^(#?\w[\w -]+\w),?/;

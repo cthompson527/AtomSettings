@@ -2,65 +2,70 @@
   "_args": [
     [
       {
-        "raw": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
+        "raw": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
         "scope": null,
         "escapedName": null,
         "name": null,
-        "rawSpec": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
-        "spec": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
+        "rawSpec": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
+        "spec": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
         "type": "local"
       },
-      "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/apm-install-dir-116917-13156-1k2uskj"
+      "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/apm-install-dir-117123-21246-1dyeyk9"
     ]
   ],
-  "_from": "../d-116917-13156-40soee/package.tgz",
-  "_id": "atom-sublime-monokai-syntax@0.3.11",
+  "_from": "../d-117123-21246-13ercdu/package.tgz",
+  "_id": "atom-sublime-monokai-syntax@0.4.4",
   "_inCache": true,
   "_installable": true,
   "_location": "/atom-sublime-monokai-syntax",
   "_phantomChildren": {},
   "_requested": {
-    "raw": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
+    "raw": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
     "scope": null,
     "escapedName": null,
     "name": null,
-    "rawSpec": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
-    "spec": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
+    "rawSpec": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
+    "spec": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
     "type": "local"
   },
   "_requiredBy": [
     "#USER"
   ],
-  "_resolved": "file:../d-116917-13156-40soee/package.tgz",
-  "_shasum": "998e6e5d5e2993799170d52b14743bb01909d110",
+  "_resolved": "file:../d-117123-21246-13ercdu/package.tgz",
+  "_shasum": "2f93dc2a4fc12ec7f60f69e91f5deb9d88857961",
   "_shrinkwrap": null,
-  "_spec": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/d-116917-13156-40soee/package.tgz",
-  "_where": "/private/var/folders/vj/n_h_20fn06v9d2vhv04zfgmc0000gn/T/apm-install-dir-116917-13156-1k2uskj",
+  "_spec": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/d-117123-21246-13ercdu/package.tgz",
+  "_where": "/private/var/folders/nm/fykwxjxx5t98106ft3xklfbr0000gn/T/apm-install-dir-117123-21246-1dyeyk9",
+  "author": {
+    "name": "odahcam"
+  },
   "bugs": {
     "url": "https://github.com/odahcam/atom-sublime-monokai-syntax/issues"
   },
   "dependencies": {},
-  "description": "A monokai theme, made with <3 and Vodka (kidding, was coffee again) for Sublime Text Monokai syntax lovers.",
+  "description": "A monokai theme, made with ❤ and Vodka (kidding, was ☕ again) for Sublime Text Monokai Syntax and ⚛ lovers. 💚",
   "devDependencies": {},
+  "engines": {
+    "atom": ">=1.13.0 <2.0.0"
+  },
   "homepage": "https://github.com/odahcam/atom-sublime-monokai-syntax#readme",
   "keywords": [
     "syntax",
     "theme",
     "monokai",
     "sublime",
-    "odahcam",
-    "php",
-    "js"
+    "text",
+    "odahcam"
   ],
   "license": "MIT",
   "name": "atom-sublime-monokai-syntax",
   "optionalDependencies": {},
-  "readme": "# A Monokai Theme\n## For Sublime Text Monokai theme lovers <3\n\nForked from https://github.com/dmoutal/sub-monokai/, but made more true to Sublime Text highlighting.\n\n**Install via APM:** `apm install atom-sublime-monokai-syntax`\n\n![alt text](https://github.com/odahcam/atom-sublime-monokai-syntax/raw/master/update/0.3.3.PNG \"Screenshot in 0.3.3 showing PHP, HTML and JS.\")\n",
+  "readme": "# A Monokai Theme\n## For Sublime Text Monokai theme lovers <3\n\nForked from https://github.com/dmoutal/sub-monokai/, but made more true to Sublime Text highlighting.\n\nActually I'm trying to make it better and I want your help! 😉\n\n**Install via APM:** `apm install atom-sublime-monokai-syntax`\n\n![alt text](https://github.com/odahcam/atom-sublime-monokai-syntax/raw/master/update/0.3.3.PNG \"Screenshot in 0.3.3 showing PHP, HTML and JS.\")\n\n----\n\n**Your contribution will be apreciated!** `/s2/`\n",
   "readmeFilename": "README.md",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/odahcam/atom-sublime-monokai-syntax.git"
   },
   "theme": "syntax",
-  "version": "0.3.11"
+  "version": "0.4.4"
 }

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.HgService = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let getForkBaseName = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (directoryPath) {
@@ -59,12 +48,6 @@ function _load_hgConstants() {
 }
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
-
-var _hgBlameOutputParser;
-
-function _load_hgBlameOutputParser() {
-  return _hgBlameOutputParser = require('./hg-blame-output-parser');
-}
 
 var _hgDiffOutputParser;
 
@@ -122,7 +105,16 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
+
 const DEFAULT_ARC_PROJECT_FORK_BASE = 'remote/master';
 const DEFAULT_FORK_BASE_NAME = 'default';
 
@@ -169,7 +161,7 @@ function getPrimaryWatchmanSubscriptionRefinements() {
   return refinements;
 }
 
-let HgService = exports.HgService = class HgService {
+class HgService {
 
   constructor(workingDirectory) {
     this._workingDirectory = workingDirectory;
@@ -223,11 +215,14 @@ let HgService = exports.HgService = class HgService {
   /**
    * Shells out of the `hg status` to get the statuses of the paths.
    */
-  fetchStatuses() {
+  fetchStatuses(toRevision) {
     const execOptions = {
       cwd: this._workingDirectory
     };
     const args = ['status', '-Tjson'];
+    if (toRevision != null) {
+      args.push('--rev', toRevision);
+    }
 
     return (0, (_hgUtils || _load_hgUtils()).hgRunCommand)(args, execOptions).map(stdout => {
       const statusMap = new Map();
@@ -267,7 +262,7 @@ let HgService = exports.HgService = class HgService {
         expression: primarySubscriptionExpression,
         defer: ['hg.update']
       });
-      logger.debug(`Watchman subscription ${ WATCHMAN_SUBSCRIPTION_NAME_PRIMARY } established.`);
+      logger.debug(`Watchman subscription ${WATCHMAN_SUBSCRIPTION_NAME_PRIMARY} established.`);
 
       // Subscribe to changes to files unrelated to source control.
       const conflictStateSubscribtion = yield watchmanClient.watchDirectoryRecursive(workingDirectory, WATCHMAN_SUBSCRIPTION_NAME_CONFLICTS, {
@@ -275,7 +270,7 @@ let HgService = exports.HgService = class HgService {
         expression: ['name', '.hg/merge', 'wholename'],
         defer: ['hg.update']
       });
-      logger.debug(`Watchman subscription ${ WATCHMAN_SUBSCRIPTION_NAME_CONFLICTS } established.`);
+      logger.debug(`Watchman subscription ${WATCHMAN_SUBSCRIPTION_NAME_CONFLICTS} established.`);
 
       // Subscribe to changes to the active Mercurial bookmark.
       const hgActiveBookmarkSubscription = yield watchmanClient.watchDirectoryRecursive(workingDirectory, WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARK, {
@@ -283,7 +278,7 @@ let HgService = exports.HgService = class HgService {
         expression: ['name', '.hg/bookmarks.current', 'wholename'],
         defer: ['hg.update']
       });
-      logger.debug(`Watchman subscription ${ WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARK } established.`);
+      logger.debug(`Watchman subscription ${WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARK} established.`);
 
       // Subscribe to changes in Mercurial bookmarks.
       const hgBookmarksSubscription = yield watchmanClient.watchDirectoryRecursive(workingDirectory, WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARKS, {
@@ -291,14 +286,14 @@ let HgService = exports.HgService = class HgService {
         expression: ['name', '.hg/bookmarks', 'wholename'],
         defer: ['hg.update']
       });
-      logger.debug(`Watchman subscription ${ WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARKS } established.`);
+      logger.debug(`Watchman subscription ${WATCHMAN_SUBSCRIPTION_NAME_HGBOOKMARKS} established.`);
 
       const dirStateSubscribtion = yield watchmanClient.watchDirectoryRecursive(workingDirectory, WATCHMAN_HG_DIR_STATE, {
         fields: ['name'],
         expression: ['name', '.hg/dirstate', 'wholename'],
         defer: ['hg.update']
       });
-      logger.debug(`Watchman subscription ${ WATCHMAN_HG_DIR_STATE } established.`);
+      logger.debug(`Watchman subscription ${WATCHMAN_HG_DIR_STATE} established.`);
 
       // Those files' changes indicate a commit-changing action has been applied to the repository,
       // Watchman currently (v4.7) ignores `.hg/store` file updates.
@@ -448,17 +443,12 @@ let HgService = exports.HgService = class HgService {
       try {
         output = yield _this5._hgAsyncExecute(args, options);
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error when running hg diff for paths: ${ filePaths.toString() } \n\tError: ${ e.stderr }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error when running hg diff for paths: ${filePaths.toString()} \n\tError: ${e.stderr}`);
         return null;
       }
       const pathToDiffInfo = (0, (_hgDiffOutputParser || _load_hgDiffOutputParser()).parseMultiFileHgDiffUnifiedOutput)(output.stdout);
       const absolutePathToDiffInfo = new Map();
-      for (const _ref2 of pathToDiffInfo) {
-        var _ref3 = _slicedToArray(_ref2, 2);
-
-        const filePath = _ref3[0];
-        const diffInfo = _ref3[1];
-
+      for (const [filePath, diffInfo] of pathToDiffInfo) {
         absolutePathToDiffInfo.set((_nuclideUri || _load_nuclideUri()).default.join(_this5._workingDirectory, filePath), diffInfo);
       }
       return absolutePathToDiffInfo;
@@ -510,7 +500,7 @@ let HgService = exports.HgService = class HgService {
       try {
         output = yield _this6._hgAsyncExecute(args, execOptions);
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`LocalHgServiceBase failed to fetch bookmarks. Error: ${ e.stderr }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`LocalHgServiceBase failed to fetch bookmarks. Error: ${e.stderr}`);
         throw e;
       }
 
@@ -577,35 +567,51 @@ let HgService = exports.HgService = class HgService {
 
     return (0, _asyncToGenerator.default)(function* () {
       const forkBaseName = yield getForkBaseName(_this8._workingDirectory);
-      return yield (0, (_hgRevisionExpressionHelpers || _load_hgRevisionExpressionHelpers()).fetchRevisionInfo)((0, (_hgRevisionExpressionHelpers || _load_hgRevisionExpressionHelpers()).expressionForCommonAncestor)(forkBaseName), _this8._workingDirectory);
+      return (0, (_hgRevisionExpressionHelpers || _load_hgRevisionExpressionHelpers()).fetchRevisionInfo)((0, (_hgRevisionExpressionHelpers || _load_hgRevisionExpressionHelpers()).expressionForCommonAncestor)(forkBaseName), _this8._workingDirectory);
     })();
   }
 
   /**
-   * Gets the blame for the filePath at the current revision, including uncommitted changes
-   * (but not unsaved changes).
+   * Gets the blame for the filePath at the current revision.
+   * It returns null for uncommitted changes (but cannot detect unsaved changes)
    * @param filePath The file to get blame information for.
-   * @return A Map that maps a line number (0-indexed) to the name that line blames to.
-   *   The name is of the form: "Firstname Lastname <username@email.com> ChangeSetID".
-   *   The Firstname Lastname may not appear sometimes.
-   *   If no blame information is available, returns an empty Map.
+   * @return An Array that maps a line number (0-indexed) to the revision info.
    */
   getBlameAtHead(filePath) {
     var _this9 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const args = ['blame', '-r', 'wdir()', '-Tjson', '--changeset', '--user', '--line-number', filePath];
-      const execOptions = {
-        cwd: _this9._workingDirectory
-      };
-      let output;
+      let revisionsByLine;
       try {
-        output = yield _this9._hgAsyncExecute(args, execOptions);
+        revisionsByLine = (yield _this9._hgAsyncExecute(['blame', '-c', // Query the hash
+        '-T', '{node|short}\n', // Just display the hash per line
+        '-r', 'wdir()', // Blank out uncommitted changes
+        filePath], { cwd: _this9._workingDirectory })).stdout.split('\n');
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`LocalHgServiceBase failed to fetch blame for file: ${ filePath }. Error: ${ e.stderr }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`LocalHgServiceBase failed to fetch blame for file: ${filePath}. Error: ${e.stderr}`);
         throw e;
       }
-      return (0, (_hgBlameOutputParser || _load_hgBlameOutputParser()).parseHgBlameOutput)(output.stdout);
+
+      const uniqueRevisions = [...new Set(revisionsByLine.filter(function (e) {
+        return e;
+      }))];
+
+      let revisionsArray;
+      try {
+        revisionsArray = yield (0, (_hgRevisionExpressionHelpers || _load_hgRevisionExpressionHelpers()).fetchRevisionsInfo)(uniqueRevisions.join('+'), _this9._workingDirectory, { hidden: true, shouldLimit: false }).toPromise();
+      } catch (e) {
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`LocalHgServiceBase failed to fetch blame for file: ${filePath}. Error: ${e.stderr}`);
+        throw e;
+      }
+
+      const revisionsByHash = {};
+      revisionsArray.forEach(function (revision) {
+        revisionsByHash[revision.hash] = revision;
+      });
+
+      return revisionsByLine.map(function (hash) {
+        return revisionsByHash[hash];
+      });
     })();
   }
 
@@ -624,7 +630,7 @@ let HgService = exports.HgService = class HgService {
       try {
         return (yield _this10._hgAsyncExecute(args, execOptions)).stdout.trim();
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Failed to fetch Hg config for key ${ key }.  Error: ${ e.toString() }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Failed to fetch Hg config for key ${key}.  Error: ${e.toString()}`);
         return null;
       }
     })();
@@ -650,7 +656,7 @@ let HgService = exports.HgService = class HgService {
         return stdout ? stdout : null;
       } catch (e) {
         // This should not happen: `hg log` does not error even if it does not recognize the template.
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Failed when trying to get differential revision for: ${ changeSetId }`);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Failed when trying to get differential revision for: ${changeSetId}`);
         return null;
       }
     })();
@@ -675,11 +681,15 @@ let HgService = exports.HgService = class HgService {
         NO_HGPLAIN: concise, // `hg ssl` is likely user-defined.
         TTY_OUTPUT: ttyOutput
       };
-      return yield _this12._hgAsyncExecute(args, execOptions);
+      return _this12._hgAsyncExecute(args, execOptions);
     })();
   }
 
-  _commitCode(message, args) {
+  _commitCode(message, args, isInteractive) {
+    if (isInteractive) {
+      args.push('--interactive');
+    }
+
     let tempFile = null;
     let editMergeConfigs;
 
@@ -712,8 +722,8 @@ let HgService = exports.HgService = class HgService {
    * Commit code to version control.
    * @param message Commit message.
    */
-  commit(message) {
-    return this._commitCode(message, ['commit']).publish();
+  commit(message, isInteractive = false) {
+    return this._commitCode(message, ['commit'], isInteractive).publish();
   }
 
   /**
@@ -724,7 +734,7 @@ let HgService = exports.HgService = class HgService {
    *  Rebase to amend and rebase the stacked diffs.
    *  Fixup to fix the stacked commits, rebasing them on top of this commit.
    */
-  amend(message, amendMode) {
+  amend(message, amendMode, isInteractive = false) {
     const args = ['amend'];
     switch (amendMode) {
       case (_hgConstants || _load_hgConstants()).AmendMode.CLEAN:
@@ -738,11 +748,15 @@ let HgService = exports.HgService = class HgService {
       default:
         throw new Error('Unexpected AmendMode');
     }
-    return this._commitCode(message, args).publish();
+    return this._commitCode(message, args, isInteractive).publish();
   }
 
-  revert(filePaths) {
-    return this._runSimpleInWorkingDirectory('revert', filePaths);
+  revert(filePaths, toRevision) {
+    const args = [...filePaths];
+    if (toRevision != null) {
+      args.push('--rev', toRevision);
+    }
+    return this._runSimpleInWorkingDirectory('revert', args);
   }
 
   _runSimpleInWorkingDirectory(action, args) {
@@ -766,9 +780,38 @@ let HgService = exports.HgService = class HgService {
   /**
    * @param revision This could be a changeset ID, name of a bookmark, revision number, etc.
    * @param create Currently, this parameter is ignored.
+   * @param options.
    */
-  checkout(revision, create) {
-    return this._runSimpleInWorkingDirectory('checkout', [revision]);
+  checkout(revision, create, options) {
+    const args = [revision];
+    if (options && options.clean) {
+      args.push('--clean');
+    }
+    return this._runSimpleInWorkingDirectory('checkout', args);
+  }
+
+  show(revision) {
+    const args = ['show', `${revision}`, '-Tjson'];
+    const execOptions = {
+      cwd: this._workingDirectory
+    };
+    return (0, (_hgUtils || _load_hgUtils()).hgRunCommand)(args, execOptions).map(stdout => {
+      return JSON.parse(stdout)[0];
+    }).publish();
+  }
+
+  /**
+   * Removes files not tracked by Mercurial.
+   */
+  purge() {
+    return this._runSimpleInWorkingDirectory('purge', []);
+  }
+
+  /**
+   * @param revision This could be a changeset ID, name of a bookmark, revision number, etc.
+   */
+  strip(revision) {
+    return this._runSimpleInWorkingDirectory('strip', [revision]);
   }
 
   /**
@@ -858,50 +901,22 @@ let HgService = exports.HgService = class HgService {
     return this._runSimpleInWorkingDirectory('add', filePaths);
   }
 
-  // TODO(t12228275) This is a stopgap hack, fix it. This takes the default
-  // commit message from the hg commit message and since there is no change to
-  // the commit message the commands errors out with error code : 255 and piggy
-  // backs the stdout and stderr into an error message.
   getTemplateCommitMessage() {
     var _this17 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      let editor;
-
-      // Windows will need 'type' in place of 'cat'
-      if (process.platform === 'win32') {
-        editor = 'type';
-      } else {
-        editor = 'cat';
-      }
-      const args = ['commit', '--config', `ui.editor=${ editor }`, '--config', 'ui.allowemptycommit=true'];
+      // Once TODO(t14843143) is done the extension would be enabled by default
+      const args = ['--config', 'extensions.debugcommitmessage= ', 'debugcommitmessage'];
       const execOptions = {
-        cwd: _this17._workingDirectory,
-        HGEDITOR: ''
+        cwd: _this17._workingDirectory
       };
+
       try {
-        var _ref5 = yield _this17._hgAsyncExecute(args, execOptions);
-
-        const stdout = _ref5.stdout;
-        // It is most certianly not going to come here ever, the hg commit
-        // is always going to error since no change is made to the commit message.
-
+        const { stdout } = yield _this17._hgAsyncExecute(args, execOptions);
         return stdout;
       } catch (e) {
-        // Since no change was made stderr is returned and the service thinks the
-        // command execution failed. This is to get the stdout part of the message.
-        // If there is no match return null. This will need to go away soon.
-        // The message format : stderr:<error> stdout:<stdout>
-        const re = /stdout:(.[\n\r]*[\s\S]*)/;
-        const stdout = re.exec(e.message);
-
-        if (stdout === null) {
-          // Return the message as is
-          return e.message;
-        }
-
-        // Match exists, return the commit message
-        return stdout[1].trim();
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error('Failed when trying to get template commit message');
+        return null;
       }
     })();
   }
@@ -943,7 +958,7 @@ let HgService = exports.HgService = class HgService {
       };
       const result = yield _this19._hgAsyncExecute(args, execOptions);
       const entries = JSON.parse(result.stdout);
-      return { entries: entries };
+      return { entries };
     })();
   }
 
@@ -951,19 +966,16 @@ let HgService = exports.HgService = class HgService {
     var _this20 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      var _ref6 = yield _this20._hgAsyncExecute(['resolve', '--list', '-Tjson'], {
+      const { stdout } = yield _this20._hgAsyncExecute(['resolve', '--list', '-Tjson'], {
         cwd: _this20._workingDirectory
       });
-
-      const stdout = _ref6.stdout;
-
       const fileListStatuses = JSON.parse(stdout);
       const conflictedFiles = fileListStatuses.filter(function (fileStatus) {
         return fileStatus.status === (_hgConstants || _load_hgConstants()).StatusCodeId.UNRESOLVED;
       });
       const origBackupPath = yield _this20._getOrigBackupPath();
       const conflicts = yield Promise.all(conflictedFiles.map((() => {
-        var _ref7 = (0, _asyncToGenerator.default)(function* (conflictedFile) {
+        var _ref3 = (0, _asyncToGenerator.default)(function* (conflictedFile) {
           let message;
           // Heuristic: If the `.orig` file doesn't exist, then it's deleted by the rebasing commit.
           if (yield _this20._checkOrigFile(origBackupPath, conflictedFile.path)) {
@@ -973,12 +985,12 @@ let HgService = exports.HgService = class HgService {
           }
           return {
             path: conflictedFile.path,
-            message: message
+            message
           };
         });
 
         return function (_x2) {
-          return _ref7.apply(this, arguments);
+          return _ref3.apply(this, arguments);
         };
       })()));
       return conflicts;
@@ -1003,11 +1015,11 @@ let HgService = exports.HgService = class HgService {
 
   _checkOrigFile(origBackupPath, filePath) {
     return (0, _asyncToGenerator.default)(function* () {
-      const origFilePath = (_nuclideUri || _load_nuclideUri()).default.join(origBackupPath, `${ filePath }.orig`);
+      const origFilePath = (_nuclideUri || _load_nuclideUri()).default.join(origBackupPath, `${filePath}.orig`);
       logger.info('origBackupPath:', origBackupPath);
       logger.info('filePath:', filePath);
       logger.info('origFilePath:', origFilePath);
-      return yield (_fsPromise || _load_fsPromise()).default.exists(origFilePath);
+      return (_fsPromise || _load_fsPromise()).default.exists(origFilePath);
     })();
   }
 
@@ -1038,6 +1050,15 @@ let HgService = exports.HgService = class HgService {
     }).publish();
   }
 
+  pull(options) {
+    const args = ['pull', ...options];
+    const execOptions = {
+      cwd: this._workingDirectory
+    };
+
+    return this._hgObserveExecution(args, execOptions).publish();
+  }
+
   /**
    * Copy files versioned under Hg.
    * @param filePaths Which files should be copied.
@@ -1065,4 +1086,5 @@ let HgService = exports.HgService = class HgService {
       }
     })();
   }
-};
+}
+exports.HgService = HgService;

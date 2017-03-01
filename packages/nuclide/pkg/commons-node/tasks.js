@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-// It's really convenient to model processes with Observables but Atom use a more OO [Task
-// interface](https://atom.io/docs/api/latest/Task). These are utilities for converting between the
-// two.
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -53,23 +40,23 @@ function taskFromObservable(observable) {
   let subscription;
 
   return {
-    start: function () {
+    start() {
       if (subscription == null) {
         subscription = events.connect();
       }
     },
-    cancel: function () {
+    cancel() {
       if (subscription != null) {
         subscription.unsubscribe();
       }
     },
-    onDidComplete: function (callback) {
+    onDidComplete(callback) {
       return new (_UniversalDisposable || _load_UniversalDisposable()).default(events.subscribe({ complete: callback, error: () => {} }));
     },
-    onDidError: function (callback) {
+    onDidError(callback) {
       return new (_UniversalDisposable || _load_UniversalDisposable()).default(events.subscribe({ error: callback }));
     },
-    onProgress: function (callback) {
+    onProgress(callback) {
       return new (_UniversalDisposable || _load_UniversalDisposable()).default(events.filter(event => event.type === 'progress').map(event => {
         if (!(event.type === 'progress')) {
           throw new Error('Invariant violation: "event.type === \'progress\'"');
@@ -84,11 +71,25 @@ function taskFromObservable(observable) {
 /**
  * Convert a task to an observable of events.
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+// It's really convenient to model processes with Observables but Atom use a more OO [Task
+// interface](https://atom.io/docs/api/latest/Task). These are utilities for converting between the
+// two.
+
 function observableFromTask(task) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     let finished = false;
 
-    const events = typeof task.onProgress === 'function' ? (0, (_event || _load_event()).observableFromSubscribeFunction)(task.onProgress.bind(task)).map(progress => ({ type: 'progress', progress: progress })) : _rxjsBundlesRxMinJs.Observable.never();
+    const events = typeof task.onProgress === 'function' ? (0, (_event || _load_event()).observableFromSubscribeFunction)(task.onProgress.bind(task)).map(progress => ({ type: 'progress', progress })) : _rxjsBundlesRxMinJs.Observable.never();
     const completeEvents = (0, (_event || _load_event()).observableFromSubscribeFunction)(task.onDidComplete.bind(task));
     const errors = (0, (_event || _load_event()).observableFromSubscribeFunction)(task.onDidError.bind(task)).switchMap(_rxjsBundlesRxMinJs.Observable.throw);
 

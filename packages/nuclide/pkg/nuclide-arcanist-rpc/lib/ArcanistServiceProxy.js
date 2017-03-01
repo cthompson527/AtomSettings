@@ -12,7 +12,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 58
+          line: 59
         },
         kind: "named",
         name: "NuclideUri"
@@ -24,14 +24,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 58
+          line: 59
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 58
+            line: 59
           },
           kind: "named",
           name: "NuclideUri"
@@ -47,7 +47,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 66
+          line: 67
         },
         kind: "named",
         name: "NuclideUri"
@@ -59,16 +59,60 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 66
+          line: 67
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 66
+            line: 67
           },
           kind: "any"
+        }
+      });
+    });
+  };
+
+  remoteModule.getArcConfigKey = function (arg0, arg1) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "fileName",
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 83
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }, {
+      name: "key",
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 84
+        },
+        kind: "string"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("ArcanistService/getArcConfigKey", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 85
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 85
+          },
+          kind: "string"
         }
       });
     });
@@ -81,7 +125,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 81
+          line: 93
         },
         kind: "named",
         name: "NuclideUri"
@@ -93,16 +137,84 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 81
+          line: 93
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 81
+            line: 93
           },
           kind: "string"
+        }
+      });
+    });
+  };
+
+  remoteModule.findArcProjectIdAndDirectory = function (arg0) {
+    return _client.marshalArguments(Array.from(arguments), [{
+      name: "fileName",
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 98
+        },
+        kind: "named",
+        name: "NuclideUri"
+      }
+    }]).then(args => {
+      return _client.callRemoteFunction("ArcanistService/findArcProjectIdAndDirectory", "promise", args);
+    }).then(value => {
+      return _client.unmarshal(value, {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 98
+        },
+        kind: "nullable",
+        type: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 98
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 99
+            },
+            name: "projectId",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 99
+              },
+              kind: "string"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 100
+            },
+            name: "directory",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 100
+              },
+              kind: "named",
+              name: "NuclideUri"
+            },
+            optional: false
+          }]
         }
       });
     });
@@ -115,7 +227,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 86
+          line: 113
         },
         kind: "named",
         name: "NuclideUri"
@@ -127,14 +239,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 86
+          line: 113
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 86
+            line: 113
           },
           kind: "string"
         }
@@ -143,24 +255,16 @@ module.exports = _client => {
   };
 
   remoteModule.findDiagnostics = function (arg0, arg1) {
-    return _client.marshalArguments(Array.from(arguments), [{
-      name: "pathToFiles",
+    return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
+      name: "path",
       type: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 92
+          line: 119
         },
-        kind: "array",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 92
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
+        kind: "named",
+        name: "NuclideUri"
       }
     }, {
       name: "skip",
@@ -168,39 +272,31 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 93
+          line: 120
         },
         kind: "array",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 93
+            line: 120
           },
           kind: "string"
         }
       }
     }]).then(args => {
-      return _client.callRemoteFunction("ArcanistService/findDiagnostics", "promise", args);
-    }).then(value => {
+      return _client.callRemoteFunction("ArcanistService/findDiagnostics", "observable", args);
+    })).concatMap(id => id).concatMap(value => {
       return _client.unmarshal(value, {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 94
+          line: 121
         },
-        kind: "array",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 94
-          },
-          kind: "named",
-          name: "ArcDiagnostic"
-        }
+        kind: "named",
+        name: "ArcDiagnostic"
       });
-    });
+    }).publish();
   };
 
   remoteModule.createPhabricatorRevision = function (arg0, arg1, arg2) {
@@ -210,7 +306,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 204
+          line: 223
         },
         kind: "named",
         name: "NuclideUri"
@@ -221,7 +317,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 205
+          line: 224
         },
         kind: "boolean"
       }
@@ -231,14 +327,14 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 206
+          line: 225
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 206
+            line: 225
           },
           kind: "string"
         }
@@ -250,21 +346,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 207
+          line: 226
         },
         kind: "object",
         fields: [{
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 207
+            line: 226
           },
           name: "stderr",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 207
+              line: 226
             },
             kind: "string"
           },
@@ -273,14 +369,14 @@ module.exports = _client => {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 207
+            line: 226
           },
           name: "stdout",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 207
+              line: 226
             },
             kind: "string"
           },
@@ -290,14 +386,14 @@ module.exports = _client => {
     }).publish();
   };
 
-  remoteModule.updatePhabricatorRevision = function (arg0, arg1, arg2, arg3) {
+  remoteModule.updatePhabricatorRevision = function (arg0, arg1, arg2, arg3, arg4) {
     return Observable.fromPromise(_client.marshalArguments(Array.from(arguments), [{
       name: "filePath",
       type: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 213
+          line: 232
         },
         kind: "named",
         name: "NuclideUri"
@@ -308,7 +404,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 214
+          line: 233
         },
         kind: "string"
       }
@@ -318,7 +414,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 215
+          line: 234
         },
         kind: "boolean"
       }
@@ -328,17 +424,27 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 216
+          line: 235
         },
         kind: "nullable",
         type: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 216
+            line: 235
           },
           kind: "string"
         }
+      }
+    }, {
+      name: "verbatimModeEnabled",
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 236
+        },
+        kind: "boolean"
       }
     }]).then(args => {
       return _client.callRemoteFunction("ArcanistService/updatePhabricatorRevision", "observable", args);
@@ -347,21 +453,21 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 217
+          line: 237
         },
         kind: "object",
         fields: [{
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 217
+            line: 237
           },
           name: "stderr",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 217
+              line: 237
             },
             kind: "string"
           },
@@ -370,14 +476,14 @@ module.exports = _client => {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 217
+            line: 237
           },
           name: "stdout",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 217
+              line: 237
             },
             kind: "string"
           },
@@ -394,7 +500,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 226
+          line: 251
         },
         kind: "named",
         name: "NuclideUri"
@@ -405,7 +511,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 227
+          line: 252
         },
         kind: "boolean"
       }
@@ -415,7 +521,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 228
+          line: 253
         },
         kind: "boolean"
       }
@@ -426,7 +532,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 229
+          line: 254
         },
         kind: "named",
         name: "ProcessMessage"
@@ -441,7 +547,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 248
+          line: 272
         },
         kind: "named",
         name: "NuclideUri"
@@ -453,7 +559,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 249
+          line: 273
         },
         kind: "named",
         name: "ProcessMessage"
@@ -468,7 +574,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 256
+          line: 281
         },
         kind: "named",
         name: "NuclideUri"
@@ -479,7 +585,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 257
+          line: 282
         },
         kind: "string"
       }
@@ -490,7 +596,7 @@ module.exports = _client => {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 258
+          line: 283
         },
         kind: "named",
         name: "ProcessMessage"
@@ -507,1078 +613,1071 @@ Object.defineProperty(module.exports, "inject", {
   }
 });
 Object.defineProperty(module.exports, "defs", {
-  value: new Map([["Object", {
-    kind: "alias",
-    name: "Object",
-    location: {
-      type: "builtin"
-    }
-  }], ["Date", {
-    kind: "alias",
-    name: "Date",
-    location: {
-      type: "builtin"
-    }
-  }], ["RegExp", {
-    kind: "alias",
-    name: "RegExp",
-    location: {
-      type: "builtin"
-    }
-  }], ["Buffer", {
-    kind: "alias",
-    name: "Buffer",
-    location: {
-      type: "builtin"
-    }
-  }], ["fs.Stats", {
-    kind: "alias",
-    name: "fs.Stats",
-    location: {
-      type: "builtin"
-    }
-  }], ["NuclideUri", {
-    kind: "alias",
-    name: "NuclideUri",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Point", {
-    kind: "alias",
-    name: "atom$Point",
-    location: {
-      type: "builtin"
-    }
-  }], ["atom$Range", {
-    kind: "alias",
-    name: "atom$Range",
-    location: {
-      type: "builtin"
-    }
-  }], ["ArcDiagnostic", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 42
+  value: {
+    Object: {
+      kind: "alias",
+      name: "Object",
+      location: {
+        type: "builtin"
+      }
     },
-    name: "ArcDiagnostic",
-    definition: {
+    Date: {
+      kind: "alias",
+      name: "Date",
+      location: {
+        type: "builtin"
+      }
+    },
+    RegExp: {
+      kind: "alias",
+      name: "RegExp",
+      location: {
+        type: "builtin"
+      }
+    },
+    Buffer: {
+      kind: "alias",
+      name: "Buffer",
+      location: {
+        type: "builtin"
+      }
+    },
+    "fs.Stats": {
+      kind: "alias",
+      name: "fs.Stats",
+      location: {
+        type: "builtin"
+      }
+    },
+    NuclideUri: {
+      kind: "alias",
+      name: "NuclideUri",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Point: {
+      kind: "alias",
+      name: "atom$Point",
+      location: {
+        type: "builtin"
+      }
+    },
+    atom$Range: {
+      kind: "alias",
+      name: "atom$Range",
+      location: {
+        type: "builtin"
+      }
+    },
+    ArcDiagnostic: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "ArcanistService.js",
-        line: 42
+        line: 43
       },
-      kind: "object",
-      fields: [{
+      name: "ArcDiagnostic",
+      definition: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
           line: 43
         },
-        name: "type",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 43
-          },
-          kind: "union",
-          types: [{
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 43
-            },
-            kind: "string-literal",
-            value: "Error"
-          }, {
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 43
-            },
-            kind: "string-literal",
-            value: "Warning"
-          }]
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 44
-        },
-        name: "text",
-        type: {
+        kind: "object",
+        fields: [{
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 44
           },
-          kind: "string"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 45
-        },
-        name: "filePath",
-        type: {
+          name: "type",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 44
+            },
+            kind: "union",
+            types: [{
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 44
+              },
+              kind: "string-literal",
+              value: "Error"
+            }, {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 44
+              },
+              kind: "string-literal",
+              value: "Warning"
+            }]
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 45
           },
-          kind: "named",
-          name: "NuclideUri"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 46
-        },
-        name: "row",
-        type: {
+          name: "text",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 45
+            },
+            kind: "string"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 46
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 47
-        },
-        name: "col",
-        type: {
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 46
+            },
+            kind: "named",
+            name: "NuclideUri"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 47
           },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 48
-        },
-        name: "code",
-        type: {
+          name: "row",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 47
+            },
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 48
           },
-          kind: "nullable",
+          name: "col",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
               line: 48
             },
-            kind: "string"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 51
-        },
-        name: "original",
-        type: {
+            kind: "number"
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 51
+            line: 49
           },
-          kind: "string"
-        },
-        optional: true
-      }, {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 52
-        },
-        name: "replacement",
-        type: {
+          name: "code",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 49
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 49
+              },
+              kind: "string"
+            }
+          },
+          optional: false
+        }, {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 52
           },
-          kind: "string"
-        },
-        optional: true
-      }]
-    }
-  }], ["findArcConfigDirectory", {
-    kind: "function",
-    name: "findArcConfigDirectory",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 58
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 58
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "fileName",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 58
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 58
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 58
-          },
-          kind: "nullable",
+          name: "original",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 58
+              line: 52
+            },
+            kind: "string"
+          },
+          optional: true
+        }, {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 53
+          },
+          name: "replacement",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 53
+            },
+            kind: "string"
+          },
+          optional: true
+        }]
+      }
+    },
+    findArcConfigDirectory: {
+      kind: "function",
+      name: "findArcConfigDirectory",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 59
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 59
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 59
             },
             kind: "named",
             name: "NuclideUri"
           }
-        }
-      }
-    }
-  }], ["readArcConfig", {
-    kind: "function",
-    name: "readArcConfig",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 66
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 66
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "fileName",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 66
+            line: 59
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 66
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 66
-          },
-          kind: "nullable",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 66
+              line: 59
             },
-            kind: "any"
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 59
+              },
+              kind: "named",
+              name: "NuclideUri"
+            }
           }
         }
       }
-    }
-  }], ["findArcProjectIdOfPath", {
-    kind: "function",
-    name: "findArcProjectIdOfPath",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 81
     },
-    type: {
+    readArcConfig: {
+      kind: "function",
+      name: "readArcConfig",
       location: {
         type: "source",
         fileName: "ArcanistService.js",
-        line: 81
+        line: 67
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "fileName",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 81
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 81
+          line: 67
         },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 81
-          },
-          kind: "nullable",
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 81
-            },
-            kind: "string"
-          }
-        }
-      }
-    }
-  }], ["getProjectRelativePath", {
-    kind: "function",
-    name: "getProjectRelativePath",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 86
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 86
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "fileName",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 86
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 86
-        },
-        kind: "promise",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 86
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 86
-            },
-            kind: "string"
-          }
-        }
-      }
-    }
-  }], ["findDiagnostics", {
-    kind: "function",
-    name: "findDiagnostics",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 91
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 91
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "pathToFiles",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 92
-          },
-          kind: "array",
-          type: {
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 92
+              line: 67
             },
             kind: "named",
             name: "NuclideUri"
           }
-        }
-      }, {
-        name: "skip",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 93
+            line: 67
           },
-          kind: "array",
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 67
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 67
+              },
+              kind: "any"
+            }
+          }
+        }
+      }
+    },
+    getArcConfigKey: {
+      kind: "function",
+      name: "getArcConfigKey",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 82
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 82
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 83
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "key",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 84
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 85
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 85
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 85
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    findArcProjectIdOfPath: {
+      kind: "function",
+      name: "findArcProjectIdOfPath",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 93
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 93
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
               line: 93
             },
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 94
-        },
-        kind: "promise",
-        type: {
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 94
+            line: 93
           },
-          kind: "array",
+          kind: "promise",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 94
+              line: 93
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 93
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    findArcProjectIdAndDirectory: {
+      kind: "function",
+      name: "findArcProjectIdAndDirectory",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 98
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 98
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 98
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 98
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 98
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 98
+              },
+              kind: "object",
+              fields: [{
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 99
+                },
+                name: "projectId",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "ArcanistService.js",
+                    line: 99
+                  },
+                  kind: "string"
+                },
+                optional: false
+              }, {
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 100
+                },
+                name: "directory",
+                type: {
+                  location: {
+                    type: "source",
+                    fileName: "ArcanistService.js",
+                    line: 100
+                  },
+                  kind: "named",
+                  name: "NuclideUri"
+                },
+                optional: false
+              }]
+            }
+          }
+        }
+      }
+    },
+    getProjectRelativePath: {
+      kind: "function",
+      name: "getProjectRelativePath",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 113
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 113
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "fileName",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 113
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 113
+          },
+          kind: "promise",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 113
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 113
+              },
+              kind: "string"
+            }
+          }
+        }
+      }
+    },
+    findDiagnostics: {
+      kind: "function",
+      name: "findDiagnostics",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 118
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 118
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "path",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 119
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "skip",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 120
+            },
+            kind: "array",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 120
+              },
+              kind: "string"
+            }
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 121
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 121
             },
             kind: "named",
             name: "ArcDiagnostic"
           }
         }
       }
-    }
-  }], ["createPhabricatorRevision", {
-    kind: "function",
-    name: "createPhabricatorRevision",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 203
     },
-    type: {
+    createPhabricatorRevision: {
+      kind: "function",
+      name: "createPhabricatorRevision",
       location: {
         type: "source",
         fileName: "ArcanistService.js",
-        line: 203
+        line: 222
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "filePath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 204
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "isPrepareMode",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 205
-          },
-          kind: "boolean"
-        }
-      }, {
-        name: "lintExcuse",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 206
-          },
-          kind: "nullable",
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 222
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "filePath",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 206
+              line: 223
             },
-            kind: "string"
+            kind: "named",
+            name: "NuclideUri"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 207
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 207
-          },
-          kind: "object",
-          fields: [{
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 207
-            },
-            name: "stderr",
-            type: {
-              location: {
-                type: "source",
-                fileName: "ArcanistService.js",
-                line: 207
-              },
-              kind: "string"
-            },
-            optional: true
-          }, {
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 207
-            },
-            name: "stdout",
-            type: {
-              location: {
-                type: "source",
-                fileName: "ArcanistService.js",
-                line: 207
-              },
-              kind: "string"
-            },
-            optional: true
-          }]
-        }
-      }
-    }
-  }], ["updatePhabricatorRevision", {
-    kind: "function",
-    name: "updatePhabricatorRevision",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 212
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 212
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "filePath",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 213
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "message",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 214
-          },
-          kind: "string"
-        }
-      }, {
-        name: "allowUntracked",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 215
-          },
-          kind: "boolean"
-        }
-      }, {
-        name: "lintExcuse",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 216
-          },
-          kind: "nullable",
+        }, {
+          name: "isPrepareMode",
           type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 216
+              line: 224
             },
-            kind: "string"
+            kind: "boolean"
           }
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 217
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 217
-          },
-          kind: "object",
-          fields: [{
+        }, {
+          name: "lintExcuse",
+          type: {
             location: {
               type: "source",
               fileName: "ArcanistService.js",
-              line: 217
+              line: 225
             },
-            name: "stderr",
+            kind: "nullable",
             type: {
               location: {
                 type: "source",
                 fileName: "ArcanistService.js",
-                line: 217
+                line: 225
               },
               kind: "string"
-            },
-            optional: true
-          }, {
-            location: {
-              type: "source",
-              fileName: "ArcanistService.js",
-              line: 217
-            },
-            name: "stdout",
-            type: {
-              location: {
-                type: "source",
-                fileName: "ArcanistService.js",
-                line: 217
-              },
-              kind: "string"
-            },
-            optional: true
-          }]
-        }
-      }
-    }
-  }], ["execArcPull", {
-    kind: "function",
-    name: "execArcPull",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 225
-    },
-    type: {
-      location: {
-        type: "source",
-        fileName: "ArcanistService.js",
-        line: 225
-      },
-      kind: "function",
-      argumentTypes: [{
-        name: "cwd",
-        type: {
+            }
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
             line: 226
           },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "fetchLatest",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 227
-          },
-          kind: "boolean"
-        }
-      }, {
-        name: "allowDirtyChanges",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 228
-          },
-          kind: "boolean"
-        }
-      }],
-      returnType: {
-        location: {
-          type: "source",
-          fileName: "ArcanistService.js",
-          line: 229
-        },
-        kind: "observable",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 229
-          },
-          kind: "named",
-          name: "ProcessMessage"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 226
+            },
+            kind: "object",
+            fields: [{
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 226
+              },
+              name: "stderr",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 226
+                },
+                kind: "string"
+              },
+              optional: true
+            }, {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 226
+              },
+              name: "stdout",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 226
+                },
+                kind: "string"
+              },
+              optional: true
+            }]
+          }
         }
       }
-    }
-  }], ["execArcLand", {
-    kind: "function",
-    name: "execArcLand",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 247
     },
-    type: {
+    updatePhabricatorRevision: {
+      kind: "function",
+      name: "updatePhabricatorRevision",
       location: {
         type: "source",
         fileName: "ArcanistService.js",
-        line: 247
+        line: 231
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "cwd",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 248
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 249
+          line: 231
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "filePath",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 232
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "message",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 233
+            },
+            kind: "string"
+          }
+        }, {
+          name: "allowUntracked",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 234
+            },
+            kind: "boolean"
+          }
+        }, {
+          name: "lintExcuse",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 235
+            },
+            kind: "nullable",
+            type: {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 235
+              },
+              kind: "string"
+            }
+          }
+        }, {
+          name: "verbatimModeEnabled",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 236
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 249
+            line: 237
           },
-          kind: "named",
-          name: "ProcessMessage"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 237
+            },
+            kind: "object",
+            fields: [{
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 237
+              },
+              name: "stderr",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 237
+                },
+                kind: "string"
+              },
+              optional: true
+            }, {
+              location: {
+                type: "source",
+                fileName: "ArcanistService.js",
+                line: 237
+              },
+              name: "stdout",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "ArcanistService.js",
+                  line: 237
+                },
+                kind: "string"
+              },
+              optional: true
+            }]
+          }
         }
       }
-    }
-  }], ["execArcPatch", {
-    kind: "function",
-    name: "execArcPatch",
-    location: {
-      type: "source",
-      fileName: "ArcanistService.js",
-      line: 255
     },
-    type: {
+    execArcPull: {
+      kind: "function",
+      name: "execArcPull",
       location: {
         type: "source",
         fileName: "ArcanistService.js",
-        line: 255
+        line: 250
       },
-      kind: "function",
-      argumentTypes: [{
-        name: "cwd",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 256
-          },
-          kind: "named",
-          name: "NuclideUri"
-        }
-      }, {
-        name: "differentialRevision",
-        type: {
-          location: {
-            type: "source",
-            fileName: "ArcanistService.js",
-            line: 257
-          },
-          kind: "string"
-        }
-      }],
-      returnType: {
+      type: {
         location: {
           type: "source",
           fileName: "ArcanistService.js",
-          line: 258
+          line: 250
         },
-        kind: "observable",
-        type: {
+        kind: "function",
+        argumentTypes: [{
+          name: "cwd",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 251
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "fetchLatest",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 252
+            },
+            kind: "boolean"
+          }
+        }, {
+          name: "allowDirtyChanges",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 253
+            },
+            kind: "boolean"
+          }
+        }],
+        returnType: {
           location: {
             type: "source",
             fileName: "ArcanistService.js",
-            line: 258
+            line: 254
           },
-          kind: "named",
-          name: "ProcessMessage"
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 254
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
         }
       }
-    }
-  }], ["ProcessExitMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 13
     },
-    name: "ProcessExitMessage",
-    definition: {
+    execArcLand: {
+      kind: "function",
+      name: "execArcLand",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 271
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 271
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "cwd",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 272
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 273
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 273
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
+        }
+      }
+    },
+    execArcPatch: {
+      kind: "function",
+      name: "execArcPatch",
+      location: {
+        type: "source",
+        fileName: "ArcanistService.js",
+        line: 280
+      },
+      type: {
+        location: {
+          type: "source",
+          fileName: "ArcanistService.js",
+          line: 280
+        },
+        kind: "function",
+        argumentTypes: [{
+          name: "cwd",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 281
+            },
+            kind: "named",
+            name: "NuclideUri"
+          }
+        }, {
+          name: "differentialRevision",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 282
+            },
+            kind: "string"
+          }
+        }],
+        returnType: {
+          location: {
+            type: "source",
+            fileName: "ArcanistService.js",
+            line: 283
+          },
+          kind: "observable",
+          type: {
+            location: {
+              type: "source",
+              fileName: "ArcanistService.js",
+              line: 283
+            },
+            kind: "named",
+            name: "ProcessMessage"
+          }
+        }
+      }
+    },
+    ProcessExitMessage: {
+      kind: "alias",
       location: {
         type: "source",
         fileName: "process-rpc-types.js",
         line: 13
       },
-      kind: "object",
-      fields: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 14
-        },
-        name: "kind",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 14
-          },
-          kind: "string-literal",
-          value: "exit"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 15
-        },
-        name: "exitCode",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 15
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 15
-            },
-            kind: "number"
-          }
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 16
-        },
-        name: "signal",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 16
-          },
-          kind: "nullable",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 16
-            },
-            kind: "string"
-          }
-        },
-        optional: false
-      }]
-    }
-  }], ["ProcessMessage", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 20
-    },
-    name: "ProcessMessage",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "process-rpc-types.js",
-        line: 20
-      },
-      kind: "union",
-      types: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 20
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 21
-          },
-          name: "kind",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 21
-            },
-            kind: "string-literal",
-            value: "stdout"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 22
-          },
-          name: "data",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 22
-            },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 23
-        },
-        kind: "object",
-        fields: [{
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 24
-          },
-          name: "kind",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 24
-            },
-            kind: "string-literal",
-            value: "stderr"
-          },
-          optional: false
-        }, {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 25
-          },
-          name: "data",
-          type: {
-            location: {
-              type: "source",
-              fileName: "process-rpc-types.js",
-              line: 25
-            },
-            kind: "string"
-          },
-          optional: false
-        }]
-      }, {
+      name: "ProcessExitMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "process-rpc-types.js",
@@ -1651,115 +1750,289 @@ Object.defineProperty(module.exports, "defs", {
           },
           optional: false
         }]
-      }, {
+      }
+    },
+    ProcessMessage: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "process-rpc-types.js",
+        line: 20
+      },
+      name: "ProcessMessage",
+      definition: {
         location: {
           type: "source",
           fileName: "process-rpc-types.js",
-          line: 26
+          line: 20
+        },
+        kind: "union",
+        types: [{
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 20
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 21
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 21
+              },
+              kind: "string-literal",
+              value: "stdout"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 22
+            },
+            name: "data",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 22
+              },
+              kind: "string"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 23
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 24
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 24
+              },
+              kind: "string-literal",
+              value: "stderr"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 25
+            },
+            name: "data",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 25
+              },
+              kind: "string"
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 13
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 14
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 14
+              },
+              kind: "string-literal",
+              value: "exit"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 15
+            },
+            name: "exitCode",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 15
+              },
+              kind: "nullable",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "process-rpc-types.js",
+                  line: 15
+                },
+                kind: "number"
+              }
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 16
+            },
+            name: "signal",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 16
+              },
+              kind: "nullable",
+              type: {
+                location: {
+                  type: "source",
+                  fileName: "process-rpc-types.js",
+                  line: 16
+                },
+                kind: "string"
+              }
+            },
+            optional: false
+          }]
+        }, {
+          location: {
+            type: "source",
+            fileName: "process-rpc-types.js",
+            line: 26
+          },
+          kind: "object",
+          fields: [{
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 27
+            },
+            name: "kind",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 27
+              },
+              kind: "string-literal",
+              value: "error"
+            },
+            optional: false
+          }, {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 28
+            },
+            name: "error",
+            type: {
+              location: {
+                type: "source",
+                fileName: "process-rpc-types.js",
+                line: 28
+              },
+              kind: "named",
+              name: "Object"
+            },
+            optional: false
+          }]
+        }],
+        discriminantField: "kind"
+      }
+    },
+    ProcessInfo: {
+      kind: "alias",
+      location: {
+        type: "source",
+        fileName: "process-rpc-types.js",
+        line: 31
+      },
+      name: "ProcessInfo",
+      definition: {
+        location: {
+          type: "source",
+          fileName: "process-rpc-types.js",
+          line: 31
         },
         kind: "object",
         fields: [{
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
-            line: 27
+            line: 32
           },
-          name: "kind",
+          name: "parentPid",
           type: {
             location: {
               type: "source",
               fileName: "process-rpc-types.js",
-              line: 27
+              line: 32
             },
-            kind: "string-literal",
-            value: "error"
+            kind: "number"
           },
           optional: false
         }, {
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
-            line: 28
+            line: 33
           },
-          name: "error",
+          name: "pid",
           type: {
             location: {
               type: "source",
               fileName: "process-rpc-types.js",
-              line: 28
+              line: 33
             },
-            kind: "named",
-            name: "Object"
+            kind: "number"
           },
           optional: false
-        }]
-      }],
-      discriminantField: "kind"
-    }
-  }], ["ProcessInfo", {
-    kind: "alias",
-    location: {
-      type: "source",
-      fileName: "process-rpc-types.js",
-      line: 31
-    },
-    name: "ProcessInfo",
-    definition: {
-      location: {
-        type: "source",
-        fileName: "process-rpc-types.js",
-        line: 31
-      },
-      kind: "object",
-      fields: [{
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 32
-        },
-        name: "parentPid",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 32
-          },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 33
-        },
-        name: "pid",
-        type: {
-          location: {
-            type: "source",
-            fileName: "process-rpc-types.js",
-            line: 33
-          },
-          kind: "number"
-        },
-        optional: false
-      }, {
-        location: {
-          type: "source",
-          fileName: "process-rpc-types.js",
-          line: 34
-        },
-        name: "command",
-        type: {
+        }, {
           location: {
             type: "source",
             fileName: "process-rpc-types.js",
             line: 34
           },
-          kind: "string"
-        },
-        optional: false
-      }]
+          name: "command",
+          type: {
+            location: {
+              type: "source",
+              fileName: "process-rpc-types.js",
+              line: 34
+            },
+            kind: "string"
+          },
+          optional: false
+        }]
+      }
     }
-  }]])
+  }
 });

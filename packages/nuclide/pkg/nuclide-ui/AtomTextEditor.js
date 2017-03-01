@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.AtomTextEditor = undefined;
-
-var _class, _temp;
 
 var _classnames;
 
@@ -38,9 +27,23 @@ function _load_textEditor() {
   return _textEditor = require('../commons-atom/text-editor');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../commons-node/UniversalDisposable'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const doNothing = () => {};
+const doNothing = () => {}; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             */
 
 function setupTextEditor(props) {
   const textBuffer = props.textBuffer || new _atom.TextBuffer();
@@ -48,8 +51,9 @@ function setupTextEditor(props) {
     textBuffer.setPath(props.path);
   }
 
+  const disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   if (props.onDidTextBufferChange != null) {
-    textBuffer.onDidChange(props.onDidTextBufferChange);
+    disposables.add(textBuffer.onDidChange(props.onDidTextBufferChange));
   }
 
   const textEditorParams = {
@@ -62,7 +66,7 @@ function setupTextEditor(props) {
   if (props.grammar != null) {
     textEditor.setGrammar(props.grammar);
   }
-  textEditor.setSoftWrapped(props.softWrapped);
+  disposables.add((0, (_textEditor || _load_textEditor()).enforceSoftWrap)(textEditor, props.softWrapped));
 
   if (props.placeholderText) {
     textEditor.setPlaceholderText(props.placeholderText);
@@ -77,17 +81,29 @@ function setupTextEditor(props) {
     });
   }
 
-  return textEditor;
+  return {
+    disposables,
+    textEditor
+  };
 }
 
-let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEditor extends _reactForAtom.React.Component {
+class AtomTextEditor extends _reactForAtom.React.Component {
 
   componentDidMount() {
+    this._editorDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._updateTextEditor(setupTextEditor(this.props));
     this._onDidUpdateTextEditorElement(this.props);
+    if (this.props.disabled) {
+      this._updateDisabledState(true);
+    }
   }
 
-  _updateTextEditor(textEditor) {
+  _updateTextEditor(setup) {
+    this._editorDisposables.dispose();
+    const { textEditor, disposables } = setup;
+
+    this._editorDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(disposables);
+
     const container = _reactForAtom.ReactDOM.findDOMNode(this);
     const textEditorElement = this._textEditorElement = document.createElement('atom-text-editor');
     textEditorElement.setModel(textEditor);
@@ -109,33 +125,35 @@ let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEd
     if ((_semver || _load_semver()).default.lt(atom.getVersion(), '1.9.0')) {
       return;
     }
-    this._ensureDidAttachDisposableDisposed();
-    this._onDidAttachDisposable = textEditorElement.onDidAttach(() => {
-      const correctlySizedElement = textEditorElement.querySelector('* /deep/ .lines > :first-child > :first-child');
-      if (correctlySizedElement == null) {
-        return;
-      }
-      const width = correctlySizedElement.style.width;
 
-      container.style.width = width;
-    });
+    if (this.props.correctContainerWidth) {
+      this._editorDisposables.add(textEditorElement.onDidAttach(() => {
+        const correctlySizedElement = textEditorElement.querySelector('* /deep/ .lines > :first-child > :first-child');
+        if (correctlySizedElement == null) {
+          return;
+        }
+        const { width } = correctlySizedElement.style;
+        container.style.width = width;
+      }));
+    }
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.textBuffer !== this.props.textBuffer || nextProps.readOnly !== this.props.readOnly) {
       const previousTextContents = this.getTextBuffer().getText();
       const nextTextContents = nextProps.textBuffer == null ? nextProps.textBuffer : nextProps.textBuffer.getText();
-      if (nextProps._alwaysUpdate || nextTextContents !== previousTextContents) {
-        const textEditor = setupTextEditor(nextProps);
+      if (nextTextContents !== previousTextContents) {
+        const textEditorSetup = setupTextEditor(nextProps);
+
         if (nextProps.syncTextContents) {
-          textEditor.setText(previousTextContents);
+          textEditorSetup.textEditor.setText(previousTextContents);
         }
-        this._updateTextEditor(textEditor);
+        this._updateTextEditor(textEditorSetup);
         this._onDidUpdateTextEditorElement(nextProps);
       }
     }
     if (nextProps.path !== this.props.path) {
-      this.getTextBuffer().setPath(nextProps.path);
+      this.getTextBuffer().setPath(nextProps.path || '');
     }
     if (nextProps.gutterHidden !== this.props.gutterHidden) {
       this.getModel().setLineNumberGutterVisible(nextProps.gutterHidden);
@@ -146,6 +164,9 @@ let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEd
     if (nextProps.softWrapped !== this.props.softWrapped) {
       this.getModel().setSoftWrapped(nextProps.softWrapped);
     }
+    if (nextProps.disabled !== this.props.disabled) {
+      this._updateDisabledState(nextProps.disabled);
+    }
   }
 
   _onDidUpdateTextEditorElement(props) {
@@ -153,18 +174,22 @@ let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEd
       return;
     }
     // TODO(most): t9929679 Remove this hack when Atom has a blinking cursor configuration API.
-
-    var _getElement = this.getElement();
-
-    const component = _getElement.component;
-
+    const { component } = this.getElement();
     if (component == null) {
       return;
     }
-    const presenter = component.presenter;
-
+    const { presenter } = component;
     presenter.startBlinkingCursors = doNothing;
     presenter.stopBlinkingCursors(false);
+  }
+
+  _updateDisabledState(isDisabled) {
+    // Hack to set TextEditor to read-only mode, per https://github.com/atom/atom/issues/6880
+    if (isDisabled) {
+      this.getElement().removeAttribute('tabindex');
+    } else {
+      this.getElement().setAttribute('tabindex', this.props.tabIndex);
+    }
   }
 
   getTextBuffer() {
@@ -197,17 +222,13 @@ let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEd
   }
 
   componentWillUnmount() {
-    this._ensureDidAttachDisposableDisposed();
+    this._editorDisposables.dispose();
   }
-
-  _ensureDidAttachDisposableDisposed() {
-    if (this._onDidAttachDisposable != null) {
-      this._onDidAttachDisposable.dispose();
-    }
-  }
-
-}, _class.defaultProps = {
-  _alwaysUpdate: false,
+}
+exports.AtomTextEditor = AtomTextEditor;
+AtomTextEditor.defaultProps = {
+  correctContainerWidth: true,
+  disabled: false,
   gutterHidden: false,
   lineNumberGutterVisible: true,
   readOnly: false,
@@ -215,4 +236,4 @@ let AtomTextEditor = exports.AtomTextEditor = (_temp = _class = class AtomTextEd
   syncTextContents: true,
   tabIndex: '0', // Keep in line with other input elements.
   softWrapped: false
-}, _temp);
+};

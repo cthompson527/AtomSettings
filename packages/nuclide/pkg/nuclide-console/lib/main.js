@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createPackage;
 
@@ -31,12 +18,16 @@ function _load_reduxObservable() {
   return _reduxObservable = require('../../commons-node/redux-observable');
 }
 
-var _atom = require('atom');
-
 var _featureConfig;
 
 function _load_featureConfig() {
   return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _Actions;
@@ -75,11 +66,21 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let Activation = class Activation {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Activation {
 
   constructor(rawState) {
     this._rawState = rawState;
-    this._disposables = new _atom.CompositeDisposable(atom.contextMenu.add({
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(atom.contextMenu.add({
       '.nuclide-console-record': [{
         label: 'Copy Message',
         command: 'nuclide-console:copy-message'
@@ -90,7 +91,9 @@ let Activation = class Activation {
         return;
       }
       atom.clipboard.write(el.innerText);
-    }), atom.commands.add('atom-workspace', 'nuclide-console:clear', () => this._getStore().dispatch((_Actions || _load_Actions()).clearRecords())), (_featureConfig || _load_featureConfig()).default.observe('nuclide-console.maximumMessageCount', maxMessageCount => this._getStore().dispatch((_Actions || _load_Actions()).setMaxMessageCount(maxMessageCount))));
+    }), atom.commands.add('atom-workspace', 'nuclide-console:clear', () => this._getStore().dispatch((_Actions || _load_Actions()).clearRecords())), (_featureConfig || _load_featureConfig()).default.observe('nuclide-console.maximumMessageCount', maxMessageCount => {
+      this._getStore().dispatch((_Actions || _load_Actions()).setMaxMessageCount(maxMessageCount));
+    }));
   }
 
   _getStore() {
@@ -115,20 +118,18 @@ let Activation = class Activation {
       tooltip: 'Toggle Console',
       priority: 700
     });
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(() => {
       toolBar.removeItems();
-    }));
+    });
   }
 
   consumeWorkspaceViewsService(api) {
-    this._disposables.add(api.registerFactory({
-      id: 'nuclide-console',
-      name: 'Console',
-      iconName: 'terminal',
-      toggleCommand: 'nuclide-console:toggle',
-      defaultLocation: 'bottom-panel',
-      create: () => (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_ConsoleContainer || _load_ConsoleContainer()).ConsoleContainer, { store: this._getStore() })),
-      isInstance: item => item instanceof (_ConsoleContainer || _load_ConsoleContainer()).ConsoleContainer
+    this._disposables.add(api.addOpener(uri => {
+      if (uri === (_ConsoleContainer || _load_ConsoleContainer()).WORKSPACE_VIEW_URI) {
+        return (0, (_viewableFromReactElement || _load_viewableFromReactElement()).viewableFromReactElement)(_reactForAtom.React.createElement((_ConsoleContainer || _load_ConsoleContainer()).ConsoleContainer, { store: this._getStore() }));
+      }
+    }), () => api.destroyWhere(item => item instanceof (_ConsoleContainer || _load_ConsoleContainer()).ConsoleContainer), atom.commands.add('atom-workspace', 'nuclide-console:toggle', event => {
+      api.toggle((_ConsoleContainer || _load_ConsoleContainer()).WORKSPACE_VIEW_URI, event.detail);
     }));
   }
 
@@ -140,18 +141,18 @@ let Activation = class Activation {
     // Create a local, nullable reference so that the service consumers don't keep the Activation
     // instance in memory.
     let activation = this;
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(() => {
       activation = null;
-    }));
+    });
 
     return {
-      registerOutputProvider: function (outputProvider) {
+      registerOutputProvider(outputProvider) {
         if (!(activation != null)) {
           throw new Error('Output service used after deactivation');
         }
 
         activation._getStore().dispatch((_Actions || _load_Actions()).registerOutputProvider(outputProvider));
-        return new _atom.Disposable(() => {
+        return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
           if (activation != null) {
             activation._getStore().dispatch((_Actions || _load_Actions()).unregisterOutputProvider(outputProvider));
           }
@@ -164,9 +165,9 @@ let Activation = class Activation {
     // Create a local, nullable reference so that the service consumers don't keep the Activation
     // instance in memory.
     let activation = this;
-    this._disposables.add(new _atom.Disposable(() => {
+    this._disposables.add(() => {
       activation = null;
-    }));
+    });
 
     return executor => {
       if (!(activation != null)) {
@@ -174,7 +175,7 @@ let Activation = class Activation {
       }
 
       activation._getStore().dispatch((_Actions || _load_Actions()).registerExecutor(executor));
-      return new _atom.Disposable(() => {
+      return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
         if (activation != null) {
           activation._getStore().dispatch((_Actions || _load_Actions()).unregisterExecutor(executor));
         }
@@ -190,9 +191,7 @@ let Activation = class Activation {
       records: this._store.getState().records
     };
   }
-
-};
-
+}
 
 function deserializeAppState(rawState) {
   return {
@@ -210,5 +209,4 @@ function deserializeAppState(rawState) {
   };
 }
 
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

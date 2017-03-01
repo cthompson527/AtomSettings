@@ -1,20 +1,22 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _atom = require('atom');
+
+var _utils;
+
+function _load_utils() {
+  return _utils = require('./utils');
+}
+
+var _nuclideHgRpc;
+
+function _load_nuclideHgRpc() {
+  return _nuclideHgRpc = require('../../nuclide-hg-rpc');
+}
 
 var _reactForAtom = require('react-for-atom');
 
@@ -44,7 +46,7 @@ function _load_Button() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DiffTimelineView = class DiffTimelineView extends _reactForAtom.React.Component {
+class DiffTimelineView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -54,8 +56,7 @@ let DiffTimelineView = class DiffTimelineView extends _reactForAtom.React.Compon
   }
 
   componentDidMount() {
-    const diffModel = this.props.diffModel;
-
+    const { diffModel } = this.props;
     this._subscriptions.add(diffModel.onDidUpdateState(this._updateRevisions));
   }
 
@@ -65,22 +66,17 @@ let DiffTimelineView = class DiffTimelineView extends _reactForAtom.React.Compon
 
   render() {
     let content = null;
-    var _props = this.props;
-    const diffModel = _props.diffModel,
-          onSelectionChange = _props.onSelectionChange;
-
-    var _diffModel$getState = diffModel.getState();
-
-    const activeRepositoryState = _diffModel$getState.activeRepositoryState;
-
+    const { diffModel, onSelectionChange } = this.props;
+    const { activeRepositoryState } = diffModel.getState();
     if (activeRepositoryState.headRevision == null) {
       content = 'Revisions not loaded...';
     } else {
-      const compareRevisionId = activeRepositoryState.compareRevisionId,
-            headRevision = activeRepositoryState.headRevision,
-            revisionStatuses = activeRepositoryState.revisionStatuses,
-            headToForkBaseRevisions = activeRepositoryState.headToForkBaseRevisions;
-
+      const {
+        compareRevisionId,
+        headRevision,
+        revisionStatuses,
+        headToForkBaseRevisions
+      } = activeRepositoryState;
       content = _reactForAtom.React.createElement(RevisionsTimelineComponent, {
         diffModel: diffModel,
         compareRevisionId: compareRevisionId || headRevision.id,
@@ -100,25 +96,38 @@ let DiffTimelineView = class DiffTimelineView extends _reactForAtom.React.Compon
   }
 
   _handleClickPublish() {
-    const diffModel = this.props.diffModel;
-
+    const { diffModel } = this.props;
     diffModel.setViewMode((_constants || _load_constants()).DiffMode.PUBLISH_MODE);
   }
 
   componentWillUnmount() {
     this._subscriptions.dispose();
   }
-};
-exports.default = DiffTimelineView;
+}
 
+exports.default = DiffTimelineView; /**
+                                     * Copyright (c) 2015-present, Facebook, Inc.
+                                     * All rights reserved.
+                                     *
+                                     * This source code is licensed under the license found in the LICENSE file in
+                                     * the root directory of this source tree.
+                                     *
+                                     * 
+                                     */
 
 function RevisionsTimelineComponent(props) {
-  const revisions = props.revisions,
-        compareRevisionId = props.compareRevisionId,
-        revisionStatuses = props.revisionStatuses;
-
+  const { revisions, compareRevisionId, revisionStatuses } = props;
   const latestToOldestRevisions = revisions.slice().reverse();
   const selectedIndex = latestToOldestRevisions.findIndex(revision => revision.id === compareRevisionId);
+
+  const headRevision = (0, (_utils || _load_utils()).getHeadRevision)(revisions);
+  const { CommitPhase } = (_nuclideHgRpc || _load_nuclideHgRpc()).hgConstants;
+  const canPublish = headRevision != null && headRevision.phase === CommitPhase.DRAFT;
+  const publishTooltip = {
+    delay: 100,
+    placement: 'top',
+    title: 'Publish your last commit to a Phabricator differential revision.'
+  };
 
   return _reactForAtom.React.createElement(
     'div',
@@ -127,7 +136,9 @@ function RevisionsTimelineComponent(props) {
       (_Button || _load_Button()).Button,
       {
         className: 'pull-right',
+        disabled: !canPublish,
         size: (_Button || _load_Button()).ButtonSizes.SMALL,
+        tooltip: publishTooltip,
         onClick: props.onClickPublish },
       'Publish to Phabricator'
     ),
@@ -143,20 +154,26 @@ function RevisionsTimelineComponent(props) {
         'div',
         { className: 'revisions' },
         _reactForAtom.React.createElement((_UncommittedChangesTimelineNode || _load_UncommittedChangesTimelineNode()).default, {
+          selectedIndex: selectedIndex,
           diffModel: props.diffModel,
-          dirtyFileCount: props.dirtyFileCount
+          dirtyFileCount: props.dirtyFileCount,
+          revisionsCount: revisions.length,
+          onSelectionChange: () => {
+            props.onSelectionChange(latestToOldestRevisions[0]);
+          }
         }),
-        latestToOldestRevisions.map((revision, i) => _reactForAtom.React.createElement((_RevisionTimelineNode || _load_RevisionTimelineNode()).default, {
+        latestToOldestRevisions.slice(0, -1).map((revision, i) => _reactForAtom.React.createElement((_RevisionTimelineNode || _load_RevisionTimelineNode()).default, {
           index: i,
           key: revision.hash,
           selectedIndex: selectedIndex,
           revision: revision,
           revisionStatus: revisionStatuses.get(revision.id),
           revisionsCount: revisions.length,
-          onSelectionChange: props.onSelectionChange
+          onSelectionChange: () => {
+            props.onSelectionChange(latestToOldestRevisions[i + 1]);
+          }
         }))
       )
     )
   );
 }
-module.exports = exports['default'];

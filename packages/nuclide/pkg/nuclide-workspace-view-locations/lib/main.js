@@ -1,22 +1,15 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createPackage;
 
 function _load_createPackage() {
   return _createPackage = _interopRequireDefault(require('../../commons-atom/createPackage'));
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _PaneLocation;
@@ -37,17 +30,25 @@ function _load_PanelLocationIds() {
   return _PanelLocationIds = _interopRequireDefault(require('./PanelLocationIds'));
 }
 
-var _atom = require('atom');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This package doesn't actually serialize its own state. The reason is that we want to centralize
 // that so that we can (eventually) associate them with profiles or workspace configurations.
 
-let Activation = class Activation {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class Activation {
 
   constructor() {
-    this._disposables = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._panelLocations = new Map();
     this._initialPanelVisibility = new Map();
   }
@@ -73,8 +74,12 @@ let Activation = class Activation {
   }
 
   consumeWorkspaceViewsService(api) {
-    this._disposables.add(api.registerLocation({ id: 'pane', create: () => new (_PaneLocation || _load_PaneLocation()).PaneLocation() }), ...(_PanelLocationIds || _load_PanelLocationIds()).default.map(id => api.registerLocation({
-      id: id,
+    const layout = require('../../nuclide-ui/VendorLib/atom-tabs/lib/layout');
+    layout.activate();
+    this._disposables.add(() => {
+      layout.deactivate();
+    }, api.registerLocation({ id: 'pane', create: () => new (_PaneLocation || _load_PaneLocation()).PaneLocation() }), ...(_PanelLocationIds || _load_PanelLocationIds()).default.map(id => api.registerLocation({
+      id,
       create: serializedState_ => {
         const serializedState = serializedState_ == null ? {} : serializedState_;
         const initialVisibility = this._initialPanelVisibility.get(id);
@@ -86,7 +91,7 @@ let Activation = class Activation {
         this._panelLocations.set(id, location);
         return location;
       }
-    })), ...(_PanelLocationIds || _load_PanelLocationIds()).default.map(id => atom.commands.add('atom-workspace', `nuclide-workspace-views:toggle-${ id }`, () => {
+    })), ...(_PanelLocationIds || _load_PanelLocationIds()).default.map(id => atom.commands.add('atom-workspace', `nuclide-workspace-views:toggle-${id}`, () => {
       this._toggleVisibility(id);
     })));
   }
@@ -100,7 +105,7 @@ let Activation = class Activation {
   provideDistractionFreeModeProvider() {
     this._initialPanelVisibility = new Map((_PanelLocationIds || _load_PanelLocationIds()).default.map(id => [id, false]));
     return (_PanelLocationIds || _load_PanelLocationIds()).default.map(id => ({
-      name: `nuclide-workspace-view-locations:${ id }`,
+      name: `nuclide-workspace-view-locations:${id}`,
       isVisible: () => {
         const location = this._panelLocations.get(id);
         return location == null ? Boolean(this._initialPanelVisibility.get(id)) : location.isVisible();
@@ -110,7 +115,6 @@ let Activation = class Activation {
       }
     }));
   }
+}
 
-};
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

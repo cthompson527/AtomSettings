@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.WORKSPACE_VIEW_URI = undefined;
 
 var _HealthPaneItemComponent;
 
@@ -24,7 +15,19 @@ var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let HealthPaneItem = class HealthPaneItem extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const WORKSPACE_VIEW_URI = exports.WORKSPACE_VIEW_URI = 'atom://nuclide/health';
+
+class HealthPaneItem extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -56,13 +59,16 @@ let HealthPaneItem = class HealthPaneItem extends _reactForAtom.React.Component 
     return false;
   }
 
-  render() {
-    var _state = this.state;
-    const toolbarJewel = _state.toolbarJewel,
-          updateToolbarJewel = _state.updateToolbarJewel,
-          childProcessesTree = _state.childProcessesTree,
-          stats = _state.stats;
+  getURI() {
+    return WORKSPACE_VIEW_URI;
+  }
 
+  getDefaultLocation() {
+    return 'pane';
+  }
+
+  render() {
+    const { toolbarJewel, updateToolbarJewel, childProcessesTree, stats } = this.state;
 
     if (stats == null) {
       return _reactForAtom.React.createElement('div', null);
@@ -70,7 +76,10 @@ let HealthPaneItem = class HealthPaneItem extends _reactForAtom.React.Component 
 
     return _reactForAtom.React.createElement(
       'div',
-      { className: 'pane-item padded nuclide-health-pane-item' },
+      {
+        // Need native-key-bindings and tabIndex={-1} to be able to copy paste
+        className: 'pane-item padded nuclide-health-pane-item native-key-bindings',
+        tabIndex: -1 },
       _reactForAtom.React.createElement((_HealthPaneItemComponent || _load_HealthPaneItemComponent()).default, {
         toolbarJewel: toolbarJewel,
         updateToolbarJewel: updateToolbarJewel,
@@ -84,7 +93,5 @@ let HealthPaneItem = class HealthPaneItem extends _reactForAtom.React.Component 
       })
     );
   }
-
-};
+}
 exports.default = HealthPaneItem;
-module.exports = exports['default'];

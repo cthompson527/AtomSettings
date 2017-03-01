@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -48,7 +39,15 @@ const DEFAULT_OPTIONS = {
   subscription: null,
   highlightedText: '',
   matchesFilter: true
-};
+}; /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */
 
 /**
 * OVERVIEW
@@ -97,7 +96,7 @@ const DEFAULT_OPTIONS = {
 *
 *   All property derivation and links set-up is done with one traversal only over the children.
 */
-let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
+class FileTreeNode {
 
   /**
   * The children property is an OrderedMap instance keyed by child's name property.
@@ -119,9 +118,7 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   /**
   * The _derivedChange param is not for external use.
   */
-  constructor(options, conf) {
-    let _deriver = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
-
+  constructor(options, conf, _deriver = null) {
     this.parent = null;
     this.nextSibling = null;
     this.prevSibling = null;
@@ -268,35 +265,35 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   }
 
   setIsExpanded(isExpanded) {
-    return this.set({ isExpanded: isExpanded });
+    return this.set({ isExpanded });
   }
 
   setIsSelected(isSelected) {
-    return this.set({ isSelected: isSelected });
+    return this.set({ isSelected });
   }
 
   setIsFocused(isFocused) {
-    return this.set({ isFocused: isFocused });
+    return this.set({ isFocused });
   }
 
   setIsDragHovered(isDragHovered) {
-    return this.set({ isDragHovered: isDragHovered });
+    return this.set({ isDragHovered });
   }
 
   setIsLoading(isLoading) {
-    return this.set({ isLoading: isLoading });
+    return this.set({ isLoading });
   }
 
   setIsTracked(isTracked) {
-    return this.set({ isTracked: isTracked });
+    return this.set({ isTracked });
   }
 
   setIsCwd(isCwd) {
-    return this.set({ isCwd: isCwd });
+    return this.set({ isCwd });
   }
 
   setChildren(children) {
-    return this.set({ children: children });
+    return this.set({ children });
   }
 
   /**
@@ -305,7 +302,7 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   */
   updateConf() {
     const children = this.children.map(c => c.updateConf(this.conf));
-    return this.newNode({ children: children }, this.conf);
+    return this.newNode({ children }, this.conf);
   }
 
   /**
@@ -331,9 +328,7 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   * The `postPredicate` is invoked on the way up. It has to return a non-null node, but it may
   * be the same instance as it was called with.
   */
-  setRecursive(prePredicate) {
-    let postPredicate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : n => n;
-
+  setRecursive(prePredicate, postPredicate = n => n) {
     if (prePredicate != null) {
       const newNode = prePredicate(this);
       if (newNode != null) {
@@ -353,7 +348,7 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   */
   updateChild(newChild) {
     const children = this.children.set(newChild.name, newChild);
-    return this.set({ children: children });
+    return this.set({ children });
   }
 
   /**
@@ -361,9 +356,7 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
   * The first is invoked upon descent and with its return value controls whether need to traverse
   * deeper into the tree. True - descend, False - don't.
   */
-  traverse(preCallback) {
-    let postCallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : () => {};
-
+  traverse(preCallback, postCallback = () => {}) {
     const descend = preCallback(this);
 
     if (descend) {
@@ -583,4 +576,5 @@ let FileTreeNode = exports.FileTreeNode = class FileTreeNode {
 
     return child._findLastByNamePath(childNamePath.slice(1));
   }
-};
+}
+exports.FileTreeNode = FileTreeNode;

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -42,7 +33,17 @@ function _load_UniversalDisposable() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class AttachProcessInfo extends (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerProcessInfo {
 
   constructor(targetUri, targetInfo) {
     super('lldb', targetUri);
@@ -59,7 +60,7 @@ let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo exte
     return (0, _asyncToGenerator.default)(function* () {
       const rpcService = _this._getRpcService();
       let debugSession = null;
-      let outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('C++ Debugger', rpcService.getOutputWindowObservable().refCount());
+      let outputDisposable = (0, (_nuclideDebuggerBase || _load_nuclideDebuggerBase()).registerConsoleLogging)('LLDB', rpcService.getOutputWindowObservable().refCount());
       try {
         yield rpcService.attach(_this._targetInfo).refCount().toPromise();
         // Start websocket server with Chrome after attach completed.
@@ -83,7 +84,9 @@ let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo exte
     const debuggerConfig = {
       logLevel: (0, (_utils || _load_utils()).getConfig)().serverLogLevel,
       pythonBinaryPath: (0, (_utils || _load_utils()).getConfig)().pythonBinaryPath,
-      buckConfigRootFile: (0, (_utils || _load_utils()).getConfig)().buckConfigRootFile
+      buckConfigRootFile: (0, (_utils || _load_utils()).getConfig)().buckConfigRootFile,
+      lldbPythonPath: (0, (_utils || _load_utils()).getConfig)().lldbPythonPath,
+      envPythonPath: ''
     };
     const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('NativeDebuggerService', this.getTargetUri());
 
@@ -97,4 +100,5 @@ let AttachProcessInfo = exports.AttachProcessInfo = class AttachProcessInfo exte
   supportSingleThreadStepping() {
     return true;
   }
-};
+}
+exports.AttachProcessInfo = AttachProcessInfo;

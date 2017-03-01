@@ -1,15 +1,16 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _atom = require('atom');
+
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
 
 var _BreakpointDisplayController;
 
@@ -19,13 +20,13 @@ function _load_BreakpointDisplayController() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let BreakpointManager = class BreakpointManager {
+class BreakpointManager {
 
   constructor(store, debuggerActions) {
     this._breakpointStore = store;
     this._debuggerActions = debuggerActions;
     this._displayControllers = new Map();
-    this._disposables = new _atom.CompositeDisposable(atom.workspace.observeTextEditors(this._handleTextEditor.bind(this)));
+    this._disposables = new _atom.CompositeDisposable((0, (_textEditor || _load_textEditor()).observeTextEditors)(this._handleTextEditor.bind(this)));
   }
 
   dispose() {
@@ -55,7 +56,13 @@ let BreakpointManager = class BreakpointManager {
       this._displayControllers.set(editor, controller);
     }
   }
-};
-
-
-module.exports = BreakpointManager;
+}
+exports.default = BreakpointManager; /**
+                                      * Copyright (c) 2015-present, Facebook, Inc.
+                                      * All rights reserved.
+                                      *
+                                      * This source code is licensed under the license found in the LICENSE file in
+                                      * the root directory of this source tree.
+                                      *
+                                      * 
+                                      */

@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,21 +45,31 @@ function _load_PanelComponentScroller() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 const TOKEN_KIND_TO_CLASS_NAME_MAP = {
-  'keyword': 'keyword',
-  'class-name': 'entity name class',
-  'constructor': 'entity name function',
-  'method': 'entity name function',
-  'param': 'variable',
-  'string': 'string',
+  'keyword': 'syntax--keyword',
+  'class-name': 'syntax--entity syntax--name syntax--class',
+  'constructor': 'syntax--entity syntax--name syntax--function',
+  'method': 'syntax--entity syntax--name syntax--function',
+  'param': 'syntax--variable',
+  'string': 'syntax--string',
   'whitespace': '',
   'plain': '',
-  'type': 'support type'
+  'type': 'syntax--support syntax--type'
 };
 
-let OutlineView = exports.OutlineView = class OutlineView extends _reactForAtom.React.Component {
+class OutlineView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -87,7 +88,7 @@ let OutlineView = exports.OutlineView = class OutlineView extends _reactForAtom.
     this.subscription = this.props.outlines.subscribe(outline => {
       // If the outline view has focus, we don't want to re-render anything.
       if (this !== atom.workspace.getActivePaneItem()) {
-        this.setState({ outline: outline });
+        this.setState({ outline });
       }
     });
   }
@@ -116,8 +117,12 @@ let OutlineView = exports.OutlineView = class OutlineView extends _reactForAtom.
       )
     );
   }
-};
-let OutlineViewComponent = class OutlineViewComponent extends _reactForAtom.React.Component {
+}
+
+exports.OutlineView = OutlineView;
+
+
+class OutlineViewComponent extends _reactForAtom.React.Component {
 
   render() {
     const outline = this.props.outline;
@@ -151,7 +156,7 @@ let OutlineViewComponent = class OutlineViewComponent extends _reactForAtom.Reac
       case 'outline':
         return renderTrees(outline.editor, outline.outlineTrees);
       default:
-        const errorText = `Encountered unexpected outline kind ${ outline.kind }`;
+        const errorText = `Encountered unexpected outline kind ${outline.kind}`;
         logger.error(errorText);
         return _reactForAtom.React.createElement(
           'span',
@@ -162,9 +167,7 @@ let OutlineViewComponent = class OutlineViewComponent extends _reactForAtom.Reac
         );
     }
   }
-
-};
-
+}
 
 function renderTree(editor, outline, index) {
   const onClick = () => {

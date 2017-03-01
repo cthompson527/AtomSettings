@@ -1,22 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let augmentDefaultFlags = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (src, flags) {
@@ -84,21 +72,35 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const SERVER_LIMIT = 20;
 
 // Limit the total memory usage of all Clang servers.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const MEMORY_LIMIT = Math.round(_os.default.totalmem() * 15 / 100);
 
 let _getDefaultFlags;
-let ClangServerManager = class ClangServerManager {
+class ClangServerManager {
 
   constructor() {
     this._flagsManager = new (_ClangFlagsManager || _load_ClangFlagsManager()).default();
     this._servers = new (_lruCache || _load_lruCache()).default({
       max: SERVER_LIMIT,
-      dispose: function (_, val) {
+      dispose(_, val) {
         val.dispose();
       }
     });
     // Avoid race conditions with simultaneous _checkMemoryUsage calls.
     this._checkMemoryUsage = (0, (_promise || _load_promise()).serializeAsyncCall)(this._checkMemoryUsageImpl.bind(this));
+  }
+
+  getClangFlagsManager() {
+    return this._flagsManager;
   }
 
   /**
@@ -110,7 +112,7 @@ let ClangServerManager = class ClangServerManager {
    * Currently, there's no "status" observable, so we can only provide a busy signal to the user
    * on diagnostic requests - and hence we only restart on 'compile' requests.
    */
-  getClangServer(src, contents, defaultFlags, restartIfChanged) {
+  getClangServer(src, contents, compilationDBFile, defaultFlags, restartIfChanged) {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
@@ -122,13 +124,7 @@ let ClangServerManager = class ClangServerManager {
           return server;
         }
       }
-
-      var _ref2 = yield Promise.all([(0, (_findClangServerArgs || _load_findClangServerArgs()).default)(), _this._getFlags(src, defaultFlags)]),
-          _ref3 = _slicedToArray(_ref2, 2);
-
-      const serverArgs = _ref3[0],
-            flagsResult = _ref3[1];
-
+      const [serverArgs, flagsResult] = yield Promise.all([(0, (_findClangServerArgs || _load_findClangServerArgs()).default)(src), _this._getFlags(src, compilationDBFile, defaultFlags)]);
       if (flagsResult == null) {
         return null;
       }
@@ -149,12 +145,12 @@ let ClangServerManager = class ClangServerManager {
 
   // 1. Attempt to get flags from ClangFlagsManager.
   // 2. Otherwise, fall back to default flags.
-  _getFlags(src, defaultFlags) {
+  _getFlags(src, compilationDBFile, defaultFlags) {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const flagsData = yield _this2._flagsManager.getFlagsForSrc(src).catch(function (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error getting flags for ${ src }:`, e);
+      const flagsData = yield _this2._flagsManager.getFlagsForSrc(src, compilationDBFile).catch(function (e) {
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error getting flags for ${src}:`, e);
         return null;
       });
       if (flagsData != null && flagsData.flags != null) {
@@ -195,13 +191,13 @@ let ClangServerManager = class ClangServerManager {
     return (0, _asyncToGenerator.default)(function* () {
       const usage = new Map();
       yield Promise.all(_this3._servers.values().map((() => {
-        var _ref4 = (0, _asyncToGenerator.default)(function* (server) {
+        var _ref2 = (0, _asyncToGenerator.default)(function* (server) {
           const mem = yield server.getMemoryUsage();
           usage.set(server, mem);
         });
 
         return function (_x3) {
-          return _ref4.apply(this, arguments);
+          return _ref2.apply(this, arguments);
         };
       })()));
 
@@ -234,7 +230,5 @@ let ClangServerManager = class ClangServerManager {
       }
     })();
   }
-
-};
+}
 exports.default = ClangServerManager;
-module.exports = exports['default'];

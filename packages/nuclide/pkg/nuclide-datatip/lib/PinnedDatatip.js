@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,6 +16,16 @@ var _DatatipComponent;
 function _load_DatatipComponent() {
   return _DatatipComponent = require('./DatatipComponent');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const LINE_END_MARGIN = 20;
 
@@ -44,12 +45,13 @@ function documentMouseUp$() {
   return _mouseUp$;
 }
 
-let PinnedDatatip = exports.PinnedDatatip = class PinnedDatatip {
+class PinnedDatatip {
 
   constructor(datatip, editor, onDispose) {
-    const component = datatip.component,
-          range = datatip.range;
-
+    const {
+      component,
+      range
+    } = datatip;
     this._subscriptions = new _atom.CompositeDisposable();
     this._subscriptions.add(new _atom.Disposable(() => onDispose(this)));
     this._range = range;
@@ -90,7 +92,7 @@ let PinnedDatatip = exports.PinnedDatatip = class PinnedDatatip {
 
   handleGlobalMouseMove(event) {
     const evt = event;
-    const _dragOrigin = this._dragOrigin;
+    const { _dragOrigin } = this;
 
     if (!_dragOrigin) {
       throw new Error('Invariant violation: "_dragOrigin"');
@@ -145,11 +147,12 @@ let PinnedDatatip = exports.PinnedDatatip = class PinnedDatatip {
 
   // Ensure positioning of the Datatip at the end of the current line.
   _updateHostElementPosition() {
-    const _editor = this._editor,
-          _range = this._range,
-          _hostElement = this._hostElement,
-          _offset = this._offset;
-
+    const {
+      _editor,
+      _range,
+      _hostElement,
+      _offset
+    } = this;
     const charWidth = _editor.getDefaultCharWidth();
     const lineLength = _editor.getBuffer().getLines()[_range.start.row].length;
     _hostElement.style.display = 'block';
@@ -158,13 +161,14 @@ let PinnedDatatip = exports.PinnedDatatip = class PinnedDatatip {
   }
 
   render() {
-    const _editor = this._editor,
-          _range = this._range,
-          ProvidedComponent = this._component,
-          _hostElement = this._hostElement,
-          _isDragging = this._isDragging,
-          _isHovering = this._isHovering;
-
+    const {
+      _editor,
+      _range,
+      _component: ProvidedComponent,
+      _hostElement,
+      _isDragging,
+      _isHovering
+    } = this;
     this._updateHostElementPosition();
     _reactForAtom.ReactDOM.render(_reactForAtom.React.createElement(
       (_DatatipComponent || _load_DatatipComponent()).DatatipComponent,
@@ -222,5 +226,5 @@ let PinnedDatatip = exports.PinnedDatatip = class PinnedDatatip {
     this._hostElement.remove();
     this._subscriptions.dispose();
   }
-
-};
+}
+exports.PinnedDatatip = PinnedDatatip;

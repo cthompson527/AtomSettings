@@ -1,20 +1,19 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-var _atom = require('atom');
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _nuclideUri;
 
 function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
+}
+
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
 var _DebuggerStore;
@@ -23,7 +22,19 @@ function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const INJECTED_CSS = [
 /* Force the inspector to scroll vertically on Atom ≥ 1.4.0 */
@@ -56,24 +67,16 @@ const INJECTED_CSS = [
   .nuclide-chrome-debugger-data-grid td:first-child {
     border-left: none;
   }
-  `].join('');let Bridge = class Bridge {
+  `].join('');
 
-  constructor(debuggerModel) {
-    this._debuggerModel = debuggerModel;
-    this._cleanupDisposables = new _atom.CompositeDisposable();
-    this._webview = null;
-    this._suppressBreakpointSync = false;
-    this._disposables = new _atom.CompositeDisposable(debuggerModel.getBreakpointStore().onUserChange(this._handleUserBreakpointChange.bind(this)));
-  }
+class Bridge {
   // Contains disposable items should be disposed by
   // cleanup() method.
-
-
-  setWebviewElement(webview) {
-    this._webview = webview;
-    const boundHandler = this._handleIpcMessage.bind(this);
-    webview.addEventListener('ipc-message', boundHandler);
-    this._cleanupDisposables.add(new _atom.Disposable(() => webview.removeEventListener('ipc-message', boundHandler)));
+  constructor(debuggerModel) {
+    this._handleIpcMessage = this._handleIpcMessage.bind(this);
+    this._debuggerModel = debuggerModel;
+    this._suppressBreakpointSync = false;
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(debuggerModel.getBreakpointStore().onUserChange(this._handleUserBreakpointChange.bind(this)));
   }
 
   dispose() {
@@ -83,14 +86,10 @@ const INJECTED_CSS = [
 
   // Clean up any state changed after constructor.
   cleanup() {
-    this._cleanupDisposables.dispose();
-    this._webview = null;
-    // Poor man's `waitFor` to prevent nested dispatch. Actual `waitsFor` requires passing around
-    // dispatch tokens between unrelated stores, which is quite cumbersome.
-    // TODO @jxg move to redux to eliminate this problem altogether.
-    setTimeout(() => {
-      this._debuggerModel.getActions().clearInterface();
-    });
+    if (this._cleanupDisposables != null) {
+      this._cleanupDisposables.dispose();
+      this._cleanupDisposables = null;
+    }
   }
 
   continue() {
@@ -114,6 +113,12 @@ const INJECTED_CSS = [
   stepOut() {
     if (this._webview) {
       this._webview.send('command', 'StepOut');
+    }
+  }
+
+  runToLocation(filePath, line) {
+    if (this._webview) {
+      this._webview.send('command', 'RunToLocation', filePath, line);
     }
   }
 
@@ -153,12 +158,8 @@ const INJECTED_CSS = [
     }
   }
 
-  sendEvaluationCommand(command, evalId) {
+  sendEvaluationCommand(command, evalId, ...args) {
     if (this._webview != null) {
-      for (var _len = arguments.length, args = Array(_len > 2 ? _len - 2 : 0), _key = 2; _key < _len; _key++) {
-        args[_key - 2] = arguments[_key];
-      }
-
       this._webview.send('command', command, evalId, ...args);
     }
   }
@@ -175,8 +176,8 @@ const INJECTED_CSS = [
     this._debuggerModel.getActions().updateCallstack(callstack);
   }
 
-  _handleLocalsUpdate(locals) {
-    this._debuggerModel.getActions().updateLocals(locals);
+  _handleScopesUpdate(scopeSections) {
+    this._debuggerModel.getActions().updateScopes(scopeSections);
   }
 
   _handleIpcMessage(stdEvent) {
@@ -227,8 +228,8 @@ const INJECTED_CSS = [
           case 'CallstackUpdate':
             this._handleCallstackUpdate(event.args[1]);
             break;
-          case 'LocalsUpdate':
-            this._handleLocalsUpdate(event.args[1]);
+          case 'ScopesUpdate':
+            this._handleScopesUpdate(event.args[1]);
             break;
           case 'ThreadsUpdate':
             this._handleThreadsUpdate(event.args[1]);
@@ -296,11 +297,7 @@ const INJECTED_CSS = [
   }
 
   _bindBreakpoint(breakpoint) {
-    const sourceURL = breakpoint.sourceURL,
-          lineNumber = breakpoint.lineNumber,
-          condition = breakpoint.condition,
-          enabled = breakpoint.enabled;
-
+    const { sourceURL, lineNumber, condition, enabled } = breakpoint;
     const path = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(sourceURL);
     // only handle real files for now.
     if (path) {
@@ -314,9 +311,7 @@ const INJECTED_CSS = [
   }
 
   _removeBreakpoint(breakpoint) {
-    const sourceURL = breakpoint.sourceURL,
-          lineNumber = breakpoint.lineNumber;
-
+    const { sourceURL, lineNumber } = breakpoint;
     const path = (_nuclideUri || _load_nuclideUri()).default.uriToNuclideUri(sourceURL);
     // only handle real files for now.
     if (path) {
@@ -332,9 +327,7 @@ const INJECTED_CSS = [
   _handleUserBreakpointChange(params) {
     const webview = this._webview;
     if (webview != null) {
-      const action = params.action,
-            breakpoint = params.breakpoint;
-
+      const { action, breakpoint } = params;
       webview.send('command', action, {
         sourceURL: (_nuclideUri || _load_nuclideUri()).default.nuclideUriToUri(breakpoint.path),
         lineNumber: breakpoint.line,
@@ -379,7 +372,55 @@ const INJECTED_CSS = [
     }
   }
 
-};
+  renderChromeWebview(url) {
+    if (this._webview == null) {
+      // Cast from HTMLElement down to WebviewElement without instanceof
+      // checking, as WebviewElement constructor is not exposed.
+      const webview = document.createElement('webview');
+      webview.src = url;
+      webview.nodeintegration = true;
+      webview.disablewebsecurity = true;
+      webview.classList.add('native-key-bindings'); // required to pass through certain key events
+      webview.classList.add('nuclide-debugger-webview');
 
+      // The webview is actually only used for its state; it's really more of a model that just has
+      // to live in the DOM. We render it into the body to keep it separate from our view, which may
+      // be detached. If the webview were a child, it would cause the webview to reload when
+      // reattached, and we'd lose our state.
 
-module.exports = Bridge;
+      if (!(document.body != null)) {
+        throw new Error('Invariant violation: "document.body != null"');
+      }
+
+      document.body.appendChild(webview);
+
+      this._setWebviewElement(webview);
+    } else if (url !== this._webviewUrl) {
+      this._webview.src = url;
+    }
+    this._webviewUrl = url;
+  }
+
+  // Exposed for tests
+  _setWebviewElement(webview) {
+    this._webview = webview;
+
+    if (!(this._cleanupDisposables == null)) {
+      throw new Error('Invariant violation: "this._cleanupDisposables == null"');
+    }
+
+    this._cleanupDisposables = new (_UniversalDisposable || _load_UniversalDisposable()).default(_rxjsBundlesRxMinJs.Observable.fromEvent(webview, 'ipc-message').subscribe(this._handleIpcMessage), () => {
+      webview.remove();
+      this._webview = null;
+      this._webviewUrl = null;
+    });
+  }
+
+  openDevTools() {
+    if (this._webview == null) {
+      return;
+    }
+    this._webview.openDevTools();
+  }
+}
+exports.default = Bridge;

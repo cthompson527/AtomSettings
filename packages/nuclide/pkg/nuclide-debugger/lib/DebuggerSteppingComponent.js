@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -46,7 +37,23 @@ function _load_DebuggerStore() {
   return _DebuggerStore = require('./DebuggerStore');
 }
 
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const defaultTooltipOptions = {
   placement: 'bottom'
@@ -84,6 +91,7 @@ function SVGButton(props) {
     {
       className: 'nuclide-debugger-stepping-svg-button',
       onClick: props.onClick,
+      disabled: props.disabled,
       tooltip: props.tooltip },
     _reactForAtom.React.createElement(
       'div',
@@ -93,23 +101,52 @@ function SVGButton(props) {
   );
 }
 
-let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class DebuggerSteppingComponent extends _reactForAtom.React.Component {
+class DebuggerSteppingComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
+    const { debuggerStore } = props;
+    this.state = {
+      allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
+      debuggerMode: debuggerStore.getDebuggerMode(),
+      pauseOnException: debuggerStore.getTogglePauseOnException(),
+      pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
+      enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
+      customControlButtons: debuggerStore.getCustomControlButtons()
+    };
+  }
+
+  componentDidMount() {
+    const { debuggerStore } = this.props;
+    this._disposables.add(debuggerStore.onChange(() => {
+      this.setState({
+        allowSingleThreadStepping: Boolean(debuggerStore.getSettings().get('SingleThreadStepping')),
+        debuggerMode: debuggerStore.getDebuggerMode(),
+        pauseOnException: debuggerStore.getTogglePauseOnException(),
+        pauseOnCaughtException: debuggerStore.getTogglePauseOnCaughtException(),
+        enableSingleThreadStepping: debuggerStore.getEnableSingleThreadStepping(),
+        customControlButtons: debuggerStore.getCustomControlButtons()
+      });
+    }));
+  }
+
+  componentWillUnmount() {
+    this._disposables.dispose();
   }
 
   render() {
-    var _props = this.props;
-    const actions = _props.actions,
-          debuggerMode = _props.debuggerMode,
-          pauseOnException = _props.pauseOnException,
-          pauseOnCaughtException = _props.pauseOnCaughtException,
-          allowSingleThreadStepping = _props.allowSingleThreadStepping,
-          singleThreadStepping = _props.singleThreadStepping,
-          customControlButtons = _props.customControlButtons;
-
+    const {
+      debuggerMode,
+      pauseOnException,
+      pauseOnCaughtException,
+      allowSingleThreadStepping,
+      enableSingleThreadStepping,
+      customControlButtons
+    } = this.state;
+    const { actions } = this.props;
     const isPaused = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.PAUSED;
+    const isStopped = debuggerMode === (_DebuggerStore || _load_DebuggerStore()).DebuggerMode.STOPPED;
     return _reactForAtom.React.createElement(
       'div',
       { className: 'nuclide-debugger-stepping-component' },
@@ -118,6 +155,7 @@ let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class Debugg
         { className: 'nuclide-debugger-stepping-buttongroup' },
         _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
           icon: isPaused ? 'playback-play' : 'playback-pause',
+          disabled: isStopped,
           tooltip: Object.assign({}, defaultTooltipOptions, {
             title: isPaused ? 'Continue' : 'Pause',
             keyBindingCommand: isPaused ? 'nuclide-debugger:continue-debugging' : undefined
@@ -126,6 +164,7 @@ let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class Debugg
         }),
         _reactForAtom.React.createElement(SVGButton, {
           icon: STEP_OVER_ICON,
+          disabled: !isPaused,
           tooltip: Object.assign({}, defaultTooltipOptions, {
             title: 'Step over',
             keyBindingCommand: 'nuclide-debugger:step-over'
@@ -134,6 +173,7 @@ let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class Debugg
         }),
         _reactForAtom.React.createElement(SVGButton, {
           icon: STEP_INTO_ICON,
+          disabled: !isPaused,
           tooltip: Object.assign({}, defaultTooltipOptions, {
             title: 'Step into',
             keyBindingCommand: 'nuclide-debugger:step-into'
@@ -142,6 +182,7 @@ let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class Debugg
         }),
         _reactForAtom.React.createElement(SVGButton, {
           icon: STEP_OUT_ICON,
+          disabled: !isPaused,
           tooltip: Object.assign({}, defaultTooltipOptions, {
             title: 'Step out',
             keyBindingCommand: 'nuclide-debugger:step-out'
@@ -195,11 +236,13 @@ let DebuggerSteppingComponent = exports.DebuggerSteppingComponent = class Debugg
         ' exception'
       )] : null,
       allowSingleThreadStepping ? _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+        disabled: isStopped,
         className: 'nuclide-debugger-exception-checkbox',
-        onChange: () => actions.toggleSingleThreadStepping(!singleThreadStepping),
-        checked: singleThreadStepping,
+        onChange: () => actions.toggleSingleThreadStepping(!enableSingleThreadStepping),
+        checked: enableSingleThreadStepping,
         label: 'Single Thread Stepping'
       }) : null
     );
   }
-};
+}
+exports.DebuggerSteppingComponent = DebuggerSteppingComponent;

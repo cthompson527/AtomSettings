@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _AtomInput;
 
@@ -36,7 +26,17 @@ var _atom = require('atom');
 
 var _reactForAtom = require('react-for-atom');
 
-let RenameBookmarkModal = class RenameBookmarkModal extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class RenameBookmarkModal extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -101,6 +101,5 @@ let RenameBookmarkModal = class RenameBookmarkModal extends _reactForAtom.React.
       )
     );
   }
-};
+}
 exports.default = RenameBookmarkModal;
-module.exports = exports['default'];

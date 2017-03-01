@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,9 +19,7 @@ let getCommands = exports.getCommands = (() => {
       throw new Error('Invariant violation: "serverInfo != null"');
     }
 
-    const commandPort = serverInfo.commandPort,
-          family = serverInfo.family;
-
+    const { commandPort, family } = serverInfo;
     return startCommands(commandPort, family);
   });
 
@@ -55,7 +44,7 @@ let startCommands = exports.startCommands = (() => {
       // ... indicating that there was a nuclide-server but it is now shutdown.
       (0, (_errors || _load_errors()).reportConnectionErrorAndExit)('Could not find a nuclide-server with a connected Atom');
     }
-    const connection = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createLocal(transport, [(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], services);
+    const connection = (_nuclideRpc || _load_nuclideRpc()).RpcConnection.createLocal(transport, [(_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).localNuclideUriMarshalers], services, (_ConfigDirectory || _load_ConfigDirectory()).RPC_PROTOCOL);
 
     // Get the command interface
     const service = connection.getService('CommandService');
@@ -110,6 +99,16 @@ function _load_errors() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function convertStringFamilyToNumberFamily(family) {
   switch (family) {
     case 'IPv4':
@@ -117,6 +116,6 @@ function convertStringFamilyToNumberFamily(family) {
     case 'IPv6':
       return 6;
     default:
-      throw new Error(`Unrecognized network address family ${ family }`);
+      throw new Error(`Unrecognized network address family ${family}`);
   }
 }

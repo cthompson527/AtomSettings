@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -31,7 +22,7 @@ function _load_nuclideAnalytics() {
 /**
  * Each context provider view is rendered inside a ProviderContainer.
  */
-let ProviderContainer = exports.ProviderContainer = class ProviderContainer extends _reactForAtom.React.Component {
+class ProviderContainer extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -61,10 +52,19 @@ let ProviderContainer = exports.ProviderContainer = class ProviderContainer exte
   }
 
   _setCollapsed(collapsed) {
-    this.setState({ collapsed: collapsed });
+    this.setState({ collapsed });
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-context-view-toggle-provider', {
       title: this.props.title,
       collapsed: String(collapsed)
     });
   }
-};
+}
+exports.ProviderContainer = ProviderContainer; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */

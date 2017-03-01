@@ -1,18 +1,14 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('../../nuclide-ui/add-tooltip'));
+}
 
 var _utils;
 
@@ -20,16 +16,16 @@ function _load_utils() {
   return _utils = require('../../nuclide-arcanist-rpc/lib/utils');
 }
 
-var _AtomTextEditor;
-
-function _load_AtomTextEditor() {
-  return _AtomTextEditor = require('../../nuclide-ui/AtomTextEditor');
-}
-
 var _AtomInput;
 
 function _load_AtomInput() {
   return _AtomInput = require('../../nuclide-ui/AtomInput');
+}
+
+var _AtomTextEditor;
+
+function _load_AtomTextEditor() {
+  return _AtomTextEditor = require('../../nuclide-ui/AtomTextEditor');
 }
 
 var _Checkbox;
@@ -58,6 +54,12 @@ function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
 }
 
+var _ButtonGroup;
+
+function _load_ButtonGroup() {
+  return _ButtonGroup = require('../../nuclide-ui/ButtonGroup');
+}
+
 var _Toolbar;
 
 function _load_Toolbar() {
@@ -76,21 +78,18 @@ function _load_ToolbarRight() {
   return _ToolbarRight = require('../../nuclide-ui/ToolbarRight');
 }
 
-var _atom = require('atom');
+var _featureConfig;
 
-var _UniversalDisposable;
-
-function _load_UniversalDisposable() {
-  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+function _load_featureConfig() {
+  return _featureConfig = _interopRequireDefault(require('../../commons-atom/featureConfig'));
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DiffRevisionView = class DiffRevisionView extends _reactForAtom.React.Component {
+class DiffRevisionView extends _reactForAtom.React.Component {
 
   render() {
-    const commitMessage = this.props.commitMessage;
-
+    const { commitMessage } = this.props;
     const commitTitle = commitMessage.split(/\n/)[0];
     const revision = (0, (_utils || _load_utils()).getPhabricatorRevisionFromCommitMessage)(commitMessage);
 
@@ -100,48 +99,36 @@ let DiffRevisionView = class DiffRevisionView extends _reactForAtom.React.Compon
       revision.name
     );
   }
-};
-let DiffPublishView = class DiffPublishView extends _reactForAtom.React.Component {
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
+
+class DiffPublishView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._onClickBack = this._onClickBack.bind(this);
     this.__onClickPublish = this.__onClickPublish.bind(this);
     this._onTogglePrepare = this._onTogglePrepare.bind(this);
-    this.state = {
-      hasLintError: false,
-      isPrepareMode: false
-    };
+    this._onLintExcuseChange = this._onLintExcuseChange.bind(this);
+    this._toggleDockPublishConfig = this._toggleDockPublishConfig.bind(this);
+    this._onToggleVerbatim = this._onToggleVerbatim.bind(this);
   }
 
   componentDidMount() {
-    this._textBuffer = new _atom.TextBuffer();
-    this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default(this.props.diffModel.getPublishUpdates().subscribe(this._onPublishUpdate.bind(this)));
     this.__populatePublishText();
-  }
-
-  _onPublishUpdate(message) {
-    const text = message.text;
-    // If the messages contain a lint error or warning show lint input
-
-    if ((_constants || _load_constants()).LintErrorMessages.some(error => text.includes(error))) {
-      this.setState({ hasLintError: true });
-    }
-    this._textBuffer.append(text);
-    const updatesEditor = this.refs.publishUpdates;
-    if (updatesEditor != null) {
-      updatesEditor.getElement().scrollToBottom();
-    }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.message !== prevProps.message || this.props.publishModeState !== prevProps.publishModeState) {
       this.__populatePublishText();
     }
-  }
-
-  componentWillUnmount() {
-    this._subscriptions.dispose();
   }
 
   __populatePublishText() {
@@ -152,97 +139,38 @@ let DiffPublishView = class DiffPublishView extends _reactForAtom.React.Componen
   }
 
   __onClickPublish() {
-    this._textBuffer.setText('');
-    this.setState({ hasLintError: false });
-
-    const isPrepareChecked = this.state.isPrepareMode;
-
-    let lintExcuse;
-    if (this.refs.excuse != null) {
-      lintExcuse = this.refs.excuse.getText();
-    }
-    this.props.diffModel.publishDiff(this.__getPublishMessage() || '', isPrepareChecked, lintExcuse);
+    const isPrepareChecked = this.props.isPrepareMode;
+    this.props.diffModel.publishDiff(this.__getPublishMessage() || '', isPrepareChecked);
   }
 
   __getPublishMessage() {
     const messageEditor = this.refs.message;
-    if (messageEditor != null) {
-      return messageEditor.getTextBuffer().getText();
-    } else {
-      return this.props.message;
-    }
+    return messageEditor == null ? this.props.message : messageEditor.getTextBuffer().getText();
   }
 
   __getStatusEditor() {
-    const publishModeState = this.props.publishModeState;
-
-    let isBusy;
-    let statusEditor;
-
-    const getStreamStatusEditor = () => {
-      return _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
-        ref: 'publishUpdates',
-        softWrapped: true,
-        textBuffer: this._textBuffer,
-        readOnly: true,
-        syncTextContents: false,
-        gutterHidden: true
-      });
-    };
-
-    const getPublishMessageEditor = () => {
-      return _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
-        ref: 'message',
-        softWrapped: true,
-        readOnly: isBusy,
-        syncTextContents: false,
-        gutterHidden: true
-      });
-    };
-
-    switch (publishModeState) {
-      case (_constants || _load_constants()).PublishModeState.READY:
-        isBusy = false;
-        statusEditor = getPublishMessageEditor();
-        break;
-      case (_constants || _load_constants()).PublishModeState.LOADING_PUBLISH_MESSAGE:
-        isBusy = true;
-        statusEditor = getPublishMessageEditor();
-        break;
-      case (_constants || _load_constants()).PublishModeState.AWAITING_PUBLISH:
-        isBusy = true;
-        statusEditor = getStreamStatusEditor();
-        break;
-      case (_constants || _load_constants()).PublishModeState.PUBLISH_ERROR:
-        isBusy = false;
-        statusEditor = getStreamStatusEditor();
-        break;
-      default:
-        throw new Error('Invalid publish mode!');
-    }
-
-    return statusEditor;
-  }
-
-  __getExcuseInput() {
-    if (this.state.hasLintError === true) {
-      return _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
-        className: 'nuclide-diff-view-lint-excuse',
-        placeholderText: 'Lint excuse',
-        ref: 'excuse',
-        size: 'lg'
-      });
-    }
-
-    return null;
+    const { publishModeState } = this.props;
+    const isBusy = publishModeState === (_constants || _load_constants()).PublishModeState.LOADING_PUBLISH_MESSAGE || publishModeState === (_constants || _load_constants()).PublishModeState.AWAITING_PUBLISH;
+    return _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
+      grammar: atom.grammars.grammarForScopeName('source.fb-arcanist-editor'),
+      ref: 'message',
+      softWrapped: true,
+      readOnly: isBusy,
+      syncTextContents: false,
+      gutterHidden: true
+    });
   }
 
   _getToolbar() {
-    var _props = this.props;
-    const publishModeState = _props.publishModeState,
-          publishMode = _props.publishMode,
-          headCommitMessage = _props.headCommitMessage;
-
+    const {
+      headCommitMessage,
+      isPrepareMode,
+      lintExcuse,
+      publishMode,
+      publishModeState,
+      shouldDockPublishView,
+      verbatimModeEnabled
+    } = this.props;
     let revisionView;
     if (headCommitMessage != null) {
       revisionView = _reactForAtom.React.createElement(DiffRevisionView, { commitMessage: headCommitMessage });
@@ -279,22 +207,70 @@ let DiffPublishView = class DiffPublishView extends _reactForAtom.React.Componen
       {
         className: (0, (_classnames || _load_classnames()).default)({ 'btn-progress': isBusy }),
         size: (_Button || _load_Button()).ButtonSizes.SMALL,
-        buttonType: (_Button || _load_Button()).ButtonTypes.SUCCESS,
+        buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY,
         onClick: this.__onClickPublish,
         disabled: isBusy },
       publishMessage
     );
 
+    const toggleDockButton = _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
+      icon: shouldDockPublishView ? 'move-up' : 'move-down',
+      onClick: this._toggleDockPublishConfig,
+      title: 'Dock or Popup view'
+    });
+
+    const backButton = shouldDockPublishView ? _reactForAtom.React.createElement(
+      (_Button || _load_Button()).Button,
+      {
+        size: (_Button || _load_Button()).ButtonSizes.SMALL,
+        onClick: this._onClickBack },
+      'Back'
+    ) : null;
+
     let prepareOptionElement;
     if (publishMode === (_constants || _load_constants()).PublishMode.CREATE) {
       prepareOptionElement = _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
-        checked: this.state.isPrepareMode,
+        checked: isPrepareMode,
         className: 'padded',
         label: 'Prepare',
         tabIndex: '-1',
-        onChange: this._onTogglePrepare
+        onChange: this._onTogglePrepare,
+        ref: (0, (_addTooltip || _load_addTooltip()).default)({
+          title: 'Whether to mark the new created revision as unpublished.',
+          delay: 200,
+          placement: 'top'
+        })
       });
     }
+
+    let verbatimeOptionElement;
+    if (publishMode === (_constants || _load_constants()).PublishMode.UPDATE) {
+      verbatimeOptionElement = _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+        className: 'padded',
+        checked: verbatimModeEnabled,
+        label: 'Verbatim',
+        onChange: this._onToggleVerbatim,
+        ref: (0, (_addTooltip || _load_addTooltip()).default)({
+          title: 'Whether to override the diff\'s' + 'commit message on Phabricator with that of your local commit.',
+          delay: 200,
+          placement: 'top'
+        })
+      });
+    }
+
+    const lintExcuseElement = _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+      className: 'nuclide-diff-view-excuse',
+      size: 'sm',
+      ref: (0, (_addTooltip || _load_addTooltip()).default)({
+        title: 'Leave this box empty to run local lint and unit tests or ' + 'enter an excuse to skip them.',
+        delay: 200,
+        placement: 'top'
+      }),
+      onDidChange: this._onLintExcuseChange,
+      placeholderText: '(Optional) Excuse',
+      value: lintExcuse,
+      width: 200
+    });
 
     return _reactForAtom.React.createElement(
       'div',
@@ -306,20 +282,20 @@ let DiffPublishView = class DiffPublishView extends _reactForAtom.React.Componen
           (_ToolbarLeft || _load_ToolbarLeft()).ToolbarLeft,
           { className: 'nuclide-diff-view-publish-toolbar-left' },
           revisionView,
+          verbatimeOptionElement,
           prepareOptionElement,
-          this.__getExcuseInput()
+          lintExcuseElement
         ),
         _reactForAtom.React.createElement(
           (_ToolbarRight || _load_ToolbarRight()).ToolbarRight,
           null,
           _reactForAtom.React.createElement(
-            (_Button || _load_Button()).Button,
-            {
-              size: (_Button || _load_Button()).ButtonSizes.SMALL,
-              onClick: this._onClickBack },
-            'Back'
-          ),
-          publishButton
+            (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
+            { size: (_ButtonGroup || _load_ButtonGroup()).ButtonGroupSizes.SMALL },
+            backButton,
+            publishButton,
+            toggleDockButton
+          )
         )
       )
     );
@@ -338,16 +314,29 @@ let DiffPublishView = class DiffPublishView extends _reactForAtom.React.Componen
     );
   }
 
+  _toggleDockPublishConfig() {
+    // Persist publish message between docked and modal views.
+    this.props.diffModel.updatePublishMessage(this.__getPublishMessage());
+    const shouldDockPublishView = (_featureConfig || _load_featureConfig()).default.get((_constants || _load_constants()).SHOULD_DOCK_PUBLISH_VIEW_CONFIG_KEY);
+    (_featureConfig || _load_featureConfig()).default.set((_constants || _load_constants()).SHOULD_DOCK_PUBLISH_VIEW_CONFIG_KEY, !shouldDockPublishView);
+  }
+
+  _onLintExcuseChange(lintExcuse) {
+    this.props.diffModel.setLintExcuse(lintExcuse);
+  }
+
   _onTogglePrepare(isChecked) {
-    this.setState({ isPrepareMode: isChecked });
+    this.props.diffModel.setIsPrepareMode(isChecked);
   }
 
   _onClickBack() {
-    const publishModeState = this.props.publishModeState;
-
+    const { publishModeState } = this.props;
     const diffMode = publishModeState === (_constants || _load_constants()).PublishModeState.PUBLISH_ERROR ? (_constants || _load_constants()).DiffMode.PUBLISH_MODE : (_constants || _load_constants()).DiffMode.BROWSE_MODE;
     this.props.diffModel.setViewMode(diffMode);
   }
-};
+
+  _onToggleVerbatim(isChecked) {
+    this.props.diffModel.setVerbatimModeEnabled(isChecked);
+  }
+}
 exports.default = DiffPublishView;
-module.exports = exports['default'];

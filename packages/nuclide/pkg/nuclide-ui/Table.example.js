@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,15 @@ const Highlight42Component = props => _reactForAtom.React.createElement(
   'div',
   { style: props.data === 42 ? { fontWeight: 'bold' } : {} },
   props.data
-);
+); /**
+    * Copyright (c) 2015-present, Facebook, Inc.
+    * All rights reserved.
+    *
+    * This source code is licensed under the license found in the LICENSE file in
+    * the root directory of this source tree.
+    *
+    * 
+    */
 
 const TableExample = () => {
   const columns = [{
@@ -89,7 +88,7 @@ const TableExample = () => {
   );
 };
 
-let SortableTableExample = class SortableTableExample extends _reactForAtom.React.Component {
+class SortableTableExample extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -116,7 +115,7 @@ let SortableTableExample = class SortableTableExample extends _reactForAtom.Reac
     this.state = {
       sortDescending: false,
       sortedColumn: null,
-      rows: rows
+      rows
     };
     this._handleSort = this._handleSort.bind(this);
   }
@@ -128,8 +127,8 @@ let SortableTableExample = class SortableTableExample extends _reactForAtom.Reac
     });
     this.setState({
       rows: sortedRows,
-      sortedColumn: sortedColumn,
-      sortDescending: sortDescending
+      sortedColumn,
+      sortDescending
     });
   }
 
@@ -162,8 +161,7 @@ let SortableTableExample = class SortableTableExample extends _reactForAtom.Reac
       })
     );
   }
-};
-
+}
 
 const EmptyTableExample = () => {
   const columns = [{

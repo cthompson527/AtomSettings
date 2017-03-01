@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -23,17 +13,14 @@ let getServerArgs = (() => {
       // Override the python path and additional sys paths
       // if override script is present.
       // $FlowFB
-      overrides = yield require('./fb/find-jedi-server-args')(src);
+      const findJediServerArgs = require('./fb/find-jedi-server-args').default;
+      overrides = yield findJediServerArgs(src);
     } catch (e) {}
     // Ignore.
 
 
     // Append the user's PYTHONPATH if it exists.
-
-    var _getOriginalEnvironme = (0, (_process || _load_process()).getOriginalEnvironment)();
-
-    const PYTHONPATH = _getOriginalEnvironme.PYTHONPATH;
-
+    const { PYTHONPATH } = yield (0, (_process || _load_process()).getOriginalEnvironment)();
     if (PYTHONPATH != null && PYTHONPATH.trim() !== '') {
       overrides.paths = (overrides.paths || []).concat((_nuclideUri || _load_nuclideUri()).default.splitPathList(PYTHONPATH));
     }
@@ -48,7 +35,15 @@ let getServerArgs = (() => {
   return function getServerArgs(_x) {
     return _ref.apply(this, arguments);
   };
-})();
+})(); /**
+       * Copyright (c) 2015-present, Facebook, Inc.
+       * All rights reserved.
+       *
+       * This source code is licensed under the license found in the LICENSE file in
+       * the root directory of this source tree.
+       *
+       * 
+       */
 
 var _lruCache;
 
@@ -88,8 +83,7 @@ function _load_LinkTreeManager() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let JediServerManager = class JediServerManager {
-
+class JediServerManager {
   // Cache the promises of additional paths to ensure that we never trigger two
   // calls for the same file name from external calls to getLinkTreePaths and
   // getTopLevelModulePath.
@@ -100,7 +94,7 @@ let JediServerManager = class JediServerManager {
     this._linkTreeManager = new (_LinkTreeManager || _load_LinkTreeManager()).default();
     this._servers = new (_lruCache || _load_lruCache()).default({
       max: 20,
-      dispose: function (key, val) {
+      dispose(key, val) {
         val.dispose();
       }
     });
@@ -112,12 +106,8 @@ let JediServerManager = class JediServerManager {
     return (0, _asyncToGenerator.default)(function* () {
       let server = _this._servers.get(src);
       if (server == null) {
-        var _ref2 = yield getServerArgs(src);
-
-        const pythonPath = _ref2.pythonPath,
-              paths = _ref2.paths;
+        const { pythonPath, paths } = yield getServerArgs(src);
         // Create a JediServer using default python path.
-
         server = new (_JediServer || _load_JediServer()).default(src, pythonPath, paths);
         _this._servers.set(src, server);
 
@@ -127,7 +117,7 @@ let JediServerManager = class JediServerManager {
         _this._addTopLevelModulePath(src, server);
       }
 
-      return yield server.getService();
+      return server.getService();
     })();
   }
 
@@ -193,7 +183,5 @@ let JediServerManager = class JediServerManager {
     this._servers.reset();
     this._linkTreeManager.dispose();
   }
-
-};
+}
 exports.default = JediServerManager;
-module.exports = exports['default'];

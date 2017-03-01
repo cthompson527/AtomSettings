@@ -1,19 +1,11 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.__test__ = exports.ServerConnection = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _class, _temp;
 
 var _nuclideRpc;
 
@@ -83,6 +75,12 @@ function _load_nuclideVersion() {
   return _nuclideVersion = require('../../nuclide-version');
 }
 
+var _lookupPreferIpV;
+
+function _load_lookupPreferIpV() {
+  return _lookupPreferIpV = _interopRequireDefault(require('./lookup-prefer-ip-v6'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // ServerConnection represents the client side of a connection to a remote machine.
@@ -94,7 +92,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 // A ServerConnection keeps a list of RemoteConnections - one for each open directory on the remote
 // machine. Once all RemoteConnections have been closed, then the ServerConnection will close.
-let ServerConnection = (_temp = _class = class ServerConnection {
+class ServerConnection {
 
   static getOrCreate(config) {
     return (0, _asyncToGenerator.default)(function* () {
@@ -118,14 +116,16 @@ let ServerConnection = (_temp = _class = class ServerConnection {
   // RemoteConnections first! This is extremely unsafe and
   // should only be used to forcibly kill Nuclide servers before restarting.
   static forceShutdownAllServers() {
+    return ServerConnection.closeAll(true);
+  }
+
+  // WARNING: This shuts down all Nuclide servers _without_ closing their
+  // RemoteConnections first! This is extremely unsafe and
+  // should only be Called during shutdown, reload, or before autoupdate.
+  static closeAll(shutdown) {
     return (0, _asyncToGenerator.default)(function* () {
-      yield Promise.all(Array.from(ServerConnection._connections).map(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2);
-
-        let _ = _ref2[0],
-            connection = _ref2[1];
-
-        return connection._closeServerConnection(true);
+      yield Promise.all(Array.from(ServerConnection._connections).map(function ([_, connection]) {
+        return connection._closeServerConnection(shutdown);
       }));
     })();
   }
@@ -157,8 +157,8 @@ let ServerConnection = (_temp = _class = class ServerConnection {
     return (0, _asyncToGenerator.default)(function* () {
       const config = {
         host: 'localhost',
-        port: port,
-        cwd: cwd
+        port,
+        cwd
       };
       const connection = new ServerConnection(config);
       yield connection.initialize();
@@ -175,31 +175,21 @@ let ServerConnection = (_temp = _class = class ServerConnection {
   }
 
   getUriOfRemotePath(remotePath) {
-    return `nuclide://${ this.getRemoteHostname() }${ remotePath }`;
+    return `nuclide://${this.getRemoteHostname()}${remotePath}`;
   }
 
   getPathOfUri(uri) {
     return (_nuclideUri || _load_nuclideUri()).default.parse(uri).path;
   }
 
-  createDirectory(uri, hgRepositoryDescription) {
-    let symlink = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
-    var _nuclideUri$parse = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-    let path = _nuclideUri$parse.path;
-
+  createDirectory(uri, hgRepositoryDescription, symlink = false) {
+    let { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
     path = (_nuclideUri || _load_nuclideUri()).default.normalize(path);
-    return new (_RemoteDirectory || _load_RemoteDirectory()).RemoteDirectory(this, this.getUriOfRemotePath(path), symlink, { hgRepositoryDescription: hgRepositoryDescription });
+    return new (_RemoteDirectory || _load_RemoteDirectory()).RemoteDirectory(this, this.getUriOfRemotePath(path), symlink, { hgRepositoryDescription });
   }
 
-  createFile(uri) {
-    let symlink = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-    var _nuclideUri$parse2 = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-    let path = _nuclideUri$parse2.path;
-
+  createFile(uri, symlink = false) {
+    let { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
     path = (_nuclideUri || _load_nuclideUri()).default.normalize(path);
     return new (_RemoteFile || _load_RemoteFile()).RemoteFile(this, this.getUriOfRemotePath(path), symlink);
   }
@@ -221,7 +211,7 @@ let ServerConnection = (_temp = _class = class ServerConnection {
       const clientVersion = (0, (_nuclideVersion || _load_nuclideVersion()).getVersion)();
 
       function throwVersionMismatch(version) {
-        const err = new Error(`Version mismatch. Client at ${ clientVersion } while server at ${ version }.`);
+        const err = new Error(`Version mismatch. Client at ${clientVersion} while server at ${version}.`);
         err.name = 'VersionMismatchError';
         throw err;
       }
@@ -229,7 +219,7 @@ let ServerConnection = (_temp = _class = class ServerConnection {
       // Test connection first. First time we get here we're checking to reestablish
       // connection using cached credentials. This will fail fast (faster than infoService)
       // when we don't have cached credentials yet.
-      const heartbeatVersion = yield client.getTransport().testConnection();
+      const [heartbeatVersion, ip] = yield Promise.all([client.getTransport().testConnection(), (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(_this._config.host)]);
       if (clientVersion !== heartbeatVersion) {
         throwVersionMismatch(heartbeatVersion);
       }
@@ -243,7 +233,7 @@ let ServerConnection = (_temp = _class = class ServerConnection {
       _this._monitorConnectionHeartbeat();
 
       ServerConnection._connections.set(_this.getRemoteHostname(), _this);
-      (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).setConnectionConfig)(_this._config);
+      (0, (_RemoteConnectionConfigurationManager || _load_RemoteConnectionConfigurationManager()).setConnectionConfig)(_this._config, ip);
       ServerConnection._emitter.emit('did-add', _this);
     })();
   }
@@ -299,10 +289,10 @@ let ServerConnection = (_temp = _class = class ServerConnection {
         cert: this._config.clientCertificate,
         key: this._config.clientKey
       };
-      uri = `https://${ this.getRemoteHostname() }:${ this.getPort() }`;
+      uri = `https://${this.getRemoteHostname()}:${this.getPort()}`;
     } else {
       options = null;
-      uri = `http://${ this.getRemoteHostname() }:${ this.getPort() }`;
+      uri = `http://${this.getRemoteHostname()}:${this.getPort()}`;
     }
 
     const socket = new (_NuclideSocket || _load_NuclideSocket()).NuclideSocket(uri, options);
@@ -358,10 +348,7 @@ let ServerConnection = (_temp = _class = class ServerConnection {
   }
 
   static getForUri(uri) {
-    var _nuclideUri$parse3 = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-    const hostname = _nuclideUri$parse3.hostname;
-
+    const { hostname } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
     if (hostname == null) {
       return null;
     }
@@ -377,11 +364,12 @@ let ServerConnection = (_temp = _class = class ServerConnection {
     return ServerConnection.onDidAddServerConnection(handler);
   }
 
+  static toDebugString(connection) {
+    return connection == null ? 'local' : connection.getRemoteHostname();
+  }
+
   getRemoteConnectionForUri(uri) {
-    var _nuclideUri$parse4 = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
-
-    const path = _nuclideUri$parse4.path;
-
+    const { path } = (_nuclideUri || _load_nuclideUri()).default.parse(uri);
     return this.getConnections().filter(connection => {
       return path.startsWith(connection.getPathForInitialWorkingDirectory());
     })[0];
@@ -414,12 +402,20 @@ let ServerConnection = (_temp = _class = class ServerConnection {
       }
     })();
   }
-}, _class._connections = new Map(), _class._emitter = new _atom.Emitter(), _temp);
+}
 
+exports.ServerConnection = ServerConnection; /**
+                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                              * All rights reserved.
+                                              *
+                                              * This source code is licensed under the license found in the LICENSE file in
+                                              * the root directory of this source tree.
+                                              *
+                                              * 
+                                              */
 
-module.exports = {
-  ServerConnection: ServerConnection,
-  __test__: {
-    connections: ServerConnection._connections
-  }
+ServerConnection._connections = new Map();
+ServerConnection._emitter = new _atom.Emitter();
+const __test__ = exports.__test__ = {
+  connections: ServerConnection._connections
 };

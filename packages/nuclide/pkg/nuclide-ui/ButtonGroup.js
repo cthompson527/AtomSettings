@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -23,6 +14,16 @@ function _load_classnames() {
 var _reactForAtom = require('react-for-atom');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const ButtonGroupSizes = exports.ButtonGroupSizes = Object.freeze({
   EXTRA_SMALL: 'EXTRA_SMALL',
@@ -40,10 +41,11 @@ const ButtonGroupSizeClassnames = Object.freeze({
  * Visually groups Buttons passed in as children.
  */
 const ButtonGroup = exports.ButtonGroup = props => {
-  const size = props.size,
-        children = props.children,
-        className = props.className;
-
+  const {
+    size,
+    children,
+    className
+  } = props;
   const sizeClassName = size == null ? '' : ButtonGroupSizeClassnames[size] || '';
   const newClassName = (0, (_classnames || _load_classnames()).default)(className, 'btn-group', 'nuclide-btn-group', {
     [sizeClassName]: size != null

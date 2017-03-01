@@ -28,24 +28,26 @@ Atom/NuclideServer design handles both local and remote requests.
 The `AtomLanguageService` class implements all of the code in the Atom process for integrating a new
 language into the Atom UI. It communicates to the NuclideServer via the `LanguageService` interface.
 The `LanguageService` interface is typically implemented by the `ServerLanguageService` class.
-The `ServerLanguageService` then defers to an implementation of the `LanguageAnalyzer` interface
+The `ServerLanguageService` then defers to an implementation of the `SingleFileLanguageService` interface
 which implements the language specific analysis.
 
 TODO: Add Picture
 
 Creating a new language service requires defining 2 packages:
-- Adding a new remote package which implements the `LanguageAnalyzer` interface.
+- Adding a new remote package which implements the `LanguageService` interface.
+  The simplest implementation can be provided by `ServerLanguageService` which defers to a `SingleFileLanguageService` for each new remote `ServerConnection`. This has some limitations
+  in fidelity and performance but is easier to implement. More sophisticated providers
+  can implement the `LanguageService` interface directly.
 - Adding a new package to Nuclide which creates an instance of `AtomLanguageService` during activation,
-  and creates instances of the `LanguageService` (typically by using a `ServerLanguageService` which
-  defers to a `LanguageAnalyzer`) for each new remote `ServerConnection`.
+  and creates instances of the `LanguageService` defined in the remote package.
 
-## Implementing the `LanguageAnalyzer` Interface
+## Implementing the `SingleFileLanguageService` Interface
 
 Add a new npm package to the `pkg` directory named `nuclide-<new-language>-rpc`.
 The `-rpc` suffix indicates that the package runs on the server.
 
-Add an implementation of the `LanguageAnalyzer` interface to your new package.
-The `LanguageAnalyzer` interface is a low level API for providing language analysis.
+Add an implementation of the `SingleFileLanguageService` interface to your new package.
+The `SingleFileLanguageService` interface is a low level API for providing language analysis.
 The API contains methods for all of the available Nuclide language services.
 Likely your language service will not provide every service. For services that
 are unavailable for your language just provide an implementation which throws an exception.
@@ -58,7 +60,7 @@ The source for the stripped TextBuffer is in the `simple-text-buffer` npm packag
 
 TODO: Add StrippedTextBuffer type annotation once we have property variance from flow.
 
-### An Example `LanguageAnalyzer` API implementation
+### An Example `SingleFileLanguageService` API implementation
 
 Let's take a look at an example API and what a typical implementation might look like. We'll use the
 
@@ -108,12 +110,12 @@ getCoverage(
 }
 ```
 
-Methods in your `LanguageAnalyzer` will only be called if the feature is enabled in the config
+Methods in your `SingleFileLanguageService` will only be called if the feature is enabled in the config
 provided to your `AtomLanguageService`, so these unimplemented methods will not be called.
 
 ## Adding Your Server package to the Nuclide Server
 
-Once you have an implementation of the `LanguageAnalyzer` interface in your new package, add it to the
+Once you have an implementation of the `SingleFileLanguageService` interface in your new package, add it to the
 nuclide server's set of RPC services:
 
 - Add an entry in `pkg/nuclide-server/services-3.json` for your new package.
@@ -122,7 +124,7 @@ nuclide server's set of RPC services:
 
 ## Enabling Your New Language in Nuclide
 
-Once you have the `LanguageAnalyzer` interface implemented for your new language create an Atom
+Once you have the `SingleFileLanguageService` interface implemented for your new language create an Atom
 package for your language named `nuclide-<my-language>`. In the package's `activate` method
 create a new instance of the `AtomLanguageService` for your new language. Creating an `AtomLanguageService`
 requires 2 things: a factory for your `LanguageService` implementation and an `AtomLanguageServiceConfig`
@@ -132,7 +134,7 @@ A simplified version of your Atom package might look like:
 
 ```js
 import type {ServerConnection} from '../../nuclide-remote-connection';
-import typeof * as MyLanguageService from '../../nuclide-my-language-rpc';
+import typeof * as MyRemoteLanguageService from '../../nuclide-my-language-rpc';
 
 import {getServiceByConnection} from '../../nuclide-remote-connection';
 import {AtomLanguageService} from '../../nuclide-language-service';
@@ -140,7 +142,7 @@ import {AtomLanguageService} from '../../nuclide-language-service';
 let languageService = null;
 
 async function languageServiceFactory(connection: ?ServerConnection): Promise<LanguageService> {
-  const remoteService: MyLanguageService = getServiceByConnection('MyLanguageService', connection);
+  const remoteService: MyRemoteLanguageService = getServiceByConnection('MyLanguageService', connection);
 
     // Get the connection specific FileCache ...
     const fileNotifier = await getNotifierByConnection(connection);
@@ -188,20 +190,27 @@ export async function initialize(
   return new ServerLanguageService(fileNotifier, new MyLanguageService(config));
 }
 
-class MyLanguageAnalyzer {
+class MyLanguageService {
   constructor(config: MyLanguageConfig) { ... }
 
-  // Implementation of the LanguageAnalyzer interface goes here
+  // Implementation of the SingleFileLanguageService interface goes here
   // ...
 }
 ```
+
+## Implementing the `LanguageService` Interface Directly
+
+The `ServerLanguageService` is easy to implement but it has some limitations in fidelity and performance. More sophisticated providers can implement the `LanguageService` interface directly.
+
+TODO: Finish writing this section...
+
 
 ## Supporting Multiple Connections
 
 A single NuclideServer process can be connected to multiple Atom processes. A new Atom process
 is created for each top level Atom window.
 In the example code above, each connected Atom process will call `initialize` and create their own
-`MyLanguageAnalyzer` instance.
+`MyLanguageService` instance.
 
 Each Atom process could open and edit the same file. Your language service could receive requests
 for language services for the same file with wildly different content from 2 connections.
@@ -223,7 +232,7 @@ So your `languageServiceFactory` becomes:
 
 ```js
 async function languageServiceFactory(connection: ?ServerConnection): Promise<LanguageService> {
-  const remoteService: MyLanguageService = getServiceByConnection('MyLanguageService', connection);
+  const remoteService: MyRemoteLanguageService = getServiceByConnection('MyLanguageService', connection);
 
   // Get my custom configuration, from atom's config object
   const config = getConfig();
@@ -253,14 +262,70 @@ export async function initialize(
     config));
 }
 
-export class MyLanguageAnalyzer {
+export class MyLanguageService {
   constructor(fileCache: FileCache, config: MyLanguageConfig) { ... }
 
-  // Implementation of the LanguageAnalyzer interface goes here
+  // Implementation of the SingleFileLanguageService interface goes here
   // ...
 }
 ```
 
 ## Observable Diagnostics
 
-TODO
+Observable diagnostics allows Nuclide to publish diagnostics as soon as the language analyzer can produce them.
+
+To implement push based diagnostics, implement the `observeDiagnostics` member of the `LanguageService` or `SingleFileLanguageService` interfaces. The main steps include:
+- watch for open projects on a given Atom connection
+- manage connections to your language analyzer processes for each open process
+- subscribe to diagnostics for each connected process
+- aggregating and invalidating the diagnostics for the connected processes
+
+### Projects
+
+A project consists of a set of source files which must be analyzed as a unit to produce consistent and complete results. For example, a Hack project is identified by a file named `.hhconfig`. The directory containing a `.hhconfig` file called the project directory. All `.php` and `.hh` files in subdirectores of the project directory are part of the project.
+
+Whenever a `.php` file in a given project directory is opened in Nuclide,
+or a directory containing a `.hhconfig` file is added to the file tree, that
+project is considered to be open.
+
+The `ConfigObserver` class in the nuclide-open-files-rpc package provides
+an Observable of open projects for a given language.
+
+### Analyzer Processes
+
+An analyzer process provides diagnostics(and possibly other language analysis services) for a single project.
+
+Each time a project is opened in Nuclide, an analyzer process for that project
+is started. When a project is closed in Atom the corresponding analyzer process is shut down.
+
+TODO: Process lifetime is currently handled by the `processes`,
+`ensureProcess`, `observeConnections` in HackProcess.js. These
+should be abstracted into a reusable Language agnostic API.
+
+One additional complexity is that a given project may be opened
+by multiple Atom windows simultaneously. A LanguageService must choose between
+starting a new analyzer process per connected Atom window; or having one analyzer
+process per project which is then synchronized to the active Atom window making
+requests.
+
+Each connected Atom window is tracked via a FileCache (which implements the FileNotifier interface).
+
+NOTE: Hack starts a new process when a new Atom window opens a
+project already open in another window. The process connected to
+the other window is closed (by Hack) and the new process subsumes
+ownership of the underlying hack server process. When the previous
+Atom window makes a request on that project it starts another
+connection process (closing the one started by the other window)
+and resynchronizes its open files. It turns out the cost of
+switching the hack server between the different Atom windows is
+quite reasonable.
+
+### Observing Diagnostics for an Analyzer Process
+
+This will be language specific.
+
+### Aggregating and Invalidating Diagnostics
+
+Currently this occurs in `observeDiagnostics` in HackService.js.
+
+TODO: Move this to a reusable component which maps Observable<Observable<FileDiagnosticUpdate>> for each project to an Observable<FileDiagnosticUpdate> which handles the invalidations and flattening.

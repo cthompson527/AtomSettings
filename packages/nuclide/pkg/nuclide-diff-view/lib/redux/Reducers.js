@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -40,6 +31,16 @@ function _load_utils() {
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const FILESYSTEM_REVISION_TITLE = 'Filesystem / Editor';
 
 function rootReducer(state, action) {
@@ -49,8 +50,7 @@ function rootReducer(state, action) {
   switch (action.type) {
     case (_ActionTypes || _load_ActionTypes()).UPDATE_ACTIVE_REPOSITORY:
       {
-        const hgRepository = action.payload.hgRepository;
-
+        const { hgRepository } = action.payload;
         return Object.assign({}, state, {
           activeRepository: hgRepository,
           activeRepositoryState: reduceActiveRepositoryState(state.repositories, hgRepository)
@@ -69,7 +69,14 @@ function rootReducer(state, action) {
 
         return Object.assign({}, state, {
           activeRepositoryState: reduceActiveRepositoryState(repositories, state.activeRepository),
-          repositories: repositories
+          repositories
+        });
+      }
+
+    case (_ActionTypes || _load_ActionTypes()).UPDATE_SUGGESTED_REVIEWERS:
+      {
+        return Object.assign({}, state, {
+          suggestedReviewers: action.payload.suggestedReviewers
         });
       }
 
@@ -105,8 +112,17 @@ function rootReducer(state, action) {
         isLoadingFileDiff: action.payload.isLoading
       });
 
+    // --interactive and --rebase are mutually exclusive
+    case (_ActionTypes || _load_ActionTypes()).SET_SHOULD_COMMIT_INTERACTIVELY:
+      return Object.assign({}, state, {
+        shouldCommitInteractively: action.payload.shouldCommitInteractively,
+        shouldPublishOnCommit: !action.payload.shouldCommitInteractively && state.shouldPublishOnCommit,
+        shouldRebaseOnAmend: !action.payload.shouldCommitInteractively && state.shouldRebaseOnAmend
+      });
+
     case (_ActionTypes || _load_ActionTypes()).SET_SHOULD_REBASE_ON_AMEND:
       return Object.assign({}, state, {
+        shouldCommitInteractively: !action.payload.shouldRebaseOnAmend && state.shouldCommitInteractively,
         shouldRebaseOnAmend: action.payload.shouldRebaseOnAmend
       });
 
@@ -140,6 +156,42 @@ function rootReducer(state, action) {
         diffNavigatorVisible: action.payload.visible
       });
 
+    case (_ActionTypes || _load_ActionTypes()).UPDATE_DOCK_CONFIG:
+      return Object.assign({}, state, {
+        shouldDockPublishView: action.payload.shouldDockPublishView
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_LINT_EXCUSE:
+      return Object.assign({}, state, {
+        lintExcuse: action.payload.lintExcuse
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_SHOULD_PUBLISH_ON_COMMIT:
+      return Object.assign({}, state, {
+        shouldCommitInteractively: !action.payload.shouldPublishOnCommit && state.shouldCommitInteractively,
+        shouldPublishOnCommit: action.payload.shouldPublishOnCommit
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_IS_PREPARE_MODE:
+      return Object.assign({}, state, {
+        isPrepareMode: action.payload.isPrepareMode
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_TEXT_BASED_FORM:
+      return Object.assign({}, state, {
+        shouldUseTextBasedForm: action.payload.shouldUseTextBasedForm
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_VERBATIM_MODE_ENABLED:
+      return Object.assign({}, state, {
+        verbatimModeEnabled: action.payload.verbatimModeEnabled
+      });
+
+    case (_ActionTypes || _load_ActionTypes()).SET_ENABLED_FEATURES:
+      return Object.assign({}, state, {
+        enabledFeatures: action.payload.enabledFeatures
+      });
+
     default:
       return state;
   }
@@ -160,8 +212,7 @@ function reduceActiveRepositoryState(repositories, activeRepository) {
 
 function reduceRepositories(repositories, action) {
   const newRepositories = new Map(repositories);
-  const repository = action.payload.repository;
-
+  const { repository } = action.payload;
 
   switch (action.type) {
     case (_ActionTypes || _load_ActionTypes()).SET_COMPARE_ID:
@@ -209,10 +260,9 @@ function reduceRepositoryAction(repositoryState, action) {
       });
     case (_ActionTypes || _load_ActionTypes()).UPDATE_HEAD_TO_FORKBASE_REVISIONS:
       {
-        const headToForkBaseRevisions = action.payload.headToForkBaseRevisions;
-
+        const { headToForkBaseRevisions } = action.payload;
         return Object.assign({}, repositoryState, {
-          headToForkBaseRevisions: headToForkBaseRevisions,
+          headToForkBaseRevisions,
           headRevision: (0, (_utils || _load_utils()).getHeadRevision)(headToForkBaseRevisions),
           revisionStatuses: action.payload.revisionStatuses
         });
@@ -247,15 +297,10 @@ function reducePublishState(state, action) {
 }
 
 function reduceFileDiff(state, action) {
-  var _action$payload = action.payload;
-  const filePath = _action$payload.filePath,
-        fromRevision = _action$payload.fromRevision,
-        newContents = _action$payload.newContents,
-        oldContents = _action$payload.oldContents;
-  let newEditorElements = state.newEditorState.inlineElements;
-  let oldEditorElements = state.oldEditorState.inlineElements;
-  let activeSectionIndex = state.activeSectionIndex;
-
+  const { filePath, fromRevision, newContents, oldContents, textDiff } = action.payload;
+  let { inlineElements: newEditorElements } = state.newEditorState;
+  let { inlineElements: oldEditorElements } = state.oldEditorState;
+  let { activeSectionIndex } = state;
 
   if (state.filePath !== filePath) {
     // Clear the ui elements and section index.
@@ -264,15 +309,16 @@ function reduceFileDiff(state, action) {
     oldEditorElements = new Map();
   }
 
-  var _computeDiff = (0, (_diffUtils || _load_diffUtils()).computeDiff)(oldContents, newContents);
+  const {
+    addedLines,
+    removedLines,
+    newToOld,
+    oldToNew
+  } = textDiff;
 
-  const addedLines = _computeDiff.addedLines,
-        removedLines = _computeDiff.removedLines,
-        oldLineOffsets = _computeDiff.oldLineOffsets,
-        newLineOffsets = _computeDiff.newLineOffsets,
-        newToOld = _computeDiff.newToOld,
-        oldToNew = _computeDiff.oldToNew;
-
+  // Deserialize from JSON.
+  const oldLineOffsets = new Map(textDiff.oldLineOffsets);
+  const newLineOffsets = new Map(textDiff.newLineOffsets);
 
   const oldEditorState = {
     revisionTitle: fromRevision == null ? '...' : (0, (_utils || _load_utils()).formatFileDiffRevisionTitle)(fromRevision),
@@ -300,22 +346,18 @@ function reduceFileDiff(state, action) {
   const navigationSections = (0, (_diffUtils || _load_diffUtils()).computeNavigationSections)(addedLines, removedLines, newEditorElements.keys(), oldEditorElements.keys(), oldLineOffsets, newLineOffsets);
 
   return {
-    activeSectionIndex: activeSectionIndex,
-    filePath: filePath,
-    lineMapping: { newToOld: newToOld, oldToNew: oldToNew },
-    newEditorState: newEditorState,
-    oldEditorState: oldEditorState,
-    navigationSections: navigationSections
+    activeSectionIndex,
+    filePath,
+    lineMapping: { newToOld, oldToNew },
+    newEditorState,
+    oldEditorState,
+    navigationSections
   };
 }
 
 function reduceUiElements(state, action) {
-  var _action$payload2 = action.payload;
-  const newEditorElements = _action$payload2.newEditorElements,
-        oldEditorElements = _action$payload2.oldEditorElements;
-  const newEditorState = state.newEditorState,
-        oldEditorState = state.oldEditorState;
-
+  const { newEditorElements, oldEditorElements } = action.payload;
+  const { newEditorState, oldEditorState } = state;
 
   const navigationSections = (0, (_diffUtils || _load_diffUtils()).computeNavigationSections)(newEditorState.highlightedLines.added, oldEditorState.highlightedLines.removed, newEditorElements.keys(), oldEditorElements.keys(), oldEditorState.offsets, newEditorState.offsets);
 
@@ -328,7 +370,7 @@ function reduceUiElements(state, action) {
       inlineElements: newEditorElements,
       inlineOffsetElements: oldEditorElements
     }),
-    navigationSections: navigationSections
+    navigationSections
   });
 }
 
@@ -343,8 +385,7 @@ function reduceUiProviders(state, action) {
     case (_ActionTypes || _load_ActionTypes()).ADD_UI_PROVIDER:
       return state.concat(action.payload.uiProvider);
     case (_ActionTypes || _load_ActionTypes()).REMOVE_UI_PROVIDER:
-      const uiProvider = action.payload.uiProvider;
-
+      const { uiProvider } = action.payload;
       return state.filter(provider => provider !== uiProvider);
   }
   return state || [];

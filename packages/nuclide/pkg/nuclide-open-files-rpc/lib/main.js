@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -59,12 +50,22 @@ function _load_nuclideAnalytics() {
   return _nuclideAnalytics = require('../../nuclide-analytics');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 exports.FileCache = (_FileCache || _load_FileCache()).FileCache;
 exports.FileVersionNotifier = (_FileVersionNotifier || _load_FileVersionNotifier()).FileVersionNotifier;
 const OPEN_FILES_SERVICE = exports.OPEN_FILES_SERVICE = 'OpenFilesService';
 
 function getBufferAtVersion(fileVersion) {
-  return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('getBufferAtVersion', () => {
+  return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('getBufferAtVersion', () => {
     if (!(fileVersion.notifier instanceof (_FileCache || _load_FileCache()).FileCache)) {
       throw new Error('Don\'t call this from the Atom process');
     }

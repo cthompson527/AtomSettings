@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,32 +23,34 @@ function _load_eventKit() {
   return _eventKit = require('event-kit');
 }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let connectionCount = 1;
 
 const ASYNC_BREAK = exports.ASYNC_BREAK = 'async_break';
 const BREAKPOINT = exports.BREAKPOINT = 'breakpoint';
 
-let Connection = exports.Connection = class Connection {
+class Connection {
 
   constructor(socket, onStatusCallback, onNotificationCallback, isDummyConnection) {
-    var _this = this;
-
     const dbgpSocket = new (_DbgpSocket || _load_DbgpSocket()).DbgpSocket(socket);
     this._socket = dbgpSocket;
     this._dataCache = new (_DataCache || _load_DataCache()).DataCache(dbgpSocket);
     this._id = connectionCount++;
-    this._status = (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.STARTING;
+    this._status = (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Starting;
     this._isDummyConnection = isDummyConnection;
     this._isDummyViewable = false;
     this._disposables = new (_eventKit || _load_eventKit()).CompositeDisposable();
     if (onStatusCallback != null) {
-      this._disposables.add(this.onStatus(function (status) {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
-
-        return onStatusCallback(_this, status, ...args);
-      }));
+      this._disposables.add(this.onStatus((status, ...args) => onStatusCallback(this, status, ...args)));
     }
     if (onNotificationCallback != null) {
       this._disposables.add(this.onNotification((notifyName, notify) => onNotificationCallback(this, notifyName, notify)));
@@ -77,36 +70,32 @@ let Connection = exports.Connection = class Connection {
     return this._socket.onStatus(this._handleStatus.bind(this, callback));
   }
 
-  _handleStatus(callback, newStatus) {
+  _handleStatus(callback, newStatus, ...args) {
     const prevStatus = this._status;
     switch (newStatus) {
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.RUNNING:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Running:
         this._stopReason = null;
         break;
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK:
-        if (prevStatus === (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_RECEIVED) {
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break:
+        if (prevStatus === (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageReceived) {
           this._stopReason = ASYNC_BREAK;
-        } else if (prevStatus !== (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK) {
+        } else if (prevStatus !== (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break) {
           // TODO(dbonafilia): investigate why we sometimes receive two BREAK_MESSAGES
           this._stopReason = BREAKPOINT;
         }
         break;
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.DUMMY_IS_VIEWABLE:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.DummyIsViewable:
         this._isDummyViewable = true;
         return;
-      case (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.DUMMY_IS_HIDDEN:
+      case (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.DummyIsHidden:
         this._isDummyViewable = false;
         return;
     }
-    if (newStatus === (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_RECEIVED && prevStatus !== (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_SENT) {
+    if (newStatus === (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageReceived && prevStatus !== (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageSent) {
       return;
     }
     this._status = newStatus;
     if (!this._isInternalStatus(newStatus)) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        args[_key2 - 2] = arguments[_key2];
-      }
-
       // Don't bubble up irrelevant statuses to the multiplexer
       // TODO(dbonafilia): Add Enums to make status association clearer
       return callback(newStatus, ...args);
@@ -114,7 +103,7 @@ let Connection = exports.Connection = class Connection {
   }
 
   _isInternalStatus(status) {
-    return [(_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_RECEIVED, (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_SENT, (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.DUMMY_IS_HIDDEN, (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.DUMMY_IS_VIEWABLE].some(internalStatus => internalStatus === status);
+    return [(_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageReceived, (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageSent, (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.DummyIsHidden, (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.DummyIsViewable].some(internalStatus => internalStatus === status);
   }
 
   /**
@@ -123,9 +112,9 @@ let Connection = exports.Connection = class Connection {
    */
   isViewable() {
     if (this._isDummyConnection) {
-      return this._status === (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK && this._isDummyViewable;
+      return this._status === (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break && this._isDummyViewable;
     } else {
-      return this._status === (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK;
+      return this._status === (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.Break;
     }
   }
 
@@ -182,7 +171,7 @@ let Connection = exports.Connection = class Connection {
   }
 
   sendBreakCommand() {
-    this._status = (_DbgpSocket || _load_DbgpSocket()).CONNECTION_STATUS.BREAK_MESSAGE_SENT;
+    this._status = (_DbgpSocket || _load_DbgpSocket()).ConnectionStatus.BreakMessageSent;
     return this._socket.sendBreakCommand();
   }
 
@@ -202,4 +191,5 @@ let Connection = exports.Connection = class Connection {
     this._disposables.dispose();
     this._socket.dispose();
   }
-};
+}
+exports.Connection = Connection;

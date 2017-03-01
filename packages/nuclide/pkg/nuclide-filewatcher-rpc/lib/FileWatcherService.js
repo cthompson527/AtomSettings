@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,12 +13,12 @@ let getRealPath = (() => {
       stat = yield (_fsPromise || _load_fsPromise()).default.stat(entityPath);
     } catch (e) {
       // Atom watcher behavior compatibility.
-      throw new Error(`Can't watch a non-existing entity: ${ entityPath }`);
+      throw new Error(`Can't watch a non-existing entity: ${entityPath}`);
     }
     if (stat.isFile() !== isFile) {
-      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`FileWatcherService: expected ${ entityPath } to be a ${ isFile ? 'file' : 'directory' }`);
+      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`FileWatcherService: expected ${entityPath} to be a ${isFile ? 'file' : 'directory'}`);
     }
-    return yield (_fsPromise || _load_fsPromise()).default.realpath(entityPath);
+    return (_fsPromise || _load_fsPromise()).default.realpath(entityPath);
   });
 
   return function getRealPath(_x, _x2) {
@@ -85,6 +76,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // Cache an observable for each watched entity (file or directory).
 // Multiple watches for the same entity can share the same observable.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const entityWatches = new (_SharedObservableCache || _load_SharedObservableCache()).default(registerWatch);
 
 // In addition, expose the observer behind each observable so we can
@@ -116,7 +117,7 @@ function registerWatch(path) {
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
     entityObserver.set(path, observer);
     return () => entityObserver.delete(path);
-  }).map(type => ({ path: path, type: type })).share();
+  }).map(type => ({ path, type })).share();
 }
 
 function watchDirectoryRecursive(directoryPath) {
@@ -124,7 +125,7 @@ function watchDirectoryRecursive(directoryPath) {
   if (client.hasSubscription(directoryPath)) {
     return _rxjsBundlesRxMinJs.Observable.of('EXISTING').publish();
   }
-  return _rxjsBundlesRxMinJs.Observable.fromPromise(client.watchDirectoryRecursive(directoryPath, `filewatcher-${ directoryPath }`,
+  return _rxjsBundlesRxMinJs.Observable.fromPromise(client.watchDirectoryRecursive(directoryPath, `filewatcher-${directoryPath}`,
   // Reloading with file changes should happen
   // during source control operations to reflect the file contents / tree state.
   { defer_vcs: false })).flatMap(watcher => {

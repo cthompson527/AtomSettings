@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -42,7 +33,17 @@ function _load_nuclideOpenFiles() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let FindReferencesProvider = exports.FindReferencesProvider = class FindReferencesProvider {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class FindReferencesProvider {
 
   constructor(name, grammarScopes, analyticsEventName, connectionToLanguageService) {
     this.name = name;
@@ -66,14 +67,15 @@ let FindReferencesProvider = exports.FindReferencesProvider = class FindReferenc
   findReferences(editor, position) {
     var _this2 = this;
 
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
       const fileVersion = yield (0, (_nuclideOpenFiles || _load_nuclideOpenFiles()).getFileVersionOfEditor)(editor);
       const languageService = _this2._connectionToLanguageService.getForUri(editor.getPath());
       if (languageService == null || fileVersion == null) {
         return null;
       }
 
-      return yield (0, (_loadingNotification || _load_loadingNotification()).default)((yield languageService).findReferences(fileVersion, position), `Loading references from ${ _this2.name } server...`);
+      return (0, (_loadingNotification || _load_loadingNotification()).default)((yield languageService).findReferences(fileVersion, position), `Loading references from ${_this2.name} server...`);
     }));
   }
-};
+}
+exports.FindReferencesProvider = FindReferencesProvider;

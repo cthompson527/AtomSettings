@@ -1,20 +1,17 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DbgpSocket = exports.COMMAND_DETACH = exports.COMMAND_STOP = exports.COMMAND_STEP_OUT = exports.COMMAND_STEP_OVER = exports.COMMAND_STEP_INTO = exports.COMMAND_RUN = exports.BREAKPOINT_RESOLVED_NOTIFICATION = exports.CONNECTION_STATUS = undefined;
+exports.DbgpSocket = exports.COMMAND_DETACH = exports.COMMAND_STOP = exports.COMMAND_STEP_OUT = exports.COMMAND_STEP_OVER = exports.COMMAND_STEP_INTO = exports.COMMAND_RUN = exports.BREAKPOINT_RESOLVED_NOTIFICATION = exports.ConnectionStatus = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
+
+var _dedent;
+
+function _load_dedent() {
+  return _dedent = _interopRequireDefault(require('dedent'));
+}
 
 var _utils;
 
@@ -44,26 +41,36 @@ function _load_event() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const CONNECTION_STATUS = exports.CONNECTION_STATUS = {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+const ConnectionStatus = exports.ConnectionStatus = {
   // Responses to the DBGP 'status' command
-  STARTING: 'starting',
-  STOPPING: 'stopping',
-  STOPPED: 'stopped',
-  RUNNING: 'running',
-  BREAK: 'break',
+  Starting: 'starting',
+  Stopping: 'stopping',
+  Stopped: 'stopped',
+  Running: 'running',
+  Break: 'break',
   // Error and End are not dbgp status codes, they relate to socket states.
-  ERROR: 'error',
-  END: 'end',
+  Error: 'error',
+  End: 'end',
   // stdout and stderr are emitted when DBGP sends the corresponding message packets.
-  STDOUT: 'stdout',
-  STDERR: 'stderr',
+  Stdout: 'stdout',
+  Stderr: 'stderr',
   // Break message statuses allow us to identify whether a connection stopped because of a break
   // message or a breakpoint
-  BREAK_MESSAGE_RECEIVED: 'status_break_message_received',
-  BREAK_MESSAGE_SENT: 'status_break_message_sent',
+  BreakMessageReceived: 'status_break_message_received',
+  BreakMessageSent: 'status_break_message_sent',
   // Indicates if the dummy connection should be shown in the UI.
-  DUMMY_IS_VIEWABLE: 'dummy is viewable',
-  DUMMY_IS_HIDDEN: 'dummy is hidden'
+  DummyIsViewable: 'dummy is viewable',
+  DummyIsHidden: 'dummy is hidden'
 };
 
 // Notifications.
@@ -92,7 +99,7 @@ const DEFAULT_DBGP_PROPERTY = {
  * Handles sending and recieving dbgp messages over a net Socket.
  * Dbgp documentation can be found at http://xdebug.org/docs-dbgp.php
  */
-let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
+class DbgpSocket {
   // Maps from transactionId -> call
   constructor(socket) {
     this._socket = socket;
@@ -101,7 +108,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     this._emitter = new _events.default();
     this._isClosed = false;
     this._messageHandler = (0, (_DbgpMessageHandler || _load_DbgpMessageHandler()).getDbgpMessageHandlerInstance)();
-    this._pendingEvalTransactionIdStack = [];
+    this._pendingEvalTransactionIds = new Set();
     this._lastContinuationCommandTransactionId = null;
 
     socket.on('end', this._onEnd.bind(this));
@@ -121,13 +128,13 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     // Not sure if hhvm is alive or not
     // do not set _isClosed flag so that detach will be sent before dispose().
     (_utils || _load_utils()).default.logError('socket error ' + error.code);
-    this._emitStatus(CONNECTION_STATUS.ERROR, error.code);
+    this._emitStatus(ConnectionStatus.Error, error.code);
   }
 
   _onEnd() {
     this._isClosed = true;
     this.dispose();
-    this._emitStatus(CONNECTION_STATUS.END);
+    this._emitStatus(ConnectionStatus.End);
   }
 
   _onData(data) {
@@ -139,14 +146,11 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     } catch (e) {
       // If message parsing fails, then our contract with HHVM is violated and we need to kill the
       // connection.
-      this._emitStatus(CONNECTION_STATUS.ERROR, e.message);
+      this._emitStatus(ConnectionStatus.Error, e.message);
       return;
     }
     responses.forEach(r => {
-      const response = r.response,
-            stream = r.stream,
-            notify = r.notify;
-
+      const { response, stream, notify } = r;
       if (response) {
         this._handleResponse(response, message);
       } else if (stream != null) {
@@ -161,10 +165,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
 
   _handleResponse(response, message) {
     const responseAttributes = response.$;
-    const command = responseAttributes.command,
-          transaction_id = responseAttributes.transaction_id,
-          status = responseAttributes.status;
-
+    const { command, transaction_id, status } = responseAttributes;
     const transactionId = Number(transaction_id);
     const call = this._calls.get(transactionId);
     if (!call) {
@@ -173,7 +174,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     }
     // We handle evaluation commands specially since they can trigger breakpoints.
     if ((0, (_helpers || _load_helpers()).isEvaluationCommand)(command)) {
-      if (status === CONNECTION_STATUS.BREAK) {
+      if (status === ConnectionStatus.Break) {
         // The eval command's response with a `break` status is special because the backend will
         // send two responses for one xdebug eval request.  One when we hit a breakpoint in the
         // code being eval'd, and another when we finish executing the code being eval'd.
@@ -181,10 +182,10 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
         // record this response ID on our stack, so we can later identify the second response.
         // Then send a user-friendly message to the console, and trigger a UI update by moving to
         // running status briefly, and then back to break status.
-        this._emitStatus(CONNECTION_STATUS.DUMMY_IS_VIEWABLE);
-        this._emitStatus(CONNECTION_STATUS.STDOUT, 'Hit breakpoint in evaluated code.');
-        this._emitStatus(CONNECTION_STATUS.RUNNING);
-        this._emitStatus(CONNECTION_STATUS.BREAK);
+        this._emitStatus(ConnectionStatus.DummyIsViewable);
+        this._emitStatus(ConnectionStatus.Stdout, 'Hit breakpoint in evaluated code.');
+        this._emitStatus(ConnectionStatus.Running);
+        this._emitStatus(ConnectionStatus.Break);
         return; // Return early so that we don't complete any request.
       }
       this._handleEvaluationCommand(transactionId, message);
@@ -193,11 +194,15 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
   }
 
   _handleEvaluationCommand(transactionId, message) {
-    if (!(this._pendingEvalTransactionIdStack.length > 0)) {
+    if (!(this._pendingEvalTransactionIds.size > 0)) {
       throw new Error('No pending Eval Ids');
     }
 
-    const lastEvalId = this._pendingEvalTransactionIdStack.pop();
+    if (!this._pendingEvalTransactionIds.has(transactionId)) {
+      throw new Error('Got evaluation response for a request that was never sent.');
+    }
+
+    this._pendingEvalTransactionIds.delete(transactionId);
     const continuationId = this._lastContinuationCommandTransactionId;
     if (continuationId == null) {
       return;
@@ -205,15 +210,10 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     // In this case, we are processing the second response to our eval request.  So we can
     // complete the current continuation command promise, and then complete the original
     // eval command promise.
-
-    if (!(lastEvalId === transactionId)) {
-      throw new Error('Evaluation requests are being processed out of order.');
-    }
-
-    if (this._pendingEvalTransactionIdStack.length === 0) {
+    if (this._pendingEvalTransactionIds.size === 0) {
       // This is the last eval command before returning to the dummy connection entry-point, so
       // we will signal to the CM that the dummy connection is now un-viewable.
-      this._emitStatus(CONNECTION_STATUS.DUMMY_IS_HIDDEN);
+      this._emitStatus(ConnectionStatus.DummyIsHidden);
     }
     const continuationCommandCall = this._calls.get(continuationId);
 
@@ -221,15 +221,15 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
       throw new Error('no pending continuation command request');
     }
 
-    this._completeRequest(message, { $: { status: CONNECTION_STATUS.BREAK } }, continuationCommandCall, continuationCommandCall.command, continuationId);
+    this._completeRequest(message, { $: { status: ConnectionStatus.Break } }, continuationCommandCall, continuationCommandCall.command, continuationId);
   }
 
   _handleStream(stream) {
     const outputType = stream.$.type;
     // The body of the `stream` XML can be omitted, e.g. `echo null`, so we defend against this.
     const outputText = stream._ != null ? (0, (_helpers || _load_helpers()).base64Decode)(stream._) : '';
-    (_utils || _load_utils()).default.log(`${ outputType } message received: ${ outputText }`);
-    const status = outputType === 'stdout' ? CONNECTION_STATUS.STDOUT : CONNECTION_STATUS.STDERR;
+    (_utils || _load_utils()).default.log(`${outputType} message received: ${outputText}`);
+    const status = outputType === 'stdout' ? ConnectionStatus.Stdout : ConnectionStatus.Stderr;
     // TODO: t13439903 -- add a way to fetch the rest of the data.
     const truncatedOutputText = outputText.slice(0, STREAM_MESSAGE_MAX_SIZE);
     this._emitStatus(status, truncatedOutputText);
@@ -240,12 +240,12 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     if (notifyName === 'breakpoint_resolved') {
       const breakpoint = notify.breakpoint[0].$;
       if (breakpoint == null) {
-        (_utils || _load_utils()).default.logError(`Fail to get breakpoint from 'breakpoint_resolved' notify: ${ JSON.stringify(notify) }`);
+        (_utils || _load_utils()).default.logError(`Fail to get breakpoint from 'breakpoint_resolved' notify: ${JSON.stringify(notify)}`);
         return;
       }
       this._emitNotification(BREAKPOINT_RESOLVED_NOTIFICATION, breakpoint);
     } else {
-      (_utils || _load_utils()).default.logError(`Unknown notify: ${ JSON.stringify(notify) }`);
+      (_utils || _load_utils()).default.logError(`Unknown notify: ${JSON.stringify(notify)}`);
     }
   }
 
@@ -271,7 +271,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const result = yield _this._callDebugger('context_names', `-d ${ frameIndex }`);
+      const result = yield _this._callDebugger('context_names', `-d ${frameIndex}`);
       return result.context.map(function (context) {
         return context.$;
       });
@@ -282,7 +282,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this2 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const result = yield _this2._callDebugger('context_get', `-d ${ frameIndex } -c ${ contextId }`);
+      const result = yield _this2._callDebugger('context_get', `-d ${frameIndex} -c ${contextId}`);
       // 0 results yields missing 'property' member
       return result.property || [];
     })();
@@ -294,7 +294,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     return (0, _asyncToGenerator.default)(function* () {
       // Escape any double quote in the expression.
       const escapedFullname = fullname.replace(/"/g, '\\"');
-      const result = yield _this3._callDebugger('property_value', `-d ${ frameIndex } -c ${ contextId } -n "${ escapedFullname }" -p ${ page }`);
+      const result = yield _this3._callDebugger('property_value', `-d ${frameIndex} -c ${contextId} -n "${escapedFullname}" -p ${page}`);
       // property_value returns the outer property, we want the children ...
       // 0 results yields missing 'property' member
       if (result.property == null || result.property[0] == null) {
@@ -309,7 +309,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
 
     return (0, _asyncToGenerator.default)(function* () {
       // Pass zero as contextId to search all contexts.
-      return yield _this4.getPropertiesByFullname(frameIndex, /* contextId */'0', fullname, page);
+      return _this4.getPropertiesByFullname(frameIndex, /* contextId */'0', fullname, page);
     })();
   }
 
@@ -321,7 +321,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
       const escapedExpression = expression.replace(/"/g, '\\"');
       // Quote the input expression so that we can support expression with
       // space in it(e.g. function evaluation).
-      const result = yield _this5._callDebugger('property_value', `-d ${ frameIndex } -n "${ escapedExpression }"`);
+      const result = yield _this5._callDebugger('property_value', `-d ${frameIndex} -n "${escapedExpression}"`);
       if (result.error && result.error.length > 0) {
         return {
           error: result.error[0],
@@ -333,7 +333,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
           wasThrown: false
         };
       } else {
-        (_utils || _load_utils()).default.log(`Received non-error evaluateOnCallFrame response with no properties: ${ expression }`);
+        (_utils || _load_utils()).default.log(`Received non-error evaluateOnCallFrame response with no properties: ${expression}`);
         return {
           result: DEFAULT_DBGP_PROPERTY,
           wasThrown: false
@@ -360,7 +360,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this7 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      _this7._emitStatus(CONNECTION_STATUS.RUNNING);
+      _this7._emitStatus(ConnectionStatus.Running);
       const response = yield _this7._callDebugger(command);
       const status = response.$.status;
       _this7._emitStatus(status);
@@ -374,7 +374,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     return (0, _asyncToGenerator.default)(function* () {
       const response = yield _this8._callDebugger('break');
       if (response.$.success !== '0') {
-        _this8._emitStatus(CONNECTION_STATUS.BREAK_MESSAGE_RECEIVED);
+        _this8._emitStatus(ConnectionStatus.BreakMessageReceived);
       }
       return response.$.success !== '0';
     })();
@@ -409,7 +409,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this11 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const response = yield _this11._callDebugger('feature_set', `-n ${ name } -v ${ value }`);
+      const response = yield _this11._callDebugger('feature_set', `-n ${name} -v ${value}`);
       return response.$.success !== '0';
     })();
   }
@@ -421,7 +421,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this12 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const response = yield _this12._callDebugger('eval', `-- ${ (0, (_helpers || _load_helpers()).base64Encode)(expr) }`);
+      const response = yield _this12._callDebugger('eval', `-- ${(0, (_helpers || _load_helpers()).base64Encode)(expr)}`);
       if (response.error && response.error.length > 0) {
         return {
           error: response.error[0],
@@ -433,7 +433,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
           wasThrown: false
         };
       } else {
-        (_utils || _load_utils()).default.log(`Received non-error runtimeEvaluate response with no properties: ${ expr }`);
+        (_utils || _load_utils()).default.log(`Received non-error runtimeEvaluate response with no properties: ${expr}`);
       }
       return {
         result: DEFAULT_DBGP_PROPERTY,
@@ -449,7 +449,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this13 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const response = yield _this13._callDebugger('breakpoint_set', `-t exception -x ${ exceptionName }`);
+      const response = yield _this13._callDebugger('breakpoint_set', `-t exception -x ${exceptionName}`);
       if (response.error) {
         throw new Error('Error from setPausedOnExceptions: ' + JSON.stringify(response));
       }
@@ -466,17 +466,18 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this14 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const filename = breakpointInfo.filename,
-            lineNumber = breakpointInfo.lineNumber,
-            conditionExpression = breakpointInfo.conditionExpression;
-
-      let params = `-t line -f ${ filename } -n ${ lineNumber }`;
+      const { filename, lineNumber, conditionExpression } = breakpointInfo;
+      let params = `-t line -f ${filename} -n ${lineNumber}`;
       if (conditionExpression != null) {
-        params += ` -- ${ (0, (_helpers || _load_helpers()).base64Encode)(conditionExpression) }`;
+        params += ` -- ${(0, (_helpers || _load_helpers()).base64Encode)(conditionExpression)}`;
       }
       const response = yield _this14._callDebugger('breakpoint_set', params);
       if (response.error) {
-        throw new Error('Error setting breakpoint: ' + JSON.stringify(response));
+        throw new Error((_dedent || _load_dedent()).default`
+        Error setting breakpoint for command: breakpoint_set ${params}
+        Got response: ${JSON.stringify(response)}
+        BreakpointInfo is: ${JSON.stringify(breakpointInfo)}
+      `);
       }
       // TODO: Validate that response.$.state === 'enabled'
       return response.$.id;
@@ -490,7 +491,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this15 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const response = yield _this15._callDebugger('breakpoint_get', `-d ${ breakpointId }`);
+      const response = yield _this15._callDebugger('breakpoint_get', `-d ${breakpointId}`);
       if (response.error != null || response.breakpoint == null || response.breakpoint[0] == null || response.breakpoint[0].$ == null) {
         throw new Error('Error getting breakpoint: ' + JSON.stringify(response));
       }
@@ -502,7 +503,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     var _this16 = this;
 
     return (0, _asyncToGenerator.default)(function* () {
-      const response = yield _this16._callDebugger('breakpoint_remove', `-d ${ breakpointId }`);
+      const response = yield _this16._callDebugger('breakpoint_remove', `-d ${breakpointId}`);
       if (response.error) {
         throw new Error('Error removing breakpoint: ' + JSON.stringify(response));
       }
@@ -514,7 +515,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
   _callDebugger(command, params) {
     const transactionId = this._sendCommand(command, params);
     if ((0, (_helpers || _load_helpers()).isEvaluationCommand)(command)) {
-      this._pendingEvalTransactionIdStack.push(transactionId);
+      this._pendingEvalTransactionIds.add(transactionId);
     }
     const isContinuation = (0, (_helpers || _load_helpers()).isContinuationCommand)(command);
     if (isContinuation) {
@@ -523,7 +524,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     }
     return new Promise((resolve, reject) => {
       this._calls.set(transactionId, {
-        command: command,
+        command,
         complete: result => {
           if (isContinuation) {
             this._lastContinuationCommandTransactionId = null;
@@ -536,7 +537,7 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
 
   _sendCommand(command, params) {
     const id = ++this._transactionId;
-    let message = `${ command } -i ${ id }`;
+    let message = `${command} -i ${id}`;
     if (params) {
       message += ' ' + params;
     }
@@ -554,18 +555,13 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
     }
   }
 
-  _emitStatus(status) {
+  _emitStatus(status, ...args) {
     (_utils || _load_utils()).default.log('Emitting status: ' + status);
-
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
     this._emitter.emit(DBGP_SOCKET_STATUS_EVENT, status, ...args);
   }
 
   _emitNotification(notifyName, notify) {
-    (_utils || _load_utils()).default.log(`Emitting notification: ${ notifyName }`);
+    (_utils || _load_utils()).default.log(`Emitting notification: ${notifyName}`);
     this._emitter.emit(DBGP_SOCKET_NOTIFICATION_EVENT, notifyName, notify);
   }
 
@@ -585,4 +581,5 @@ let DbgpSocket = exports.DbgpSocket = class DbgpSocket {
       this._isClosed = true;
     }
   }
-};
+}
+exports.DbgpSocket = DbgpSocket;

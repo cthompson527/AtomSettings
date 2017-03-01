@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _helpers;
 
@@ -24,7 +19,17 @@ function _load_Handler() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Handles all 'Page.*' Chrome dev tools messages
-let PageHandler = class PageHandler extends (_Handler || _load_Handler()).default {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class PageHandler extends (_Handler || _load_Handler()).default {
   constructor(clientCallback) {
     super('Page', clientCallback);
   }
@@ -65,7 +70,5 @@ let PageHandler = class PageHandler extends (_Handler || _load_Handler()).defaul
     }
     return Promise.resolve();
   }
-};
-
-
-module.exports = PageHandler;
+}
+exports.default = PageHandler;

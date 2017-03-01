@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -45,6 +36,16 @@ var _ButtonGroup;
 function _load_ButtonGroup() {
   return _ButtonGroup = require('../../nuclide-ui/ButtonGroup');
 }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 function getColumns() {
   return [{
@@ -85,7 +86,7 @@ function getCompareFunction(sortedColumn, sortDescending) {
   return () => 0;
 }
 
-let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent extends _reactForAtom.React.Component {
+class AttachUIComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -94,6 +95,7 @@ let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent exte
     this._handleSelectTableRow = this._handleSelectTableRow.bind(this);
     this._handleCancelButtonClick = this._handleCancelButtonClick.bind(this);
     this._handleAttachClick = this._handleAttachClick.bind(this);
+    this._handleParentVisibilityChanged = this._handleParentVisibilityChanged.bind(this);
     this._updateAttachTargetList = this._updateAttachTargetList.bind(this);
     this._updateList = this._updateList.bind(this);
     this._handleSort = this._handleSort.bind(this);
@@ -109,13 +111,16 @@ let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent exte
 
   componentWillMount() {
     this.props.parentEmitter.on((_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachEventTypes.ENTER_KEY_PRESSED, this._handleAttachClick);
+    this.props.parentEmitter.on((_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachEventTypes.VISIBILITY_CHANGED, this._handleParentVisibilityChanged);
+    this.props.actions.updateAttachUIVisibility(true);
   }
 
   componentWillUnmount() {
+    this.props.actions.updateAttachUIVisibility(false);
     if (this.state.targetListChangeDisposable != null) {
       this.state.targetListChangeDisposable.dispose();
     }
-
+    this.props.parentEmitter.removeListener((_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachEventTypes.VISIBILITY_CHANGED, this._handleParentVisibilityChanged);
     this.props.parentEmitter.removeListener((_nuclideDebuggerBase || _load_nuclideDebuggerBase()).DebuggerLaunchAttachEventTypes.ENTER_KEY_PRESSED, this._handleAttachClick);
   }
 
@@ -138,21 +143,20 @@ let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent exte
 
   _handleSort(sortedColumn, sortDescending) {
     this.setState({
-      sortedColumn: sortedColumn,
-      sortDescending: sortDescending
+      sortedColumn,
+      sortDescending
     });
   }
 
   render() {
     const filterRegex = new RegExp(this.state.filterText, 'i');
-    var _state = this.state;
-    const attachTargetInfos = _state.attachTargetInfos,
-          sortedColumn = _state.sortedColumn,
-          sortDescending = _state.sortDescending;
-
+    const {
+      attachTargetInfos,
+      sortedColumn,
+      sortDescending
+    } = this.state;
     const compareFn = getCompareFunction(sortedColumn, sortDescending);
-    const selectedAttachTarget = this.state.selectedAttachTarget;
-
+    const { selectedAttachTarget } = this.state;
     let selectedIndex = null;
     const rows = attachTargetInfos.filter(item => filterRegex.test(item.name) || filterRegex.test(item.pid.toString()) || filterRegex.test(item.commandName)).sort(compareFn).map((item, index) => {
       const row = {
@@ -235,6 +239,10 @@ let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent exte
     this._attachToProcess();
   }
 
+  _handleParentVisibilityChanged(visible) {
+    this.props.actions.updateParentUIVisibility(visible);
+  }
+
   _handleCancelButtonClick() {
     this.props.actions.toggleLaunchAttachDialog();
   }
@@ -253,4 +261,5 @@ let AttachUIComponent = exports.AttachUIComponent = class AttachUIComponent exte
       this.props.actions.toggleLaunchAttachDialog();
     }
   }
-};
+}
+exports.AttachUIComponent = AttachUIComponent;

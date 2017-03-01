@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -47,7 +38,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *   4. Provides centralized (and fallback) error handling for errors that occur during the
  *      "startup" phase (before the process has signalled that it's ready), and afterwards.
  */
-let LogTailer = exports.LogTailer = class LogTailer {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class LogTailer {
 
   constructor(options) {
     this._name = options.name;
@@ -70,7 +71,7 @@ let LogTailer = exports.LogTailer = class LogTailer {
         this._stop();
       }
     }).catch(err => {
-      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error with ${ this._name } tailer.`, err);
+      (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().error(`Error with ${this._name} tailer.`, err);
       const wasStarting = this._statuses.getValue() === 'starting';
       this._stop(false);
 
@@ -91,12 +92,12 @@ let LogTailer = exports.LogTailer = class LogTailer {
 
       if (!errorWasHandled) {
         // Default error handling.
-        const message = `An unexpected error occurred while running the ${ this._name } process` + (err.message ? `:\n\n**${ err.message }**` : '.');
+        const message = `An unexpected error occurred while running the ${this._name} process` + (err.message ? `:\n\n**${err.message}**` : '.');
         const notification = atom.notifications.addError(message, {
           dismissable: true,
           detail: err.stack == null ? '' : err.stack.toString(),
           buttons: [{
-            text: `Restart ${ this._name }`,
+            text: `Restart ${this._name}`,
             className: 'icon icon-sync',
             onDidClick: () => {
               notification.dismiss();
@@ -201,9 +202,7 @@ let LogTailer = exports.LogTailer = class LogTailer {
     this._subscription = sub;
   }
 
-  _stop() {
-    let trackCall = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-
+  _stop(trackCall = true) {
     if (this._subscription != null) {
       this._subscription.unsubscribe();
     }
@@ -221,11 +220,12 @@ let LogTailer = exports.LogTailer = class LogTailer {
   getMessages() {
     return this._messages;
   }
+}
 
-};
-let ProcessCancelledError = class ProcessCancelledError extends Error {
+exports.LogTailer = LogTailer;
+class ProcessCancelledError extends Error {
   constructor(logProducerName) {
-    super(`${ logProducerName } was stopped`);
+    super(`${logProducerName} was stopped`);
     this.name = 'ProcessCancelledError';
   }
-};
+}

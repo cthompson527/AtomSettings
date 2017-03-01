@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -18,9 +9,7 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
 let getLineNumberForTag = exports.getLineNumberForTag = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (tag) {
-    let lineNumber = tag.lineNumber,
-        pattern = tag.pattern;
-
+    let { lineNumber, pattern } = tag;
     if (lineNumber) {
       lineNumber--; // ctags line numbers start at 1
     } else if (pattern != null) {
@@ -36,12 +25,7 @@ let getLineNumberForTag = exports.getLineNumberForTag = (() => {
       }
       try {
         // Search for the pattern in the file.
-        const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getServiceByNuclideUri)('FileSystemService', tag.file);
-
-        if (!service) {
-          throw new Error('Invariant violation: "service"');
-        }
-
+        const service = (0, (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).getFileSystemServiceByNuclideUri)(tag.file);
         const contents = yield service.readFile((_nuclideUri || _load_nuclideUri()).default.getPath(tag.file));
         const lines = contents.toString('utf8').split('\n');
         lineNumber = 0;
@@ -52,7 +36,7 @@ let getLineNumberForTag = exports.getLineNumberForTag = (() => {
           }
         }
       } catch (e) {
-        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`nuclide-ctags: Could not locate pattern in ${ tag.file }`, e);
+        (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)().warn(`nuclide-ctags: Could not locate pattern in ${tag.file}`, e);
       }
     }
 
@@ -85,6 +69,16 @@ function _load_nuclideUri() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Taken from http://ctags.sourceforge.net/FORMAT
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const CTAGS_KIND_NAMES = exports.CTAGS_KIND_NAMES = {
   c: 'class',
   d: 'define',
@@ -98,7 +92,9 @@ const CTAGS_KIND_NAMES = exports.CTAGS_KIND_NAMES = {
   t: 'typedef',
   u: 'union',
   v: 'var'
-};const CTAGS_KIND_ICONS = exports.CTAGS_KIND_ICONS = {
+};
+
+const CTAGS_KIND_ICONS = exports.CTAGS_KIND_ICONS = {
   c: 'icon-code',
   d: 'icon-quote',
   e: 'icon-quote',

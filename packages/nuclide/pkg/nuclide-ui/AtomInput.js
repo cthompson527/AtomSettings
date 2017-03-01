@@ -1,20 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.AtomInput = undefined;
-
-var _class, _temp;
 
 var _classnames;
 
@@ -37,13 +26,23 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * An input field rendered as an <atom-text-editor mini />.
  */
-let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class AtomInput extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     const value = props.value == null ? props.initialValue : props.value;
     this.state = {
-      value: value
+      value
     };
   }
 
@@ -55,6 +54,17 @@ let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _r
     // event.
     const textEditor = this.getTextEditor();
     const textEditorElement = this.getTextEditorElement();
+    if (this.props.autofocus) {
+      this.focus();
+    }
+    if (this.props.startSelected) {
+      // For some reason, selectAll() has no effect if called right now.
+      process.nextTick(() => {
+        if (!textEditor.isDestroyed()) {
+          textEditor.selectAll();
+        }
+      });
+    }
     disposables.add(atom.commands.add(textEditorElement, {
       'core:confirm': () => {
         if (this.props.onConfirm != null) {
@@ -95,16 +105,19 @@ let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _r
     if (nextProps.disabled !== this.props.disabled) {
       this._updateDisabledState(nextProps.disabled);
     }
-    const value = nextProps.value;
-
+    const { value, placeholderText } = nextProps;
     if (typeof value === 'string' && value !== this.props.value) {
       // If the `value` prop is specified, then we must update the input area when there is new
       // text, and this includes maintaining the correct cursor position.
-      this.setState({ value: value });
+      this.setState({ value });
       const editor = this.getTextEditor();
       const cursorPosition = editor.getCursorBufferPosition();
       this.setText(value);
       editor.setCursorBufferPosition(cursorPosition);
+    }
+
+    if (placeholderText !== this.props.placeholderText) {
+      this.getTextEditor().setPlaceholderText(placeholderText || '');
     }
   }
 
@@ -134,7 +147,7 @@ let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _r
   render() {
     const className = (0, (_classnames || _load_classnames()).default)(this.props.className, {
       'atom-text-editor-unstyled': this.props.unstyled,
-      [`atom-text-editor-${ (0, (_string || _load_string()).maybeToString)(this.props.size) }`]: this.props.size != null
+      [`atom-text-editor-${(0, (_string || _load_string()).maybeToString)(this.props.size)}`]: this.props.size != null
     });
 
     return (
@@ -183,8 +196,12 @@ let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _r
     this.getTextEditor().moveToEndOfLine();
     this.getTextEditorElement().focus();
   }
-}, _class.defaultProps = {
+}
+exports.AtomInput = AtomInput;
+AtomInput.defaultProps = {
   disabled: false,
+  autofocus: false,
+  startSelected: false,
   initialValue: '',
   tabIndex: '0', // Default to all <AtomInput /> components being in tab order
   onClick: event => {},
@@ -192,4 +209,4 @@ let AtomInput = exports.AtomInput = (_temp = _class = class AtomInput extends _r
   onFocus: () => {},
   onBlur: () => {},
   unstyled: false
-}, _temp);
+};

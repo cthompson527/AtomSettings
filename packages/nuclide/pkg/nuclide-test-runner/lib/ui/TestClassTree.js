@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _reactForAtom = require('react-for-atom');
 
@@ -31,15 +26,24 @@ function _load_TreeRootComponent() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function labelClassNameForNode() {
   return 'icon icon-code';
 }
 
-let TestClassTree = class TestClassTree extends _reactForAtom.React.Component {
+class TestClassTree extends _reactForAtom.React.Component {
 
   componentDidUpdate(prevProps) {
-    const testSuiteModel = this.props.testSuiteModel;
-
+    const { testSuiteModel } = this.props;
     if (testSuiteModel !== prevProps.testSuiteModel) {
       const roots = [];
       if (testSuiteModel) {
@@ -103,8 +107,7 @@ let TestClassTree = class TestClassTree extends _reactForAtom.React.Component {
   }
 
   rowClassNameForNode(node) {
-    const testSuiteModel = this.props.testSuiteModel;
-
+    const { testSuiteModel } = this.props;
     if (!testSuiteModel) {
       return '';
     }
@@ -128,7 +131,5 @@ let TestClassTree = class TestClassTree extends _reactForAtom.React.Component {
 
     return '';
   }
-};
-
-
-module.exports = TestClassTree;
+}
+exports.default = TestClassTree;

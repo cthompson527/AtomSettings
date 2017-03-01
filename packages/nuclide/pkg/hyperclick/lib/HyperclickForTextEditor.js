@@ -1,22 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _dec, _desc, _value, _class;
 
 var _atom = require('atom');
 
@@ -24,6 +12,12 @@ var _hyperclickUtils;
 
 function _load_hyperclickUtils() {
   return _hyperclickUtils = require('./hyperclick-utils');
+}
+
+var _showTriggerConflictWarning;
+
+function _load_showTriggerConflictWarning() {
+  return _showTriggerConflictWarning = _interopRequireDefault(require('./showTriggerConflictWarning'));
 }
 
 var _nuclideAnalytics;
@@ -40,42 +34,27 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  var desc = {};
-  Object['ke' + 'ys'](descriptor).forEach(function (key) {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-
-  desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-
-  if (desc.initializer === void 0) {
-    Object['define' + 'Property'](target, property, desc);
-    desc = null;
-  }
-
-  return desc;
-}
+/* global localStorage */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+
+const WARN_ABOUT_TRIGGER_CONFLICT_KEY = 'hyperclick.warnAboutTriggerConflict';
 
 /**
  * Construct this object to enable Hyperclick in a text editor.
  * Call `dispose` to disable the feature.
  */
-let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('hyperclick:confirm-cursor'), (_class = class HyperclickForTextEditor {
+class HyperclickForTextEditor {
 
   constructor(textEditor, hyperclick) {
     this._textEditor = textEditor;
@@ -96,9 +75,8 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
     this._subscriptions = new _atom.CompositeDisposable();
 
     this._onMouseMove = this._onMouseMove.bind(this);
-    this._textEditorView.addEventListener('mousemove', this._onMouseMove);
     this._onMouseDown = this._onMouseDown.bind(this);
-    this._setupMouseDownListener();
+    this._setupMouseListeners();
 
     this._onKeyDown = this._onKeyDown.bind(this);
     this._textEditorView.addEventListener('keydown', this._onKeyDown);
@@ -116,13 +94,14 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
     this._loadingTracker = null;
 
     this._subscriptions.add(atom.config.observe(process.platform === 'darwin' ? 'nuclide.hyperclick.darwinTriggerKeys' : process.platform === 'win32' ? 'nuclide.hyperclick.win32TriggerKeys' : 'nuclide.hyperclick.linuxTriggerKeys', newValue => {
+      // For all Flow knows, newValue.split could return any old strings
       this._triggerKeys = new Set(newValue.split(','));
     }));
   }
 
-  _setupMouseDownListener() {
+  _setupMouseListeners() {
     const getLinesDomNode = () => {
-      const component = this._textEditorView.component;
+      const { component } = this._textEditorView;
 
       if (!component) {
         throw new Error('Invariant violation: "component"');
@@ -130,19 +109,21 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
 
       return component.linesComponent.getDomNode();
     };
-    const removeMouseDownListener = () => {
+    const removeMouseListeners = () => {
       if (this._textEditorView.component == null) {
         return;
       }
       getLinesDomNode().removeEventListener('mousedown', this._onMouseDown);
+      getLinesDomNode().removeEventListener('mousemove', this._onMouseMove);
     };
-    const addMouseDownListener = () => {
+    const addMouseListeners = () => {
       getLinesDomNode().addEventListener('mousedown', this._onMouseDown);
+      getLinesDomNode().addEventListener('mousemove', this._onMouseMove);
     };
-    this._subscriptions.add(new _atom.Disposable(removeMouseDownListener));
-    this._subscriptions.add(this._textEditorView.onDidDetach(removeMouseDownListener));
-    this._subscriptions.add(this._textEditorView.onDidAttach(addMouseDownListener));
-    addMouseDownListener();
+    this._subscriptions.add(new _atom.Disposable(removeMouseListeners));
+    this._subscriptions.add(this._textEditorView.onDidDetach(removeMouseListeners));
+    this._subscriptions.add(this._textEditorView.onDidAttach(addMouseListeners));
+    addMouseListeners();
   }
 
   _confirmSuggestion(suggestion) {
@@ -194,11 +175,7 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
     if (this._isMouseAtLastWordRange() && lastSuggestionIsNotMultiRange) {
       return;
     }
-
-    var _getWordTextAndRange = (0, (_hyperclickUtils || _load_hyperclickUtils()).getWordTextAndRange)(this._textEditor, this._getMousePositionAsBufferPosition());
-
-    const range = _getWordTextAndRange.range;
-
+    const { range } = (0, (_hyperclickUtils || _load_hyperclickUtils()).getWordTextAndRange)(this._textEditor, this._getMousePositionAsBufferPosition());
     this._lastWordRange = range;
 
     if (this._isHyperclickEvent(mouseEvent)) {
@@ -214,12 +191,28 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
 
   _onMouseDown(event) {
     const mouseEvent = event;
-    if (!this._isHyperclickEvent(mouseEvent) || !this._isMouseAtLastSuggestion()) {
+    const isHyperclickEvent = this._isHyperclickEvent(mouseEvent);
+
+    // If hyperclick and multicursor are using the same trigger, prevent multicursor.
+    if (isHyperclickEvent && isMulticursorEvent(mouseEvent)) {
+      mouseEvent.stopPropagation();
+      if (localStorage.getItem(WARN_ABOUT_TRIGGER_CONFLICT_KEY) !== 'false') {
+        localStorage.setItem(WARN_ABOUT_TRIGGER_CONFLICT_KEY, 'false');
+        (0, (_showTriggerConflictWarning || _load_showTriggerConflictWarning()).default)();
+      }
+    }
+
+    if (!isHyperclickEvent || !this._isMouseAtLastSuggestion()) {
       return;
     }
 
     if (this._lastSuggestionAtMouse) {
-      this._confirmSuggestion(this._lastSuggestionAtMouse);
+      const lastSuggestionAtMouse = this._lastSuggestionAtMouse;
+      // Move the cursor to the click location to force a navigation-stack push.
+      const newCursorPosition = this._getMousePositionAsBufferPosition();
+      this._textEditor.setCursorBufferPosition(newCursorPosition);
+
+      this._confirmSuggestion(lastSuggestionAtMouse);
       // Prevent the <meta-click> event from adding another cursor.
       event.stopPropagation();
     }
@@ -260,7 +253,7 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
       const position = _this._getMousePositionAsBufferPosition();
 
       if (_this._lastSuggestionAtMouse != null) {
-        const range = _this._lastSuggestionAtMouse.range;
+        const { range } = _this._lastSuggestionAtMouse;
 
         if (!range) {
           throw new Error('Hyperclick result must have a valid Range');
@@ -309,7 +302,7 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
   }
 
   _getMousePositionAsBufferPosition() {
-    const component = this._textEditorView.component;
+    const { component } = this._textEditorView;
 
     if (!component) {
       throw new Error('Invariant violation: "component"');
@@ -336,7 +329,7 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
     if (!this._lastSuggestionAtMouse) {
       return false;
     }
-    const range = this._lastSuggestionAtMouse.range;
+    const { range } = this._lastSuggestionAtMouse;
 
     if (!range) {
       throw new Error('Hyperclick result must have a valid Range');
@@ -367,12 +360,12 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
   _confirmSuggestionAtCursor() {
     var _this2 = this;
 
-    return (0, _asyncToGenerator.default)(function* () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('hyperclick:confirm-cursor', (0, _asyncToGenerator.default)(function* () {
       const suggestion = yield _this2._hyperclick.getSuggestion(_this2._textEditor, _this2._textEditor.getCursorBufferPosition());
       if (suggestion) {
         _this2._confirmSuggestion(suggestion);
       }
-    })();
+    }));
   }
 
   /**
@@ -415,12 +408,30 @@ let HyperclickForTextEditor = (_dec = (0, (_nuclideAnalytics || _load_nuclideAna
   dispose() {
     this._isDestroyed = true;
     this._clearSuggestion();
-    this._textEditorView.removeEventListener('mousemove', this._onMouseMove);
     this._textEditorView.removeEventListener('keydown', this._onKeyDown);
     this._textEditorView.removeEventListener('keyup', this._onKeyUp);
     this._textEditorView.removeEventListener('contextmenu', this._onContextMenu);
     this._subscriptions.dispose();
   }
-}, (_applyDecoratedDescriptor(_class.prototype, '_confirmSuggestionAtCursor', [_dec], Object.getOwnPropertyDescriptor(_class.prototype, '_confirmSuggestionAtCursor'), _class.prototype)), _class));
-exports.default = HyperclickForTextEditor;
-module.exports = exports['default'];
+}
+
+exports.default = HyperclickForTextEditor; /**
+                                            * Determine whether the specified event will trigger Atom's multiple cursors. This is based on (and
+                                            * must be the same as!) [Atom's
+                                            * logic](https://github.com/atom/atom/blob/v1.14.2/src/text-editor-component.coffee#L527).
+                                            */
+
+function isMulticursorEvent(event) {
+  const { platform } = process;
+  const isLeftButton = event.button === 0 || event.button === 1 && platform === 'linux';
+  const { metaKey, ctrlKey } = event;
+
+  if (!isLeftButton) {
+    return false;
+  }
+  if (ctrlKey && platform === 'darwin') {
+    return false;
+  }
+
+  return metaKey || ctrlKey && platform !== 'darwin';
+}

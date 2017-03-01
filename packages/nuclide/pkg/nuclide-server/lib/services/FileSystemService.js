@@ -1,19 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-/**
- * This code implements the NuclideFs service.  It exports the FS on http via
- * the endpoint: http://your.server:your_port/fs/method where method is one of
- * readFile, writeFile, etc.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -64,11 +49,11 @@ let readdir = exports.readdir = (() => {
         const fullpath = (_nuclideUri || _load_nuclideUri()).default.join(path, file);
         const lstats = yield (_fsPromise || _load_fsPromise()).default.lstat(fullpath);
         if (!lstats.isSymbolicLink()) {
-          return { file: file, stats: lstats, isSymbolicLink: false };
+          return { file, stats: lstats, isSymbolicLink: false };
         } else {
           try {
             const stats = yield (_fsPromise || _load_fsPromise()).default.stat(fullpath);
-            return { file: file, stats: stats, isSymbolicLink: true };
+            return { file, stats, isSymbolicLink: true };
           } catch (error) {
             return null;
           }
@@ -190,7 +175,7 @@ let readFile = exports.readFile = (() => {
   var _ref7 = (0, _asyncToGenerator.default)(function* (path, options) {
     const stats = yield (_fsPromise || _load_fsPromise()).default.stat(path);
     if (stats.size > READFILE_SIZE_LIMIT) {
-      throw new Error(`File is too large (${ stats.size } bytes)`);
+      throw new Error(`File is too large (${stats.size} bytes)`);
     }
     return (_fsPromise || _load_fsPromise()).default.readFile(path, options);
   });
@@ -239,22 +224,31 @@ let copyFilePermissions = (() => {
 
 let writeFile = exports.writeFile = (() => {
   var _ref9 = (0, _asyncToGenerator.default)(function* (path, data, options) {
-
     let complete = false;
     const tempFilePath = yield (_fsPromise || _load_fsPromise()).default.tempfile('nuclide');
     try {
       yield (_fsPromise || _load_fsPromise()).default.writeFile(tempFilePath, data, options);
+
+      // Expand the target path in case it contains symlinks.
+      let realPath = path;
+      try {
+        realPath = yield resolveRealPath(path);
+      } catch (e) {}
+      // Fallback to using the specified path if it cannot be expanded.
+      // Note: this is expected in cases where the remote file does not
+      // actually exist.
+
 
       // Ensure file still has original permissions:
       // https://github.com/facebook/nuclide/issues/157
       // We update the mode of the temp file rather than the destination file because
       // if we did the mv() then the chmod(), there would be a brief period between
       // those two operations where the destination file might have the wrong permissions.
-      yield copyFilePermissions(path, tempFilePath);
+      yield copyFilePermissions(realPath, tempFilePath);
 
       // TODO(mikeo): put renames into a queue so we don't write older save over new save.
       // Use mv as fs.rename doesn't work across partitions.
-      yield mvPromise(tempFilePath, path);
+      yield mvPromise(tempFilePath, realPath);
       complete = true;
     } finally {
       if (!complete) {
@@ -321,6 +315,22 @@ const READFILE_SIZE_LIMIT = 10 * 1024 * 1024;
 /**
  * Checks a certain path for existence and returns 'true'/'false' accordingly
  */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+/**
+ * This code implements the NuclideFs service.  It exports the FS on http via
+ * the endpoint: http://your.server:your_port/fs/method where method is one of
+ * readFile, writeFile, etc.
+ */
+
 function exists(path) {
   return (_fsPromise || _load_fsPromise()).default.exists(path);
 }

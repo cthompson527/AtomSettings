@@ -1,20 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
-
-var _class, _temp;
 
 var _AuthenticationPrompt;
 
@@ -76,8 +64,18 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
-const remote = _electron.default.remote;
+const { remote } = _electron.default;
 
 if (!(remote != null)) {
   throw new Error('Invariant violation: "remote != null"');
@@ -91,7 +89,7 @@ const WAITING_FOR_AUTHENTICATION = 4;
 /**
  * Component that manages the state transitions as the user connects to a server.
  */
-let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactForAtom.React.Component {
+class ConnectionDialog extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -123,7 +121,7 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
       instructions: '',
       isDirty: false,
       mode: REQUEST_CONNECTION_DETAILS,
-      sshHandshake: sshHandshake
+      sshHandshake
     };
 
     this.cancel = this.cancel.bind(this);
@@ -151,13 +149,13 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
       indexOfSelectedConnectionProfile = nextProps.connectionProfiles.length - 1;
     }
 
-    this.setState({ indexOfSelectedConnectionProfile: indexOfSelectedConnectionProfile });
+    this.setState({ indexOfSelectedConnectionProfile });
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.mode !== prevState.mode) {
       this._focus();
-    } else if (this.state.mode === REQUEST_CONNECTION_DETAILS && this.state.indexOfSelectedConnectionProfile === prevState.indexOfSelectedConnectionProfile && !this.state.isDirty && prevState.isDirty) {
+    } else if (this.state.mode === REQUEST_CONNECTION_DETAILS && this.state.indexOfSelectedConnectionProfile === prevState.indexOfSelectedConnectionProfile && !this.state.isDirty && prevState.isDirty && this.refs.okButton != null) {
       // When editing a profile and clicking "Save", the Save button disappears. Focus the primary
       // button after re-rendering so focus is on a logical element.
       this.refs.okButton.focus();
@@ -167,7 +165,11 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
   _focus() {
     const content = this.refs.content;
     if (content == null) {
-      _reactForAtom.ReactDOM.findDOMNode(this.refs.cancelButton).focus();
+      const { cancelButton } = this.refs;
+      if (cancelButton == null) {
+        return;
+      }
+      cancelButton.focus();
     } else {
       content.focus();
     }
@@ -278,14 +280,14 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
           (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
           null,
           _reactForAtom.React.createElement(
-            'button',
-            { className: 'btn', onClick: this.cancel, ref: 'cancelButton' },
+            (_Button || _load_Button()).Button,
+            { onClick: this.cancel, ref: 'cancelButton' },
             'Cancel'
           ),
           _reactForAtom.React.createElement(
-            'button',
+            (_Button || _load_Button()).Button,
             {
-              className: 'btn btn-primary',
+              buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY,
               disabled: isOkDisabled,
               onClick: this.ok,
               ref: 'okButton' },
@@ -322,25 +324,22 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
   }
 
   ok() {
-    const mode = this.state.mode;
-
+    const { mode } = this.state;
 
     if (mode === REQUEST_CONNECTION_DETAILS) {
       // User is trying to submit connection details.
       const connectionDetailsForm = this.refs.content;
-
-      var _connectionDetailsFor = connectionDetailsForm.getFormFields();
-
-      const username = _connectionDetailsFor.username,
-            server = _connectionDetailsFor.server,
-            cwd = _connectionDetailsFor.cwd,
-            remoteServerCommand = _connectionDetailsFor.remoteServerCommand,
-            sshPort = _connectionDetailsFor.sshPort,
-            pathToPrivateKey = _connectionDetailsFor.pathToPrivateKey,
-            authMethod = _connectionDetailsFor.authMethod,
-            password = _connectionDetailsFor.password,
-            displayTitle = _connectionDetailsFor.displayTitle;
-
+      const {
+        username,
+        server,
+        cwd,
+        remoteServerCommand,
+        sshPort,
+        pathToPrivateKey,
+        authMethod,
+        password,
+        displayTitle
+      } = connectionDetailsForm.getFormFields();
 
       if (!this._validateInitialDirectory(cwd)) {
         remote.dialog.showErrorBox('Invalid initial path', 'Please specify a non-root directory.');
@@ -354,14 +353,14 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
         });
         this.state.sshHandshake.connect({
           host: server,
-          sshPort: sshPort,
-          username: username,
-          pathToPrivateKey: pathToPrivateKey,
-          authMethod: authMethod,
-          cwd: cwd,
-          remoteServerCommand: remoteServerCommand,
-          password: password,
-          displayTitle: displayTitle
+          sshPort,
+          username,
+          pathToPrivateKey,
+          authMethod,
+          cwd,
+          remoteServerCommand,
+          password,
+          displayTitle
         });
       } else {
         remote.dialog.showErrorBox('Missing information', "Please make sure you've filled out all the form fields.");
@@ -381,7 +380,7 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
 
   requestAuthentication(instructions, finish) {
     this.setState({
-      finish: finish,
+      finish,
       instructions: instructions.prompt,
       isDirty: false,
       mode: REQUEST_AUTHENTICATION_DETAILS
@@ -394,37 +393,36 @@ let ConnectionDialog = (_temp = _class = class ConnectionDialog extends _reactFo
       return null;
     }
 
-    var _connectionDetailsFor2 = connectionDetailsForm.getFormFields();
-
-    const username = _connectionDetailsFor2.username,
-          server = _connectionDetailsFor2.server,
-          cwd = _connectionDetailsFor2.cwd,
-          remoteServerCommand = _connectionDetailsFor2.remoteServerCommand,
-          sshPort = _connectionDetailsFor2.sshPort,
-          pathToPrivateKey = _connectionDetailsFor2.pathToPrivateKey,
-          authMethod = _connectionDetailsFor2.authMethod,
-          displayTitle = _connectionDetailsFor2.displayTitle;
-
+    const {
+      username,
+      server,
+      cwd,
+      remoteServerCommand,
+      sshPort,
+      pathToPrivateKey,
+      authMethod,
+      displayTitle
+    } = connectionDetailsForm.getFormFields();
     return {
-      username: username,
-      server: server,
-      cwd: cwd,
-      remoteServerCommand: remoteServerCommand,
-      sshPort: sshPort,
-      pathToPrivateKey: pathToPrivateKey,
-      authMethod: authMethod,
-      displayTitle: displayTitle
+      username,
+      server,
+      cwd,
+      remoteServerCommand,
+      sshPort,
+      pathToPrivateKey,
+      authMethod,
+      displayTitle
     };
   }
 
   onProfileClicked(indexOfSelectedConnectionProfile) {
     this.setState({
-      indexOfSelectedConnectionProfile: indexOfSelectedConnectionProfile,
+      indexOfSelectedConnectionProfile,
       isDirty: false
     });
   }
-}, _class.defaultProps = {
-  indexOfInitiallySelectedConnectionProfile: -1
-}, _temp);
+}
 exports.default = ConnectionDialog;
-module.exports = exports['default'];
+ConnectionDialog.defaultProps = {
+  indexOfInitiallySelectedConnectionProfile: -1
+};

@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -30,18 +20,30 @@ function _load_FindReferencesModel() {
   return _FindReferencesModel = _interopRequireDefault(require('../FindReferencesModel'));
 }
 
+var _string;
+
+function _load_string() {
+  return _string = require('../../../commons-node/string');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Number of files to show on every page.
 const PAGE_SIZE = 10;
 // Start loading more once the user scrolls within this many pixels of the bottom.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const SCROLL_LOAD_THRESHOLD = 250;
 
-function pluralize(noun, count) {
-  return count === 1 ? noun : noun + 's';
-}
-
-let FindReferencesView = class FindReferencesView extends _reactForAtom.React.Component {
+class FindReferencesView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -116,12 +118,12 @@ let FindReferencesView = class FindReferencesView extends _reactForAtom.React.Co
         { className: 'nuclide-find-references-count panel-heading' },
         refCount,
         ' ',
-        pluralize('reference', refCount),
+        (0, (_string || _load_string()).pluralize)('reference', refCount),
         ' ',
         'found in ',
         fileCount,
         ' ',
-        pluralize('file', fileCount),
+        (0, (_string || _load_string()).pluralize)('file', fileCount),
         ' for',
         ' ',
         _reactForAtom.React.createElement(
@@ -138,6 +140,5 @@ let FindReferencesView = class FindReferencesView extends _reactForAtom.React.Co
       )
     );
   }
-};
+}
 exports.default = FindReferencesView;
-module.exports = exports['default'];

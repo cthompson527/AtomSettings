@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -26,6 +17,12 @@ var _Button;
 
 function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
+}
+
+var _Dropdown;
+
+function _load_Dropdown() {
+  return _Dropdown = require('../../nuclide-ui/Dropdown');
 }
 
 var _nuclideDebuggerBase;
@@ -48,16 +45,25 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent extends _reactForAtom.React.Component {
+const TARGET_ENVIRONMENTS = [{ label: 'iOS', value: 'iOS' }, { label: 'Android', value: 'Android' }]; /**
+                                                                                                       * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                       * All rights reserved.
+                                                                                                       *
+                                                                                                       * This source code is licensed under the license found in the LICENSE file in
+                                                                                                       * the root directory of this source tree.
+                                                                                                       *
+                                                                                                       * 
+                                                                                                       */
+
+class AttachUiComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handleCancelButtonClick = this._handleCancelButtonClick.bind(this);
     this._handleAttachButtonClick = this._handleAttachButtonClick.bind(this);
-    this._handlePathsDropdownChange = this._handlePathsDropdownChange.bind(this);
+    this._handleDropdownChange = this._handleDropdownChange.bind(this);
     this.state = {
-      selectedPathIndex: 0,
-      pathMenuItems: this._getPathMenuItems()
+      selectedEnvironment: 'iOS'
     };
   }
 
@@ -73,6 +79,20 @@ let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent exte
     return _reactForAtom.React.createElement(
       'div',
       { className: 'block' },
+      _reactForAtom.React.createElement(
+        'div',
+        { className: 'nuclide-debugger-php-launch-attach-ui-select-project' },
+        _reactForAtom.React.createElement(
+          'label',
+          null,
+          'Environment: '
+        ),
+        _reactForAtom.React.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
+          options: TARGET_ENVIRONMENTS,
+          onChange: this._handleDropdownChange,
+          value: this.state.selectedEnvironment
+        })
+      ),
       _reactForAtom.React.createElement(
         'div',
         { className: 'padded text-right' },
@@ -92,20 +112,15 @@ let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent exte
     );
   }
 
-  _getPathMenuItems() {
-    return [];
-  }
-
-  _handlePathsDropdownChange(newIndex) {
+  _handleDropdownChange(selectedEnvironment) {
     this.setState({
-      selectedPathIndex: newIndex,
-      pathMenuItems: this._getPathMenuItems()
+      selectedEnvironment
     });
   }
 
   _handleAttachButtonClick() {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('nuclide-debugger-jsc-attach');
-    const processInfo = new (_AttachProcessInfo || _load_AttachProcessInfo()).AttachProcessInfo(this.props.targetUri);
+    const processInfo = new (_AttachProcessInfo || _load_AttachProcessInfo()).AttachProcessInfo(this.props.targetUri, this.state.selectedEnvironment);
     (0, (_consumeFirstProvider || _load_consumeFirstProvider()).default)('nuclide-debugger.remote').then(debuggerService => debuggerService.startDebugging(processInfo));
     this._showDebuggerPanel();
     this._handleCancelButtonClick();
@@ -118,4 +133,5 @@ let AttachUiComponent = exports.AttachUiComponent = class AttachUiComponent exte
   _handleCancelButtonClick() {
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-debugger:toggle-launch-attach');
   }
-};
+}
+exports.AttachUiComponent = AttachUiComponent;

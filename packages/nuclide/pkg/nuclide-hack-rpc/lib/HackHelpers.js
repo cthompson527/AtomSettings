@@ -1,18 +1,9 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.HACK_WORD_REGEX = exports.callHHClient = undefined;
+exports.callHHClient = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -21,7 +12,6 @@ var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
  */
 let callHHClient = exports.callHHClient = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (args, errorStream, processInput, filePath) {
-
     if (!hhPromiseQueue) {
       hhPromiseQueue = new (_promiseExecutors || _load_promiseExecutors()).PromiseQueue();
     }
@@ -30,11 +20,9 @@ let callHHClient = exports.callHHClient = (() => {
     if (!hackExecOptions) {
       return null;
     }
-    const hackRoot = hackExecOptions.hackRoot,
-          hackCommand = hackExecOptions.hackCommand;
+    const { hackRoot, hackCommand } = hackExecOptions;
 
-
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(trackingIdOfHackArgs(args) + ':plus-queue', function () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(trackingIdOfHackArgs(args) + ':plus-queue', function () {
       if (!hhPromiseQueue) {
         throw new Error('Invariant violation: "hhPromiseQueue"');
       }
@@ -48,23 +36,22 @@ let callHHClient = exports.callHHClient = (() => {
 
         let execResult = null;
 
-        (_hackConfig || _load_hackConfig()).logger.logTrace(`Calling Hack: ${ hackCommand } with ${ allArgs.toString() }`);
-        execResult = yield (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(trackingIdOfHackArgs(args), function () {
+        (_hackConfig || _load_hackConfig()).logger.log(`Calling Hack: ${hackCommand} with ${allArgs.toString()}`);
+        execResult = yield (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(trackingIdOfHackArgs(args), function () {
           return (0, (_process || _load_process()).asyncExecute)(hackCommand, allArgs, { stdin: processInput });
         });
 
-        var _execResult = execResult;
-        const stdout = _execResult.stdout,
-              stderr = _execResult.stderr;
-
+        const { stdout, stderr } = execResult;
         if (stderr.indexOf(HH_SERVER_INIT_MESSAGE) !== -1) {
-          throw new Error(`${ HH_SERVER_INIT_MESSAGE }: try: \`arc build\` or try again later!`);
+          throw new Error(`${HH_SERVER_INIT_MESSAGE}: try: \`arc build\` or try again later!`);
         } else if (stderr.startsWith(HH_SERVER_BUSY_MESSAGE)) {
-          throw new Error(`${ HH_SERVER_BUSY_MESSAGE }: try: \`arc build\` or try again later!`);
+          throw new Error(`${HH_SERVER_BUSY_MESSAGE}: try: \`arc build\` or try again later!`);
         }
 
         const output = errorStream ? stderr : stdout;
-        (_hackConfig || _load_hackConfig()).logger.logTrace(`Hack output for ${ allArgs.toString() }: ${ output }`);
+        // keeping this at "Trace" log level, since output for --color contains
+        // entire file contents, which fills the logs too quickly
+        (_hackConfig || _load_hackConfig()).logger.logTrace(`Hack output for ${allArgs.toString()}: ${output}`);
         try {
           const result = JSON.parse(output);
 
@@ -77,8 +64,8 @@ let callHHClient = exports.callHHClient = (() => {
           result.hackRoot = hackRoot;
           return result;
         } catch (err) {
-          const errorMessage = `hh_client error, args: [${ args.join(',') }]
-stdout: ${ stdout }, stderr: ${ stderr }`;
+          const errorMessage = `hh_client error, args: [${args.join(',')}]
+stdout: ${stdout}, stderr: ${stderr}`;
           (_hackConfig || _load_hackConfig()).logger.logError(errorMessage);
           throw new Error(errorMessage);
         }
@@ -126,7 +113,16 @@ function _load_nuclideAnalytics() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const HH_SERVER_INIT_MESSAGE = 'hh_server still initializing';
+const HH_SERVER_INIT_MESSAGE = 'hh_server still initializing'; /**
+                                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                                * All rights reserved.
+                                                                *
+                                                                * This source code is licensed under the license found in the LICENSE file in
+                                                                * the root directory of this source tree.
+                                                                *
+                                                                * 
+                                                                */
+
 const HH_SERVER_BUSY_MESSAGE = 'hh_server is busy';
 
 
@@ -137,8 +133,6 @@ let hhPromiseQueue = null;function hackRangeToAtomRange(position) {
 function atomPointOfHackRangeStart(position) {
   return new (_simpleTextBuffer || _load_simpleTextBuffer()).Point(position.line - 1, position.char_start - 1);
 }
-
-const HACK_WORD_REGEX = exports.HACK_WORD_REGEX = /[a-zA-Z0-9_$]+/g;
 
 function trackingIdOfHackArgs(args) {
   const command = args.length === 0 ? '--diagnostics' : args[0];

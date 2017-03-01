@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,10 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.SshHandshake = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-
-var _class, _temp;
 
 exports.decorateSshConnectionDelegateWithTracking = decorateSshConnectionDelegateWithTracking;
 
@@ -74,6 +61,16 @@ function _load_nuclideLogging() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
 // Sync word and regex pattern for parsing command stdout.
@@ -120,7 +117,7 @@ const ErrorType = Object.freeze({
 
 const SshConnectionErrorLevelMap = new Map([['client-timeout', ErrorType.SSH_CONNECT_TIMEOUT], ['client-socket', ErrorType.SSH_CONNECT_FAILED], ['protocal', ErrorType.SSH_CONNECT_FAILED], ['client-authentication', ErrorType.SSH_AUTHENTICATION], ['agent', ErrorType.SSH_AUTHENTICATION], ['client-dns', ErrorType.SSH_AUTHENTICATION]]);
 
-let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
+class SshHandshake {
 
   constructor(delegate, connection) {
     this._cancelled = false;
@@ -140,7 +137,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
   }
 
   _error(message, errorType, error) {
-    logger.error(`SshHandshake failed: ${ errorType }, ${ message }`, error);
+    logger.error(`SshHandshake failed: ${errorType}, ${message}`, error);
     this._delegate.onError(errorType, error, this._config);
   }
 
@@ -152,18 +149,14 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
       const retryText = this._passwordRetryCount ? ' again' : '';
       this._delegate.onKeyboardInteractive('', '', '', // ignored
       [{
-        prompt: `Authentication failed. Try entering your password${ retryText }:`,
+        prompt: `Authentication failed. Try entering your password${retryText}:`,
         echo: true
-      }], (_ref) => {
-        var _ref2 = _slicedToArray(_ref, 1);
-
-        let password = _ref2[0];
-
+      }], ([password]) => {
         this._connection.connect({
           host: config.host,
           port: config.sshPort,
           username: config.username,
-          password: password,
+          password,
           tryKeyboard: true
         });
       });
@@ -190,18 +183,21 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
         return;
       }
 
-      const connection = yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(_this._config.host, _this._config.cwd, _this._config.displayTitle);
+      let address;
+      try {
+        address = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
+      } catch (e) {
+        return _this._error('Failed to resolve DNS.', SshHandshake.ErrorType.HOST_NOT_FOUND, e);
+      }
+
+      const connection = (yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(_this._config.host, _this._config.cwd, _this._config.displayTitle)) || (
+      // We save connections by their IP address as well, in case a different hostname
+      // was used for the same server.
+      yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.createConnectionBySavedConfig(address, _this._config.cwd, _this._config.displayTitle));
 
       if (connection) {
         _this._didConnect(connection);
         return;
-      }
-
-      let address = null;
-      try {
-        address = yield (0, (_lookupPreferIpV || _load_lookupPreferIpV()).default)(config.host);
-      } catch (e) {
-        _this._error('Failed to resolve DNS.', SshHandshake.ErrorType.HOST_NOT_FOUND, e);
       }
 
       if (config.authMethod === SupportedMethods.SSL_AGENT) {
@@ -215,7 +211,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
           host: address,
           port: config.sshPort,
           username: config.username,
-          agent: agent,
+          agent,
           tryKeyboard: true,
           readyTimeout: READY_TIMEOUT_MS
         });
@@ -241,7 +237,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
             host: address,
             port: config.sshPort,
             username: config.username,
-            privateKey: privateKey,
+            privateKey,
             tryKeyboard: true,
             readyTimeout: READY_TIMEOUT_MS
           });
@@ -317,10 +313,10 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
     let sftpTimer = null;
     return new Promise((resolve, reject) => {
       let stdOut = '';
-      const remoteTempFile = `/tmp/nuclide-sshhandshake-${ Math.random() }`;
+      const remoteTempFile = `/tmp/nuclide-sshhandshake-${Math.random()}`;
       // TODO: escape any single quotes
       // TODO: the timeout value shall be configurable using .json file too (t6904691).
-      const cmd = `${ this._config.remoteServerCommand } --workspace=${ this._config.cwd }` + ` --common-name=${ this._config.host } --json-output-file=${ remoteTempFile } -t 60`;
+      const cmd = `${this._config.remoteServerCommand} --workspace=${this._config.cwd}` + ` --common-name=${this._config.host} --json-output-file=${remoteTempFile} -t 60`;
 
       this._connection.exec(cmd, { pty: { term: 'nuclide' } }, (err, stream) => {
         if (err) {
@@ -328,7 +324,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
           return resolve(false);
         }
         stream.on('close', (() => {
-          var _ref3 = (0, _asyncToGenerator.default)(function* (code, signal) {
+          var _ref = (0, _asyncToGenerator.default)(function* (code, signal) {
             // Note: this code is probably the code from the child shell if one
             // is in use.
             if (code === 0) {
@@ -344,7 +340,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
                 resolve(false);
               }, SFTP_TIMEOUT_MS);
               _this2._connection.sftp((() => {
-                var _ref4 = (0, _asyncToGenerator.default)(function* (error, sftp) {
+                var _ref2 = (0, _asyncToGenerator.default)(function* (error, sftp) {
                   if (sftpTimer != null) {
                     // Clear the sftp timer once we get a response.
                     clearTimeout(sftpTimer);
@@ -358,7 +354,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
                   }
                   const localTempFile = yield (_fsPromise || _load_fsPromise()).default.tempfile();
                   sftp.fastGet(remoteTempFile, localTempFile, (() => {
-                    var _ref5 = (0, _asyncToGenerator.default)(function* (sftpError) {
+                    var _ref3 = (0, _asyncToGenerator.default)(function* (sftpError) {
                       sftp.end();
                       if (sftpError) {
                         _this2._error('Failed to transfer server start information', SshHandshake.ErrorType.SERVER_START_FAILED, sftpError);
@@ -390,13 +386,13 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
                     });
 
                     return function (_x5) {
-                      return _ref5.apply(this, arguments);
+                      return _ref3.apply(this, arguments);
                     };
                   })());
                 });
 
                 return function (_x3, _x4) {
-                  return _ref4.apply(this, arguments);
+                  return _ref2.apply(this, arguments);
                 };
               })());
             } else {
@@ -410,7 +406,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
           });
 
           return function (_x, _x2) {
-            return _ref3.apply(this, arguments);
+            return _ref.apply(this, arguments);
           };
         })()).on('data', data => {
           stdOut += data;
@@ -428,7 +424,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
       }
 
       const connect = (() => {
-        var _ref6 = (0, _asyncToGenerator.default)(function* (config) {
+        var _ref4 = (0, _asyncToGenerator.default)(function* (config) {
           let connection = null;
           try {
             connection = yield (_RemoteConnection || _load_RemoteConnection()).RemoteConnection.findOrCreate(config);
@@ -445,7 +441,7 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
         });
 
         return function connect(_x6) {
-          return _ref6.apply(this, arguments);
+          return _ref4.apply(this, arguments);
         };
       })();
 
@@ -497,7 +493,11 @@ let SshHandshake = exports.SshHandshake = (_temp = _class = class SshHandshake {
   getConfig() {
     return this._config;
   }
-}, _class.ErrorType = ErrorType, _class.SupportedMethods = SupportedMethods, _temp);
+}
+
+exports.SshHandshake = SshHandshake;
+SshHandshake.ErrorType = ErrorType;
+SshHandshake.SupportedMethods = SupportedMethods;
 function decorateSshConnectionDelegateWithTracking(delegate) {
   let connectionTracker;
 

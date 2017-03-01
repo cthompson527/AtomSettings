@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _DiagnosticsPane;
 
@@ -64,10 +59,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 /**
  * Dismissable panel that displays the diagnostics from nuclide-diagnostics-store.
  */
-let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Component {
+class DiagnosticsPanel extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
+    this._onShowTracesChange = this._onShowTracesChange.bind(this);
     this._onFilterByActiveTextEditorChange = this._onFilterByActiveTextEditorChange.bind(this);
     this._openAllFilesWithErrors = this._openAllFilesWithErrors.bind(this);
   }
@@ -75,12 +71,16 @@ let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Compon
   render() {
     let warningCount = 0;
     let errorCount = 0;
-    let diagnostics = this.props.diagnostics;
-    const showTraces = this.props.showTraces;
-
-    if (this.props.filterByActiveTextEditor && this.props.pathToActiveTextEditor) {
+    let { diagnostics } = this.props;
+    const { showTraces } = this.props;
+    if (this.props.filterByActiveTextEditor) {
       const pathToFilterBy = this.props.pathToActiveTextEditor;
-      diagnostics = diagnostics.filter(diagnostic => diagnostic.scope === 'file' && diagnostic.filePath === pathToFilterBy);
+      if (pathToFilterBy !== null) {
+        diagnostics = diagnostics.filter(diagnostic => diagnostic.scope === 'file' && diagnostic.filePath === pathToFilterBy);
+      } else {
+        // Current pane is not a text editor; do not show diagnostics.
+        diagnostics = [];
+      }
     }
     diagnostics.forEach(diagnostic => {
       if (diagnostic.type === 'Error') {
@@ -119,8 +119,8 @@ let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Compon
       );
     }
 
-    const errorSpanClassName = `inline-block ${ errorCount > 0 ? 'text-error' : '' }`;
-    const warningSpanClassName = `inline-block ${ warningCount > 0 ? 'text-warning' : '' }`;
+    const errorSpanClassName = `inline-block ${errorCount > 0 ? 'text-error' : ''}`;
+    const warningSpanClassName = `inline-block ${warningCount > 0 ? 'text-warning' : ''}`;
 
     return _reactForAtom.React.createElement(
       'div',
@@ -152,6 +152,15 @@ let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Compon
             'span',
             { className: 'inline-block' },
             _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+              checked: this.props.showTraces,
+              label: 'Show full diagnostic traces',
+              onChange: this._onShowTracesChange
+            })
+          ),
+          _reactForAtom.React.createElement(
+            'span',
+            { className: 'inline-block' },
+            _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
               checked: this.props.filterByActiveTextEditor,
               label: 'Show only diagnostics for current file',
               onChange: this._onFilterByActiveTextEditorChange
@@ -177,6 +186,11 @@ let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Compon
     );
   }
 
+  _onShowTracesChange(isChecked) {
+    (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diagnostics-panel-toggle-show-traces', { isChecked: isChecked.toString() });
+    this.props.onShowTracesChange.call(null, isChecked);
+  }
+
   _onFilterByActiveTextEditorChange(isChecked) {
     (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)('diagnostics-panel-toggle-current-file', { isChecked: isChecked.toString() });
     this.props.onFilterByActiveTextEditorChange.call(null, isChecked);
@@ -185,7 +199,13 @@ let DiagnosticsPanel = class DiagnosticsPanel extends _reactForAtom.React.Compon
   _openAllFilesWithErrors() {
     atom.commands.dispatch(atom.views.getView(atom.workspace), 'nuclide-diagnostics-ui:open-all-files-with-errors');
   }
-};
-
-
-module.exports = DiagnosticsPanel;
+}
+exports.default = DiagnosticsPanel; /**
+                                     * Copyright (c) 2015-present, Facebook, Inc.
+                                     * All rights reserved.
+                                     *
+                                     * This source code is licensed under the license found in the LICENSE file in
+                                     * the root directory of this source tree.
+                                     *
+                                     * 
+                                     */

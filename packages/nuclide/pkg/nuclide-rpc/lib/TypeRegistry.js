@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.TypeRegistry = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _assert = _interopRequireDefault(require('assert'));
 
@@ -60,6 +49,16 @@ function smartPromiseAll(arr) {
 }
 
 // Same as the above, but works for non-homogenous input.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function checkedSmartPromiseAll(arr) {
   for (const elem of arr) {
     if (elem instanceof Promise) {
@@ -132,7 +131,7 @@ function objectToStats(jsonStats) {
  * The ObjectRegistry is opaque to the TypeRegistry and allows for adding per-connection
  * context to marshalling transformations.
  */
-let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
+class TypeRegistry {
   /** Store marshallers and and unmarshallers, index by the kind of the type. */
   constructor(predefinedTypes) {
     this._kindMarshallers = new Map();
@@ -173,7 +172,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
 
       const namedMarshaller = this._namedMarshallers.get(type.name);
       if (namedMarshaller == null) {
-        throw new Error(`No marshaller found for named type ${ type.name }.`);
+        throw new Error(`No marshaller found for named type ${type.name}.`);
       }
       return namedMarshaller.marshaller(value, context);
     }, (value, type, context) => {
@@ -183,7 +182,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
 
       const namedMarshaller = this._namedMarshallers.get(type.name);
       if (namedMarshaller == null) {
-        throw new Error(`No marshaller found for named type ${ type.name }.`);
+        throw new Error(`No marshaller found for named type ${type.name}.`);
       }
       return namedMarshaller.unmarshaller(value, context);
     });
@@ -226,11 +225,11 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
     if (existingMarshaller != null) {
       // If the locations are equal then assume that the types are equal.
       if (!(0, (_location || _load_location()).locationsEqual)(existingMarshaller.location, location)) {
-        throw new Error(`${ (0, (_location || _load_location()).locationToString)(location) }: A type by the name ${ typeName } has already` + ` been registered at ${ (0, (_location || _load_location()).locationToString)(existingMarshaller.location) }.`);
+        throw new Error(`${(0, (_location || _load_location()).locationToString)(location)}: A type by the name ${typeName} has already` + ` been registered at ${(0, (_location || _load_location()).locationToString)(existingMarshaller.location)}.`);
       }
     } else {
       this._namedMarshallers.set(typeName, {
-        location: location,
+        location,
         marshaller: makeNamedMarshaller(typeName, marshaller),
         unmarshaller: makeNamedMarshaller(typeName, unmarshaller)
       });
@@ -259,7 +258,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
   _marshal(context, value, type) {
     const kindMarshaller = this._kindMarshallers.get(type.kind);
     if (kindMarshaller == null) {
-      throw new Error(`No marshaller found for type kind ${ type.kind }.`);
+      throw new Error(`No marshaller found for type kind ${type.kind}.`);
     }
     return kindMarshaller.marshaller(value, type, context);
   }
@@ -296,7 +295,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
   unmarshalArguments(context, args, argTypes) {
     return Promise.all(argTypes.map((arg, i) => {
       if (!(Object.hasOwnProperty.call(args, arg.name) || canBeUndefined(arg.type))) {
-        throw new Error(`unmarshalArguments: Missing argument: ${ arg.name }`);
+        throw new Error(`unmarshalArguments: Missing argument: ${arg.name}`);
       }
 
       return this.unmarshal(context, args[arg.name], arg.type);
@@ -306,7 +305,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
   _unmarshal(context, value, type) {
     const kindMarshaller = this._kindMarshallers.get(type.kind);
     if (kindMarshaller == null) {
-      throw new Error(`No unmarshaller found for type kind ${ type.kind }.`);
+      throw new Error(`No unmarshaller found for type kind ${type.kind}.`);
     }
     return kindMarshaller.unmarshaller(value, type, context);
   }
@@ -532,7 +531,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
       // Unbox argument.
       base64string = base64string instanceof String ? base64string.valueOf() : base64string;
 
-      (0, _assert.default)(typeof base64string === 'string', `Expected a base64 string. Not ${ typeof base64string }`);
+      (0, _assert.default)(typeof base64string === 'string', `Expected a base64 string. Not ${typeof base64string}`);
       return new Buffer(base64string, 'base64');
     });
 
@@ -581,7 +580,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
         const name = prop.name;
         const originalValue = obj[name];
         const annotateErrorAndThrow = e => {
-          addMarshallingContextToError(`Field: ${ name }`, originalValue, e);
+          addMarshallingContextToError(`Field: ${name}`, originalValue, e);
           throw e;
         };
         // Check if the source object has this key.
@@ -604,7 +603,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
           }
         } else if (!prop.optional) {
           // If the property is optional, it's okay for it to be missing.
-          throw new Error(`Source object: ${ JSON.stringify(obj) } is missing property ${ prop.name }.`);
+          throw new Error(`Source object: ${JSON.stringify(obj)} is missing property ${prop.name}.`);
         }
       }));
       if (promise instanceof Promise) {
@@ -625,7 +624,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
           const name = prop.name;
           const originalValue = obj[name];
           const annotateErrorAndThrow = e => {
-            addMarshallingContextToError(`Field: ${ name }`, originalValue, e);
+            addMarshallingContextToError(`Field: ${name}`, originalValue, e);
             throw e;
           };
           try {
@@ -641,7 +640,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
         } else if (!prop.optional && !canBeUndefined(prop.type)) {
           // If the property is optional, it's okay for it to be missing.
           // JSON omits undefined values, so they can also be missing.
-          throw new Error(`Source object: ${ JSON.stringify(obj) } is missing property ${ prop.name }.`);
+          throw new Error(`Source object: ${JSON.stringify(obj)} is missing property ${prop.name}.`);
         }
       }));
       if (promise instanceof Promise) {
@@ -686,12 +685,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
       }
 
       const serializePromises = [];
-      for (const _ref of map) {
-        var _ref2 = _slicedToArray(_ref, 2);
-
-        const key = _ref2[0];
-        const value = _ref2[1];
-
+      for (const [key, value] of map) {
         serializePromises.push(checkedSmartPromiseAll([this._marshal(context, key, type.keyType), this._marshal(context, value, type.valueType)]));
       }
       return smartPromiseAll(serializePromises);
@@ -721,7 +715,7 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
       }
 
       const types = type.types;
-      (0, _assert.default)(value.length === types.length, `Expected tuple of length ${ types.length }.`);
+      (0, _assert.default)(value.length === types.length, `Expected tuple of length ${types.length}.`);
 
       // Convert all of the elements through the correct marshaller.
       return checkedSmartPromiseAll(value.map((elem, i) => this._marshal(context, elem, types[i])));
@@ -734,15 +728,15 @@ let TypeRegistry = exports.TypeRegistry = class TypeRegistry {
       }
 
       const types = type.types;
-      (0, _assert.default)(value.length === types.length, `Expected tuple of length ${ types.length }.`);
+      (0, _assert.default)(value.length === types.length, `Expected tuple of length ${types.length}.`);
 
       // Convert all of the elements through the correct unmarshaller.
       return checkedSmartPromiseAll(value.map((elem, i) => this._unmarshal(context, elem, types[i])));
     });
   }
-};
+}
 
-
+exports.TypeRegistry = TypeRegistry;
 function getObjectFieldByName(type, fieldName) {
   const result = type.fields.find(field => field.name === fieldName);
 
@@ -799,9 +793,9 @@ function valueToString(value) {
 function addMarshallingContextToError(message, value, e) {
   if (e.hasMarshallingError == null) {
     e.hasMarshallingError = true;
-    e.message += `\nError marshalling value: '${ valueToString(value) }'\n`;
+    e.message += `\nError marshalling value: '${valueToString(value)}'\n`;
   }
-  e.message += `${ message }\n`;
+  e.message += `${message}\n`;
 }
 
 function makeKindMarshaller(kind, transformer) {

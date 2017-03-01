@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _ContextMenu;
 
@@ -15,7 +10,11 @@ function _load_ContextMenu() {
   return _ContextMenu = _interopRequireDefault(require('../../commons-atom/ContextMenu'));
 }
 
-var _atom = require('atom');
+var _UniversalDisposable;
+
+function _load_UniversalDisposable() {
+  return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
+}
 
 var _FileTreeConstants;
 
@@ -39,7 +38,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 // It's just atom$ContextMenuItem with an optional `callback` property added.
 // I wish flow would let add it in a more elegant way.
-const FILE_TREE_CSS = '.nuclide-file-tree';
+const FILE_TREE_CSS = '.nuclide-file-tree'; /**
+                                             * Copyright (c) 2015-present, Facebook, Inc.
+                                             * All rights reserved.
+                                             *
+                                             * This source code is licensed under the license found in the LICENSE file in
+                                             * the root directory of this source tree.
+                                             *
+                                             * 
+                                             */
 
 const NEW_MENU_PRIORITY = 0;
 const ADD_PROJECT_MENU_PRIORITY = 1000;
@@ -74,21 +81,21 @@ const SHOW_IN_MENU_PRIORITY = 6000;
  * import {CompositeDisposable, Disposable} from 'atom';
  * import invariant from 'assert';
  *
- * let subscriptions: ?CompositeDisposable = null;
+ * let disposables: ?CompositeDisposable = null;
  *
  * export function activate(state: ?Object): void {
- *   subscriptions = new CompositeDisposable();
+ *   disposables = new CompositeDisposable();
  * }
  *
  * export function deactivate(): void {
- *   if (subscriptions != null) {
- *     subscriptions.dispose();
- *     subscriptions = null;
+ *   if (disposables != null) {
+ *     disposables.dispose();
+ *     disposables = null;
  *   }
  * }
  *
  * export function addItemsToFileTreeContextMenu(contextMenu: FileTreeContextMenu): IDisposable {
- *   invariant(subscriptions);
+ *   invariant(disposables);
  *
  *   const contextDisposable = contextMenu.addItemToSourceControlMenu(
  *     {
@@ -112,24 +119,24 @@ const SHOW_IN_MENU_PRIORITY = 6000;
  *     1000, // priority
  *   );
  *
- *   subscriptions.add(contextDisposable);
+ *   disposables.add(contextDisposable);
  *   return new Disposable(() => {
- *     invariant(subscriptions);
- *     if (subscriptions != null) {
- *       subscriptions.remove(contextDisposable);
+ *     invariant(disposables);
+ *     if (disposables != null) {
+ *       disposables.remove(contextDisposable);
  *     }
  *   });
  * }
  * ```
  */
-let FileTreeContextMenu = class FileTreeContextMenu {
+class FileTreeContextMenu {
 
   constructor() {
     this._contextMenu = new (_ContextMenu || _load_ContextMenu()).default({
       type: 'root',
       cssSelector: (_FileTreeConstants || _load_FileTreeConstants()).EVENT_HANDLER_SELECTOR
     });
-    this._subscriptions = new _atom.CompositeDisposable();
+    this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._store = (_FileTreeStore || _load_FileTreeStore()).FileTreeStore.getInstance();
 
     const shouldDisplaySetToCurrentWorkingRootOption = () => {
@@ -267,10 +274,21 @@ let FileTreeContextMenu = class FileTreeContextMenu {
    */
   addItemToTestSection(originalItem, priority) {
     if (priority < 0 || priority >= 1000) {
-      throw Error(`Illegal priority value: ${ priority }`);
+      throw Error(`Illegal priority value: ${priority}`);
     }
 
     return this._addItemToMenu(originalItem, this._contextMenu, TEST_SECTION_PRIORITY + priority);
+  }
+
+  /**
+   * @param priority must be an integer in the range [0, 1000).
+   */
+  addItemToProjectMenu(originalItem, priority) {
+    if (priority < 0 || priority >= 1000) {
+      throw Error(`Illegal priority value: ${priority}`);
+    }
+
+    return this._addItemToMenu(originalItem, this._contextMenu, ADD_PROJECT_MENU_PRIORITY + priority);
   }
 
   addItemToSourceControlMenu(originalItem, priority) {
@@ -278,16 +296,12 @@ let FileTreeContextMenu = class FileTreeContextMenu {
   }
 
   _addItemToMenu(originalItem, menu, priority) {
-    var _initCommandIfPresent = initCommandIfPresent(originalItem);
-
-    const itemDisposable = _initCommandIfPresent.itemDisposable,
-          item = _initCommandIfPresent.item;
-
+    const { itemDisposable, item } = initCommandIfPresent(originalItem);
     itemDisposable.add(menu.addItem(item, priority));
 
-    this._subscriptions.add(itemDisposable);
-    return new _atom.Disposable(() => {
-      this._subscriptions.remove(itemDisposable);
+    this._disposables.add(itemDisposable);
+    return new (_UniversalDisposable || _load_UniversalDisposable()).default(() => {
+      this._disposables.remove(itemDisposable);
       itemDisposable.dispose();
     });
   }
@@ -301,7 +315,7 @@ let FileTreeContextMenu = class FileTreeContextMenu {
   }
 
   dispose() {
-    this._subscriptions.dispose();
+    this._disposables.dispose();
   }
 
   _addContextMenuItemGroup(menuItems, priority_) {
@@ -323,25 +337,23 @@ let FileTreeContextMenu = class FileTreeContextMenu {
     const node = this.getSingleSelectedNode();
     return node != null && (_nuclideUri || _load_nuclideUri()).default.isAbsolute(node.uri) && process.platform === platform;
   }
-};
+}
 
-
+exports.default = FileTreeContextMenu;
 function initCommandIfPresent(item) {
-  const itemDisposable = new _atom.CompositeDisposable();
+  const itemDisposable = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   if (typeof item.callback === 'function' && item.label != null) {
     const command = item.command || generateNextInternalCommand(item.label);
     itemDisposable.add(atom.commands.add(FILE_TREE_CSS, command, item.callback));
-    return { itemDisposable: itemDisposable, item: Object.assign({}, item, { command: command }) };
+    return { itemDisposable, item: Object.assign({}, item, { command }) };
   }
 
-  return { itemDisposable: itemDisposable, item: item };
+  return { itemDisposable, item };
 }
 
 let nextInternalCommandId = 0;
 
 function generateNextInternalCommand(itemLabel) {
   const cmdName = itemLabel.toLowerCase().replace(/[^\w]+/g, '-') + '-' + nextInternalCommandId++;
-  return `nuclide-file-tree:${ cmdName }`;
+  return `nuclide-file-tree:${cmdName}`;
 }
-
-module.exports = FileTreeContextMenu;

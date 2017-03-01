@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,6 +7,7 @@ exports.activate = activate;
 exports.deactivate = deactivate;
 exports.consumeProvider = consumeProvider;
 exports.observeTextEditor = observeTextEditor;
+exports.provideHyperclickView = provideHyperclickView;
 
 var _atom = require('atom');
 
@@ -25,9 +17,31 @@ function _load_Hyperclick() {
   return _Hyperclick = _interopRequireDefault(require('./Hyperclick'));
 }
 
+var _SuggestionList;
+
+function _load_SuggestionList() {
+  return _SuggestionList = _interopRequireDefault(require('./SuggestionList'));
+}
+
+var _SuggestionListElement;
+
+function _load_SuggestionListElement() {
+  return _SuggestionListElement = _interopRequireDefault(require('./SuggestionListElement'));
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let hyperclick = null;function activate() {
+let hyperclick = null; /**
+                        * Copyright (c) 2015-present, Facebook, Inc.
+                        * All rights reserved.
+                        *
+                        * This source code is licensed under the license found in the LICENSE file in
+                        * the root directory of this source tree.
+                        *
+                        * 
+                        */
+
+function activate() {
   hyperclick = new (_Hyperclick || _load_Hyperclick()).default();
 
   // FB-only: override the symbols-view "Go To Declaration" context menu item
@@ -35,10 +49,7 @@ let hyperclick = null;function activate() {
   // TODO(hansonw): Remove when symbols-view has a proper API.
   try {
     // $FlowFB
-    var _require = require('./fb/overrideGoToDeclaration');
-
-    const overrideGoToDeclaration = _require.overrideGoToDeclaration;
-
+    const { overrideGoToDeclaration } = require('./fb/overrideGoToDeclaration');
     overrideGoToDeclaration();
   } catch (e) {
     // Ignore.
@@ -74,4 +85,11 @@ function observeTextEditor() {
       hyperclick.observeTextEditor(textEditor);
     }
   };
+}
+
+function provideHyperclickView(model) {
+  if (!(model instanceof (_SuggestionList || _load_SuggestionList()).default)) {
+    return;
+  }
+  return new (_SuggestionListElement || _load_SuggestionListElement()).default().initialize(model);
 }

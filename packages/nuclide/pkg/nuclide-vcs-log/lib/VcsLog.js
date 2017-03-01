@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _reactForAtom = require('react-for-atom');
 
@@ -30,7 +20,17 @@ function _load_util() {
   return _util = require('./util');
 }
 
-let VcsLog = class VcsLog extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class VcsLog extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -48,8 +48,7 @@ let VcsLog = class VcsLog extends _reactForAtom.React.Component {
   }
 
   render() {
-    const logEntries = this.state.logEntries;
-
+    const { logEntries } = this.state;
     if (logEntries != null) {
       // Even if the "Show Differential Revision" preference is enabled, only show the column if
       // there is at least one row with a Differential revision. This way, enabling the preference
@@ -209,10 +208,9 @@ let VcsLog = class VcsLog extends _reactForAtom.React.Component {
     const endIndex = str.lastIndexOf(':');
     return str.substring(startIndex, endIndex);
   }
-};
+}
+
 exports.default = VcsLog;
-
-
 function parseFirstLine(desc) {
   const index = desc.indexOf('\n');
   if (index === -1) {
@@ -225,8 +223,7 @@ function parseFirstLine(desc) {
 const DIFFERENTIAL_REVISION_RE = /^Differential Revision:\s*(.*)$/im;
 
 function parseDifferentialRevision(logEntry) {
-  const desc = logEntry.desc;
-
+  const { desc } = logEntry;
   const match = desc.match(DIFFERENTIAL_REVISION_RE);
   if (match != null) {
     return match[1];
@@ -234,4 +231,3 @@ function parseDifferentialRevision(logEntry) {
     return null;
   }
 }
-module.exports = exports['default'];

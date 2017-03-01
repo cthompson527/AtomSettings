@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 var _collection;
 
@@ -29,31 +20,27 @@ function getOpenTabsMatching(query) {
     score: result.score,
     matchIndexes: result.matchIndexes
   }));
-}
+} /**
+   * Copyright (c) 2015-present, Facebook, Inc.
+   * All rights reserved.
+   *
+   * This source code is licensed under the license found in the LICENSE file in
+   * the root directory of this source tree.
+   *
+   * 
+   */
 
 const OpenFileListProvider = {
-  getName: function () {
-    return 'OpenFileListProvider';
+  providerType: 'GLOBAL',
+  name: 'OpenFileListProvider',
+  debounceDelay: 0,
+  display: {
+    title: 'Open Files',
+    prompt: 'Search open filenames...',
+    action: 'nuclide-open-filenames-provider:toggle-provider'
   },
-  getProviderType: function () {
-    return 'GLOBAL';
-  },
-  getDebounceDelay: function () {
-    return 0;
-  },
-  isRenderable: function () {
-    return true;
-  },
-  getAction: function () {
-    return 'nuclide-open-filenames-provider:toggle-provider';
-  },
-  getPromptText: function () {
-    return 'Search names of open files';
-  },
-  getTabTitle: function () {
-    return 'Open Files';
-  },
-  executeQuery: function (query) {
+
+  executeQuery(query) {
     return Promise.resolve(getOpenTabsMatching(query));
   }
 };

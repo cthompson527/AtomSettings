@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
@@ -48,44 +39,39 @@ let main = (() => {
     yield (0, (_errors || _load_errors()).setupLogging)();
     (0, (_errors || _load_errors()).setupErrorHandling)();
 
-    logger.debug(`nuclide-remote-atom with arguments: ${ argv._ }`);
+    logger.debug(`nuclide-remote-atom with arguments: ${argv._}`);
 
     // TODO(t10180337): Consider a batch API for openFile().
     if (argv._ != null && argv._.length > 0) {
       const commands = argv.port != null ? yield (0, (_CommandClient || _load_CommandClient()).startCommands)(argv.port, argv.family) : yield (0, (_CommandClient || _load_CommandClient()).getCommands)();
 
       for (const arg of argv._) {
-        var _parseLocationParamet = parseLocationParameter(arg);
-
-        const filePath = _parseLocationParamet.filePath,
-              line = _parseLocationParamet.line,
-              column = _parseLocationParamet.column;
-        // eslint-disable-next-line babel/no-await-in-loop
-
+        const { filePath, line, column } = parseLocationParameter(arg);
+        // eslint-disable-next-line no-await-in-loop
         const realpath = yield getRealPath(filePath);
-        // eslint-disable-next-line babel/no-await-in-loop
+        // eslint-disable-next-line no-await-in-loop
         const isDirectory = yield getIsDirectory(realpath);
         try {
           if ((_nuclideUri || _load_nuclideUri()).default.isRemote(realpath)) {
             const result = commands.openRemoteFile(realpath, line, column, Boolean(argv.wait)).refCount();
             if (argv.wait) {
-              // eslint-disable-next-line babel/no-await-in-loop
+              // eslint-disable-next-line no-await-in-loop
               yield result.toPromise();
             } else {
-              // eslint-disable-next-line babel/no-await-in-loop
+              // eslint-disable-next-line no-await-in-loop
               yield result.take(1).toPromise();
             }
           } else if (isDirectory) {
             // file/line/wait are ignored on directories
-            // eslint-disable-next-line babel/no-await-in-loop
+            // eslint-disable-next-line no-await-in-loop
             yield commands.addProject(realpath);
           } else {
             const result = commands.openFile(realpath, line, column, Boolean(argv.wait)).refCount();
             if (argv.wait) {
-              // eslint-disable-next-line babel/no-await-in-loop
+              // eslint-disable-next-line no-await-in-loop
               yield result.toPromise();
             } else {
-              // eslint-disable-next-line babel/no-await-in-loop
+              // eslint-disable-next-line no-await-in-loop
               yield result.take(1).toPromise();
             }
           }
@@ -104,7 +90,7 @@ let main = (() => {
 
 let run = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* () {
-    var _yargs$usage$help$ali = (_yargs || _load_yargs()).default.usage('Usage: atom <file>').help('h').alias('h', 'help').demand(1, 'At least one file name is required.').option('a', {
+    const { argv } = (_yargs || _load_yargs()).default.usage('Usage: atom <file>').help('h').alias('h', 'help').demand(1, 'At least one file name is required.').option('a', {
       alias: 'add',
       describe: 'Ignored, as --add as always implied. ' + 'Included for compatibility with atom CLI.',
       type: 'boolean'
@@ -121,9 +107,6 @@ let run = (() => {
       describe: 'Address family for connecting to nuclide. Either "IPv4" or "IPv6".',
       type: 'string'
     });
-
-    const argv = _yargs$usage$help$ali.argv;
-
     if (argv.port == null !== (argv.family == null)) {
       process.stderr.write('Invalid options. Both port and family must be specified.\n');
       process.exit((_errors || _load_errors()).EXIT_CODE_INVALID_ARGUMENTS);
@@ -175,7 +158,15 @@ function _load_yargs() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)(); /**
+                                                                              * Copyright (c) 2015-present, Facebook, Inc.
+                                                                              * All rights reserved.
+                                                                              *
+                                                                              * This source code is licensed under the license found in the LICENSE file in
+                                                                              * the root directory of this source tree.
+                                                                              *
+                                                                              * 
+                                                                              */
 
 const LocationSuffixRegExp = /(:\d+)(:\d+)?$/;
 
@@ -196,9 +187,9 @@ function parseLocationParameter(value) {
     }
   }
   return {
-    filePath: filePath,
-    line: line,
-    column: column
+    filePath,
+    line,
+    column
   };
 }
 

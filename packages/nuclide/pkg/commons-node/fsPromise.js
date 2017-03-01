@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,7 +23,7 @@ let findNearestFile = (() => {
     let currentPath = (_nuclideUri || _load_nuclideUri()).default.resolve(pathToDirectory);
     for (;;) {
       const fileToFind = (_nuclideUri || _load_nuclideUri()).default.join(currentPath, fileName);
-      // eslint-disable-next-line babel/no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop
       const hasFile = yield exists(fileToFind);
       if (hasFile) {
         return currentPath;
@@ -44,7 +35,7 @@ let findNearestFile = (() => {
     }
   });
 
-  return function findNearestFile(_x2, _x3) {
+  return function findNearestFile(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 })();
@@ -61,14 +52,12 @@ let findNearestFile = (() => {
 
 
 let findFurthestFile = (() => {
-  var _ref2 = (0, _asyncToGenerator.default)(function* (fileName, pathToDirectory) {
-    let stopOnMissing = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+  var _ref2 = (0, _asyncToGenerator.default)(function* (fileName, pathToDirectory, stopOnMissing = false) {
     let currentPath = (_nuclideUri || _load_nuclideUri()).default.resolve(pathToDirectory);
     let result = null;
     for (;;) {
       const fileToFind = (_nuclideUri || _load_nuclideUri()).default.join(currentPath, fileName);
-      // eslint-disable-next-line babel/no-await-in-loop
+      // eslint-disable-next-line no-await-in-loop
       const hasFile = yield exists(fileToFind);
       if (!hasFile && stopOnMissing || (_nuclideUri || _load_nuclideUri()).default.isRoot(currentPath)) {
         return result;
@@ -79,7 +68,7 @@ let findFurthestFile = (() => {
     }
   });
 
-  return function findFurthestFile(_x5, _x6) {
+  return function findFurthestFile(_x3, _x4) {
     return _ref2.apply(this, arguments);
   };
 })();
@@ -109,7 +98,7 @@ let mkdirp = (() => {
     }
   });
 
-  return function mkdirp(_x7) {
+  return function mkdirp(_x5) {
     return _ref3.apply(this, arguments);
   };
 })();
@@ -123,11 +112,7 @@ let mkdirp = (() => {
 let isNfs = (() => {
   var _ref4 = (0, _asyncToGenerator.default)(function* (entityPath) {
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      var _ref5 = yield (0, (_process || _load_process()).asyncExecute)('stat', ['-f', '-L', '-c', '%T', entityPath]);
-
-      const stdout = _ref5.stdout,
-            exitCode = _ref5.exitCode;
-
+      const { stdout, exitCode } = yield (0, (_process || _load_process()).asyncExecute)('stat', ['-f', '-L', '-c', '%T', entityPath]);
       if (exitCode === 0) {
         return stdout.trim() === 'nfs';
       } else {
@@ -139,13 +124,13 @@ let isNfs = (() => {
     }
   });
 
-  return function isNfs(_x8) {
+  return function isNfs(_x6) {
     return _ref4.apply(this, arguments);
   };
 })();
 
 let isNonNfsDirectory = (() => {
-  var _ref6 = (0, _asyncToGenerator.default)(function* (directoryPath) {
+  var _ref5 = (0, _asyncToGenerator.default)(function* (directoryPath) {
     try {
       const stats = yield stat(directoryPath);
       if (stats.isDirectory()) {
@@ -161,8 +146,8 @@ let isNonNfsDirectory = (() => {
     }
   });
 
-  return function isNonNfsDirectory(_x9) {
-    return _ref6.apply(this, arguments);
+  return function isNonNfsDirectory(_x7) {
+    return _ref5.apply(this, arguments);
   };
 })();
 
@@ -222,9 +207,17 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * @param prefix optinal prefix for the temp directory name.
  * @return path to a temporary directory.
  */
-function tempdir() {
-  let prefix = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
+function tempdir(prefix = '') {
   return new Promise((resolve, reject) => {
     (_temp || _load_temp()).default.mkdir(prefix, (err, result) => {
       if (err == null) {
@@ -476,32 +469,31 @@ function unlink(path) {
 }
 
 exports.default = {
-  tempdir: tempdir,
-  tempfile: tempfile,
-  findNearestFile: findNearestFile,
-  findFurthestFile: findFurthestFile,
-  getCommonAncestorDirectory: getCommonAncestorDirectory,
-  exists: exists,
-  mkdirp: mkdirp,
-  rmdir: rmdir,
-  isNfs: isNfs,
-  glob: glob,
-  isNonNfsDirectory: isNonNfsDirectory,
+  tempdir,
+  tempfile,
+  findNearestFile,
+  findFurthestFile,
+  getCommonAncestorDirectory,
+  exists,
+  mkdirp,
+  rmdir,
+  isNfs,
+  glob,
+  isNonNfsDirectory,
 
-  copy: copy,
-  move: move,
-  writeFile: writeFile,
+  copy,
+  move,
+  writeFile,
 
-  chmod: chmod,
-  lstat: lstat,
-  mkdir: mkdir,
-  readFile: readFile,
-  readdir: readdir,
-  readlink: readlink,
-  realpath: realpath,
-  rename: rename,
-  stat: stat,
-  symlink: symlink,
-  unlink: unlink
+  chmod,
+  lstat,
+  mkdir,
+  readFile,
+  readdir,
+  readlink,
+  realpath,
+  rename,
+  stat,
+  symlink,
+  unlink
 };
-module.exports = exports['default'];

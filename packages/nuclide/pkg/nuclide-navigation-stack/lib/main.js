@@ -1,17 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _projects;
 
@@ -63,9 +50,19 @@ function _load_StatusBar() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const controller = new (_NavigationStackController || _load_NavigationStackController()).NavigationStackController();
 
-let Activation = class Activation {
+class Activation {
 
   constructor(state) {
     this._disposables = new (_UniversalDisposable || _load_UniversalDisposable()).default();
@@ -90,21 +87,23 @@ let Activation = class Activation {
 
     const addEditor = addEvent => {
       const editor = addEvent.textEditor;
-      subscribeEditor(editor);
-      controller.onCreate(editor);
+      if ((0, (_textEditor || _load_textEditor()).isValidTextEditor)(editor)) {
+        subscribeEditor(editor);
+        controller.onCreate(editor);
+      }
     };
 
     atom.workspace.getTextEditors().forEach(subscribeEditor);
     this._disposables.add(atom.workspace.onDidAddTextEditor(addEditor), atom.workspace.onDidOpen(event => {
-      if (atom.workspace.isTextEditor(event.item)) {
+      if ((0, (_textEditor || _load_textEditor()).isValidTextEditor)(event.item)) {
         controller.onOpen(event.item);
       }
     }), atom.workspace.observeActivePaneItem(item => {
-      if (atom.workspace.isTextEditor(item)) {
+      if ((0, (_textEditor || _load_textEditor()).isValidTextEditor)(item)) {
         controller.onActivate(item);
       }
     }), atom.workspace.onDidStopChangingActivePaneItem(item => {
-      if (atom.workspace.isTextEditor(item)) {
+      if ((0, (_textEditor || _load_textEditor()).isValidTextEditor)(item)) {
         controller.onActiveStopChanging(item);
       }
     }), (0, (_projects || _load_projects()).onDidRemoveProjectPath)(path => {
@@ -112,9 +111,9 @@ let Activation = class Activation {
     }), (0, (_goToLocation || _load_goToLocation()).observeNavigatingEditors)().subscribe(editor => {
       controller.onOptInNavigation(editor);
     }), atom.commands.add('atom-workspace', 'nuclide-navigation-stack:navigate-forwards', () => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('nuclide-navigation-stack:forwards', () => controller.navigateForwards());
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-navigation-stack:forwards', () => controller.navigateForwards());
     }), atom.commands.add('atom-workspace', 'nuclide-navigation-stack:navigate-backwards', () => {
-      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)('nuclide-navigation-stack:backwards', () => controller.navigateBackwards());
+      (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)('nuclide-navigation-stack:backwards', () => controller.navigateBackwards());
     }));
   }
 
@@ -127,6 +126,6 @@ let Activation = class Activation {
   dispose() {
     this._disposables.dispose();
   }
-};
-exports.default = (0, (_createPackage || _load_createPackage()).default)(Activation);
-module.exports = exports['default'];
+}
+
+(0, (_createPackage || _load_createPackage()).default)(module.exports, Activation);

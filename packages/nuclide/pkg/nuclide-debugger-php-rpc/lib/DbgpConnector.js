@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -54,7 +45,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * Note that 0 pid also does not filter on process id.
  */
 
-const DBGP_ATTACH_EVENT = 'dbgp-attach-event';
+const DBGP_ATTACH_EVENT = 'dbgp-attach-event'; /**
+                                                * Copyright (c) 2015-present, Facebook, Inc.
+                                                * All rights reserved.
+                                                *
+                                                * This source code is licensed under the license found in the LICENSE file in
+                                                * the root directory of this source tree.
+                                                *
+                                                * 
+                                                */
+
 const DBGP_CLOSE_EVENT = 'dbgp-close-event';
 const DBGP_ERROR_EVENT = 'dbgp-error-event';
 
@@ -69,7 +69,7 @@ const DBGP_ERROR_EVENT = 'dbgp-error-event';
  * If the connection does not match the given pid/idekey/path
  * then close the connection and continue waiting for a match.
  */
-let DbgpConnector = exports.DbgpConnector = class DbgpConnector {
+class DbgpConnector {
 
   constructor(port) {
     this._server = null;
@@ -110,6 +110,8 @@ let DbgpConnector = exports.DbgpConnector = class DbgpConnector {
   }
 
   _onSocketConnection(socket) {
+    // Xdebug encodes XML messages as iso-8859-1, which is the same as 'latin1'.
+    socket.setEncoding('latin1');
     (_utils || _load_utils()).default.log('Connection on port ' + this._port);
     if (!this._checkListening(socket, 'Connection')) {
       return;
@@ -120,9 +122,9 @@ let DbgpConnector = exports.DbgpConnector = class DbgpConnector {
   _onServerError(error) {
     let errorMessage;
     if (error.code === 'EADDRINUSE') {
-      errorMessage = `Can't start debugging because port ${ this._port } is being used by another process. ` + "Try running 'killall node' on your devserver and then restarting Nuclide.";
+      errorMessage = `Can't start debugging because port ${this._port} is being used by another process. ` + "Try running 'killall node' on your devserver and then restarting Nuclide.";
     } else {
-      errorMessage = `Unknown debugger socket error: ${ error.code }.`;
+      errorMessage = `Unknown debugger socket error: ${error.code}.`;
     }
 
     (_utils || _load_utils()).default.logError(errorMessage);
@@ -150,7 +152,7 @@ let DbgpConnector = exports.DbgpConnector = class DbgpConnector {
     }
 
     const message = messages[0];
-    this._emitter.emit(DBGP_ATTACH_EVENT, { socket: socket, message: message });
+    this._emitter.emit(DBGP_ATTACH_EVENT, { socket, message });
   }
 
   _failConnection(socket, logMessage, userMessage) {
@@ -180,4 +182,5 @@ let DbgpConnector = exports.DbgpConnector = class DbgpConnector {
       this._server = null;
     }
   }
-};
+}
+exports.DbgpConnector = DbgpConnector;

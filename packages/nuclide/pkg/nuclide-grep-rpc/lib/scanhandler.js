@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -25,6 +16,12 @@ function _load_process() {
   return _process = require('../../commons-node/process');
 }
 
+var _observable;
+
+function _load_observable() {
+  return _observable = require('../../commons-node/observable');
+}
+
 var _fsPromise;
 
 function _load_fsPromise() {
@@ -37,6 +34,12 @@ function _load_nuclideUri() {
   return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
 }
 
+var _minimatch;
+
+function _load_minimatch() {
+  return _minimatch = require('minimatch');
+}
+
 var _split;
 
 function _load_split() {
@@ -46,7 +49,20 @@ function _load_split() {
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // This pattern is used for parsing the output of grep.
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const GREP_PARSE_PATTERN = /(.*?):(\d*):(.*)/;
+
+// Limit the total result size to avoid overloading the Nuclide server + Atom.
+const MATCH_BYTE_LIMIT = 2 * 1024 * 1024;
 
 /**
  * Searches for all instances of a pattern in a directory.
@@ -63,15 +79,18 @@ function search(directory, regex, subdirs) {
   if (!subdirs || subdirs.length === 0) {
     // Since no subdirs were specified, run search on the root directory.
     return searchInSubdir(matchesByFile, directory, '.', regex);
-  } else if (subdirs.length === 1 && subdirs[0].includes('*')) {
-    // Filters results by glob specified in subdirs[0]
-    const unfilteredResults = searchInSubdir(matchesByFile, directory, '.', regex);
-
-    return unfilteredResults.filter(result => {
-      const glob = subdirs[0];
-      const matches = result.filePath.match(globToRegex(glob));
-      return matches != null && matches.length > 0;
+  } else if (subdirs.find(subdir => subdir.includes('*'))) {
+    // Mimic Atom and use minimatch for glob matching.
+    const matchers = subdirs.map(subdir => {
+      let pattern = subdir;
+      if (!pattern.includes('*')) {
+        // Automatically glob-ify the non-globs.
+        pattern = (_nuclideUri || _load_nuclideUri()).default.ensureTrailingSeparator(pattern) + '**';
+      }
+      return new (_minimatch || _load_minimatch()).Minimatch(pattern, { matchBase: true, dot: true });
     });
+    // TODO: This should walk the subdirectories and filter by glob before searching.
+    return searchInSubdir(matchesByFile, directory, '.', regex).filter(result => Boolean(matchers.find(matcher => matcher.match(result.filePath))));
   } else {
     // Run the search on each subdirectory that exists.
     return _rxjsBundlesRxMinJs.Observable.from(subdirs).concatMap((() => {
@@ -106,11 +125,11 @@ function searchInSubdir(matchesByFile, directory, subdir, regex) {
   const linesSource = getLinesFromCommand('hg', ['wgrep'].concat(vcsargs), cmdDir).catch(() => getLinesFromCommand('git', ['grep'].concat(vcsargs), cmdDir)).catch(() => getLinesFromCommand('grep', grepargs, cmdDir)).catch(() => _rxjsBundlesRxMinJs.Observable.throw(new Error('Failed to execute a grep search.')));
 
   // Transform lines into file matches.
-  return linesSource.flatMap(line => {
+  const results = (0, (_observable || _load_observable()).compact)(linesSource.map(line => {
     // Try to parse the output of grep.
     const grepMatchResult = line.match(GREP_PARSE_PATTERN);
     if (!grepMatchResult) {
-      return [];
+      return null;
     }
 
     // Extract the filename, line number, and line text from grep output.
@@ -121,7 +140,7 @@ function searchInSubdir(matchesByFile, directory, subdir, regex) {
     // Try to extract the actual "matched" text.
     const matchTextResult = regex.exec(lineText);
     if (!matchTextResult) {
-      return [];
+      return null;
     }
 
     // IMPORTANT: reset the regex for the next search
@@ -130,22 +149,25 @@ function searchInSubdir(matchesByFile, directory, subdir, regex) {
     const matchText = matchTextResult[0];
     const matchIndex = matchTextResult.index;
 
-    // Put this match into lists grouped by files.
-    let matches = matchesByFile.get(filePath);
-    if (matches == null) {
-      matches = [];
-      matchesByFile.set(filePath, matches);
-    }
-    matches.push({
-      lineText: lineText,
-      lineTextOffset: 0,
-      matchText: matchText,
-      range: [[lineNo, matchIndex], [lineNo, matchIndex + matchText.length]]
-    });
+    return {
+      filePath,
+      match: {
+        lineText,
+        lineTextOffset: 0,
+        matchText,
+        range: [[lineNo, matchIndex], [lineNo, matchIndex + matchText.length]]
+      }
+    };
+  })).share();
 
-    // If a callback was provided, invoke it with the newest update.
-    return [{ matches: matches, filePath: filePath }];
-  });
+  return results
+  // Limit the total result size.
+  .merge(results.scan((size, { match }) => size + match.lineText.length + match.matchText.length, 0).filter(size => size > MATCH_BYTE_LIMIT).switchMapTo(_rxjsBundlesRxMinJs.Observable.throw(Error(`Too many results, truncating to ${MATCH_BYTE_LIMIT} bytes`))).ignoreElements())
+  // Buffer results by file. Flush when the file changes, or on completion.
+  .buffer(_rxjsBundlesRxMinJs.Observable.concat(results.distinct(result => result.filePath), _rxjsBundlesRxMinJs.Observable.of(null))).filter(buffer => buffer.length > 0).map(buffer => ({
+    filePath: buffer[0].filePath,
+    matches: buffer.map(x => x.match)
+  }));
 }
 
 // Helper function that runs a command in a given directory, invoking a callback
@@ -189,13 +211,3 @@ function getLinesFromCommand(command, args, localDirectoryPath) {
     };
   });
 }
-
-// Converts a wildcard string to JS RegExp.
-function globToRegex(str) {
-  return new RegExp(preg_quote(str).replace(/\\\*/g, '.*').replace(/\\\?/g, '.'), 'g');
-}
-
-function preg_quote(str, delimiter) {
-  return String(str).replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
-}
-module.exports = exports['default'];

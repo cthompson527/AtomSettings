@@ -1,15 +1,16 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
+
+var _nuclideUri;
+
+function _load_nuclideUri() {
+  return _nuclideUri = _interopRequireDefault(require('../../commons-node/nuclideUri'));
+}
 
 var _nuclideRemoteConnection;
 
@@ -17,7 +18,9 @@ function _load_nuclideRemoteConnection() {
   return _nuclideRemoteConnection = require('../../nuclide-remote-connection');
 }
 
-let RemoteDirectorySearcher = class RemoteDirectorySearcher {
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+class RemoteDirectorySearcher {
 
   // When constructed, RemoteDirectorySearcher must be passed a function that
   // it can use to get a 'GrepService' for a given remote path.
@@ -36,7 +39,7 @@ let RemoteDirectorySearcher = class RemoteDirectorySearcher {
     // Get the remote service that corresponds to each remote directory.
     const services = directories.map(dir => this._serviceProvider(dir));
 
-    const searchStreams = directories.map((dir, index) => services[index].grepSearch(dir.getPath(), regex, options.inclusions).refCount());
+    const searchStreams = directories.map((dir, index) => services[index].grepSearch(dir.getPath(), regex, RemoteDirectorySearcher.processPaths(dir.getPath(), options.inclusions)).refCount());
 
     // Start the search in each directory, and merge the resulting streams.
     const searchStream = _rxjsBundlesRxMinJs.Observable.merge(...searchStreams);
@@ -64,13 +67,47 @@ let RemoteDirectorySearcher = class RemoteDirectorySearcher {
     const completionPromise = searchCompletion.toPromise();
     return {
       then: completionPromise.then.bind(completionPromise),
-      cancel: function () {
+      cancel() {
         // Cancel the subscription, which should also kill the grep process.
         subscription.unsubscribe();
       }
     };
   }
-};
 
-
-module.exports = RemoteDirectorySearcher;
+  /**
+   * If a query's prefix matches the rootPath's basename, treat the query as a relative search.
+   * Based on https://github.com/atom/atom/blob/master/src/scan-handler.coffee.
+   * Marked as static for testing.
+   */
+  static processPaths(rootPath, paths) {
+    if (paths == null) {
+      return [];
+    }
+    const rootPathBase = (_nuclideUri || _load_nuclideUri()).default.basename(rootPath);
+    const results = [];
+    for (const path of paths) {
+      const segments = (_nuclideUri || _load_nuclideUri()).default.split(path);
+      const firstSegment = segments.shift();
+      results.push(path);
+      if (firstSegment === rootPathBase) {
+        if (segments.length === 0) {
+          // Search everything.
+          return [];
+        } else {
+          // Try interpreting this as a subdirectory of the base as well.
+          results.push((_nuclideUri || _load_nuclideUri()).default.join(...segments));
+        }
+      }
+    }
+    return results;
+  }
+}
+exports.default = RemoteDirectorySearcher; /**
+                                            * Copyright (c) 2015-present, Facebook, Inc.
+                                            * All rights reserved.
+                                            *
+                                            * This source code is licensed under the license found in the LICENSE file in
+                                            * the root directory of this source tree.
+                                            *
+                                            * 
+                                            */

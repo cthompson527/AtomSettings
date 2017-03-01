@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -31,6 +22,16 @@ function _load_eventKit() {
 }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 
@@ -56,7 +57,7 @@ const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
 // send(data) yields false if the message failed to send, true on success.
 // onClose handlers will be called before close() returns.
 // May not call send() after transport has closed..
-let QueuedTransport = exports.QueuedTransport = class QueuedTransport {
+class QueuedTransport {
 
   constructor(clientId, transport) {
     this.id = clientId;
@@ -91,19 +92,6 @@ let QueuedTransport = exports.QueuedTransport = class QueuedTransport {
     transport.onClose(() => this._onClose(transport));
   }
 
-  _onMessage(transport, message) {
-    if (this._isClosed) {
-      logger.error('Received socket message after connection closed', new Error());
-      return;
-    }
-    if (this._transport !== transport) {
-      // This shouldn't happen, but ...
-      logger.error('Received message after transport closed', new Error());
-    }
-
-    this._emitter.emit('message', message);
-  }
-
   _onClose(transport) {
     if (!transport.isClosed()) {
       throw new Error('Invariant violation: "transport.isClosed()"');
@@ -115,7 +103,7 @@ let QueuedTransport = exports.QueuedTransport = class QueuedTransport {
     }
     if (transport !== this._transport) {
       // This should not happen...
-      logger.error('Orphaned transport closed', new Error());
+      logger.error('Orphaned transport closed');
       return;
     }
 
@@ -182,7 +170,7 @@ let QueuedTransport = exports.QueuedTransport = class QueuedTransport {
 
     return (0, _asyncToGenerator.default)(function* () {
       if (!!_this._isClosed) {
-        throw new Error('Attempt to send socket message after connection closed');
+        throw new Error(`Attempt to send socket message after connection closed: ${message}`);
       }
 
       _this._messageQueue.push(message);
@@ -214,4 +202,5 @@ let QueuedTransport = exports.QueuedTransport = class QueuedTransport {
   isClosed() {
     return this._isClosed;
   }
-};
+}
+exports.QueuedTransport = QueuedTransport;

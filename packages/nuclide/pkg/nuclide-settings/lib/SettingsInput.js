@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _AtomInput;
 
@@ -28,7 +18,17 @@ function _load_settingsUtils() {
   return _settingsUtils = require('./settings-utils');
 }
 
-let SettingsInput = class SettingsInput extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class SettingsInput extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -146,6 +146,5 @@ let SettingsInput = class SettingsInput extends _reactForAtom.React.Component {
       )
     );
   }
-};
+}
 exports.default = SettingsInput;
-module.exports = exports['default'];

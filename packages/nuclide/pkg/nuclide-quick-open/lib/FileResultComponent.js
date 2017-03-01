@@ -1,13 +1,8 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
 var _reactForAtom = require('react-for-atom');
 
@@ -25,6 +20,16 @@ function _load_nuclideUri() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 function renderSubsequence(seq, props) {
   return seq.length === 0 ? null : _reactForAtom.React.createElement(
     'span',
@@ -34,18 +39,17 @@ function renderSubsequence(seq, props) {
 }
 
 function renderUnmatchedSubsequence(seq, key) {
-  return renderSubsequence(seq, { key: key });
+  return renderSubsequence(seq, { key });
 }
 
 function renderMatchedSubsequence(seq, key) {
   return renderSubsequence(seq, {
-    key: key,
+    key,
     className: 'quick-open-file-search-match'
   });
 }
 
-let FileResultComponent = class FileResultComponent {
-
+class FileResultComponent {
   static getComponentForItem(item, serviceName, dirName) {
     // Trim the `dirName` off the `filePath` since that's shown by the group
     let filePath = item.path;
@@ -73,7 +77,7 @@ let FileResultComponent = class FileResultComponent {
           streakOngoing = false;
         } else {
           if (i > 0) {
-            pathComponents.push(renderUnmatchedSubsequence(filePath.slice(start, i), `before${ i }`));
+            pathComponents.push(renderUnmatchedSubsequence(filePath.slice(start, i), `before${i}`));
           }
           pathComponents.push(renderMatchedSubsequence(filePath.slice(i, i + 1), i));
         }
@@ -91,7 +95,5 @@ let FileResultComponent = class FileResultComponent {
       pathComponents
     );
   }
-};
-
-
-module.exports = FileResultComponent;
+}
+exports.default = FileResultComponent;

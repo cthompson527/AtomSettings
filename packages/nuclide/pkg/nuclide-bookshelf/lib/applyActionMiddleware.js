@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -32,9 +23,23 @@ function _load_event() {
   return _event = require('../../commons-node/event');
 }
 
+var _goToLocation;
+
+function _load_goToLocation() {
+  return _goToLocation = require('../../commons-atom/go-to-location');
+}
+
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-const HANDLED_ACTION_TYPES = [(_constants || _load_constants()).ActionType.ADD_PROJECT_REPOSITORY, (_constants || _load_constants()).ActionType.RESTORE_PANE_ITEM_STATE];
+const HANDLED_ACTION_TYPES = [(_constants || _load_constants()).ActionType.ADD_PROJECT_REPOSITORY, (_constants || _load_constants()).ActionType.RESTORE_PANE_ITEM_STATE]; /**
+                                                                                                                                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                                                                                                                                           * All rights reserved.
+                                                                                                                                                                           *
+                                                                                                                                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                                                                                                                                           * the root directory of this source tree.
+                                                                                                                                                                           *
+                                                                                                                                                                           * 
+                                                                                                                                                                           */
 
 function getActionsOfType(actions, type) {
   return actions.filter(action => action.type === type);
@@ -60,8 +65,7 @@ function applyActionMiddleware(actions, getState) {
 }
 
 function watchProjectRepository(action, getState) {
-  const repository = action.payload.repository;
-
+  const { repository } = action.payload;
   const hgRepository = repository;
   // Type was checked with `getType`. Downcast to safely access members with Flow.
   return _rxjsBundlesRxMinJs.Observable.merge((0, (_event || _load_event()).observableFromSubscribeFunction)(
@@ -78,25 +82,22 @@ function watchProjectRepository(action, getState) {
 
     return {
       payload: {
-        activeShortHead: activeShortHead,
-        bookmarkNames: bookmarkNames,
-        repository: repository
+        activeShortHead,
+        bookmarkNames,
+        repository
       },
       type: (_constants || _load_constants()).ActionType.UPDATE_REPOSITORY_BOOKMARKS
     };
   }).takeUntil((0, (_event || _load_event()).observableFromSubscribeFunction)(repository.onDidDestroy.bind(repository))).concat(_rxjsBundlesRxMinJs.Observable.of({
     payload: {
-      repository: repository
+      repository
     },
     type: (_constants || _load_constants()).ActionType.REMOVE_PROJECT_REPOSITORY
   }));
 }
 
 function restorePaneItemState(action, getState) {
-  var _action$payload = action.payload;
-  const repository = _action$payload.repository,
-        shortHead = _action$payload.shortHead;
-
+  const { repository, shortHead } = action.payload;
 
   const repositoryState = getState().repositoryPathToState.get(repository.getWorkingDirectory());
   if (repositoryState == null) {
@@ -115,7 +116,7 @@ function restorePaneItemState(action, getState) {
 
   return _rxjsBundlesRxMinJs.Observable.concat(_rxjsBundlesRxMinJs.Observable.of({
     payload: {
-      repository: repository
+      repository
     },
     type: (_constants || _load_constants()).ActionType.START_RESTORING_REPOSITORY_STATE
   }), _rxjsBundlesRxMinJs.Observable.from(editorsToClose)
@@ -140,10 +141,10 @@ function restorePaneItemState(action, getState) {
       return _rxjsBundlesRxMinJs.Observable.fromPromise(textEditor.getBuffer().load());
     }
   }).ignoreElements(), _rxjsBundlesRxMinJs.Observable.from(urisToOpen).flatMap(fileUri => {
-    return _rxjsBundlesRxMinJs.Observable.fromPromise(atom.workspace.open(fileUri));
+    return _rxjsBundlesRxMinJs.Observable.fromPromise((0, (_goToLocation || _load_goToLocation()).goToLocation)(fileUri));
   }).ignoreElements(), _rxjsBundlesRxMinJs.Observable.of({
     payload: {
-      repository: repository
+      repository
     },
     type: (_constants || _load_constants()).ActionType.COMPLETE_RESTORING_REPOSITORY_STATE
   }));

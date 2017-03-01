@@ -1,13 +1,10 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _electron = require('electron');
 
 var _constants;
 
@@ -27,7 +24,23 @@ function _load_Dropdown() {
   return _Dropdown = require('../../nuclide-ui/Dropdown');
 }
 
+var _Button;
+
+function _load_Button() {
+  return _Button = require('../../nuclide-ui/Button');
+}
+
 var _reactForAtom = require('react-for-atom');
+
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
 
 const WEB_SERVER_OPTION = { label: 'Attach to WebServer', value: 'webserver' };
 const SCRIPT_OPTION = { label: 'Launch Script', value: 'script' };
@@ -36,7 +49,7 @@ const DEBUG_OPTIONS = [WEB_SERVER_OPTION, SCRIPT_OPTION];
 
 const NO_LAUNCH_DEBUG_OPTIONS = [WEB_SERVER_OPTION];
 
-let HhvmToolbar = class HhvmToolbar extends _reactForAtom.React.Component {
+class HhvmToolbar extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -83,7 +96,7 @@ let HhvmToolbar = class HhvmToolbar extends _reactForAtom.React.Component {
     const isDebugScript = store.getDebugMode() === 'script';
     return _reactForAtom.React.createElement(
       'div',
-      { className: 'hhvm-toolbar block' },
+      { className: 'hhvm-toolbar' },
       _reactForAtom.React.createElement((_Dropdown || _load_Dropdown()).Dropdown, {
         className: 'inline-block',
         options: this._getMenuItems(),
@@ -94,7 +107,7 @@ let HhvmToolbar = class HhvmToolbar extends _reactForAtom.React.Component {
       }),
       _reactForAtom.React.createElement(
         'div',
-        { className: 'inline-block', style: { width: '500px' } },
+        { className: 'inline-block', style: { width: '300px' } },
         _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
           ref: 'debugTarget',
           initialValue: store.getDebugTarget(),
@@ -102,14 +115,21 @@ let HhvmToolbar = class HhvmToolbar extends _reactForAtom.React.Component {
           onDidChange: this._updateLastScriptCommand,
           size: 'sm'
         })
-      )
+      ),
+      !isDebugScript ? _reactForAtom.React.createElement(
+        (_Button || _load_Button()).Button,
+        {
+          size: 'SMALL',
+          onClick: () => {
+            _electron.shell.openExternal('https://' + store.getDebugTarget());
+          } },
+        'Open'
+      ) : null
     );
   }
 
   _handleDropdownChange(value) {
     this.props.projectStore.setDebugMode(value);
   }
-};
-
-
-module.exports = HhvmToolbar;
+}
+exports.default = HhvmToolbar;

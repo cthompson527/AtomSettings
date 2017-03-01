@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -42,7 +33,17 @@ function _load_nuclideDebuggerBase() {
 
 // TODO: All this needs to be serialized by the package, so we're going to need to hoist it and use
 //   actions.
-let DebugUiComponent = exports.DebugUiComponent = class DebugUiComponent extends _reactForAtom.React.Component {
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
+class DebugUiComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
@@ -74,7 +75,7 @@ let DebugUiComponent = exports.DebugUiComponent = class DebugUiComponent extends
         _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
           checked: this.state.startPackager,
           label: 'Start Packager',
-          onChange: startPackager => this.setState({ startPackager: startPackager })
+          onChange: startPackager => this.setState({ startPackager })
         })
       ),
       _reactForAtom.React.createElement(
@@ -83,7 +84,7 @@ let DebugUiComponent = exports.DebugUiComponent = class DebugUiComponent extends
         _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
           checked: this.state.tailIosLogs,
           label: 'Tail iOS Simulator Logs',
-          onChange: tailIosLogs => this.setState({ tailIosLogs: tailIosLogs })
+          onChange: tailIosLogs => this.setState({ tailIosLogs })
         })
       ),
       _reactForAtom.React.createElement(
@@ -92,7 +93,7 @@ let DebugUiComponent = exports.DebugUiComponent = class DebugUiComponent extends
         _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
           checked: this.state.tailAdbLogs,
           label: 'Tail adb Logcat Logs',
-          onChange: tailAdbLogs => this.setState({ tailAdbLogs: tailAdbLogs })
+          onChange: tailAdbLogs => this.setState({ tailAdbLogs })
         })
       ),
       _reactForAtom.React.createElement(
@@ -141,10 +142,9 @@ let DebugUiComponent = exports.DebugUiComponent = class DebugUiComponent extends
   _handleCancelButtonClick() {
     callWorkspaceCommand('nuclide-debugger:toggle-launch-attach');
   }
+}
 
-};
-
-
+exports.DebugUiComponent = DebugUiComponent;
 function callWorkspaceCommand(command) {
   atom.commands.dispatch(atom.views.getView(atom.workspace), command);
 }

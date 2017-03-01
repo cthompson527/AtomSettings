@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.datatip = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 let datatip = exports.datatip = (() => {
   var _ref = (0, _asyncToGenerator.default)(function* (editor, position) {
@@ -38,11 +27,8 @@ let datatip = exports.datatip = (() => {
     if (messagesAtPosition.length === 0) {
       return null;
     }
-
-    var _messagesAtPosition = _slicedToArray(messagesAtPosition, 1);
-
-    const message = _messagesAtPosition[0];
-    const range = message.range;
+    const [message] = messagesAtPosition;
+    const { range } = message;
 
     if (!range) {
       throw new Error('Invariant violation: "range"');
@@ -51,7 +37,7 @@ let datatip = exports.datatip = (() => {
     return {
       component: (0, (_DiagnosticsDatatipComponent || _load_DiagnosticsDatatipComponent()).makeDiagnosticsDatatipComponent)(message),
       pinnable: false,
-      range: range
+      range
     };
   });
 
@@ -73,6 +59,12 @@ function _load_DiagnosticsDatatipComponent() {
   return _DiagnosticsDatatipComponent = require('./DiagnosticsDatatipComponent');
 }
 
+var _textEditor;
+
+function _load_textEditor() {
+  return _textEditor = require('../../commons-atom/text-editor');
+}
+
 var _passesGK;
 
 function _load_passesGK() {
@@ -81,7 +73,15 @@ function _load_passesGK() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const GK_DIAGNOSTICS_DATATIPS = 'nuclide_diagnostics_datatips';
+const GK_DIAGNOSTICS_DATATIPS = 'nuclide_diagnostics_datatips'; /**
+                                                                 * Copyright (c) 2015-present, Facebook, Inc.
+                                                                 * All rights reserved.
+                                                                 *
+                                                                 * This source code is licensed under the license found in the LICENSE file in
+                                                                 * the root directory of this source tree.
+                                                                 *
+                                                                 * 
+                                                                 */
 
 const DATATIP_PACKAGE_NAME = 'nuclide-diagnostics-datatip';
 
@@ -92,7 +92,7 @@ function getDatatipProvider() {
     validForScope: scope => true,
     providerName: DATATIP_PACKAGE_NAME,
     inclusionPriority: 1,
-    datatip: datatip
+    datatip
   };
 }
 
@@ -122,7 +122,7 @@ function consumeDiagnosticUpdates(diagnosticUpdater) {
     throw new Error('Invariant violation: "disposables"');
   }
 
-  disposables.add(atom.workspace.observeTextEditors(editor => {
+  disposables.add((0, (_textEditor || _load_textEditor()).observeTextEditors)(editor => {
     if (!fileDiagnostics) {
       throw new Error('Invariant violation: "fileDiagnostics"');
     }

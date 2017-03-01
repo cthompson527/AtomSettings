@@ -1,15 +1,14 @@
-'use strict';
-/* @noflow */
-
-/*
+/**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
  *
  * This source code is licensed under the license found in the LICENSE file in
  * the root directory of this source tree.
+ *
+ * @noflow
  */
+'use strict';
 
-/* NON-TRANSPILED FILE */
 /* eslint comma-dangle: [1, always-multiline], prefer-object-spread/prefer-object-spread: 0 */
 
 /* eslint-disable no-console */
@@ -27,12 +26,8 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const PREFIXES = ["'use babel'", '"use babel"', '/* @flow */', '/** @babel */'];
-const PREFIX_LENGTH = Math.max(...PREFIXES.map(x => x.length));
+const docblock = require('./docblock');
 
-// NOTE: When removing plugins, testing Atom is not enough, it's important to
-// test the nuclide server. Atom runs with `--harmony` so some JS feature may
-// work there, but not on the server.
 const BABEL_OPTIONS = {
   parserOpts: {
     plugins: [
@@ -40,26 +35,11 @@ const BABEL_OPTIONS = {
       'flow',
       'jsx',
       'objectRestSpread',
-      // TODO(asuarez): Remove decorators and remove:
-      'decorators',
     ],
   },
   plugins: [
     [require.resolve('./inline-invariant-tr')],
     [require.resolve('./use-minified-libs-tr')],
-
-    // TODO(asuarez): Remove decorators and remove:
-    [require.resolve('babel-plugin-transform-decorators-legacy')],
-    // TODO(asuarez): Switch module boundaries to `module.exports` and remove:
-    [require.resolve('babel-plugin-add-module-exports')],
-    // TODO(asuarez): Remove after updating to Node 6.3.0:
-    [require.resolve('babel-plugin-transform-es2015-parameters')],
-    [require.resolve('babel-plugin-transform-es2015-shorthand-properties')],
-    [require.resolve('babel-plugin-transform-es2015-sticky-regex')],
-    [require.resolve('babel-plugin-transform-es2015-unicode-regex')],
-
-    [require.resolve('babel-plugin-check-es2015-constants')],
-    [require.resolve('babel-plugin-transform-strict-mode')],
 
     [require.resolve('babel-plugin-transform-async-to-module-method'), {
       module: 'async-to-generator',
@@ -67,8 +47,7 @@ const BABEL_OPTIONS = {
     }],
     [require.resolve('babel-plugin-transform-class-properties')],
     [require.resolve('babel-plugin-transform-object-rest-spread'), {useBuiltIns: true}],
-    // object-rest-spread needs es2015-destructuring
-    [require.resolve('babel-plugin-transform-es2015-destructuring')],
+    [require.resolve('babel-plugin-transform-strict-mode')],
 
     // babel-preset-react:
     [require.resolve('babel-plugin-transform-react-jsx'), {useBuiltIns: true}],
@@ -105,10 +84,10 @@ function getVersion(start) {
 }
 
 class NodeTranspiler {
-
   static shouldCompile(bufferOrString) {
-    const start = bufferOrString.slice(0, PREFIX_LENGTH).toString();
-    return PREFIXES.some(prefix => start.startsWith(prefix));
+    const src = bufferOrString.toString();
+    const directives = docblock.parseAsObject(docblock.extract(src));
+    return directives.hasOwnProperty('flow');
   }
 
   constructor() {
@@ -133,7 +112,7 @@ class NodeTranspiler {
       // The source of this file and that of our plugins is used as part of the
       // hash as a way to version our transforms. For external transforms their
       // package.json version is used.
-      [__filename]
+      [__filename, require.resolve('./docblock')]
         .concat(BABEL_OPTIONS.plugins)
         .filter(Boolean)
         .forEach(plugin => {

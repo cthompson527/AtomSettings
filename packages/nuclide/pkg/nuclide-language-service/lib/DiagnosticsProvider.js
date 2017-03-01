@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -16,16 +7,12 @@ exports.ObservableDiagnosticProvider = exports.FileDiagnosticsProvider = undefin
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
-// eslint-disable-next-line nuclide-internal/no-cross-atom-imports
-
-
 exports.registerDiagnostics = registerDiagnostics;
 
-var _Cache;
+var _cache;
 
-function _load_Cache() {
-  return _Cache = require('../../commons-node/Cache');
+function _load_cache() {
+  return _cache = require('../../commons-node/cache');
 }
 
 var _nuclideRemoteConnection;
@@ -64,12 +51,6 @@ function _load_projects() {
   return _projects = require('../../commons-atom/projects');
 }
 
-var _nuclideLogging;
-
-function _load_nuclideLogging() {
-  return _nuclideLogging = require('../../nuclide-logging');
-}
-
 var _nuclideOpenFiles;
 
 function _load_nuclideOpenFiles() {
@@ -84,34 +65,40 @@ function _load_event() {
   return _event = require('../../commons-node/event');
 }
 
-var _nuclideBusySignal;
-
-function _load_nuclideBusySignal() {
-  return _nuclideBusySignal = require('../../nuclide-busy-signal');
-}
-
 var _UniversalDisposable;
 
 function _load_UniversalDisposable() {
   return _UniversalDisposable = _interopRequireDefault(require('../../commons-node/UniversalDisposable'));
 }
 
+var _nuclideLanguageServiceRpc;
+
+function _load_nuclideLanguageServiceRpc() {
+  return _nuclideLanguageServiceRpc = require('../../nuclide-language-service-rpc');
+}
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const logger = (0, (_nuclideLogging || _load_nuclideLogging()).getLogger)();
+const diagnosticService = 'nuclide-diagnostics-provider'; /**
+                                                           * Copyright (c) 2015-present, Facebook, Inc.
+                                                           * All rights reserved.
+                                                           *
+                                                           * This source code is licensed under the license found in the LICENSE file in
+                                                           * the root directory of this source tree.
+                                                           *
+                                                           * 
+                                                           */
 
-const diagnosticService = 'nuclide-diagnostics-provider';
-
-function registerDiagnostics(name, grammars, config, connectionToLanguageService) {
+function registerDiagnostics(name, grammars, config, logger, connectionToLanguageService, busySignalProvider) {
   const result = new (_UniversalDisposable || _load_UniversalDisposable()).default();
   let provider;
   switch (config.version) {
     case '0.1.0':
-      provider = new FileDiagnosticsProvider(name, grammars, config.shouldRunOnTheFly, config.analyticsEventName, connectionToLanguageService);
+      provider = new FileDiagnosticsProvider(name, grammars, config.shouldRunOnTheFly, config.analyticsEventName, connectionToLanguageService, busySignalProvider);
       result.add(provider);
       break;
     case '0.2.0':
-      provider = new ObservableDiagnosticProvider(config.analyticsEventName, connectionToLanguageService);
+      provider = new ObservableDiagnosticProvider(config.analyticsEventName, logger, connectionToLanguageService);
       break;
     default:
       throw new Error('Unexpected diagnostics version');
@@ -120,19 +107,16 @@ function registerDiagnostics(name, grammars, config, connectionToLanguageService
   return result;
 }
 
-let FileDiagnosticsProvider = exports.FileDiagnosticsProvider = class FileDiagnosticsProvider {
+class FileDiagnosticsProvider {
 
-  constructor(name, grammars, shouldRunOnTheFly, analyticsEventName, connectionToLanguageService) {
-    let busySignalProvider = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : new (_nuclideBusySignal || _load_nuclideBusySignal()).BusySignalProviderBase();
-    let ProviderBase = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : (_nuclideDiagnosticsProviderBase || _load_nuclideDiagnosticsProviderBase()).DiagnosticsProviderBase;
-
+  constructor(name, grammars, shouldRunOnTheFly, analyticsEventName, connectionToLanguageService, busySignalProvider, ProviderBase = (_nuclideDiagnosticsProviderBase || _load_nuclideDiagnosticsProviderBase()).DiagnosticsProviderBase) {
     this.name = name;
     this._analyticsEventName = analyticsEventName;
     this._busySignalProvider = busySignalProvider;
     this._connectionToLanguageService = connectionToLanguageService;
     const utilsOptions = {
       grammarScopes: new Set(grammars),
-      shouldRunOnTheFly: shouldRunOnTheFly,
+      shouldRunOnTheFly,
       onTextEditorEvent: editor => this._runDiagnostics(editor),
       onNewUpdateSubscriber: callback => this._receivedNewUpdateSubscriber(callback)
     };
@@ -142,7 +126,7 @@ let FileDiagnosticsProvider = exports.FileDiagnosticsProvider = class FileDiagno
     this._subscriptions = new (_UniversalDisposable || _load_UniversalDisposable()).default();
     this._subscriptions.add((0, (_projects || _load_projects()).onDidRemoveProjectPath)(projectPath => {
       this.invalidateProjectPath(projectPath);
-    }), this._providerBase, atom.packages.serviceHub.provide('nuclide-busy-signal', '0.1.0', busySignalProvider));
+    }), this._providerBase);
   }
 
   /**
@@ -152,25 +136,19 @@ let FileDiagnosticsProvider = exports.FileDiagnosticsProvider = class FileDiagno
 
 
   _runDiagnostics(textEditor) {
-    this._busySignalProvider.reportBusy(`${ this.name }: Waiting for diagnostics`, () => this._runDiagnosticsImpl(textEditor));
+    this._busySignalProvider.reportBusy(`${this.name}: Waiting for diagnostics`, () => this._runDiagnosticsImpl(textEditor));
   }
 
   _runDiagnosticsImpl(textEditor) {
     var _this = this;
 
-    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackOperationTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
+    return (0, (_nuclideAnalytics || _load_nuclideAnalytics()).trackTiming)(this._analyticsEventName, (0, _asyncToGenerator.default)(function* () {
       let filePath = textEditor.getPath();
       if (filePath == null) {
         return;
       }
 
-      // `hh_client` doesn't currently support `onTheFly` diagnosis.
-      // So, currently, it would only work if there is no `hh_client` or `.hhconfig` where
-      // the `HackWorker` model will diagnose with the updated editor contents.
       const diagnosisResult = yield _this._requestSerializer.run(_this.findDiagnostics(textEditor));
-      if (diagnosisResult.status === 'success' && diagnosisResult.result == null) {
-        logger.error('hh_client could not be reached');
-      }
       if (diagnosisResult.status === 'outdated' || diagnosisResult.result == null) {
         return;
       }
@@ -232,7 +210,7 @@ let FileDiagnosticsProvider = exports.FileDiagnosticsProvider = class FileDiagno
     // Once we provide all diagnostics, instead of just the current file, we can
     // probably remove the activeTextEditor parameter.
     const activeTextEditor = atom.workspace.getActiveTextEditor();
-    if (activeTextEditor) {
+    if (activeTextEditor && !(_nuclideUri || _load_nuclideUri()).default.isBrokenDeserializedUri(activeTextEditor.getPath())) {
       if (this._providerBase.getGrammarScopes().has(activeTextEditor.getGrammar().scopeName)) {
         this._runDiagnostics(activeTextEditor);
       }
@@ -284,48 +262,63 @@ let FileDiagnosticsProvider = exports.FileDiagnosticsProvider = class FileDiagno
         return null;
       }
 
-      return yield (yield languageService).getDiagnostics(fileVersion);
+      return (yield languageService).getDiagnostics(fileVersion);
     })();
   }
-};
-let ObservableDiagnosticProvider = exports.ObservableDiagnosticProvider = class ObservableDiagnosticProvider {
+}
 
-  constructor(analyticsEventName, connectionToLanguageService) {
+exports.FileDiagnosticsProvider = FileDiagnosticsProvider;
+class ObservableDiagnosticProvider {
+
+  constructor(analyticsEventName, logger, connectionToLanguageService) {
+    this._logger = logger;
     this._analyticsEventName = analyticsEventName;
-    this._connectionToFiles = new (_Cache || _load_Cache()).Cache(connection => new Set());
+    this._connectionToFiles = new (_cache || _load_cache()).Cache(connection => new Set());
     this._connectionToLanguageService = connectionToLanguageService;
-    this.updates = this._connectionToLanguageService.observeEntries().mergeMap((_ref2) => {
-      var _ref3 = _slicedToArray(_ref2, 2);
-
-      let connection = _ref3[0],
-          languageService = _ref3[1];
-
-      return _rxjsBundlesRxMinJs.Observable.fromPromise(languageService).catch(error => _rxjsBundlesRxMinJs.Observable.empty()).mergeMap(language => {
-        return language.observeDiagnostics().refCount().catch(error => _rxjsBundlesRxMinJs.Observable.empty());
-      }).map((_ref4) => {
-        let filePath = _ref4.filePath,
-            messages = _ref4.messages;
-
+    this.updates = this._connectionToLanguageService.observeEntries().mergeMap(([connection, languageService]) => {
+      const connectionName = (_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.toDebugString(connection);
+      this._logger.log(`Starting observing diagnostics ${connectionName}, ${this._analyticsEventName}`);
+      return _rxjsBundlesRxMinJs.Observable.fromPromise(languageService).catch(error => {
+        this._logger.logError(`Error: languageService, ${this._analyticsEventName} ${error}`);
+        return _rxjsBundlesRxMinJs.Observable.empty();
+      }).mergeMap(language => {
+        this._logger.log(`Observing diagnostics ${connectionName}, ${this._analyticsEventName}`);
+        return (0, (_nuclideLanguageServiceRpc || _load_nuclideLanguageServiceRpc()).ensureInvalidations)(this._logger, language.observeDiagnostics().refCount().catch(error => {
+          this._logger.logError(`Error: observeDiagnostics, ${this._analyticsEventName} ${error}`);
+          return _rxjsBundlesRxMinJs.Observable.empty();
+        }));
+      }).map(update => {
+        const { filePath, messages } = update;
         (0, (_nuclideAnalytics || _load_nuclideAnalytics()).track)(this._analyticsEventName);
         const fileCache = this._connectionToFiles.get(connection);
         if (messages.length === 0) {
+          this._logger.log(`Observing diagnostics: removing ${filePath}, ${this._analyticsEventName}`);
           fileCache.delete(filePath);
         } else {
+          this._logger.log(`Observing diagnostics: adding ${filePath}, ${this._analyticsEventName}`);
           fileCache.add(filePath);
         }
         return {
           filePathToMessages: new Map([[filePath, messages]])
         };
       });
+    }).catch(error => {
+      this._logger.logError(`Error: observeEntries, ${this._analyticsEventName} ${error}`);
+      throw error;
     });
 
     this.invalidations = (0, (_event || _load_event()).observableFromSubscribeFunction)((_nuclideRemoteConnection || _load_nuclideRemoteConnection()).ServerConnection.onDidCloseServerConnection).map(connection => {
+      this._logger.log(`Diagnostics closing ${connection.getRemoteHostname()}, ${this._analyticsEventName}`);
       const files = Array.from(this._connectionToFiles.get(connection));
       this._connectionToFiles.delete(connection);
       return {
         scope: 'file',
         filePaths: files
       };
+    }).catch(error => {
+      this._logger.logError(`Error: invalidations, ${this._analyticsEventName} ${error}`);
+      throw error;
     });
   }
-};
+}
+exports.ObservableDiagnosticProvider = ObservableDiagnosticProvider;

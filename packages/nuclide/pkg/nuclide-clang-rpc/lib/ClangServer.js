@@ -1,22 +1,10 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _asyncToGenerator = _interopRequireDefault(require('async-to-generator'));
-
-var _class, _temp;
 
 var _nuclideUri;
 
@@ -52,20 +40,25 @@ function _load_nuclideFilewatcherRpc() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let serviceRegistry = null;
+let serviceRegistry = null; /**
+                             * Copyright (c) 2015-present, Facebook, Inc.
+                             * All rights reserved.
+                             *
+                             * This source code is licensed under the license found in the LICENSE file in
+                             * the root directory of this source tree.
+                             *
+                             * 
+                             */
 
 function getServiceRegistry() {
   if (serviceRegistry == null) {
-    serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry((_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getServerSideMarshalers, (0, (_nuclideRpc || _load_nuclideRpc()).loadServicesConfig)((_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..')));
+    serviceRegistry = new (_nuclideRpc || _load_nuclideRpc()).ServiceRegistry((_nuclideMarshalersCommon || _load_nuclideMarshalersCommon()).getServerSideMarshalers, (0, (_nuclideRpc || _load_nuclideRpc()).loadServicesConfig)((_nuclideUri || _load_nuclideUri()).default.join(__dirname, '..')), 'clang_language_service');
   }
   return serviceRegistry;
 }
 
 function spawnClangProcess(src, serverArgs, flags) {
-  const libClangLibraryFile = serverArgs.libClangLibraryFile,
-        pythonPathEnv = serverArgs.pythonPathEnv,
-        pythonExecutable = serverArgs.pythonExecutable;
-
+  const { libClangLibraryFile, pythonPathEnv, pythonExecutable } = serverArgs;
   const pathToLibClangServer = (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../python/clang_server.py');
   const args = [pathToLibClangServer];
   if (libClangLibraryFile != null) {
@@ -88,10 +81,10 @@ function spawnClangProcess(src, serverArgs, flags) {
   return (0, (_process || _load_process()).safeSpawn)(pythonExecutable, args, options);
 }
 
-let ClangServer = (_temp = _class = class ClangServer extends (_nuclideRpc || _load_nuclideRpc()).RpcProcess {
+class ClangServer extends (_nuclideRpc || _load_nuclideRpc()).RpcProcess {
 
   constructor(src, serverArgs, flagsData) {
-    super(`ClangServer-${ src }`, getServiceRegistry(), () => spawnClangProcess(src, serverArgs, flagsData.flags));
+    super(`ClangServer-${src}`, getServiceRegistry(), () => spawnClangProcess(src, serverArgs, flagsData.flags));
     this._usesDefaultFlags = flagsData.usesDefaultFlags;
     this._pendingCompileRequests = 0;
     this._serverStatus = new _rxjsBundlesRxMinJs.BehaviorSubject(ClangServer.Status.READY);
@@ -126,12 +119,7 @@ let ClangServer = (_temp = _class = class ClangServer extends (_nuclideRpc || _l
       if (_this._process == null) {
         return 0;
       }
-
-      var _ref = yield (0, (_process || _load_process()).asyncExecute)('ps', ['-p', _this._process.pid.toString(), '-o', 'rss=']);
-
-      const exitCode = _ref.exitCode,
-            stdout = _ref.stdout;
-
+      const { exitCode, stdout } = yield (0, (_process || _load_process()).asyncExecute)('ps', ['-p', _this._process.pid.toString(), '-o', 'rss=']);
       if (exitCode !== 0) {
         return 0;
       }
@@ -177,10 +165,9 @@ let ClangServer = (_temp = _class = class ClangServer extends (_nuclideRpc || _l
     }
     return this._serverStatus.takeWhile(x => x !== ClangServer.Status.READY).toPromise();
   }
-
-}, _class.Status = Object.freeze({
+}
+exports.default = ClangServer;
+ClangServer.Status = Object.freeze({
   READY: 'ready',
   COMPILING: 'compiling'
-}), _temp);
-exports.default = ClangServer;
-module.exports = exports['default'];
+});

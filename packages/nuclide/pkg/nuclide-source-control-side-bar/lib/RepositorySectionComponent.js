@@ -1,18 +1,8 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
 
 var _bookmarkIsEqual;
 
@@ -32,20 +22,55 @@ function _load_HR() {
   return _HR = require('../../nuclide-ui/HR');
 }
 
+var _Button;
+
+function _load_Button() {
+  return _Button = require('../../nuclide-ui/Button');
+}
+
+var _MultiRootChangedFilesView;
+
+function _load_MultiRootChangedFilesView() {
+  return _MultiRootChangedFilesView = require('../../nuclide-ui/MultiRootChangedFilesView');
+}
+
 var _reactForAtom = require('react-for-atom');
+
+var _Section;
+
+function _load_Section() {
+  return _Section = require('../../nuclide-ui/Section');
+}
+
+var _url = _interopRequireDefault(require('url'));
+
+var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-const ACTIVE_BOOKMARK_TITLE = 'Active bookmark';
+const ACTIVE_BOOKMARK_TITLE = 'Active bookmark'; /**
+                                                  * Copyright (c) 2015-present, Facebook, Inc.
+                                                  * All rights reserved.
+                                                  *
+                                                  * This source code is licensed under the license found in the LICENSE file in
+                                                  * the root directory of this source tree.
+                                                  *
+                                                  * 
+                                                  */
+
 const LOADING_BOOKMARK_TITLE = 'Loading...';
 
-let RepositorySectionComponent = class RepositorySectionComponent extends _reactForAtom.React.Component {
+class RepositorySectionComponent extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this._handleBookmarkContextMenu = this._handleBookmarkContextMenu.bind(this);
     this._handleRepoGearClick = this._handleRepoGearClick.bind(this);
-    this._handleUncommittedChangesClick = this._handleUncommittedChangesClick.bind(this);
+    this._handleUncommittedFilesExpandedChange = this._handleUncommittedFilesExpandedChange.bind(this);
+
+    this.state = {
+      uncommittedChangesExpanded: true
+    };
   }
 
   _handleBookmarkClick(bookmark) {
@@ -72,12 +97,23 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
     this.props.onRepoGearClick(this.props.repository, event);
   }
 
-  _handleUncommittedChangesClick() {
-    if (!(this.props.repository != null)) {
-      throw new Error('Invariant violation: "this.props.repository != null"');
-    }
+  _onFileChosen(filePath) {
+    const diffEntityOptions = { file: filePath };
+    const formattedUrl = _url.default.format({
+      protocol: 'atom',
+      host: 'nuclide',
+      pathname: 'diff-view',
+      slashes: true,
+      query: diffEntityOptions
+    });
 
-    this.props.onUncommittedChangesClick(this.props.repository);
+    // Not a file URI
+    // eslint-disable-next-line nuclide-internal/atom-apis
+    atom.workspace.open(formattedUrl);
+  }
+
+  _handleUncommittedFilesExpandedChange(isCollapsed) {
+    this.setState({ uncommittedChangesExpanded: !isCollapsed });
   }
 
   render() {
@@ -87,11 +123,13 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
     let bookmarksBranchesHeader;
     let bookmarksBranchesList;
     let createButton;
+    let uncommittedChangesSection;
     if (repository != null) {
       if (repository.getType() === 'hg') {
         bookmarksBranchesHeader = 'BOOKMARKS';
-        createButton = _reactForAtom.React.createElement('button', {
-          className: 'btn btn-sm icon icon-plus',
+        createButton = _reactForAtom.React.createElement((_Button || _load_Button()).Button, {
+          size: (_Button || _load_Button()).ButtonSizes.SMALL,
+          icon: 'plus',
           onClick: this._handleRepoGearClick,
           style: { marginTop: '6px', position: 'absolute', right: '10px' },
           title: 'Create bookmark...'
@@ -99,7 +137,7 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
       } else if (repository.getType() === 'git') {
         bookmarksBranchesHeader = 'BRANCHES';
       } else {
-        bookmarksBranchesHeader = `UNSUPPORTED REPOSITORY TYPE ${ repository.getType() }`;
+        bookmarksBranchesHeader = `UNSUPPORTED REPOSITORY TYPE ${repository.getType()}`;
       }
 
       if (repository.getType() === 'hg') {
@@ -152,20 +190,28 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
               loadingSpinner = _reactForAtom.React.createElement('span', { className: 'loading loading-spinner-tiny inline-block inline-block-tight' });
             }
 
-            let onContextMenu;
-            if (!isLoading) {
-              // When the bookmark is not loading, show its context menu so actions can be taken on
-              // it.
-              onContextMenu = this._handleBookmarkContextMenu.bind(this, bookmark);
-            }
+            // We need to use native event handling so that we can preempt Electron's menu.
+            let sub;
+            const cb = el => {
+              if (el == null) {
+                if (sub != null) {
+                  sub.unsubscribe();
+                  sub = null;
+                }
+                return;
+              }
+              sub = _rxjsBundlesRxMinJs.Observable.fromEvent(el, 'contextmenu').filter(() => !isLoading).subscribe(event => {
+                this._handleBookmarkContextMenu(bookmark, event);
+              });
+            };
 
             return _reactForAtom.React.createElement(
               'li',
               {
+                ref: cb,
                 className: liClassName,
                 key: bookmark.bookmark,
                 onClick: this._handleBookmarkClick.bind(this, bookmark),
-                onContextMenu: onContextMenu,
                 title: title },
               _reactForAtom.React.createElement(
                 'span',
@@ -181,6 +227,33 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
           { className: 'list-group' },
           bookmarksBranchesListItems
         );
+
+        const uncommittedChanges = this.props.uncommittedChanges.get(repository.getPath());
+        if (repository != null && uncommittedChanges != null && uncommittedChanges.size > 0) {
+          uncommittedChangesSection = _reactForAtom.React.createElement(
+            (_Section || _load_Section()).Section,
+            {
+              className: 'nuclide-file-tree-section-caption',
+              collapsable: true,
+              collapsed: !this.state.uncommittedChangesExpanded,
+              headline: 'UNCOMMITTED CHANGES',
+              onChange: this._handleUncommittedFilesExpandedChange,
+              size: 'small' },
+            _reactForAtom.React.createElement(
+              'div',
+              { className: 'nuclide-source-control-side-bar-uncommitted-changes' },
+              _reactForAtom.React.createElement((_MultiRootChangedFilesView || _load_MultiRootChangedFilesView()).MultiRootChangedFilesView, {
+                fileChanges: this.props.uncommittedChanges,
+                rootPath: repository.getPath(),
+                commandPrefix: 'sc-sidebar',
+                selectedFile: null,
+                hideEmptyFolders: true,
+                shouldShowFolderName: false,
+                onFileChosen: this._onFileChosen
+              })
+            )
+          );
+        }
       } else {
         bookmarksBranchesList = _reactForAtom.React.createElement(
           'div',
@@ -197,9 +270,6 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
       separator = _reactForAtom.React.createElement((_HR || _load_HR()).HR, null);
     }
 
-    const uncommittedChangesClassName = (0, (_classnames || _load_classnames()).default)('list-item nuclide-source-control-side-bar--list-item', {
-      selected: selectedItem != null && selectedItem.type === 'uncommitted'
-    });
     return _reactForAtom.React.createElement(
       'li',
       null,
@@ -210,19 +280,9 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
         this.props.title
       ),
       _reactForAtom.React.createElement(
-        'ul',
-        { className: 'list-group' },
-        _reactForAtom.React.createElement(
-          'li',
-          {
-            className: uncommittedChangesClassName,
-            onClick: this._handleUncommittedChangesClick },
-          _reactForAtom.React.createElement(
-            'span',
-            null,
-            'Uncommitted Changes'
-          )
-        )
+        'div',
+        { className: 'nuclide-source-control-side-bar--header' },
+        uncommittedChangesSection
       ),
       createButton,
       _reactForAtom.React.createElement(
@@ -233,7 +293,5 @@ let RepositorySectionComponent = class RepositorySectionComponent extends _react
       bookmarksBranchesList
     );
   }
-
-};
+}
 exports.default = RepositorySectionComponent;
-module.exports = exports['default'];

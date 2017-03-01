@@ -1,18 +1,20 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+
+var _addTooltip;
+
+function _load_addTooltip() {
+  return _addTooltip = _interopRequireDefault(require('../../nuclide-ui/add-tooltip'));
+}
+
+var _AtomInput;
+
+function _load_AtomInput() {
+  return _AtomInput = require('../../nuclide-ui/AtomInput');
+}
 
 var _AtomTextEditor;
 
@@ -48,6 +50,12 @@ function _load_Button() {
   return _Button = require('../../nuclide-ui/Button');
 }
 
+var _ButtonGroup;
+
+function _load_ButtonGroup() {
+  return _ButtonGroup = require('../../nuclide-ui/ButtonGroup');
+}
+
 var _Toolbar;
 
 function _load_Toolbar() {
@@ -68,14 +76,18 @@ function _load_ToolbarRight() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component {
+class DiffCommitView extends _reactForAtom.React.Component {
 
   constructor(props) {
     super(props);
     this.__onClickCommit = this.__onClickCommit.bind(this);
-    this._onToggleAmend = this._onToggleAmend.bind(this);
+    this._onTogglePublish = this._onTogglePublish.bind(this);
     this._onToggleAmendRebase = this._onToggleAmendRebase.bind(this);
     this._onClickBack = this._onClickBack.bind(this);
+    this._onTogglePrepare = this._onTogglePrepare.bind(this);
+    this._onToggleVerbatim = this._onToggleVerbatim.bind(this);
+    this._onLintExcuseChange = this._onLintExcuseChange.bind(this);
+    this._onToggleInteractiveCommit = this._onToggleInteractiveCommit.bind(this);
   }
 
   componentDidMount() {
@@ -96,16 +108,20 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
   }
 
   _isLoading() {
-    const commitModeState = this.props.commitModeState;
-
+    const { commitModeState } = this.props;
     return commitModeState !== (_constants || _load_constants()).CommitModeState.READY;
   }
 
-  _getToolbar() {
-    var _props = this.props;
-    const commitModeState = _props.commitModeState,
-          commitMode = _props.commitMode;
+  _addTooltip(title) {
+    return (0, (_addTooltip || _load_addTooltip()).default)({
+      title,
+      delay: 200,
+      placement: 'top'
+    });
+  }
 
+  _getToolbar() {
+    const { commitModeState, commitMode } = this.props;
     let message;
     switch (commitModeState) {
       case (_constants || _load_constants()).CommitModeState.AWAITING_COMMIT:
@@ -143,7 +159,55 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
         disabled: isLoading,
         label: 'Rebase stacked commits',
         onChange: this._onToggleAmendRebase,
-        tabIndex: '-1'
+        tabIndex: '-1',
+        ref: this._addTooltip('Whether to rebase any child revisions on top of the newly amended revision.')
+      });
+    }
+
+    let interactiveOptionElement;
+    if (this.props.hasUncommittedChanges && this.props.enabledFeatures.has((_constants || _load_constants()).DiffViewFeatures.INTERACTIVE)) {
+      interactiveOptionElement = _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+        className: 'padded',
+        checked: this.props.shouldCommitInteractively,
+        disabled: isLoading,
+        label: 'Use interactive mode',
+        onChange: this._onToggleInteractiveCommit,
+        tabIndex: '-1',
+        ref: this._addTooltip('Whether to include all uncommitted changes or to select specific ones')
+      });
+    }
+
+    let prepareOptionElement;
+    let verbatimeOptionElement;
+    let lintExcuseElement;
+    if (this.props.shouldPublishOnCommit) {
+      prepareOptionElement = _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+        className: 'padded',
+        checked: this.props.isPrepareMode,
+        disabled: isLoading,
+        label: 'Prepare',
+        onChange: this._onTogglePrepare,
+        ref: this._addTooltip('Whether to mark the new created revision as unpublished.')
+      });
+
+      verbatimeOptionElement = _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
+        className: 'padded',
+        checked: this.props.verbatimModeEnabled,
+        disabled: isLoading,
+        label: 'Verbatim',
+        onChange: this._onToggleVerbatim,
+        ref: this._addTooltip('Whether to override the diff\'s ' + 'commit message on Phabricator with that of your local commit.')
+      });
+
+      lintExcuseElement = _reactForAtom.React.createElement((_AtomInput || _load_AtomInput()).AtomInput, {
+        className: 'nuclide-diff-view-excuse',
+        size: 'sm',
+        ref: this._addTooltip('Leave this box empty to run local lint and unit tests or ' + 'enter an excuse to skip them.'),
+        onDidChange: this._onLintExcuseChange,
+        placeholderText: '(Optional) Excuse',
+        disabled: isLoading,
+        value: this.props.lintExcuse,
+        width: 200
       });
     }
 
@@ -153,33 +217,43 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
       _reactForAtom.React.createElement(
         (_ToolbarLeft || _load_ToolbarLeft()).ToolbarLeft,
         null,
+        rebaseOptionElement,
+        interactiveOptionElement,
         _reactForAtom.React.createElement((_Checkbox || _load_Checkbox()).Checkbox, {
-          checked: this.props.commitMode === (_constants || _load_constants()).CommitMode.AMEND,
+          className: 'padded',
+          checked: this.props.shouldPublishOnCommit,
           disabled: isLoading,
-          label: 'Amend',
-          onChange: this._onToggleAmend
+          label: 'Publish',
+          onChange: this._onTogglePublish,
+          ref: this._addTooltip('Whether to automatically publish the revision ' + 'to Phabricator after committing or amending it.')
         }),
-        rebaseOptionElement
+        prepareOptionElement,
+        verbatimeOptionElement,
+        lintExcuseElement
       ),
       _reactForAtom.React.createElement(
         (_ToolbarRight || _load_ToolbarRight()).ToolbarRight,
         null,
         _reactForAtom.React.createElement(
-          (_Button || _load_Button()).Button,
-          {
-            size: (_Button || _load_Button()).ButtonSizes.SMALL,
-            onClick: this._onClickBack },
-          'Back'
-        ),
-        _reactForAtom.React.createElement(
-          (_Button || _load_Button()).Button,
-          {
-            className: btnClassname,
-            size: (_Button || _load_Button()).ButtonSizes.SMALL,
-            buttonType: (_Button || _load_Button()).ButtonTypes.SUCCESS,
-            disabled: isLoading,
-            onClick: this.__onClickCommit },
-          message
+          (_ButtonGroup || _load_ButtonGroup()).ButtonGroup,
+          { size: (_ButtonGroup || _load_ButtonGroup()).ButtonGroupSizes.SMALL },
+          _reactForAtom.React.createElement(
+            (_Button || _load_Button()).Button,
+            {
+              size: (_Button || _load_Button()).ButtonSizes.SMALL,
+              onClick: this._onClickBack },
+            'Back'
+          ),
+          _reactForAtom.React.createElement(
+            (_Button || _load_Button()).Button,
+            {
+              className: btnClassname,
+              size: (_Button || _load_Button()).ButtonSizes.SMALL,
+              buttonType: (_Button || _load_Button()).ButtonTypes.PRIMARY,
+              disabled: isLoading,
+              onClick: this.__onClickCommit },
+            message
+          )
         )
       )
     );
@@ -193,6 +267,7 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
         'div',
         { className: 'message-editor-wrapper' },
         _reactForAtom.React.createElement((_AtomTextEditor || _load_AtomTextEditor()).AtomTextEditor, {
+          grammar: atom.grammars.grammarForScopeName('source.fb-arcanist-editor'),
           gutterHidden: true,
           path: '.HG_COMMIT_EDITMSG',
           readOnly: this._isLoading(),
@@ -203,8 +278,8 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
     );
   }
 
-  __onClickCommit() {
-    this.props.diffModel.commit(this.__getCommitMessage());
+  __onClickCommit(bookmarkName) {
+    this.props.diffModel.commit(this.__getCommitMessage(), bookmarkName);
   }
 
   _onClickBack() {
@@ -215,17 +290,40 @@ let DiffCommitView = class DiffCommitView extends _reactForAtom.React.Component 
     return this.refs.message.getTextBuffer().getText();
   }
 
-  _onToggleAmend(isChecked) {
-    this.props.diffModel.setCommitMode(isChecked ? (_constants || _load_constants()).CommitMode.AMEND : (_constants || _load_constants()).CommitMode.COMMIT);
-  }
-
   _onToggleAmendRebase(isChecked) {
     this.props.diffModel.setShouldAmendRebase(isChecked);
+  }
+
+  _onToggleInteractiveCommit(isChecked) {
+    this.props.diffModel.setShouldCommitInteractively(isChecked);
+  }
+
+  _onTogglePublish(isChecked) {
+    this.props.diffModel.setShouldPublishOnCommit(isChecked);
+  }
+
+  _onTogglePrepare(isChecked) {
+    this.props.diffModel.setIsPrepareMode(isChecked);
+  }
+
+  _onToggleVerbatim(isChecked) {
+    this.props.diffModel.setVerbatimModeEnabled(isChecked);
+  }
+
+  _onLintExcuseChange(newExcuse) {
+    this.props.diffModel.setLintExcuse(newExcuse);
   }
 
   componentWillUnmount() {
     this._subscriptions.dispose();
   }
-};
-exports.default = DiffCommitView;
-module.exports = exports['default'];
+}
+exports.default = DiffCommitView; /**
+                                   * Copyright (c) 2015-present, Facebook, Inc.
+                                   * All rights reserved.
+                                   *
+                                   * This source code is licensed under the license found in the LICENSE file in
+                                   * the root directory of this source tree.
+                                   *
+                                   * 
+                                   */

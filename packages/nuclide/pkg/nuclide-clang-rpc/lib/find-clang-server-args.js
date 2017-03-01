@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -29,15 +20,25 @@ function _load_process() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 let fbFindClangServerArgs;
 
 exports.default = (() => {
-  var _ref = (0, _asyncToGenerator.default)(function* () {
+  var _ref = (0, _asyncToGenerator.default)(function* (src) {
     if (fbFindClangServerArgs === undefined) {
       fbFindClangServerArgs = null;
       try {
         // $FlowFB
-        fbFindClangServerArgs = require('./fb/find-clang-server-args');
+        fbFindClangServerArgs = require('./fb/find-clang-server-args').default;
       } catch (e) {
         // Ignore.
       }
@@ -65,23 +66,21 @@ exports.default = (() => {
     }
 
     const clangServerArgs = {
-      libClangLibraryFile: libClangLibraryFile,
+      libClangLibraryFile,
       pythonExecutable: 'python2.7',
       pythonPathEnv: (_nuclideUri || _load_nuclideUri()).default.join(__dirname, '../VendorLib')
     };
     if (typeof fbFindClangServerArgs === 'function') {
-      const clangServerArgsOverrides = yield fbFindClangServerArgs();
+      const clangServerArgsOverrides = yield fbFindClangServerArgs(src);
       return Object.assign({}, clangServerArgs, clangServerArgsOverrides);
     } else {
       return clangServerArgs;
     }
   });
 
-  function findClangServerArgs() {
+  function findClangServerArgs(_x) {
     return _ref.apply(this, arguments);
   }
 
   return findClangServerArgs;
 })();
-
-module.exports = exports['default'];

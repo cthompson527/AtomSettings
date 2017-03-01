@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -28,6 +19,16 @@ function _load_Hasher() {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the LICENSE file in
+ * the root directory of this source tree.
+ *
+ * 
+ */
+
 const NOTHING = Symbol('nothing');
 
 /**
@@ -47,18 +48,12 @@ const NOTHING = Symbol('nothing');
  *       }
  *     }
  */
-function memoizeUntilChanged(func, keySelector_) {
-  let compareKeys = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : (_collection || _load_collection()).arrayEqual;
-
+function memoizeUntilChanged(func, keySelector_, compareKeys = (_collection || _load_collection()).arrayEqual) {
   let prevArgKeys;
   let prevResult = NOTHING;
   const keySelector = keySelector_ || createKeySelector();
   // $FlowIssue: Flow can't express that we want the args to be the same type as the input func's.
-  return function () {
-    for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-
+  return function (...args) {
     const argKeys = args.map(keySelector);
     if (prevResult === NOTHING || !compareKeys(argKeys, prevArgKeys)) {
       prevArgKeys = argKeys;
@@ -72,4 +67,3 @@ function createKeySelector() {
   const hasher = new (_Hasher || _load_Hasher()).default();
   return x => hasher.getHash(x);
 }
-module.exports = exports['default'];

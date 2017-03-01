@@ -1,13 +1,9 @@
 'use strict';
-'use babel';
 
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.DebuggerStore = exports.DebuggerMode = undefined;
 
 var _atom = require('atom');
 
@@ -23,13 +19,21 @@ function _load_DebuggerDispatcher() {
   return _DebuggerDispatcher = require('./DebuggerDispatcher');
 }
 
-const DebuggerMode = Object.freeze({
+const DebuggerMode = exports.DebuggerMode = Object.freeze({
   STARTING: 'starting',
   RUNNING: 'running',
   PAUSED: 'paused',
   STOPPING: 'stopping',
   STOPPED: 'stopped'
-});
+}); /**
+     * Copyright (c) 2015-present, Facebook, Inc.
+     * All rights reserved.
+     *
+     * This source code is licensed under the license found in the LICENSE file in
+     * the root directory of this source tree.
+     *
+     * 
+     */
 
 const DEBUGGER_CHANGE_EVENT = 'change';
 const DEBUGGER_MODE_CHANGE_EVENT = 'debugger mode change';
@@ -37,7 +41,7 @@ const DEBUGGER_MODE_CHANGE_EVENT = 'debugger mode change';
 /**
  * Flux style Store holding all data used by the debugger plugin.
  */
-let DebuggerStore = class DebuggerStore {
+class DebuggerStore {
 
   // Stored values
   constructor(dispatcher, model) {
@@ -66,8 +70,12 @@ let DebuggerStore = class DebuggerStore {
   dispose() {
     this._emitter.dispose();
     this._dispatcher.unregister(this._dispatcherToken);
-    if (this._debuggerInstance) {
-      this._debuggerInstance.dispose();
+    const debuggerInstance = this._debuggerInstance;
+    if (debuggerInstance != null) {
+      // On package deactivation, this field is expected to be nulled out, which must happen here
+      // because the dispatcher for this store is now unregistered.
+      this._debuggerInstance = null;
+      debuggerInstance.dispose();
     }
   }
 
@@ -211,10 +219,5 @@ let DebuggerStore = class DebuggerStore {
     }
     this._emitter.emit(DEBUGGER_CHANGE_EVENT);
   }
-};
-
-
-module.exports = {
-  DebuggerMode: DebuggerMode,
-  DebuggerStore: DebuggerStore
-};
+}
+exports.DebuggerStore = DebuggerStore;

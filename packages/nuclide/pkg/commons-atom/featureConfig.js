@@ -1,13 +1,4 @@
 'use strict';
-'use babel';
-
-/*
- * Copyright (c) 2015-present, Facebook, Inc.
- * All rights reserved.
- *
- * This source code is licensed under the license found in the LICENSE file in
- * the root directory of this source tree.
- */
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -15,19 +6,41 @@ Object.defineProperty(exports, "__esModule", {
 
 var _rxjsBundlesRxMinJs = require('rxjs/bundles/Rx.min.js');
 
-const NUCLIDE_CONFIG_SCOPE = 'nuclide.';
+const NUCLIDE_CONFIG_SCOPE = 'nuclide.'; /**
+                                          * Copyright (c) 2015-present, Facebook, Inc.
+                                          * All rights reserved.
+                                          *
+                                          * This source code is licensed under the license found in the LICENSE file in
+                                          * the root directory of this source tree.
+                                          *
+                                          * 
+                                          */
 
 function formatKeyPath(keyPath) {
-  return `${ NUCLIDE_CONFIG_SCOPE }${ keyPath }`;
+  return `${NUCLIDE_CONFIG_SCOPE}${keyPath}`;
 }
 
 /*
  * Returns the value of a setting for a Nuclide feature key. Takes and returns the same types as
  * `atom.config.get` exception `keyPath` is not optional. To get the entire config object, use
  * `atom.config.get`.
+ *
+ * Note: This is intentionally typed as mixed, this way each call site has to
+ * first cast it as any and it is obvious that this is an area that is not safe
+ * and flow will not proceed if the callsite doesn't do it.
+ *
+ * Example:
+ *   const config: MyConfigType = (featureConfig.get('config-name'): any);
  */
 function get(keyPath, options) {
-  return atom.config.get(formatKeyPath(keyPath), ...Array.prototype.slice.call(arguments, 1));
+  // atom.config.get will crash if the second arg is present and undefined.
+  // It does not crash if the second arg is missing.
+  return atom.config.get(formatKeyPath(keyPath), ...(options == null ? [] : [options]));
+}
+
+function getWithDefaults(keyPath, defaults, options) {
+  const current = get(keyPath, options);
+  return current == null ? defaults : current;
 }
 
 /*
@@ -39,11 +52,12 @@ function getSchema(keyPath) {
 }
 
 /*
- * Takes and returns the same types as `atom.config.observe` except `keyPath` is not optional.
+ * Similar to `atom.config.observe` except arguments are required, and options cannot be given.
+ *
  * To observe changes on the entire config, use `atom.config.observe`.
  */
-function observe(keyPath, optionsOrCallback, callback) {
-  return atom.config.observe(formatKeyPath(keyPath), ...Array.prototype.slice.call(arguments, 1));
+function observe(keyPath, callback) {
+  return atom.config.observe(formatKeyPath(keyPath), callback);
 }
 
 /*
@@ -51,10 +65,8 @@ function observe(keyPath, optionsOrCallback, callback) {
  * then receiving a callback.
  */
 function observeAsStream(keyPath) {
-  let options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
   return _rxjsBundlesRxMinJs.Observable.create(observer => {
-    const disposable = observe(keyPath, options, observer.next.bind(observer));
+    const disposable = observe(keyPath, observer.next.bind(observer));
     return disposable.dispose.bind(disposable);
   });
 }
@@ -96,18 +108,18 @@ function unset(keyPath, options) {
  *   'nuclide' package itself is disabled.
  */
 function isFeatureDisabled(name) {
-  return atom.packages.isPackageDisabled('nuclide') || !atom.config.get(`nuclide.use.${ name }`);
+  return atom.packages.isPackageDisabled('nuclide') || !atom.config.get(`nuclide.use.${name}`);
 }
 
 exports.default = {
-  get: get,
-  getSchema: getSchema,
-  observe: observe,
-  observeAsStream: observeAsStream,
-  onDidChange: onDidChange,
-  set: set,
-  setSchema: setSchema,
-  unset: unset,
-  isFeatureDisabled: isFeatureDisabled
+  get,
+  getWithDefaults,
+  getSchema,
+  observe,
+  observeAsStream,
+  onDidChange,
+  set,
+  setSchema,
+  unset,
+  isFeatureDisabled
 };
-module.exports = exports['default'];
